@@ -1,0 +1,41 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.7'
+    }
+}
+
+plugins {
+    id "com.github.hierynomus.license" version "0.11.0"
+}
+
+apply plugin: 'com.github.ben-manes.versions'
+
+allprojects {
+    apply plugin: 'scala'
+
+    repositories {
+        jcenter()
+    }
+
+    sourceCompatibility = 1.8
+
+    dependencies {
+        compile 'org.scala-lang:scala-library:2.11.5'
+
+        testCompile 'junit:junit:4.11'
+        testCompile 'org.scalatest:scalatest_2.11:2.2.2'
+        testRuntime 'org.scala-lang.modules:scala-xml_2.11:1.0.2'
+    }
+
+    tasks.withType(ScalaCompile) {
+        scalaCompileOptions.useAnt = false
+        scalaCompileOptions.useCompileDaemon = true
+        scalaCompileOptions.additionalParameters = [
+                "-feature"
+        ]
+    }
+}

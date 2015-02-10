@@ -1,0 +1,14 @@
+apply from: '../javafx.plugin'
+
+version = '1.0'
+
+dependencies {
+    compile 'org.scalafx:scalafx_2.11:8.0.31-R7'
+
+    compile project(':hypedyn-api')
+    compile project(':hypedyn-core')
+}
+
+javafx {
+    mainClass 'org.narrativeandplay.hypedyn.Main'
+}
