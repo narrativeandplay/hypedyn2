@@ -1,11 +1,9 @@
 package org.narrativeandplay.hypedyn.story
 
-import scala.collection.mutable.ArrayBuffer
+trait Story {
+  def title: String
+  def author: String
+  def description: String
 
-sealed class Story(var title: String = "Untitled",
-                   var author: String = "",
-                   var description: String = "") {
-  private val storyNodes = ArrayBuffer.empty[Node]
-
-  def nodes = storyNodes.toList
+  def nodes: List[Node]
 }
