@@ -9,6 +9,10 @@ object EventBus {
     eventBus.onNext(event)
   }
 
+  /**
+   * All Observable streams are considered private API, no plugin should be using the streams, and they are subject
+   * to breaking at any time
+   */
   def editNodeEvents = eventBus.collect { case e: EditNodeEvent => e }
   def newNodeEvents = eventBus.collect { case NewNodeEvent => NewNodeEvent }
   def deleteNodeEvents = eventBus.collect { case e: DeleteNodeEvent => e }
