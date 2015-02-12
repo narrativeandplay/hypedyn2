@@ -10,18 +10,6 @@ trait StoryViewer {
 
   type NodeType <: ViewerNode
 
-  EventBus.nodeCreatedEvents.subscribe((evt: NodeCreatedEvent) => {
-    onNodeCreated(evt.node)
-  })
-
-  EventBus.nodeEditedEvents.subscribe((evt: NodeEditedEvent) => {
-    onNodeEdited(evt.node)
-  })
-
-  EventBus.nodeDeletedEvents.subscribe((evt: NodeDeletedEvent) => {
-    onNodeDeleted(evt.node)
-  })
-
   def onNodeCreated(node: Node): Unit
   def onNodeEdited(node: Node): Unit
   def onNodeDeleted(node: Node): Unit
