@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.events
 
-import org.narrativeandplay.hypedyn.plugins.serialisation.{SaveHash, SaveElement}
+import org.narrativeandplay.hypedyn.plugins.serialisation.SaveHash
 import org.narrativeandplay.hypedyn.story.Node
 
 sealed trait Event
