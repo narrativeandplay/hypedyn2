@@ -1,11 +1,12 @@
 package org.narrativeandplay.hypedyn.plugins.storyviewer
 
-import org.narrativeandplay.hypedyn.events.{NodeDeletedEvent, NodeEditedEvent, NodeCreatedEvent, EventBus}
+import javafx.scene.control.Control
+
 import org.narrativeandplay.hypedyn.plugins.Plugin
 import org.narrativeandplay.hypedyn.story.Node
 
 trait StoryViewer {
-  this: Plugin =>
+  this: Control with Plugin =>
 
   type NodeType <: ViewerNode
 
