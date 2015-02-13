@@ -13,13 +13,22 @@ object EventBus {
    * All Observable streams are considered private API, no plugin should be using the streams, and they are subject
    * to breaking at any time
    */
-  def editNodeEvents = eventBus.collect { case e: EditNodeEvent => e }
-  def newNodeEvents = eventBus.collect { case NewNodeEvent => NewNodeEvent }
-  def deleteNodeEvents = eventBus.collect { case e: DeleteNodeEvent => e }
+  def requests = eventBus collect { case e: Request => e }
+  def actions = eventBus collect { case e: Action => e }
+  def completions = eventBus collect { case e: Completion => e }
 
-  def nodeEditedEvents = eventBus.collect { case e: NodeEditedEvent => e }
-  def nodeCreatedEvents = eventBus.collect { case e: NodeCreatedEvent => e }
-  def nodeDeletedEvents = eventBus.collect { case e: NodeDeletedEvent => e }
+  def createNodeRequests = eventBus collect { case CreateNodeRequest => CreateNodeRequest }
+  def editNodeRequests = eventBus collect { case EditNodeRequest => EditNodeRequest }
+  def deleteNodeRequests = eventBus collect { case DeleteNodeRequest => DeleteNodeRequest }
+
+  def createNodeEvents = eventBus collect { case e: CreateNode => e }
+  def editNodeEvents = eventBus collect { case e: EditNode => e }
+  def deleteNodeEvents = eventBus collect { case e: DeleteNode => e }
+
+  def nodeCreatedEvents = eventBus collect { case e: NodeCreated => e }
+  def nodeEditedEvents = eventBus collect { case e: NodeEdited => e }
+  def nodeDeletedEvents = eventBus collect { case e: NodeDeleted => e }
+
 
   def saveEvents = eventBus.collect { case SaveEvent => SaveEvent }
   def loadEvents = eventBus.collect { case e: LoadEvent => e }
