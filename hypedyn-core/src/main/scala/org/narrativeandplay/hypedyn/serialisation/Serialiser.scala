@@ -1,8 +1,8 @@
-package org.narrativeandplay.hypedyn.plugins.serialisation
+package org.narrativeandplay.hypedyn.serialisation
 
 import java.io.File
 
-import org.narrativeandplay.hypedyn.plugins.serialisation.json.JsonSerialiser
+import org.narrativeandplay.hypedyn.serialisation.json.JsonSerialiser
 
 object Serialiser {
   def save(file: File): Unit = {

@@ -1,10 +1,10 @@
-package org.narrativeandplay.hypedyn.plugins.serialisation.json
+package org.narrativeandplay.hypedyn.serialisation.json
 
 import java.io.{File, PrintWriter}
 
 import org.json4s._
 import org.json4s.native.JsonMethods._
-import org.narrativeandplay.hypedyn.plugins.serialisation._
+import org.narrativeandplay.hypedyn.serialisation._
 
 import scala.io.Source
 

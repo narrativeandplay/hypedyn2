@@ -1,4 +1,4 @@
-package org.narrativeandplay.hypedyn.plugins.serialisation
+package org.narrativeandplay.hypedyn.serialisation
 
 /**
  * Base trait for all save data objects

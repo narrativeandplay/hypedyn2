@@ -1,7 +1,7 @@
 package org.narrativeandplay.hypedyn.plugins
 
 import org.narrativeandplay.hypedyn.events.{LoadEvent, SaveEvent, EventBus}
-import org.narrativeandplay.hypedyn.plugins.serialisation.SaveElement
+import org.narrativeandplay.hypedyn.serialisation.SaveElement
 
 trait Saveable {
   /**
