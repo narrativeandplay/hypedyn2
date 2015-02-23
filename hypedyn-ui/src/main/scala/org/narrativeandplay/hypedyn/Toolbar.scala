@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn
 
-import org.narrativeandplay.hypedyn.events.{NewNodeEvent, EventBus}
+import org.narrativeandplay.hypedyn.events.{NewNode, EventBus}
 
 import scalafx.Includes._
 import scalafx.event.ActionEvent
@@ -12,7 +12,7 @@ object Toolbar {
   }
 
   private lazy val newNode = new Button("New Node") {
-    onAction = (ae: ActionEvent) => EventBus.send(NewNodeEvent)
+    onAction = (ae: ActionEvent) => EventBus.send(NewNode)
   }
   private lazy val deleteNode = new Button("Delete Node")
   private lazy val editNode = new Button("Edit Node")

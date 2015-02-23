@@ -6,19 +6,24 @@ import org.narrativeandplay.hypedyn.story.{Story, Node}
 sealed trait Event
 
 sealed trait Request extends Event
-case object CreateNodeRequest extends Request
-case object EditNodeRequest extends Request
-case object DeleteNodeRequest extends Request
+case object NewNodeRequest extends Request
+sealed case class EditNodeRequest(nodeId: Long) extends Request
+sealed case class DeleteNodeRequest(nodeId: Long) extends Request
+
+sealed trait UIAction extends Event
+case object NewNode extends UIAction
+sealed case class EditNode(node: Node) extends UIAction
+sealed case class DeleteNode(node: Node) extends UIAction
 
 sealed trait Action extends Event
 sealed case class CreateNode(node: Node) extends Action
-sealed case class EditNode(node: Node) extends Action
-sealed case class DeleteNode(node: Node) extends Action
+sealed case class UpdateNode(node: Node) extends Action
+sealed case class DestroyNode(node: Node) extends Action
 
 sealed trait Completion extends Event
 sealed case class NodeCreated(node: Node) extends Completion
-sealed case class NodeEdited(node: Node) extends Completion
-sealed case class NodeDeleted(node: Node) extends Completion
+sealed case class NodeUpdated(node: Node) extends Completion
+sealed case class NodeDestroyed(node: Node) extends Completion
 
 
 case object SaveEvent extends Event

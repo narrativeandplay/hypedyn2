@@ -14,20 +14,37 @@ object EventBus {
    * to breaking at any time
    */
   def requests = eventBus collect { case e: Request => e }
+  def uiActions = eventBus collect { case e: UIAction => e }
   def actions = eventBus collect { case e: Action => e }
   def completions = eventBus collect { case e: Completion => e }
 
-  def createNodeRequests = eventBus collect { case CreateNodeRequest => CreateNodeRequest }
-  def editNodeRequests = eventBus collect { case EditNodeRequest => EditNodeRequest }
-  def deleteNodeRequests = eventBus collect { case DeleteNodeRequest => DeleteNodeRequest }
+  /**
+   * Request streams
+   */
+  def createNodeRequests = eventBus collect { case NewNodeRequest => NewNodeRequest }
+  def editNodeRequests = eventBus collect { case e: EditNodeRequest => e }
+  def deleteNodeRequests = eventBus collect { case e: DeleteNodeRequest => e }
 
-  def createNodeEvents = eventBus collect { case e: CreateNode => e }
+  /**
+   * UIAction streams
+   */
+  def newNodeEvents = eventBus collect { case NewNode => NewNode }
   def editNodeEvents = eventBus collect { case e: EditNode => e }
   def deleteNodeEvents = eventBus collect { case e: DeleteNode => e }
 
+  /**
+   * Action streams
+   */
+  def createNodeEvents = eventBus collect { case e: CreateNode => e }
+  def updateNodeEvents = eventBus collect { case e: UpdateNode => e }
+  def destroyNodeEvents = eventBus collect { case e: DestroyNode => e }
+
+  /**
+   * Completion streams
+   */
   def nodeCreatedEvents = eventBus collect { case e: NodeCreated => e }
-  def nodeEditedEvents = eventBus collect { case e: NodeEdited => e }
-  def nodeDeletedEvents = eventBus collect { case e: NodeDeleted => e }
+  def nodeUpdatedEvents = eventBus collect { case e: NodeUpdated => e }
+  def nodeDestroyedEvents = eventBus collect { case e: NodeDestroyed => e }
 
 
   def saveEvents = eventBus.collect { case SaveEvent => SaveEvent }
