@@ -19,6 +19,10 @@ allprojects {
 
     repositories {
         jcenter()
+
+        flatDir {
+            dirs rootDir.path + '/lib'
+        }
     }
 
     sourceCompatibility = 1.8
