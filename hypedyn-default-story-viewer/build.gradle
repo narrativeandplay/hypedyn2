@@ -1,0 +1,8 @@
+version = '0.1.0'
+
+dependencies {
+    compile 'org.scalafx:scalafx_2.11:2.2.67-R10'
+    compile ':scala-math-vector:0.1.0'
+
+    compile project(':hypedyn-api')
+}
