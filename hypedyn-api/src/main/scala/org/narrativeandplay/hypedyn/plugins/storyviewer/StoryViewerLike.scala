@@ -5,7 +5,7 @@ import javafx.scene.control.Control
 import org.narrativeandplay.hypedyn.plugins.Plugin
 import org.narrativeandplay.hypedyn.story.Node
 
-trait StoryViewer {
+trait StoryViewerLike {
   this: Control with Plugin =>
 
   type NodeType <: ViewerNode
