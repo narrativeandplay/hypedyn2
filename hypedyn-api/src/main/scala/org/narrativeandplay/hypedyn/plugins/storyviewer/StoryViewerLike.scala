@@ -1,16 +1,19 @@
 package org.narrativeandplay.hypedyn.plugins.storyviewer
 
-import javafx.scene.control.Control
-
+import org.narrativeandplay.hypedyn.events.EventBus
 import org.narrativeandplay.hypedyn.plugins.Plugin
 import org.narrativeandplay.hypedyn.story.Node
+
+import scalafx.scene.control.Control
 
 trait StoryViewerLike {
   this: Control with Plugin =>
 
-  type NodeType <: ViewerNode
+  EventBus.nodeCreatedEvents.subscribe { evt => onNodeCreated(evt.node) }
+  EventBus.nodeUpdatedEvents.subscribe { evt => onNodeUpdated(evt.node) }
+  EventBus.nodeDestroyedEvents.subscribe { evt => onNodeDestroyed(evt.node) }
 
   def onNodeCreated(node: Node): Unit
-  def onNodeEdited(node: Node): Unit
-  def onNodeDeleted(node: Node): Unit
+  def onNodeUpdated(node: Node): Unit
+  def onNodeDestroyed(node: Node): Unit
 }
