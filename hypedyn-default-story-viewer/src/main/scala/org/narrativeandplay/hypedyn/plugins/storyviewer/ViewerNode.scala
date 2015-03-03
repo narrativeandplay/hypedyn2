@@ -5,6 +5,7 @@ import javafx.scene.control.{Skin, Control}
 import javafx.scene.input.MouseEvent
 
 import com.github.benedictleejh.scala.math.vector.Vector2
+import org.narrativeandplay.hypedyn.events.{NodeDeselected, NodeSelected, EventBus}
 import org.narrativeandplay.hypedyn.story.Node
 
 import scalafx.Includes._
@@ -61,8 +62,21 @@ class ViewerNode(initName: String, initContent: String, val id: Long) extends Co
 
   def centre = topLeft + (ViewerNode.width/2, ViewerNode.height/2)
 
-  def select(): Unit = _selected() = true
-  def deselect(): Unit = _selected() = false
+  def select(): Unit = {
+    EventBus.send(NodeSelected(id))
+    _selected() = true
+  }
+  def deselect(): Unit = {
+    EventBus.send(NodeDeselected(id))
+    _selected() = false
+  }
+
+  def edgePoints = {
+    val widthVector = Vector2(width/2, 0d)
+    val heightVector = Vector2(height/2, 0d)
+
+    Map("left" -> (centre - widthVector), "right" -> (centre + widthVector), "top" -> (centre - heightVector), "bottom" -> (centre + heightVector))
+  }
 
 
   // <editor-fold desc="Utility Methods for a ScalaFX-like access pattern">

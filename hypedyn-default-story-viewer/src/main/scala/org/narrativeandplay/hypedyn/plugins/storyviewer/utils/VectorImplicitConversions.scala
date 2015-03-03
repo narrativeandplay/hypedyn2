@@ -20,4 +20,10 @@ object VectorImplicitConversions {
       case _ => throw new ClassCastException
     }
   }
+
+  implicit class RotatableVector(v: Vector2[Double]) {
+    private def degToRad(x: Double) = math.Pi / 180 * x
+    def rotate(deg: Double) = Vector2(math.cos(degToRad(deg)) * v.x - math.sin(degToRad(deg)) * v.y,
+                                      math.sin(degToRad(deg)) * v.x + math.cos(degToRad(deg)) * v.y)
+  }
 }
