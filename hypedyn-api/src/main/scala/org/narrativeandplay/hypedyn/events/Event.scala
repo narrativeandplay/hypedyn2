@@ -24,6 +24,8 @@ sealed trait Completion extends Event
 sealed case class NodeCreated(node: Node) extends Completion
 sealed case class NodeUpdated(node: Node) extends Completion
 sealed case class NodeDestroyed(node: Node) extends Completion
+sealed case class NodeSelected(nodeId: Long) extends Completion
+sealed case class NodeDeselected(nodeId: Long) extends Completion
 
 
 case object SaveEvent extends Event
