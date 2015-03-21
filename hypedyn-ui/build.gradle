@@ -3,10 +3,12 @@ apply from: '../javafx.plugin'
 version = '1.0'
 
 dependencies {
-    compile 'org.scalafx:scalafx_2.11:8.0.31-R7'
+    compile 'org.scalafx:scalafx_2.11:8.0.40-R8'
+    compile 'com.miglayout:miglayout-javafx:5.0'
 
     compile project(':hypedyn-api')
     compile project(':hypedyn-core')
+    compile project(':hypedyn-default-story-viewer')
 }
 
 javafx {
