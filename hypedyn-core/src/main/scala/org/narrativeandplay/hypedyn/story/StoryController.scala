@@ -7,9 +7,33 @@ object StoryController {
   var currentStory = new StoryImpl()
   var firstUnusedId = 0.toLong
 
+  EventBus.createNodeEvents subscribe { evt =>
+    addNode(evt.node)
+  }
+
+  def init(): Unit = {
+    currentStory = new StoryImpl()
+    firstUnusedId = 0
+  }
+
   def addNode(node: Node): Unit = {
-    currentStory.storyNodes += new NodeImpl(node.name, node.content, firstUnusedId)
+    println("hello")
+    println(node)
+    println("hello1")
+    val newNode = new Node {
+      override def name: String = node.name
+
+      override def content: String = node.content
+
+      override def id: Long = firstUnusedId
+    }
+    //currentStory.storyNodes += newNode
+    println("hello2")
     firstUnusedId += 1
+    println("hello3")
+
+    EventBus send NodeCreated(newNode)
+    println("goodbye")
   }
   def deleteNode(node: Node): Unit = {
     val nodeToRemove = currentStory.storyNodes find (_.id == node.id)

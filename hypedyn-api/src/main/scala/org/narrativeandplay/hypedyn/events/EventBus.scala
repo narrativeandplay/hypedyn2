@@ -7,6 +7,8 @@ object EventBus {
 
   def send(event: Event): Unit = {
     eventBus.onNext(event)
+
+    println(s"$event")
   }
 
   /**

@@ -7,6 +7,8 @@ import scalafx.scene.control.Control
 object StoryViewersController extends PluginsController{
   type T = StoryViewerLike
   override val PluginClassName = classOf[StoryViewerLike].getCanonicalName
-  
+
+  init()
+
   val defaultViewer: Control = Plugins("Default Story Viewer").asInstanceOf[Control]
 }
