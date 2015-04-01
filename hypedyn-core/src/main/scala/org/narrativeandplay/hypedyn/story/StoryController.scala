@@ -17,23 +17,11 @@ object StoryController {
   }
 
   def addNode(node: Node): Unit = {
-    println("hello")
-    println(node)
-    println("hello1")
-    val newNode = new Node {
-      override def name: String = node.name
-
-      override def content: String = node.content
-
-      override def id: Long = firstUnusedId
-    }
-    //currentStory.storyNodes += newNode
-    println("hello2")
+    val newNode = new NodeImpl(node.name, node.content, firstUnusedId)
+    currentStory.storyNodes += newNode
     firstUnusedId += 1
-    println("hello3")
 
     EventBus send NodeCreated(newNode)
-    println("goodbye")
   }
   def deleteNode(node: Node): Unit = {
     val nodeToRemove = currentStory.storyNodes find (_.id == node.id)

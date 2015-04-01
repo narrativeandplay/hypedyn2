@@ -23,9 +23,9 @@ object Toolbar {
         initModality(Modality.APPLICATION_MODAL)
       }.showAndWait()
 
-      nodeName foreach { name =>
+      nodeName foreach { n =>
         EventBus send CreateNode(new Node {
-          override def name: String = name
+          override def name: String = n
 
           override def content: String = ""
 
