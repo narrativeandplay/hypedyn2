@@ -28,6 +28,6 @@ object StoryController {
     nodeToRemove map (currentStory.storyNodes -= _)
   }
   def updateNode(node: Node): Unit = {
-    currentStory.storyNodes find (_.id == node.id) map { n => n.content = node.content; n.name = node.name }
+    currentStory.storyNodes find (_.id == node.id) foreach { n => n.content = node.content; n.name = node.name }
   }
 }

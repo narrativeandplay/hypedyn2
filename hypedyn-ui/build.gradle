@@ -5,6 +5,7 @@ version = '1.0'
 dependencies {
     compile 'org.scalafx:scalafx_2.11:8.0.40-R8'
     compile 'com.miglayout:miglayout-javafx:5.0'
+    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.6.3'
 
     compile project(':hypedyn-api')
     compile project(':hypedyn-core')

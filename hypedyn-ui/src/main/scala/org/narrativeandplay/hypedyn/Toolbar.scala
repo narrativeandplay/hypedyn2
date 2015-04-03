@@ -1,5 +1,6 @@
 package org.narrativeandplay.hypedyn
 
+import org.narrativeandplay.hypedyn.dialogs.NodeEditor
 import org.narrativeandplay.hypedyn.events.{CreateNode, NewNode, EventBus}
 import org.narrativeandplay.hypedyn.story.Node
 
@@ -15,23 +16,9 @@ object Toolbar {
 
   private lazy val newNode = new Button("New Node") {
     onAction = (ae: ActionEvent) => {
-      val nodeName = new TextInputDialog() {
-        title = "New Node"
-        headerText = None
-        contentText = "Enter the node's name:"
+      val newNode = new NodeEditor("New Node").showAndWait()
 
-        initModality(Modality.APPLICATION_MODAL)
-      }.showAndWait()
-
-      nodeName foreach { n =>
-        EventBus send CreateNode(new Node {
-          override def name: String = n
-
-          override def content: String = ""
-
-          override def id: Long = 0
-        })
-      }
+      newNode foreach { node => EventBus send CreateNode(node) }
     }
   }
   private lazy val deleteNode = new Button("Delete Node")
