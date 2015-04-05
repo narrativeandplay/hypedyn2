@@ -21,7 +21,7 @@ object EventBus {
   /**
    * Request streams
    */
-  def createNodeRequests = eventBus collect { case NewNodeRequest => NewNodeRequest }
+  def newNodeRequests = eventBus collect { case NewNodeRequest => NewNodeRequest }
   def editNodeRequests = eventBus collect { case e: EditNodeRequest => e }
   def deleteNodeRequests = eventBus collect { case e: DeleteNodeRequest => e }
 
