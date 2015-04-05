@@ -11,11 +11,6 @@ object StoryController {
     addNode(evt.node)
   }
 
-  def init(): Unit = {
-    currentStory = new StoryImpl()
-    firstUnusedId = 0
-  }
-
   def addNode(node: Node): Unit = {
     val newNode = new NodeImpl(node.name, node.content, firstUnusedId)
     currentStory.storyNodes += newNode

@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn
 
-import org.narrativeandplay.hypedyn.events.EventBus
+import org.narrativeandplay.hypedyn.events.{UIEventDispatcher, EventBus}
 import org.narrativeandplay.hypedyn.plugins.storyviewer.StoryViewersController
 import org.narrativeandplay.hypedyn.story.StoryController
 
@@ -12,7 +12,7 @@ import scalafx.scene.layout.{VBox, BorderPane}
 object Main extends JFXApp {
   EventBus
   StoryController
-  StoryController.init()
+  UIEventDispatcher
 
   stage = new PrimaryStage {
     title = "HypeDyn"
