@@ -7,10 +7,6 @@ object StoryController {
   var currentStory = new StoryImpl()
   var firstUnusedId = 0.toLong
 
-  EventBus.createNodeEvents subscribe { evt =>
-    addNode(evt.node)
-  }
-
   def addNode(node: Node): Unit = {
     val newNode = new NodeImpl(node.name, node.content, firstUnusedId)
     currentStory.storyNodes += newNode
@@ -18,6 +14,7 @@ object StoryController {
 
     EventBus send NodeCreated(newNode)
   }
+
   def deleteNode(node: Node): Unit = {
     val nodeToRemove = currentStory.storyNodes find (_.id == node.id)
     nodeToRemove map (currentStory.storyNodes -= _)
