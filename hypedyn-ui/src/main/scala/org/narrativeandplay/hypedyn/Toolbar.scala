@@ -1,7 +1,7 @@
 package org.narrativeandplay.hypedyn
 
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
-import org.narrativeandplay.hypedyn.events.{CreateNode, NewNode, EventBus}
+import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.story.Node
 
 import scalafx.Includes._
@@ -16,11 +16,17 @@ object Toolbar {
 
   private lazy val newNode = new Button("New Node") {
     onAction = (ae: ActionEvent) => {
-      val newNode = new NodeEditor("New Node").showAndWait()
-
-      newNode foreach { node => EventBus send CreateNode(node) }
+      EventBus send NewNodeRequest
     }
   }
-  private lazy val deleteNode = new Button("Delete Node")
-  private lazy val editNode = new Button("Edit Node")
+  private lazy val deleteNode = new Button("Delete Node") {
+    onAction = (ae: ActionEvent) => {
+      UIEventDispatcher.selectedNodeId foreach { id => EventBus send DeleteNodeRequest(id) }
+    }
+  }
+  private lazy val editNode = new Button("Edit Node") {
+    onAction = (ae: ActionEvent) => {
+      UIEventDispatcher.selectedNodeId foreach { id => EventBus send EditNodeRequest(id) }
+    }
+  }
 }

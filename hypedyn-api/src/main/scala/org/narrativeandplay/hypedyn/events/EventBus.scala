@@ -45,6 +45,8 @@ object EventBus {
   def nodeCreatedEvents = eventBus collect { case e: NodeCreated => e }
   def nodeUpdatedEvents = eventBus collect { case e: NodeUpdated => e }
   def nodeDestroyedEvents = eventBus collect { case e: NodeDestroyed => e }
+  def nodeSelectedEvents = eventBus collect { case e: NodeSelected => e }
+  def nodeDeselectedEvents = eventBus collect { case e: NodeDeselected => e }
 
 
   def saveEvents = eventBus.collect { case SaveEvent => SaveEvent }
