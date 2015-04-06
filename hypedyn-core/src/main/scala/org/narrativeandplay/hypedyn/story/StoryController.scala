@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.story
 
-import org.narrativeandplay.hypedyn.events.{NodeUpdated, NodeCreated, EventBus}
+import org.narrativeandplay.hypedyn.events.{NodeDestroyed, NodeUpdated, NodeCreated, EventBus}
 import org.narrativeandplay.hypedyn.story.internal.{NodeImpl, StoryImpl}
 
 object StoryController {
@@ -17,9 +17,11 @@ object StoryController {
     EventBus send NodeCreated(newNode)
   }
 
-  def deleteNode(node: Node): Unit = {
+  def destroyNode(node: Node): Unit = {
     val nodeToRemove = currentStory.storyNodes find (_.id == node.id)
     nodeToRemove foreach (currentStory.storyNodes -= _)
+
+    nodeToRemove foreach (EventBus send NodeDestroyed(_))
   }
 
   def updateNode(node: Node): Unit = {
