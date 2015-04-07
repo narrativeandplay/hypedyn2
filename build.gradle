@@ -13,6 +13,15 @@ plugins {
 }
 
 apply plugin: 'com.github.ben-manes.versions'
+apply from: 'javafx.plugin'
+
+dependencies {
+    compile project(':hypedyn-ui')
+}
+
+javafx {
+    mainClass 'org.narrativeandplay.hypedyn.Main'
+}
 
 allprojects {
     apply plugin: 'scala'

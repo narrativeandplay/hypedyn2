@@ -1,5 +1,3 @@
-apply from: '../javafx.plugin'
-
 version = '1.0'
 
 dependencies {
@@ -10,8 +8,4 @@ dependencies {
     compile project(':hypedyn-api')
     compile project(':hypedyn-core')
     compile project(':hypedyn-default-story-viewer')
-}
-
-javafx {
-    mainClass 'org.narrativeandplay.hypedyn.Main'
 }
