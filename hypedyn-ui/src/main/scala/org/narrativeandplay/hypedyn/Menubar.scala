@@ -11,7 +11,7 @@ import scalafx.scene.control.{SeparatorMenuItem, MenuBar, MenuItem, Menu}
  * All menu items are declared after the menu itself, for organisation purposes. As such all menu items must be lazily
  * evaluated, to guarantee correct execution
  */
-object MenuBar {
+object Menubar {
   val menuBar = new MenuBar() {
     useSystemMenuBar = true
 

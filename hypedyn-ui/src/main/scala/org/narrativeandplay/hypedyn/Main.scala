@@ -19,7 +19,7 @@ object Main extends JFXApp {
     scene = new Scene {
       root = new BorderPane() {
         top = new VBox() {
-          children.addAll(MenuBar.menuBar, Toolbar.toolbar)
+          children.addAll(Menubar.menuBar, Toolbar.toolbar)
         }
 
         center = StoryViewersController.defaultViewer
