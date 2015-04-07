@@ -4,11 +4,10 @@ import org.narrativeandplay.hypedyn.plugins.PluginsController
 
 import scalafx.scene.control.Control
 
-object StoryViewersController extends PluginsController{
-  type T = StoryViewerLike
-  override val PluginClassName = classOf[StoryViewerLike].getCanonicalName
+object StoryViewersController {
+  val StoryViewers = PluginsController.Plugins collect {
+    case (name, plugin: StoryViewerLike) => name -> plugin
+  }
 
-  init()
-
-  val defaultViewer: Control = Plugins("Default Story Viewer").asInstanceOf[Control]
+  val defaultViewer: Control = StoryViewers("Default Story Viewer").asInstanceOf[Control]
 }
