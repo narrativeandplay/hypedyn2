@@ -9,9 +9,7 @@ trait Saveable {
    */
   this: Plugin =>
 
-  EventBus.loadEvents.subscribe((evt: LoadEvent) => {
-    onLoad(evt.data(name))
-  })
+  EventBus.loadEvents subscribe { evt => onLoad(evt.data(name)) }
 
   /**
    * Returns the formatted data that a plugin wishes to save

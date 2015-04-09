@@ -29,7 +29,7 @@ object Menubar {
   private lazy val openStory = new MenuItem("Open")
   private lazy val saveStory = new MenuItem("Save")
   private lazy val exit = new MenuItem("Exit") {
-    onAction = (ae: ActionEvent) => {
+    onAction = { actionEvent: ActionEvent =>
       Platform.exit()
     }
   }

@@ -15,17 +15,17 @@ object Toolbar {
   }
 
   private lazy val newNode = new Button("New Node") {
-    onAction = (ae: ActionEvent) => {
+    onAction = { actionEvent: ActionEvent =>
       EventBus send NewNodeRequest
     }
   }
   private lazy val deleteNode = new Button("Delete Node") {
-    onAction = (ae: ActionEvent) => {
+    onAction = { actionEvent: ActionEvent =>
       UIEventDispatcher.selectedNodeId foreach { id => EventBus send DeleteNodeRequest(id) }
     }
   }
   private lazy val editNode = new Button("Edit Node") {
-    onAction = (ae: ActionEvent) => {
+    onAction = { actionEvent: ActionEvent =>
       UIEventDispatcher.selectedNodeId foreach { id => EventBus send EditNodeRequest(id) }
     }
   }

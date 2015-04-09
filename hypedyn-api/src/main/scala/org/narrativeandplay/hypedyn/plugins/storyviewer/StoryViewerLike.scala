@@ -9,9 +9,9 @@ import scalafx.scene.control.Control
 trait StoryViewerLike {
   this: Control with Plugin =>
 
-  EventBus.nodeCreatedEvents.subscribe { evt => onNodeCreated(evt.node) }
-  EventBus.nodeUpdatedEvents.subscribe { evt => onNodeUpdated(evt.node) }
-  EventBus.nodeDestroyedEvents.subscribe { evt => onNodeDestroyed(evt.node) }
+  EventBus.nodeCreatedEvents subscribe { evt => onNodeCreated(evt.node) }
+  EventBus.nodeUpdatedEvents subscribe { evt => onNodeUpdated(evt.node) }
+  EventBus.nodeDestroyedEvents subscribe { evt => onNodeDestroyed(evt.node) }
 
   def onNodeCreated(node: Node): Unit
   def onNodeUpdated(node: Node): Unit
