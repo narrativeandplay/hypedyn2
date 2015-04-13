@@ -17,7 +17,7 @@ sealed case class DeleteNode(node: Node) extends UIAction
 
 sealed trait Action extends Event
 sealed case class CreateNode(node: Node) extends Action
-sealed case class UpdateNode(node: Node) extends Action
+sealed case class UpdateNode(uneditedNode: Node, editedNode: Node) extends Action
 sealed case class DestroyNode(node: Node) extends Action
 
 sealed trait Completion extends Event

@@ -24,9 +24,9 @@ object StoryController {
     nodeToRemove foreach (EventBus send NodeDestroyed(_))
   }
 
-  def updateNode(node: Node): Unit = {
-    val nodeToUpdate = currentStory.storyNodes find (_.id == node.id)
-    nodeToUpdate foreach { n => n.content = node.content; n.name = node.name }
+  def updateNode(uneditedNode: Node, editedNode: Node): Unit = {
+    val nodeToUpdate = currentStory.storyNodes find (_.id == uneditedNode.id)
+    nodeToUpdate foreach { n => n.content = editedNode.content; n.name = editedNode.name }
 
     nodeToUpdate foreach (EventBus send NodeUpdated(_))
   }
