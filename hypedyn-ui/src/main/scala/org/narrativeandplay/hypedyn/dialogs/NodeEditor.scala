@@ -6,6 +6,7 @@ import org.tbee.javafx.scene.layout.MigPane
 
 import scalafx.Includes._
 import scalafx.scene.control.{Label, TextField, ButtonType, Dialog}
+import scalafx.stage.Modality
 
 class NodeEditor(dialogTitle: String, nodeToEdit: Option[Node]) extends Dialog[Node] {
   def this(dialogTitle: String) = this(dialogTitle, None)
@@ -17,17 +18,22 @@ class NodeEditor(dialogTitle: String, nodeToEdit: Option[Node]) extends Dialog[N
 
   title = dialogTitle
   headerText = None
+  resizable = true
+
+  initModality(Modality.APPLICATION_MODAL)
 
   dialogPane.value.getButtonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
 
   private val nodeNameField = new TextField()
-  private val nodeContentField = new StyleClassedTextArea()
+  private val nodeContentField = new StyleClassedTextArea() {
+    setWrapText(true)
+  }
 
-  private val contentPane = new MigPane() {
-    add(new Label("Name"), "wrap")
-    add(nodeNameField, "wrap")
-    add(new Label("Content"), "wrap")
-    add(nodeContentField, "wrap")
+  private val contentPane = new MigPane("fill") {
+    add(new Label("Name"), "grow 0 0, wrap")
+    add(nodeNameField, "growx 100, wrap")
+    add(new Label("Content"), "grow 0 0, wrap")
+    add(nodeContentField, "grow 100 100, wrap")
   }
   dialogPane.value.setContent(contentPane)
 
