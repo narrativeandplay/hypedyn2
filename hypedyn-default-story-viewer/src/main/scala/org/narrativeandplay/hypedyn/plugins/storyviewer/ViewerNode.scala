@@ -5,7 +5,7 @@ import javafx.scene.control.{Skin, Control}
 import javafx.scene.input.MouseEvent
 
 import com.github.benedictleejh.scala.math.vector.Vector2
-import org.narrativeandplay.hypedyn.events.{NodeDeselected, NodeSelected, EventBus}
+import org.narrativeandplay.hypedyn.events.{EditNodeRequest, NodeDeselected, NodeSelected, EventBus}
 import org.narrativeandplay.hypedyn.story.Node
 
 import scalafx.Includes._
@@ -30,9 +30,14 @@ class ViewerNode(initName: String, initContent: String, val id: Long) extends Co
   setSkin(new ViewerNodeSkin(this))
 
   onMouseClicked = { (me: MouseEvent) =>
-    if (selected) deselect() else select()
-    requestLayout()
-    me.consume() // Prevent mouse event from propagating to parent pane
+    me.getClickCount match {
+      case 1 =>
+        if (selected) deselect() else select()
+        requestLayout()
+        me.consume() // Prevent mouse event from propagating to parent pane
+      case 2 => EventBus send EditNodeRequest(id)
+      case _ =>
+    }
   }
 
   onMousePressed = { (me: MouseEvent) =>
