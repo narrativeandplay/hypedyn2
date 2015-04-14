@@ -18,7 +18,7 @@ object UndoController {
 
   private val changes = new EventSource[Change[_]]()
 
-  def send(change: Change[_]) = changes.push(change)
+  def send(change: Change[_]) = changes push change
 
   UndoManagerFactory.unlimitedHistoryUndoManager(
     changes,
@@ -29,7 +29,7 @@ object UndoController {
       c.undo()
     },
     { (c1: Change[_], c2: Change[_]) =>
-      c1.mergeWith(c2)
+      c1 mergeWith c2
     }
   )
 }
