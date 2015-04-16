@@ -14,6 +14,7 @@ class NodeEditor(dialogTitle: String, nodeToEdit: Option[Node]) extends Dialog[N
     this(dialogTitle, Some(nodeToEdit))
     nodeNameField.text = nodeToEdit.name
     nodeContentField.replaceText(nodeToEdit.content)
+    nodeContentField.getUndoManager.forgetHistory()
   }
 
   title = dialogTitle
