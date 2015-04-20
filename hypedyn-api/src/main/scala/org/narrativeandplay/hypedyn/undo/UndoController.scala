@@ -20,7 +20,7 @@ object UndoController {
 
   def send(change: Change[_]) = changes push change
 
-  UndoManagerFactory.unlimitedHistoryUndoManager(
+  private val undoManager = UndoManagerFactory.unlimitedHistoryUndoManager(
     changes,
     { c: Change[_] =>
       c.redo()
@@ -32,4 +32,7 @@ object UndoController {
       c1 mergeWith c2
     }
   )
+
+  def undo() = undoManager.undo()
+  def redo() = undoManager.redo()
 }
