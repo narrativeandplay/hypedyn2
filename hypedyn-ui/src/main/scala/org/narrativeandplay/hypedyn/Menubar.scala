@@ -1,5 +1,8 @@
 package org.narrativeandplay.hypedyn
 
+import org.narrativeandplay.hypedyn.keycombinations.KeyCombinations
+import org.narrativeandplay.hypedyn.undo.UndoController
+
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.event.ActionEvent
@@ -15,7 +18,7 @@ object Menubar {
   val menuBar = new MenuBar() {
     useSystemMenuBar = true
 
-    menus.addAll(fileMenu, helpMenu)
+    menus.addAll(fileMenu, editMenu, helpMenu)
   }
 
   /**
@@ -31,6 +34,28 @@ object Menubar {
   private lazy val exit = new MenuItem("Exit") {
     onAction = { actionEvent: ActionEvent =>
       Platform.exit()
+    }
+  }
+
+  /**
+   * Edit Menu
+   */
+  private lazy val editMenu = new Menu("Edit") {
+    items.addAll(undo, redo)
+  }
+  private lazy val undo = new MenuItem("Undo") {
+    accelerator = KeyCombinations.Undo
+
+    onAction = { actionEvent: ActionEvent =>
+      UndoController.undo()
+    }
+  }
+
+  private lazy val redo = new MenuItem("Redo") {
+    accelerator = if (System.getProperty("os.name") == "Windows") KeyCombinations.RedoWin else KeyCombinations.RedoUnix
+
+    onAction = { actionEvent: ActionEvent =>
+      UndoController.redo()
     }
   }
 
