@@ -10,8 +10,9 @@ object StoryController {
   def find(id: Long) = currentStory.nodes.find(_.id == id)
 
   def createNode(node: Node, undoable: Boolean = true): Unit = {
+    val newNode = new NodeImpl(node.name, node.content, if (node.id < 0) firstUnusedId else node.id)
     currentStory.storyNodes += newNode
-    firstUnusedId += 1
+    firstUnusedId = math.max(firstUnusedId, node.id + 1)
 
     EventBus send NodeCreated(newNode)
   }
