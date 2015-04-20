@@ -9,22 +9,21 @@ object StoryController {
 
   def find(id: Long) = currentStory.nodes.find(_.id == id)
 
-  def createNode(node: Node): Unit = {
-    val newNode = new NodeImpl(node.name, node.content, firstUnusedId)
+  def createNode(node: Node, undoable: Boolean = true): Unit = {
     currentStory.storyNodes += newNode
     firstUnusedId += 1
 
     EventBus send NodeCreated(newNode)
   }
 
-  def destroyNode(node: Node): Unit = {
+  def destroyNode(node: Node, undoable: Boolean = true): Unit = {
     val nodeToRemove = currentStory.storyNodes find (_.id == node.id)
     nodeToRemove foreach (currentStory.storyNodes -= _)
 
     nodeToRemove foreach (EventBus send NodeDestroyed(_))
   }
 
-  def updateNode(uneditedNode: Node, editedNode: Node): Unit = {
+  def updateNode(uneditedNode: Node, editedNode: Node, undoable: Boolean = true): Unit = {
     val nodeToUpdate = currentStory.storyNodes find (_.id == uneditedNode.id)
     nodeToUpdate foreach { n => n.content = editedNode.content; n.name = editedNode.name }
 
