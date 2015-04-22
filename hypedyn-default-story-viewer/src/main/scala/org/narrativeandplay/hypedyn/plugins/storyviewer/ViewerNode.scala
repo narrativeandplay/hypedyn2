@@ -7,6 +7,7 @@ import javafx.scene.input.MouseEvent
 import com.github.benedictleejh.scala.math.vector.Vector2
 import org.narrativeandplay.hypedyn.events.{EditNodeRequest, NodeDeselected, NodeSelected, EventBus}
 import org.narrativeandplay.hypedyn.story.Node
+import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoController}
 
 import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, StringProperty}
@@ -47,6 +48,9 @@ class ViewerNode(initName: String, initContent: String, val id: Long) extends Co
   onMouseDragged = { (me: MouseEvent) =>
     val translation = Vector2(me.getSceneX, me.getSceneY) - anchor
     val finalPos = topLeft + translation
+
+    UndoController send new NodeMovedChange(this, topLeft, finalPos)
+
     relocate(finalPos.x, finalPos.y)
     anchor = (me.getSceneX, me.getSceneY)
     topLeft = (getLayoutX, getLayoutY)
