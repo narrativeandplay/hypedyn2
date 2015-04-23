@@ -16,23 +16,29 @@ object UndoController {
     override def apply(t: T, u: U): R = lambda(t, u)
   }
 
-  private val changes = new EventSource[Change[_]]()
+  private val changes = new EventSource[Change]()
 
-  def send(change: Change[_]) = changes push change
+  def send(change: Change) = changes push change
 
   private val undoManager = UndoManagerFactory.unlimitedHistoryUndoManager(
     changes,
-    { c: Change[_] =>
+    { c: Change =>
       c.redo()
     },
-    { c: Change[_] =>
+    { c: Change =>
       c.undo()
     },
-    { (c1: Change[_], c2: Change[_]) =>
+    { (c1: Change, c2: Change) =>
       c1 mergeWith c2
     }
   )
 
   def undo() = undoManager.undo()
   def redo() = undoManager.redo()
+
+  def makeUndoableAction[T, U](action: T => U) = { (param: T, undoable: Boolean) =>
+    val result = action(param)
+
+
+  }
 }
