@@ -1,7 +1,5 @@
 package org.narrativeandplay.hypedyn.plugins.storyviewer
 
-import javafx.scene.control.Control
-
 import org.narrativeandplay.hypedyn.plugins.Plugin
 import org.narrativeandplay.hypedyn.story.Node
 

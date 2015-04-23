@@ -1,13 +1,10 @@
 package org.narrativeandplay.hypedyn
 
-import org.narrativeandplay.hypedyn.dialogs.NodeEditor
 import org.narrativeandplay.hypedyn.events._
-import org.narrativeandplay.hypedyn.story.Node
 
 import scalafx.Includes._
 import scalafx.event.ActionEvent
-import scalafx.scene.control.{TextInputDialog, Dialog, Button, ToolBar}
-import scalafx.stage.Modality
+import scalafx.scene.control.{Button, ToolBar}
 
 object Toolbar {
   val toolbar = new ToolBar() {

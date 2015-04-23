@@ -1,7 +1,7 @@
 package org.narrativeandplay.hypedyn.plugins.storyviewer
 
 import javafx.event.EventHandler
-import javafx.scene.control.{Skin, Control}
+import javafx.scene.control.Control
 import javafx.scene.input.MouseEvent
 
 import com.github.benedictleejh.scala.math.vector.Vector2

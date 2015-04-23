@@ -1,7 +1,6 @@
 package org.narrativeandplay.hypedyn.undo
 
-import java.util.Optional
-import java.util.function.{BiFunction, BiConsumer, Consumer}
+import java.util.function.{BiFunction, Consumer}
 
 import scala.language.implicitConversions
 
