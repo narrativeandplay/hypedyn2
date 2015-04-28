@@ -31,7 +31,11 @@ object JsonSerialiser {
     case SaveInt(i) => JInt(i)
     case SaveFloat(f) => JDouble(f)
     case SaveString(s) => JString(s)
-    case SaveList(ls @ _*) => JArray(ls.map(saveElementToJValue _).toList)
+    case SaveBoolean(b) => JBool(b)
+    case SaveDecimal(d) => JDecimal(d)
+    case SaveNothing => JNothing
+    case SaveNull => JNull
+    case SaveList(ls @ _*) => JArray((ls map saveElementToJValue).toList)
     case SaveHash(hs @ _*) => JObject(hs.map { case (k, v) =>
       k -> saveElementToJValue(v)
     }.toList)
@@ -41,7 +45,11 @@ object JsonSerialiser {
     case JInt(i) => SaveInt(i.toLong)
     case JDouble(f) => SaveFloat(f)
     case JString(s) => SaveString(s)
-    case JArray(a) => SaveList(a.map(jValueToSaveElement _).toSeq: _*)
+    case JBool(b) => SaveBoolean(b)
+    case JDecimal(d) => SaveDecimal(d)
+    case JNothing => SaveNothing
+    case JNull => SaveNull
+    case JArray(a) => SaveList((a map jValueToSaveElement).toSeq: _*)
     case JObject(o) => SaveHash(o.map { case (k, v) =>
       k -> jValueToSaveElement(v)
     }.toSeq: _*)
