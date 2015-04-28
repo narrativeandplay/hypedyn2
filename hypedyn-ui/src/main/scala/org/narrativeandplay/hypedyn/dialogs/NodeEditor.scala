@@ -10,6 +10,7 @@ import scalafx.stage.Modality
 
 class NodeEditor(dialogTitle: String, nodeToEdit: Option[Node]) extends Dialog[Node] {
   def this(dialogTitle: String) = this(dialogTitle, None)
+
   def this(dialogTitle: String, nodeToEdit: Node) = {
     this(dialogTitle, Some(nodeToEdit))
     nodeNameField.text = nodeToEdit.name

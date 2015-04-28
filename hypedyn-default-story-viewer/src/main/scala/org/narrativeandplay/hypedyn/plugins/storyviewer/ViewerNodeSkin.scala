@@ -29,8 +29,8 @@ class ViewerNodeSkin(viewerNode: ViewerNode) extends Skin[ViewerNode] {
     stroke = Color.Black
   }
   private val selectRect = new Rectangle {
-    width = viewerNode.width + 2*selectionOutlineWidth
-    height = viewerNode.height + 2*selectionOutlineWidth
+    width = viewerNode.width + 2 * selectionOutlineWidth
+    height = viewerNode.height + 2 * selectionOutlineWidth
     fill = Color.Red
     translateX = -selectionOutlineWidth
     translateY = -selectionOutlineWidth
@@ -55,7 +55,7 @@ class ViewerNodeSkin(viewerNode: ViewerNode) extends Skin[ViewerNode] {
     alignment = Pos.TopLeft
     //textOverrun = OverrunStyle.WordEllipsis
 
-    delegate.setMaxSize(viewerNode.width - 2*textPadding, viewerNode.height - 2*textPadding - headingHeight)
+    delegate.setMaxSize(viewerNode.width - 2 * textPadding, viewerNode.height - 2 * textPadding - headingHeight)
 
     text <== viewerNode._content
   }

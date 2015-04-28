@@ -14,6 +14,8 @@ trait StoryViewerLike {
   EventBus.nodeDestroyedEvents subscribe { evt => onNodeDestroyed(evt.node) }
 
   def onNodeCreated(node: Node): Unit
+
   def onNodeUpdated(node: Node): Unit
+
   def onNodeDestroyed(node: Node): Unit
 }

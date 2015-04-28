@@ -53,6 +53,7 @@ class StoryViewerContent extends Control {
   def children = getChildren
 
   def onMouseClicked = getOnMouseClicked
+
   def onMouseClicked_=(value: EventHandler[_ >: MouseEvent]) = setOnMouseClicked(value)
 
   // </editor-fold>

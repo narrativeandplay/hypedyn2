@@ -10,5 +10,6 @@ case class UnorderedPair[T](_1: T, _2: T) {
   def contains(elem: T) = elem == _1 || elem == _2
 
   override def canEqual(that: Any) = that.isInstanceOf[UnorderedPair[T]]
+
   override def hashCode = _1.hashCode + _2.hashCode
 }

@@ -62,27 +62,30 @@ class ViewerNode(initName: String, initContent: String, val id: Long) extends Co
   }
 
   override def name: String = _name()
+
   def name_=(newName: String): Unit = _name() = newName
 
   override def content: String = _content()
+
   def content_=(newContent: String): Unit = _content() = newContent
 
   def selected = _selected()
 
-  def centre = topLeft + (ViewerNode.width/2, ViewerNode.height/2)
+  def centre = topLeft + (ViewerNode.width / 2, ViewerNode.height / 2)
 
   def select(): Unit = {
     EventBus.send(NodeSelected(id))
     _selected() = true
   }
+
   def deselect(): Unit = {
     EventBus.send(NodeDeselected(id))
     _selected() = false
   }
 
   def edgePoints = {
-    val widthVector = Vector2(width/2, 0d)
-    val heightVector = Vector2(height/2, 0d)
+    val widthVector = Vector2(width / 2, 0d)
+    val heightVector = Vector2(height / 2, 0d)
 
     Map("left" -> (centre - widthVector), "right" -> (centre + widthVector), "top" -> (centre - heightVector), "bottom" -> (centre + heightVector))
   }
@@ -91,18 +94,23 @@ class ViewerNode(initName: String, initContent: String, val id: Long) extends Co
   // <editor-fold desc="Utility Methods for a ScalaFX-like access pattern">
 
   def width = getWidth
+
   def width_=(value: Double) = setWidth(value)
-  
+
   def height = getHeight
+
   def height_=(value: Double) = setHeight(value)
 
   def onMouseClicked = getOnMouseClicked
+
   def onMouseClicked_=(value: EventHandler[_ >: MouseEvent]) = setOnMouseClicked(value)
 
   def onMousePressed = getOnMousePressed
+
   def onMousePressed_=(value: EventHandler[_ >: MouseEvent]) = setOnMousePressed(value)
 
   def onMouseDragged = getOnMouseDragged
+
   def onMouseDragged_=(value: EventHandler[_ >: MouseEvent]) = setOnMouseDragged(value)
 
   // </editor-fold>

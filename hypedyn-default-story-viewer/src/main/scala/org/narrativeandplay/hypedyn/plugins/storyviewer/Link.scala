@@ -24,6 +24,7 @@ class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private v
   val _selected = BooleanProperty(false)
 
   def name: String = _name()
+
   def name_=(newName: String) = _name() = newName
 
   def selected = _selected()
@@ -107,7 +108,7 @@ class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private v
     if (parentLinkGroup.size % 2 == 0) {
       o = v2 * (gap / 2)
 
-      if(from ne mainEdge.from)
+      if (from ne mainEdge.from)
         o = -o
     }
 
@@ -163,19 +164,19 @@ class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private v
     val label: Option[Label] = Link.LinkNameDisplayType match {
       case OnLinkAlways =>
         val labelMidpoint = linkPath.pointAt(0.5)
-        linkLabel.relocate(labelMidpoint.x - Link.labelWidth/2, labelMidpoint.y - Link.labelHeight/2)
+        linkLabel.relocate(labelMidpoint.x - Link.labelWidth / 2, labelMidpoint.y - Link.labelHeight / 2)
         Some(linkLabel)
       case OnLinkOnClick =>
         if (selected) {
           val labelMidpoint = linkPath.pointAt(0.5)
-          linkLabel.relocate(labelMidpoint.x - Link.labelWidth/2, labelMidpoint.y - Link.labelHeight/2)
+          linkLabel.relocate(labelMidpoint.x - Link.labelWidth / 2, labelMidpoint.y - Link.labelHeight / 2)
           Some(linkLabel)
         }
         else None
       case AtMouseOnClick =>
         if (selected) {
           val labelMidpoint = linkPath.pointAt(closestBezierParam)
-          linkLabel.relocate(labelMidpoint.x - Link.labelWidth/2, labelMidpoint.y - Link.labelHeight/2)
+          linkLabel.relocate(labelMidpoint.x - Link.labelWidth / 2, labelMidpoint.y - Link.labelHeight / 2)
           Some(linkLabel)
         }
         else None

@@ -43,7 +43,7 @@ object JsonSerialiser {
     case JString(s) => SaveString(s)
     case JArray(a) => SaveList(a.map(jValueToSaveElement _).toSeq: _*)
     case JObject(o) => SaveHash(o.map { case (k, v) =>
-        k -> jValueToSaveElement(v)
+      k -> jValueToSaveElement(v)
     }.toSeq: _*)
   }
 }

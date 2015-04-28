@@ -11,6 +11,7 @@ object UndoController {
   implicit def lambdaToConsumer[C](lambda: C => Unit): Consumer[C] = new Consumer[C] {
     override def accept(t: C): Unit = lambda(t)
   }
+
   implicit def lambdaToBiFunction[T, U, R](lambda: (T, U) => R): BiFunction[T, U, R] = new BiFunction[T, U, R] {
     override def apply(t: T, u: U): R = lambda(t, u)
   }
@@ -33,6 +34,7 @@ object UndoController {
   )
 
   def undo() = undoManager.undo()
+
   def redo() = undoManager.redo()
 
   def makeUndoableAction[T, U](action: T => U) = { (param: T, undoable: Boolean) =>

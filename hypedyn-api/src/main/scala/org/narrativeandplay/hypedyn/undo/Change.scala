@@ -4,6 +4,7 @@ import java.util.Optional
 
 trait Change {
   def undo(): Unit
+
   def redo(): Unit
 
   def merge(other: Change): Option[Change] = None
