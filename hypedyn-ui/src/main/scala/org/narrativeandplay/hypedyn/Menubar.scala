@@ -1,12 +1,13 @@
 package org.narrativeandplay.hypedyn
 
-import org.narrativeandplay.hypedyn.keycombinations.KeyCombinations
-import org.narrativeandplay.hypedyn.undo.UndoController
-
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.event.ActionEvent
-import scalafx.scene.control.{SeparatorMenuItem, MenuBar, MenuItem, Menu}
+import scalafx.scene.control.{Menu, MenuBar, MenuItem, SeparatorMenuItem}
+
+import org.narrativeandplay.hypedyn.events._
+import org.narrativeandplay.hypedyn.keycombinations.KeyCombinations
+import org.narrativeandplay.hypedyn.undo.UndoController
 
 /**
  * Object containing the menu bar
@@ -41,7 +42,7 @@ object Menubar {
    * Edit Menu
    */
   private lazy val editMenu = new Menu("Edit") {
-    items.addAll(undo, redo)
+    items.addAll(undo, redo, new SeparatorMenuItem(), cut, copy, paste)
   }
   private lazy val undo = new MenuItem("Undo") {
     accelerator = KeyCombinations.Undo
@@ -56,6 +57,30 @@ object Menubar {
 
     onAction = { actionEvent: ActionEvent =>
       UndoController.redo()
+    }
+  }
+
+  private lazy val cut = new MenuItem("Cut") {
+    accelerator = KeyCombinations.Cut
+
+    onAction = { actionEvent: ActionEvent =>
+      UIEventDispatcher.selectedNodeId foreach (EventBus send CutNodeRequest(_))
+    }
+  }
+
+  private lazy val copy = new MenuItem("Copy") {
+    accelerator = KeyCombinations.Copy
+
+    onAction = { actionEvent: ActionEvent =>
+      UIEventDispatcher.selectedNodeId foreach (EventBus send CopyNodeRequest(_))
+    }
+  }
+
+  private lazy val paste = new MenuItem("Paste") {
+    accelerator = KeyCombinations.Paste
+
+    onAction = { actionEvent: ActionEvent =>
+      EventBus send PasteNodeRequest
     }
   }
 
