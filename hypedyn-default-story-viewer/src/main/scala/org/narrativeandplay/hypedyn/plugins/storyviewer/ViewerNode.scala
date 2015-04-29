@@ -6,7 +6,7 @@ import javafx.scene.input.MouseEvent
 
 import com.github.benedictleejh.scala.math.vector.Vector2
 import org.narrativeandplay.hypedyn.events.{EditNodeRequest, NodeDeselected, NodeSelected, EventBus}
-import org.narrativeandplay.hypedyn.story.Node
+import org.narrativeandplay.hypedyn.story.NodeLike
 import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoController}
 
 import scalafx.Includes._
@@ -15,7 +15,7 @@ import scalafx.beans.property.{BooleanProperty, StringProperty}
 import utils.SAMConversions._
 import utils.VectorImplicitConversions._
 
-class ViewerNode(initName: String, initContent: String, val id: Long) extends Control with Node {
+class ViewerNode(initName: String, initContent: String, val id: Long) extends Control with NodeLike {
   private var anchor = Vector2(0.0, 0.0)
   private var topLeft = ViewerNode.defaultLocation
 

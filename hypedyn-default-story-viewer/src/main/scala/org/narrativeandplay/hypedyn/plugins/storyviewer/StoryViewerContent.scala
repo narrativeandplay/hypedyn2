@@ -4,7 +4,7 @@ import javafx.event.EventHandler
 import javafx.scene.control.Control
 import javafx.scene.input.MouseEvent
 
-import org.narrativeandplay.hypedyn.story.Node
+import org.narrativeandplay.hypedyn.story.NodeLike
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -25,7 +25,7 @@ class StoryViewerContent extends Control {
 
   def links: List[Link] = linkGroups.flatMap(_.links).toList
 
-  def addNode(node: Node) = {
+  def addNode(node: NodeLike) = {
     val n = new ViewerNode(node.name, node.content, node.id)
     nodes += n
     children += n
@@ -33,14 +33,14 @@ class StoryViewerContent extends Control {
     n
   }
 
-  def updateNode(node: Node): Unit = {
+  def updateNode(node: NodeLike): Unit = {
     nodes find (_.id == node.id) foreach { n =>
       n.name = node.name
       n.content = node.content
     }
   }
 
-  def removeNode(node: Node): Unit = {
+  def removeNode(node: NodeLike): Unit = {
     nodes find (_.id == node.id) foreach { n =>
       children -= n
       linkGroups --= linkGroups filter (_.endPoints.contains(n))

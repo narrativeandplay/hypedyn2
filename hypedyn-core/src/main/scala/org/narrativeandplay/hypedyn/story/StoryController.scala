@@ -1,17 +1,17 @@
 package org.narrativeandplay.hypedyn.story
 
 import org.narrativeandplay.hypedyn.events.{NodeDestroyed, NodeUpdated, NodeCreated, EventBus}
-import org.narrativeandplay.hypedyn.story.internal.{NodeImpl, StoryImpl}
+import org.narrativeandplay.hypedyn.story.internal.{Node, Story}
 import org.narrativeandplay.hypedyn.undo.{NodeDestroyedChange, NodeEditedChange, NodeCreatedChange, UndoController}
 
 object StoryController {
-  var currentStory = new StoryImpl()
+  var currentStory = new Story()
   var firstUnusedId = 1.toLong
 
   def find(id: Long) = currentStory.nodes.find(_.id == id)
 
-  def createNode(node: Node, undoable: Boolean = true): Unit = {
-    val newNode = new NodeImpl(node.name, node.content, if (node.id < 0) firstUnusedId else node.id)
+  def createNode(node: NodeLike, undoable: Boolean = true): Unit = {
+    val newNode = new Node(node.name, node.content, if (node.id < 0) firstUnusedId else node.id)
     currentStory.storyNodes += newNode
     firstUnusedId = math.max(firstUnusedId, newNode.id + 1)
 
@@ -22,7 +22,7 @@ object StoryController {
     }
   }
 
-  def destroyNode(node: Node, undoable: Boolean = true): Unit = {
+  def destroyNode(node: NodeLike, undoable: Boolean = true): Unit = {
     val nodeToRemove = currentStory.storyNodes find (_.id == node.id)
     nodeToRemove foreach (currentStory.storyNodes -= _)
 
@@ -33,7 +33,7 @@ object StoryController {
     }
   }
 
-  def updateNode(uneditedNode: Node, editedNode: Node, undoable: Boolean = true): Unit = {
+  def updateNode(uneditedNode: NodeLike, editedNode: NodeLike, undoable: Boolean = true): Unit = {
     val nodeToUpdate = currentStory.storyNodes find (_.id == uneditedNode.id)
     nodeToUpdate foreach { n => n.content = editedNode.content; n.name = editedNode.name }
 

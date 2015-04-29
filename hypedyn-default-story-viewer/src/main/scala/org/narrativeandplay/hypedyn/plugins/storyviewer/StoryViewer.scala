@@ -1,7 +1,7 @@
 package org.narrativeandplay.hypedyn.plugins.storyviewer
 
 import org.narrativeandplay.hypedyn.plugins.Plugin
-import org.narrativeandplay.hypedyn.story.Node
+import org.narrativeandplay.hypedyn.story.NodeLike
 
 import scalafx.scene.control.ScrollPane
 
@@ -22,9 +22,9 @@ class StoryViewer extends ScrollPane with Plugin with StoryViewerLike {
   val viewer = new StoryViewerContent
   content = viewer
 
-  override def onNodeCreated(node: Node): Unit = viewer addNode node
+  override def onNodeCreated(node: NodeLike): Unit = viewer addNode node
 
-  override def onNodeUpdated(node: Node): Unit = viewer updateNode node
+  override def onNodeUpdated(node: NodeLike): Unit = viewer updateNode node
 
-  override def onNodeDestroyed(node: Node): Unit = viewer removeNode node
+  override def onNodeDestroyed(node: NodeLike): Unit = viewer removeNode node
 }

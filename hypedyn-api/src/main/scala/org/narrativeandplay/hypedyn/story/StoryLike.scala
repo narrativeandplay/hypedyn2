@@ -1,11 +1,11 @@
 package org.narrativeandplay.hypedyn.story
 
-trait Story {
+trait StoryLike {
   def title: String
 
   def author: String
 
   def description: String
 
-  def nodes: List[Node]
+  def nodes: List[NodeLike]
 }

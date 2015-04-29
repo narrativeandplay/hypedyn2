@@ -1,7 +1,7 @@
 package org.narrativeandplay.hypedyn.events
 
 import org.narrativeandplay.hypedyn.serialisation.SaveHash
-import org.narrativeandplay.hypedyn.story.{Story, Node}
+import org.narrativeandplay.hypedyn.story.{StoryLike, NodeLike}
 
 sealed trait Event
 
@@ -23,25 +23,25 @@ sealed trait UIAction extends Event
 
 case object NewNode extends UIAction
 
-sealed case class EditNode(node: Node) extends UIAction
+sealed case class EditNode(node: NodeLike) extends UIAction
 
-sealed case class DeleteNode(node: Node) extends UIAction
+sealed case class DeleteNode(node: NodeLike) extends UIAction
 
 sealed trait Action extends Event
 
-sealed case class CreateNode(node: Node) extends Action
+sealed case class CreateNode(node: NodeLike) extends Action
 
-sealed case class UpdateNode(uneditedNode: Node, editedNode: Node) extends Action
+sealed case class UpdateNode(uneditedNode: NodeLike, editedNode: NodeLike) extends Action
 
-sealed case class DestroyNode(node: Node) extends Action
+sealed case class DestroyNode(node: NodeLike) extends Action
 
 sealed trait Completion extends Event
 
-sealed case class NodeCreated(node: Node) extends Completion
+sealed case class NodeCreated(node: NodeLike) extends Completion
 
-sealed case class NodeUpdated(node: Node) extends Completion
+sealed case class NodeUpdated(node: NodeLike) extends Completion
 
-sealed case class NodeDestroyed(node: Node) extends Completion
+sealed case class NodeDestroyed(node: NodeLike) extends Completion
 
 sealed case class NodeSelected(nodeId: Long) extends Completion
 
@@ -52,4 +52,4 @@ case object SaveEvent extends Event
 
 sealed case class LoadEvent(data: SaveHash) extends Event
 
-sealed case class StoryLoadedEvent(story: Story) extends Event
+sealed case class StoryLoadedEvent(story: StoryLike) extends Event

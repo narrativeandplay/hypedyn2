@@ -1,23 +1,23 @@
 package org.narrativeandplay.hypedyn.clipboard
 
 import org.narrativeandplay.hypedyn.events.{CreateNode, DeleteNode, EventBus}
-import org.narrativeandplay.hypedyn.story.Node
+import org.narrativeandplay.hypedyn.story.NodeLike
 
 import scalafx.scene.input.{ClipboardContent, Clipboard}
 
 object ClipboardController {
   private val clipboard = new Clipboard(Clipboard.systemClipboard)
 
-  def cut(node: Node): Unit = {
+  def cut(node: NodeLike): Unit = {
     copy(node)
 
     EventBus send DeleteNode(node)
   }
 
-  def copy(node: Node): Unit = {
+  def copy(node: NodeLike): Unit = {
     val c = new ClipboardContent()
 
-    val n = new Node {
+    val n = new NodeLike {
       override def name: String = node.name
 
       override def content: String = node.content
@@ -31,7 +31,7 @@ object ClipboardController {
   }
 
   def paste(): Unit = {
-    val node = clipboard.content(ClipboardDataFormats.nodeFormat).asInstanceOf[Node]
+    val node = clipboard.content(ClipboardDataFormats.nodeFormat).asInstanceOf[NodeLike]
 
     EventBus.send(CreateNode(node))
   }

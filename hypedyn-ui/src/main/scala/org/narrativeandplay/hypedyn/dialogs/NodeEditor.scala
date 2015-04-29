@@ -1,17 +1,17 @@
 package org.narrativeandplay.hypedyn.dialogs
 
 import org.fxmisc.richtext.StyleClassedTextArea
-import org.narrativeandplay.hypedyn.story.Node
+import org.narrativeandplay.hypedyn.story.NodeLike
 import org.tbee.javafx.scene.layout.MigPane
 
 import scalafx.Includes._
 import scalafx.scene.control.{Label, TextField, ButtonType, Dialog}
 import scalafx.stage.Modality
 
-class NodeEditor(dialogTitle: String, nodeToEdit: Option[Node]) extends Dialog[Node] {
+class NodeEditor(dialogTitle: String, nodeToEdit: Option[NodeLike]) extends Dialog[NodeLike] {
   def this(dialogTitle: String) = this(dialogTitle, None)
 
-  def this(dialogTitle: String, nodeToEdit: Node) = {
+  def this(dialogTitle: String, nodeToEdit: NodeLike) = {
     this(dialogTitle, Some(nodeToEdit))
     nodeNameField.text = nodeToEdit.name
     nodeContentField.replaceText(nodeToEdit.content)
@@ -41,7 +41,7 @@ class NodeEditor(dialogTitle: String, nodeToEdit: Option[Node]) extends Dialog[N
 
   resultConverter = {
     case ButtonType.OK =>
-      new Node {
+      new NodeLike {
         override def name: String = nodeNameField.text.value
 
         override def content: String = nodeContentField.getText
@@ -52,7 +52,7 @@ class NodeEditor(dialogTitle: String, nodeToEdit: Option[Node]) extends Dialog[N
     case _ => null
   }
 
-  def showAndWait(): Option[Node] = {
+  def showAndWait(): Option[NodeLike] = {
     val result = delegate.showAndWait()
 
     if (result.isPresent) Some(result.get()) else None
