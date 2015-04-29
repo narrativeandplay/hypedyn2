@@ -284,7 +284,7 @@ Examples:
 ```scala
 val list = List("list", "of", "strings")
 list filter (_.length > 2)
-list filter (_.contains("i"))
+list filter (_ contains "i")
 ```
 
 ## Passing named functions
@@ -486,4 +486,10 @@ Use your best judgment otherwise, and err toward more documentation rather than 
 
 # Further Reading
 
+The Twitter Scala style guide ([Effective Scala](http://twitter.github.io/effectivescala/)) is to be used if some point
+of style is not covered in this document. It also makes for good reading regardless, as it provides a good set of core
+practices to follow when writing Scala.
 
+Also of interest is the [official Scala style guide](http://docs.scala-lang.org/style/). It contains much of the
+reasoning behind many of the guidelines provided here, and is to be used as reference if both this and the Twitter style
+guide are ambiguous or silent on some point of style. 
