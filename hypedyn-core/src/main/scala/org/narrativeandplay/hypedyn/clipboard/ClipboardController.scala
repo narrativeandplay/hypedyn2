@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.clipboard
 
-import org.narrativeandplay.hypedyn.events.{CreateNode, DeleteNode, EventBus}
+import org.narrativeandplay.hypedyn.events.{DestroyNode, CreateNode, EventBus}
 import org.narrativeandplay.hypedyn.story.NodeLike
 
 import scalafx.scene.input.{ClipboardContent, Clipboard}
@@ -11,7 +11,7 @@ object ClipboardController {
   def cut(node: NodeLike): Unit = {
     copy(node)
 
-    EventBus send DeleteNode(node)
+    EventBus send DestroyNode(node)
   }
 
   def copy(node: NodeLike): Unit = {

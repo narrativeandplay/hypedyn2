@@ -30,7 +30,7 @@ object EventBus {
 
   def deleteNodeRequests = eventBus collect { case e: DeleteNodeRequest => e }
 
-  def cutNodeRequests = eventBus collect { case e: CopyNodeRequest => e }
+  def cutNodeRequests = eventBus collect { case e: CutNodeRequest => e }
 
   def copyNodeRequests = eventBus collect { case e: CopyNodeRequest => e }
 
