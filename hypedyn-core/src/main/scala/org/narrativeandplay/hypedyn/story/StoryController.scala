@@ -1,6 +1,7 @@
 package org.narrativeandplay.hypedyn.story
 
 import org.narrativeandplay.hypedyn.events.{NodeDestroyed, NodeUpdated, NodeCreated, EventBus}
+import org.narrativeandplay.hypedyn.serialisation.SaveHash
 import org.narrativeandplay.hypedyn.story.internal.{Node, Story}
 import org.narrativeandplay.hypedyn.undo.{NodeDestroyedChange, NodeEditedChange, NodeCreatedChange, UndoController}
 
@@ -43,5 +44,12 @@ object StoryController {
     if (undoable) {
       UndoController send new NodeEditedChange(editedNode, uneditedNode)
     }
+  }
+
+  def save = currentStory.serialise
+
+  def load(story: SaveHash): Unit = {
+    currentStory = Story deserialise story
+    firstUnusedId = (currentStory.nodes map (_.id)).max + 1
   }
 }
