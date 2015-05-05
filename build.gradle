@@ -49,7 +49,11 @@ allprojects {
         scalaCompileOptions.useAnt = false
         scalaCompileOptions.useCompileDaemon = true
         scalaCompileOptions.additionalParameters = [
-                "-feature"
+                "-feature",
+                "-Xfatal-warnings",
+                "-deprecation",
+                "-unchecked",
+                "-Yinline-warnings"
         ]
     }
 }
