@@ -1,31 +1,12 @@
 package org.narrativeandplay.hypedyn.serialisation.json
 
-import java.io.{File, PrintWriter}
-
 import org.json4s._
 import org.json4s.native.JsonMethods._
 import org.narrativeandplay.hypedyn.serialisation._
 
-import scala.io.Source
-
 object JsonSerialiser {
-  def save(data: SaveElement, saveFile: File): Unit = {
-    val saveData = pretty(render(saveElementToJValue(data)))
-    val writer = new PrintWriter(saveFile)
-
-    writer.write(saveData)
-    writer.close()
-  }
-
-  def load(saveFile: File) = {
-    val fileSource = Source.fromFile(saveFile)
-    val sourceData = fileSource.mkString
-    val parsedData = parse(sourceData)
-
-    fileSource.close()
-
-    jValueToSaveElement(parsedData)
-  }
+  def serialise(data: SaveElement) = pretty(render(saveElementToJValue(data)))
+  def deserialise(data: String): SaveElement = jValueToSaveElement(parse(data))
 
   private def saveElementToJValue(elem: SaveElement): JValue = elem match {
     case SaveInt(i) => JInt(i)
