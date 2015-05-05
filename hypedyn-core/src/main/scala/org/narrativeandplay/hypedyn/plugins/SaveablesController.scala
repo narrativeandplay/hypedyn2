@@ -14,4 +14,8 @@ object SaveablesController {
 
     SaveHash(data.toSeq: _*)
   }
+
+  def onLoad(data: SaveHash): Unit = {
+    SaveablePlugins foreach { case (name, plugin) => plugin.onLoad(data(s"$name")) }
+  }
 }
