@@ -2,7 +2,11 @@ package org.narrativeandplay.hypedyn.plugins.storyviewer
 
 import javafx.event.EventHandler
 import javafx.scene.control.Control
-import javafx.scene.input.MouseEvent
+import javafx.{event => jfxe}
+import javafx.scene.{input => jfxsi}
+
+import scalafx.event.Event
+import scalafx.scene.input.MouseEvent
 
 import com.github.benedictleejh.scala.math.vector.Vector2
 import org.narrativeandplay.hypedyn.events.{EditNodeRequest, NodeDeselected, NodeSelected, EventBus}
@@ -12,7 +16,7 @@ import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoController}
 import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, StringProperty}
 
-import utils.SAMConversions._
+//import utils.SAMConversions._
 import utils.VectorImplicitConversions._
 
 class ViewerNode(initName: String, initContent: String, val id: Long) extends Control with NodeLike {
@@ -30,8 +34,8 @@ class ViewerNode(initName: String, initContent: String, val id: Long) extends Co
 
   setSkin(new ViewerNodeSkin(this))
 
-  onMouseClicked = { (me: MouseEvent) =>
-    me.getClickCount match {
+  onMouseClicked = { me =>
+    me.clickCount match {
       case 1 =>
         if (selected) deselect() else select()
         requestLayout()
@@ -41,19 +45,19 @@ class ViewerNode(initName: String, initContent: String, val id: Long) extends Co
     }
   }
 
-  onMousePressed = { (me: MouseEvent) =>
-    anchor = (me.getSceneX, me.getSceneY)
+  onMousePressed = { me =>
+    anchor = (me.sceneX, me.sceneY)
     topLeft = (getLayoutX, getLayoutY)
   }
-  onMouseDragged = { (me: MouseEvent) =>
+  onMouseDragged = { me =>
     val translation = Vector2(me.getSceneX, me.getSceneY) - anchor
     val finalPos = topLeft + translation
 
     UndoController send new NodeMovedChange(this, topLeft, finalPos)
 
     relocate(finalPos.x, finalPos.y)
-    anchor = (me.getSceneX, me.getSceneY)
-    topLeft = (getLayoutX, getLayoutY)
+    anchor = (me.sceneX, me.sceneY)
+    topLeft = (layoutX, layoutY)
   }
 
   override def relocate(x: Double, y: Double): Unit = {
@@ -101,17 +105,40 @@ class ViewerNode(initName: String, initContent: String, val id: Long) extends Co
 
   def height_=(value: Double) = setHeight(value)
 
+  def layoutX = getLayoutX
+  def layoutY = getLayoutY
+
   def onMouseClicked = getOnMouseClicked
 
-  def onMouseClicked_=(value: EventHandler[_ >: MouseEvent]) = setOnMouseClicked(value)
+  //def onMouseClicked_=(value: EventHandler[_ >: jfxsi.MouseEvent]) = setOnMouseClicked(value)
+  def onMouseClicked_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: T => Unit)(implicit jfx2sfx: U => T) = {
+    setOnMouseClicked(new EventHandler[U] {
+      override def handle(event: U): Unit = lambda(event)
+    })
+  }
+  def onMouseClicked_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: () => Unit) = {
+    setOnMouseClicked(new EventHandler[U] {
+      override def handle(event: U): Unit = lambda()
+    })
+  }
 
   def onMousePressed = getOnMousePressed
 
-  def onMousePressed_=(value: EventHandler[_ >: MouseEvent]) = setOnMousePressed(value)
+  //def onMousePressed_=(value: EventHandler[_ >: jfxsi.MouseEvent]) = setOnMousePressed(value)
+  def onMousePressed_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: T => Unit)(implicit jfx2sfx: U => T) = {
+    setOnMousePressed(new EventHandler[U] {
+      override def handle(event: U): Unit = lambda(event)
+    })
+  }
 
   def onMouseDragged = getOnMouseDragged
 
-  def onMouseDragged_=(value: EventHandler[_ >: MouseEvent]) = setOnMouseDragged(value)
+  //def onMouseDragged_=(value: EventHandler[_ >: jfxsi.MouseEvent]) = setOnMouseDragged(value)
+  def onMouseDragged_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: T => Unit)(implicit jfx2sfx: U => T) = {
+    setOnMouseDragged(new EventHandler[U] {
+      override def handle(event: U): Unit = lambda(event)
+    })
+  }
 
   // </editor-fold>
 }

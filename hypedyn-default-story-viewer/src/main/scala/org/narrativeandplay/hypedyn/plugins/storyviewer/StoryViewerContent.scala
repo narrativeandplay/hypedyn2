@@ -1,16 +1,17 @@
 package org.narrativeandplay.hypedyn.plugins.storyviewer
 
+import javafx.{event => jfxe}
 import javafx.event.EventHandler
 import javafx.scene.control.Control
-import javafx.scene.input.MouseEvent
+import javafx.scene.{input => jfxsi}
+
+import scalafx.Includes._
+import scalafx.event.Event
+import scalafx.scene.input.MouseEvent
 
 import org.narrativeandplay.hypedyn.story.NodeLike
 
 import scala.collection.mutable.ArrayBuffer
-
-import scalafx.Includes._
-
-import utils.SAMConversions._
 
 class StoryViewerContent extends Control {
   val nodes = ArrayBuffer.empty[ViewerNode]
@@ -18,9 +19,10 @@ class StoryViewerContent extends Control {
 
   setSkin(new StoryViewerContentSkin(this))
 
-  onMouseClicked = { (me: MouseEvent) =>
+  onMouseClicked = { me =>
     links foreach (_.deselect())
-    links find (_.contains(me.getX, me.getY)) foreach (_.select(me.getX, me.getY))
+    nodes foreach (_.deselect())
+    links find (_.contains(me.x, me.y)) foreach (_.select(me.x, me.y))
   }
 
   def links: List[Link] = linkGroups.flatMap(_.links).toList
@@ -54,7 +56,11 @@ class StoryViewerContent extends Control {
 
   def onMouseClicked = getOnMouseClicked
 
-  def onMouseClicked_=(value: EventHandler[_ >: MouseEvent]) = setOnMouseClicked(value)
+  def onMouseClicked_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: T => Unit)(implicit jfx2sfx: U => T) = {
+    setOnMouseClicked(new EventHandler[U] {
+      override def handle(event: U): Unit = lambda(event)
+    })
+  }
 
   // </editor-fold>
 }
