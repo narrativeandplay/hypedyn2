@@ -5,14 +5,14 @@ import org.narrativeandplay.hypedyn.story.internal.{Node, Story}
 import org.narrativeandplay.hypedyn.undo.{NodeDestroyedChange, NodeEditedChange, NodeCreatedChange, UndoController}
 
 object StoryController {
-  var currentStory = new Story()
-  var firstUnusedId = 1.toLong
+  private var currentStory = new Story()
+  private var firstUnusedId = 0.toLong
 
-  def find(id: Long) = currentStory.nodes.find(_.id == id)
+  def find(id: Long) = currentStory.nodes find (_.id == id)
 
-  def createNode(node: NodeLike, undoable: Boolean = true): Unit = {
+  def create(node: NodeLike, undoable: Boolean = true): Unit = {
     val newNode = new Node(node.name, node.content, if (node.id < 0) firstUnusedId else node.id)
-    currentStory.storyNodes += newNode
+    currentStory = currentStory addNode newNode
     firstUnusedId = math.max(firstUnusedId, newNode.id + 1)
 
     EventBus send NodeCreated(newNode)
@@ -22,9 +22,9 @@ object StoryController {
     }
   }
 
-  def destroyNode(node: NodeLike, undoable: Boolean = true): Unit = {
-    val nodeToRemove = currentStory.storyNodes find (_.id == node.id)
-    nodeToRemove foreach (currentStory.storyNodes -= _)
+  def destroy(node: NodeLike, undoable: Boolean = true): Unit = {
+    val nodeToRemove = currentStory.nodes find (_.id == node.id)
+    nodeToRemove foreach { n => currentStory = currentStory removeNode n }
 
     nodeToRemove foreach (EventBus send NodeDestroyed(_))
 
@@ -33,11 +33,12 @@ object StoryController {
     }
   }
 
-  def updateNode(uneditedNode: NodeLike, editedNode: NodeLike, undoable: Boolean = true): Unit = {
-    val nodeToUpdate = currentStory.storyNodes find (_.id == uneditedNode.id)
-    nodeToUpdate foreach { n => n.content = editedNode.content; n.name = editedNode.name }
+  def update(uneditedNode: NodeLike, editedNode: NodeLike, undoable: Boolean = true): Unit = {
+    val nodeToUpdate = currentStory.nodes find (_.id == uneditedNode.id)
+    val updatedNode = new Node(editedNode.name, editedNode.content, editedNode.id)
+    nodeToUpdate foreach { n => currentStory = currentStory updateNode (n, updatedNode) }
 
-    nodeToUpdate foreach (EventBus send NodeUpdated(_))
+    EventBus.send(NodeUpdated(updatedNode))
 
     if (undoable) {
       UndoController send new NodeEditedChange(editedNode, uneditedNode)
