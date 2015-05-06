@@ -10,4 +10,8 @@ object KeyCombinations {
   val Cut = new KeyCodeCombination(KeyCode.X, KeyCombination.ShortcutDown)
   val Copy = new KeyCodeCombination(KeyCode.C, KeyCombination.ShortcutDown)
   val Paste = new KeyCodeCombination(KeyCode.V, KeyCombination.ShortcutDown)
+
+  val New = new KeyCodeCombination(KeyCode.N, KeyCombination.ShortcutDown)
+  val Open = new KeyCodeCombination(KeyCode.O, KeyCombination.ShortcutDown)
+  val Save = new KeyCodeCombination(KeyCode.S, KeyCombination.ShortcutDown)
 }

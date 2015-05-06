@@ -29,9 +29,26 @@ object Menubar {
     items.addAll(newStory, openStory, saveStory, new SeparatorMenuItem(), exit)
   }
 
-  private lazy val newStory = new MenuItem("New")
-  private lazy val openStory = new MenuItem("Open")
-  private lazy val saveStory = new MenuItem("Save")
+  private lazy val newStory = new MenuItem("New") {
+    accelerator = KeyCombinations.New
+  }
+
+  private lazy val openStory = new MenuItem("Open"){
+    accelerator = KeyCombinations.Open
+
+    onAction = { ae: ActionEvent =>
+      UiEventDispatcher.load()
+    }
+  }
+
+  private lazy val saveStory = new MenuItem("Save") {
+    accelerator = KeyCombinations.Save
+
+    onAction = { ae: ActionEvent =>
+      UiEventDispatcher.save()
+    }
+  }
+
   private lazy val exit = new MenuItem("Exit") {
     onAction = { actionEvent: ActionEvent =>
       Platform.exit()
@@ -64,7 +81,7 @@ object Menubar {
     accelerator = KeyCombinations.Cut
 
     onAction = { actionEvent: ActionEvent =>
-      UIEventDispatcher.selectedNodeId foreach (EventBus send CutNodeRequest(_))
+      UiEventDispatcher.selectedNodeId foreach (EventBus send CutNodeRequest(_))
     }
   }
 
@@ -72,7 +89,7 @@ object Menubar {
     accelerator = KeyCombinations.Copy
 
     onAction = { actionEvent: ActionEvent =>
-      UIEventDispatcher.selectedNodeId foreach (EventBus send CopyNodeRequest(_))
+      UiEventDispatcher.selectedNodeId foreach (EventBus send CopyNodeRequest(_))
     }
   }
 
