@@ -2,7 +2,7 @@ package org.narrativeandplay.hypedyn.events
 
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
 
-object UIEventDispatcher {
+object UiEventDispatcher {
   var selectedNodeId: Option[Long] = None
 
   EventBus.newNodeEvents subscribe { evt =>
