@@ -15,7 +15,7 @@ object EventBus {
    */
   def requests = eventBus collect { case e: Request => e }
 
-  def uiActions = eventBus collect { case e: UIAction => e }
+  def uiActions = eventBus collect { case e: UiAction => e }
 
   def actions = eventBus collect { case e: Action => e }
 
@@ -37,7 +37,7 @@ object EventBus {
   def pasteNodeRequests = eventBus collect { case PasteNodeRequest => PasteNodeRequest }
 
   /**
-   * UIAction streams
+   * UiAction streams
    */
   def newNodeEvents = eventBus collect { case NewNode => NewNode }
 

@@ -16,13 +16,12 @@ sealed case class CutNodeRequest(nodeId: Long) extends Request
 sealed case class CopyNodeRequest(nodeId: Long) extends Request
 case object PasteNodeRequest extends Request
 
-sealed trait UIAction extends Event
 
-case object NewNode extends UIAction
+sealed trait UiAction extends Event
+case object NewNode extends UiAction
+sealed case class EditNode(node: NodeLike) extends UiAction
+sealed case class DeleteNode(node: NodeLike) extends UiAction
 
-sealed case class EditNode(node: NodeLike) extends UIAction
-
-sealed case class DeleteNode(node: NodeLike) extends UIAction
 
 sealed trait Action extends Event
 sealed case class CreateNode(node: NodeLike) extends Action
