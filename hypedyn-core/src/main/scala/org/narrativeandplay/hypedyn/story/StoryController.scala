@@ -7,7 +7,9 @@ import org.narrativeandplay.hypedyn.undo.{NodeDestroyedChange, NodeEditedChange,
 
 object StoryController {
   private var currentStory = new Story()
-  private var firstUnusedId = 0.toLong
+  private var firstUnusedId = 0L
+
+  def story = currentStory
 
   def find(id: Long) = currentStory.nodes find (_.id == id)
 
