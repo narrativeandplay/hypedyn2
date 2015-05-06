@@ -50,6 +50,12 @@ class StoryViewerContent extends Control {
     }
   }
 
+  def clear(): Unit = {
+    children.clear()
+    linkGroups.clear()
+    nodes.clear()
+  }
+
   // <editor-fold desc="Utility Methods for a ScalaFX-like access pattern">
 
   def children = getChildren

@@ -8,6 +8,8 @@ import javafx.scene.{input => jfxsi}
 import scalafx.event.Event
 import scalafx.scene.input.MouseEvent
 
+import org.narrativeandplay.hypedyn.serialisation.{SaveFloat, SaveInt, SaveHash}
+
 import com.github.benedictleejh.scala.math.vector.Vector2
 import org.narrativeandplay.hypedyn.events.{EditNodeRequest, NodeDeselected, NodeSelected, EventBus}
 import org.narrativeandplay.hypedyn.story.NodeLike
@@ -94,6 +96,7 @@ class ViewerNode(initName: String, initContent: String, val id: Long) extends Co
     Map("left" -> (centre - widthVector), "right" -> (centre + widthVector), "top" -> (centre - heightVector), "bottom" -> (centre + heightVector))
   }
 
+  override def toString = s" Node(id = $id)"
 
   // <editor-fold desc="Utility Methods for a ScalaFX-like access pattern">
 
