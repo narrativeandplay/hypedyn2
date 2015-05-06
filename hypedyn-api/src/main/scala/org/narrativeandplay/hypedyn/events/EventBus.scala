@@ -67,8 +67,10 @@ object EventBus {
 
   def nodeDeselectedEvents = eventBus collect { case e: NodeDeselected => e }
 
+  def storyLoadedEvents = eventBus collect { case e: StoryLoadedEvent => e }
 
-  def saveEvents = eventBus.collect { case SaveEvent => SaveEvent }
+
+  def saveEvents = eventBus.collect { case e: SaveEvent => e }
 
   def loadEvents = eventBus.collect { case e: LoadEvent => e }
 }
