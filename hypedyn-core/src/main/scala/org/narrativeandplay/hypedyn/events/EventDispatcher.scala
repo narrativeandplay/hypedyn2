@@ -1,6 +1,7 @@
 package org.narrativeandplay.hypedyn.events
 
 import org.narrativeandplay.hypedyn.clipboard.ClipboardController
+import org.narrativeandplay.hypedyn.serialisation.IoController
 import org.narrativeandplay.hypedyn.story.StoryController
 
 object EventDispatcher {
@@ -15,4 +16,7 @@ object EventDispatcher {
   EventBus.cutNodeRequests subscribe { evt => StoryController find evt.nodeId foreach ClipboardController.cut }
   EventBus.copyNodeRequests subscribe { evt => StoryController find evt.nodeId foreach ClipboardController.copy }
   EventBus.pasteNodeRequests subscribe { evt => ClipboardController.paste() }
+
+  EventBus.saveEvents subscribe { evt => IoController.save(evt.saveFile) }
+  EventBus.loadEvents subscribe { evt => IoController.load(evt.saveFile) }
 }
