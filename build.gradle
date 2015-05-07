@@ -1,0 +1,50 @@
+plugins {
+    id "com.github.hierynomus.license" version "0.11.0"
+    id "com.github.ben-manes.versions" version "0.9"
+}
+
+apply from: 'javafx.plugin'
+
+dependencies {
+    compile project(':hypedyn-ui')
+}
+
+javafx {
+    mainClass 'org.narrativeandplay.hypedyn.Main'
+}
+
+allprojects {
+    apply plugin: 'scala'
+
+    repositories {
+        jcenter()
+        mavenCentral()
+
+        flatDir {
+            dirs rootDir.path + '/libs'
+        }
+    }
+
+    sourceCompatibility = 1.8
+
+    dependencies {
+        compile 'org.scala-lang:scala-library:2.11.6'
+
+        testCompile 'junit:junit:4.12'
+        testCompile 'org.scalatest:scalatest_2.11:2.2.4'
+        testRuntime 'org.scala-lang.modules:scala-xml_2.11:1.0.4'
+    }
+
+    tasks.withType(ScalaCompile) {
+        scalaCompileOptions.useAnt = false
+        scalaCompileOptions.useCompileDaemon = true
+        scalaCompileOptions.additionalParameters = [
+                "-Xexperimental", // for Single Abstract Method conversion support without needing implicits
+                "-feature",
+                "-Xfatal-warnings",
+                "-deprecation",
+                "-unchecked",
+                "-Yinline-warnings"
+        ]
+    }
+}
