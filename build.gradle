@@ -21,7 +21,7 @@ allprojects {
         mavenCentral()
 
         flatDir {
-            dirs rootDir.path + '/libs'
+            dirs "${rootDir.path}/libs"
         }
     }
 
