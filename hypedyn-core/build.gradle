@@ -8,3 +8,11 @@ dependencies {
 
     compile project(':hypedyn-api')
 }
+
+sourceSets {
+    main {
+        resources {
+            exclude 'org/narrativeandplay/hypedyn/serialisation/export/dev' // exclude development resources
+        }
+    }
+}

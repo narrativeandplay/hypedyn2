@@ -21,7 +21,7 @@ allprojects {
         mavenCentral()
 
         flatDir {
-            dirs rootDir.path + '/libs'
+            dirs "${rootDir.path}/libs"
         }
     }
 
@@ -40,6 +40,7 @@ allprojects {
         scalaCompileOptions.useCompileDaemon = true
         scalaCompileOptions.additionalParameters = [
                 "-Xexperimental", // for Single Abstract Method conversion support without needing implicits
+                "-Xlint",
                 "-feature",
                 "-Xfatal-warnings",
                 "-deprecation",
