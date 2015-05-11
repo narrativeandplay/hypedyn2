@@ -2,11 +2,13 @@ package org.narrativeandplay.hypedyn.events
 
 import rx.lang.scala.subjects.{PublishSubject, SerializedSubject}
 
-import org.narrativeandplay.hypedyn.serialisation.{AstMap, AstElement}
-
 object EventBus {
   private val _eventBus = SerializedSubject(PublishSubject[Event]())
 
+  /**
+   * Send an event to the application
+   * @param event The event to be sent
+   */
   def send(event: Event) = _eventBus.onNext(event)
 
 
@@ -22,12 +24,12 @@ object EventBus {
    */
   val Requests = _eventBus collect { case e: Request => e }
 
-  val NewNodeRequests = _eventBus collect { case NewNodeRequest => NewNodeRequest }
+  val NewNodeRequests = _eventBus collect { case e: NewNodeRequest => e }
   val EditNodeRequests = _eventBus collect { case e: EditNodeRequest => e }
   val DeleteNodeRequests = _eventBus collect { case e: DeleteNodeRequest => e }
 
-  val SaveRequests = _eventBus collect { case SaveRequest => SaveRequest }
-  val LoadRequests = _eventBus collect { case LoadRequest => LoadRequest }
+  val SaveRequests = _eventBus collect { case e: SaveRequest => e }
+  val LoadRequests = _eventBus collect { case e: LoadRequest => e }
 
 
   /**
@@ -35,12 +37,12 @@ object EventBus {
    */
   val Responses = _eventBus collect { case e: Response => e }
 
-  val NewNodeResponses = _eventBus collect { case NewNodeResponse => NewNodeResponse }
+  val NewNodeResponses = _eventBus collect { case e: NewNodeResponse => e }
   val EditNodeResponses = _eventBus collect { case e: EditNodeResponse => e }
   val DeleteNodeResponses = _eventBus collect { case e: DeleteNodeResponse => e }
 
-  val SaveResponses = _eventBus collect { case SaveResponse => SaveResponse }
-  val LoadResponses = _eventBus collect { case LoadResponse => LoadResponse }
+  val SaveResponses = _eventBus collect { case e: SaveResponse => e }
+  val LoadResponses = _eventBus collect { case e: LoadResponse => e }
 
 
   /**
@@ -66,7 +68,7 @@ object EventBus {
   val NodeUpdatedEvents = _eventBus collect { case e: NodeUpdated => e }
   val NodeDestroyedEvents = _eventBus collect { case e: NodeDestroyed => e }
 
-  val StorySavedEvents = _eventBus collect { case StorySaved => StorySaved }
+  val StorySavedEvents = _eventBus collect { case e: StorySaved => e }
   val StoryLoadedEvents = _eventBus collect { case e: StoryLoaded => e }
   val DataLoadedEvents = _eventBus collect { case e: DataLoaded => e }
 }
