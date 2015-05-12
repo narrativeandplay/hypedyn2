@@ -17,7 +17,7 @@ trait Nodal extends Serializable {
   /**
    * The content of the node
    */
-  def content: String
+  def content: NodeContent
 
   /**
    * Determines if this node represents the start of the story
