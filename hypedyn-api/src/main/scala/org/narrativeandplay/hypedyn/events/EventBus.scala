@@ -16,7 +16,7 @@ object EventBus {
   /**
    * Event stream of all `Event`s
    */
-  val Events = _eventBus.toObservable
+  val Events = _eventBus collect { case e: Event => e }
 
 
   /**
