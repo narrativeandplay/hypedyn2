@@ -12,9 +12,9 @@ object PluginsController {
 
   private final val PluginFolder = new File("plugins")
 
-  private val plugins = mutable.HashMap.empty[String, Plugin]
+  private val _plugins = mutable.HashMap.empty[String, Plugin]
 
-  val Plugins = plugins.toMap
+  def plugins = _plugins.toMap
 
   private def init(): Unit = {
     val pluginFolderFiles = Option(PluginFolder.listFiles())
@@ -30,7 +30,7 @@ object PluginsController {
     pluginsToLoad.map(_.name).foreach { pluginClassName =>
       val plugin = loader.loadClass(pluginClassName).newInstance().asInstanceOf[Plugin]
 
-      plugins += plugin.name -> plugin
+      _plugins += plugin.name -> plugin
     }
   }
 

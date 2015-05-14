@@ -9,7 +9,7 @@ trait Saveable {
    */
   this: Plugin =>
 
-  EventBus.SaveResponses foreach { _ => EventBus.send(SaveData(name, onSave, s"Plugin - $name")) }
+  EventBus.SaveToFileEvents foreach { _ => EventBus.send(SaveData(name, onSave, s"Plugin - $name")) }
   EventBus.DataLoadedEvents foreach { evt => onLoad(evt.data(name)) }
 
   /**

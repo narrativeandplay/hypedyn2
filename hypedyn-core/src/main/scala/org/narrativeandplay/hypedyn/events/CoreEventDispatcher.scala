@@ -61,7 +61,7 @@ object CoreEventDispatcher {
   EventBus.SaveRequests foreach { _ => EventBus.send(SaveResponse(CoreEventSourceIdentity)) }
   EventBus.LoadRequests foreach { _ => EventBus.send(LoadResponse(CoreEventSourceIdentity)) }
 
-  EventBus.SaveDataEvents tumbling PluginsController.Plugins.size zip EventBus.SaveToFileEvents foreach {
+  EventBus.SaveDataEvents tumbling PluginsController.plugins.size zip EventBus.SaveToFileEvents foreach {
     case (pluginData, saveFileEvt) =>
       pluginData.foldLeft(Map.empty[String, AstElement])({ case (m, SaveData(pluginName, data, _)) =>
         m + (pluginName -> data)
@@ -96,4 +96,7 @@ object CoreEventDispatcher {
 
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
   }
+
+  EventBus.UndoRequests foreach { _ => EventBus.send(UndoResponse(CoreEventSourceIdentity)) }
+  EventBus.RedoRequests foreach { _ => EventBus.send(RedoResponse(CoreEventSourceIdentity)) }
 }

@@ -4,7 +4,7 @@ import scalafx.scene.control.{Control, ScrollPane}
 
 import com.github.benedictleejh.scala.math.vector.Vector2
 
-import org.narrativeandplay.hypedyn.events.{EditNodeRequest, EventBus}
+import org.narrativeandplay.hypedyn.events.{UiNodeDeselected, UiNodeSelected, EditNodeRequest, EventBus}
 import org.narrativeandplay.hypedyn.plugins.storyviewer.components.ViewerNode
 import org.narrativeandplay.hypedyn.plugins.{Saveable, Plugin}
 import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
@@ -13,10 +13,14 @@ import org.narrativeandplay.hypedyn.story.{NodeId, Narrative, Nodal}
 import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoController}
 
 class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Saveable {
+  prefWidth = 800
+  prefHeight = 600
   /**
    * Returns the name of the plugin
    */
   val name: String = "Default Story Viewer"
+
+  val StoryViewerEventSourceIdentity = s"Plugin - $name"
 
   /**
    * Returns the version of the plugin
@@ -83,11 +87,19 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   }
 
   def requestNodeEdit(id: NodeId): Unit = {
-    EventBus.send(EditNodeRequest(id, s"Plugin - $name"))
+    EventBus.send(EditNodeRequest(id, StoryViewerEventSourceIdentity))
   }
 
   def notifyNodeMove(id: NodeId, initialPos: Vector2[Double], finalPos: Vector2[Double]): Unit = {
     UndoController.send(new NodeMovedChange(viewer, id, initialPos, finalPos))
+  }
+
+  def notifyNodeSelection(id: NodeId): Unit = {
+    EventBus.send(UiNodeSelected(id, StoryViewerEventSourceIdentity))
+  }
+
+  def notifyNodeDeselection(id: NodeId): Unit = {
+    EventBus.send(UiNodeDeselected(id, StoryViewerEventSourceIdentity))
   }
 
   private def serialise(n: ViewerNode) = AstMap("id" -> AstInteger(n.id.value),

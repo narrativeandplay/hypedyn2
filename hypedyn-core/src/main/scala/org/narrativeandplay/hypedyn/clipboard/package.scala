@@ -23,9 +23,9 @@ package object clipboard {
      * Defines what to do on a paste action
      */
     override def paste(): Unit = {
-      val node = clipboard.content(NodeDataFormat).asInstanceOf[Node]
+      val node = Option(clipboard.content(NodeDataFormat).asInstanceOf[Node])
 
-      ClipboardEventDispatcher.pasteNode(node)
+      node foreach { n => ClipboardEventDispatcher.pasteNode(n) }
     }
 
     /**

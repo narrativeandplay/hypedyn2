@@ -30,6 +30,8 @@ class ViewerNode(initName: String,
   width = ViewerNode.width
   height = ViewerNode.height
 
+  setSkin(new ViewerNodeSkin(this))
+
   relocate(topLeft.x, topLeft.y)
 
   onMouseClicked = { me =>
@@ -74,10 +76,12 @@ class ViewerNode(initName: String,
 
   def select(): Unit = {
     selectedProperty() = true
+    eventDispatcher.notifyNodeSelection(id)
   }
 
   def deselect(): Unit = {
     selectedProperty() = false
+    eventDispatcher.notifyNodeDeselection(id)
   }
 
   def edgePoints = {

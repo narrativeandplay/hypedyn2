@@ -48,6 +48,9 @@ sealed case class PasteNodeRequest(src: String) extends Request
 
 sealed case class NewStoryRequest(src: String) extends Request
 
+sealed case class UndoRequest(src: String) extends Request
+sealed case class RedoRequest(src: String) extends Request
+
 
 /**
  * Responses to a request, either containing information, or simply being an acknowledgement of one
@@ -67,6 +70,9 @@ sealed case class CopyNodeResponse(node: Nodal, src: String) extends Response
 sealed case class PasteNodeResponse(src: String) extends Response
 
 sealed case class NewStoryResponse(src: String) extends Response
+
+sealed case class UndoResponse(src: String) extends Response
+sealed case class RedoResponse(src: String) extends Response
 
 
 /**
@@ -102,3 +108,6 @@ sealed case class NodeDestroyed(node: Nodal, src: String) extends Completion
 sealed case class StorySaved(src: String) extends Completion
 sealed case class StoryLoaded(story: Narrative, src: String) extends Completion
 sealed case class DataLoaded(data: Map[String, AstElement], src: String) extends Completion
+
+sealed case class UiNodeSelected(id: NodeId, src: String) extends Completion
+sealed case class UiNodeDeselected(id: NodeId, src: String) extends Completion

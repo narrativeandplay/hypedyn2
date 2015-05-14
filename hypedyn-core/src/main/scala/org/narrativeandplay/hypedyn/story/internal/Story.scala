@@ -11,6 +11,6 @@ class Story(val title: String = "Untitled",
   def changeDescription(newDescription: String) = new Story(title, author, newDescription, nodes)
 
   def addNode(node: Node) = new Story(title, author, description, node :: nodes)
-  def updateNode(node: Node, newNode: Node) = new Story(title, author, description, newNode :: nodes filter (_ != node))
+  def updateNode(node: Node, newNode: Node) = new Story(title, author, description, newNode :: (nodes filter (_ != node)))
   def removeNode(node: Node) = new Story(title, author, description, nodes filter (_ != node))
 }
