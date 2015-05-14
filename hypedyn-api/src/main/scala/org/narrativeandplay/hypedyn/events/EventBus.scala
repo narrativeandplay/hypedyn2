@@ -9,7 +9,10 @@ object EventBus {
    * Send an event to the application
    * @param event The event to be sent
    */
-  def send(event: Event) = eventBus.onNext(event)
+  def send(event: Event) = {
+    println(event)
+    eventBus.onNext(event)
+  }
 
 
 
@@ -37,6 +40,9 @@ object EventBus {
 
   val NewStoryRequests = eventBus collect { case e: NewStoryRequest => e }
 
+  val UndoRequests = eventBus collect { case e: UndoRequest => e }
+  val RedoRequests = eventBus collect { case e: RedoRequest => e }
+
 
   /**
    * Event stream of all `Response`s
@@ -55,6 +61,9 @@ object EventBus {
   val PasteNodeResponses = eventBus collect { case e: PasteNodeResponse => e }
 
   val NewStoryResponses = eventBus collect { case e: NewStoryResponse => e }
+
+  val UndoResponses = eventBus collect { case e: UndoResponse => e }
+  val RedoResponses = eventBus collect { case e: RedoResponse => e }
 
 
   /**
