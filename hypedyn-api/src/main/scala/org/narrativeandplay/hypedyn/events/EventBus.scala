@@ -31,6 +31,12 @@ object EventBus {
   val SaveRequests = eventBus collect { case e: SaveRequest => e }
   val LoadRequests = eventBus collect { case e: LoadRequest => e }
 
+  val CutNodeRequests = eventBus collect { case e: CutNodeRequest => e }
+  val CopyNodeRequests = eventBus collect { case e: CopyNodeRequest => e }
+  val PasteNodeRequests = eventBus collect { case e: PasteNodeRequest => e }
+
+  val NewStoryRequests = eventBus collect { case e: NewStoryRequest => e }
+
 
   /**
    * Event stream of all `Response`s
@@ -43,6 +49,12 @@ object EventBus {
 
   val SaveResponses = eventBus collect { case e: SaveResponse => e }
   val LoadResponses = eventBus collect { case e: LoadResponse => e }
+
+  val CutNodeResponses = eventBus collect { case e: CutNodeResponse => e }
+  val CopyNodeResponses = eventBus collect { case e: CopyNodeResponse => e }
+  val PasteNodeResponses = eventBus collect { case e: PasteNodeResponse => e }
+
+  val NewStoryResponses = eventBus collect { case e: NewStoryResponse => e }
 
 
   /**
@@ -57,6 +69,8 @@ object EventBus {
   val SaveDataEvents = eventBus collect { case e: SaveData => e }
   val SaveToFileEvents = eventBus collect { case e: SaveToFile => e }
   val LoadFromFileEvents = eventBus collect { case e: LoadFromFile => e }
+
+  val CreateStoryEvents = eventBus collect { case e: CreateStory => e }
 
 
   /**
