@@ -2,6 +2,7 @@ package org.narrativeandplay.hypedyn.plugins.narrativeviewer
 
 import scalafx.scene.control.Control
 
+import org.narrativeandplay.hypedyn.events.EventBus
 import org.narrativeandplay.hypedyn.plugins.Plugin
 import org.narrativeandplay.hypedyn.story.Nodal
 
@@ -10,6 +11,10 @@ trait NarrativeViewer {
    * Ensure that a NarrativeViewer is also a ScalaFX control, and a Plugin
    */
   this: Control with Plugin =>
+
+  EventBus.NodeCreatedEvents foreach { n => onNodeCreated(n.node) }
+  EventBus.NodeUpdatedEvents foreach { n => onNodeUpdated(n.node, n.updatedNode) }
+  EventBus.NodeDestroyedEvents foreach { n => onNodeDestroyed(n.node) }
 
   /**
    * Defines what to do when a node is created
