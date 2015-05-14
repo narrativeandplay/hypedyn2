@@ -96,4 +96,7 @@ object CoreEventDispatcher {
 
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
   }
+
+  EventBus.UndoRequests foreach { _ => EventBus.send(UndoResponse(CoreEventSourceIdentity)) }
+  EventBus.RedoRequests foreach { _ => EventBus.send(RedoResponse(CoreEventSourceIdentity)) }
 }
