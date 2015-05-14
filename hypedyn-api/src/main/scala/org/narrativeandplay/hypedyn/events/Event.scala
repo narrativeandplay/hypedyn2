@@ -3,7 +3,7 @@ package org.narrativeandplay.hypedyn.events
 import java.io.File
 
 import org.narrativeandplay.hypedyn.serialisation.AstElement
-import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
+import org.narrativeandplay.hypedyn.story.{NodeId, Narrative, Nodal}
 
 /**
  * A generic trait representing an event in the HypeDyn event system
@@ -25,7 +25,7 @@ sealed trait Event {
   /**
    * Returns the originator of the event
    */
-  def source: String
+  def src: String
 }
 
 
@@ -35,12 +35,18 @@ sealed trait Event {
  * Only the UI or plugins may send Requests
  */
 sealed trait Request extends Event
-sealed case class NewNodeRequest(source: String) extends Request
-sealed case class EditNodeRequest(id: Long, source: String) extends Request
-sealed case class DeleteNodeRequest(id: Long, source: String) extends Request
+sealed case class NewNodeRequest(src: String) extends Request
+sealed case class EditNodeRequest(id: NodeId, src: String) extends Request
+sealed case class DeleteNodeRequest(id: NodeId, src: String) extends Request
 
-sealed case class SaveRequest(source: String) extends Request
-sealed case class LoadRequest(source: String) extends Request
+sealed case class SaveRequest(src: String) extends Request
+sealed case class LoadRequest(src: String) extends Request
+
+sealed case class CutNodeRequest(id: NodeId, src: String) extends Request
+sealed case class CopyNodeRequest(id: NodeId, src: String) extends Request
+sealed case class PasteNodeRequest(src: String) extends Request
+
+sealed case class NewStoryRequest(src: String) extends Request
 
 
 /**
@@ -49,12 +55,18 @@ sealed case class LoadRequest(source: String) extends Request
  * Sent only by the core
  */
 sealed trait Response extends Event
-sealed case class NewNodeResponse(source: String) extends Response
-sealed case class EditNodeResponse(node: Nodal, source: String) extends Response
-sealed case class DeleteNodeResponse(node: Nodal, source: String) extends Response
+sealed case class NewNodeResponse(src: String) extends Response
+sealed case class EditNodeResponse(node: Nodal, src: String) extends Response
+sealed case class DeleteNodeResponse(node: Nodal, src: String) extends Response
 
-sealed case class SaveResponse(source: String) extends Response
-sealed case class LoadResponse(source: String) extends Response
+sealed case class SaveResponse(src: String) extends Response
+sealed case class LoadResponse(src: String) extends Response
+
+sealed case class CutNodeResponse(node: Nodal, src: String) extends Response
+sealed case class CopyNodeResponse(node: Nodal, src: String) extends Response
+sealed case class PasteNodeResponse(src: String) extends Response
+
+sealed case class NewStoryResponse(src: String) extends Response
 
 
 /**
@@ -63,13 +75,13 @@ sealed case class LoadResponse(source: String) extends Response
  * Sent only by the UI or plugins
  */
 sealed trait Action extends Event
-sealed case class CreateNode(node: Nodal, source: String) extends Action
-sealed case class UpdateNode(node: Nodal, updatedNode: Nodal, source: String) extends Action
-sealed case class DestroyNode(node: Nodal, source: String) extends Action
+sealed case class CreateNode(node: Nodal, src: String) extends Action
+sealed case class UpdateNode(node: Nodal, updatedNode: Nodal, src: String) extends Action
+sealed case class DestroyNode(node: Nodal, src: String) extends Action
 
-sealed case class SaveData(pluginName: String, data: AstElement, source: String) extends Action
-sealed case class SaveStory(file: File, source: String) extends Action
-sealed case class LoadStory(file: File, source: String) extends Action
+sealed case class SaveData(pluginName: String, data: AstElement, src: String) extends Action
+sealed case class SaveToFile(file: File, src: String) extends Action
+sealed case class LoadFromFile(file: File, src: String) extends Action
 
 
 /**
@@ -78,10 +90,10 @@ sealed case class LoadStory(file: File, source: String) extends Action
  * Sent only by the core
  */
 sealed trait Completion extends Event
-sealed case class NodeCreated(node: Nodal, source: String) extends Completion
-sealed case class NodeUpdated(node: Nodal, source: String) extends Completion
-sealed case class NodeDestroyed(node: Nodal, source: String) extends Completion
+sealed case class NodeCreated(node: Nodal, src: String) extends Completion
+sealed case class NodeUpdated(node: Nodal, updatedNode: Nodal, src: String) extends Completion
+sealed case class NodeDestroyed(node: Nodal, src: String) extends Completion
 
-sealed case class StorySaved(source: String) extends Completion
-sealed case class StoryLoaded(story: Narrative, source: String) extends Completion
-sealed case class DataLoaded(data: Map[String, AstElement], source: String) extends Completion
+sealed case class StorySaved(src: String) extends Completion
+sealed case class StoryLoaded(story: Narrative, src: String) extends Completion
+sealed case class DataLoaded(data: Map[String, AstElement], src: String) extends Completion
