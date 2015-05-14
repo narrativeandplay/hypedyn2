@@ -5,44 +5,48 @@ import javafx.event.EventHandler
 import javafx.scene.control.Control
 import javafx.scene.{input => jfxsi}
 
+import scala.language.implicitConversions
+import scala.collection.mutable.ArrayBuffer
+
 import scalafx.Includes._
 import scalafx.event.Event
 import scalafx.scene.input.MouseEvent
 
-import org.narrativeandplay.hypedyn.story.NodeLike
+import org.narrativeandplay.hypedyn.plugins.storyviewer.components.{Link, ViewerNode, LinkGroup}
+import org.narrativeandplay.hypedyn.story.Nodal
 
-import scala.collection.mutable.ArrayBuffer
-
-class StoryViewerContent extends Control {
+class StoryViewerContent(private val eventDispatcher: StoryViewer) extends Control {
   val nodes = ArrayBuffer.empty[ViewerNode]
   val linkGroups = ArrayBuffer.empty[LinkGroup]
 
   setSkin(new StoryViewerContentSkin(this))
 
-  onMouseClicked = { me =>
-    links foreach (_.deselect())
-    nodes foreach (_.deselect())
-    links find (_.contains(me.x, me.y)) foreach (_.select(me.x, me.y))
-  }
+  addEventFilter(MouseEvent.MouseClicked, new EventHandler[jfxsi.MouseEvent] {
+    override def handle(event: jfxsi.MouseEvent): Unit = {
+      nodes foreach (_.deselect())
+      links foreach (_.deselect())
+      links find (_.contains(event.getX, event.getY)) foreach (_.select(event.getX, event.getY))
+    }
+  })
 
   def links: List[Link] = linkGroups.flatMap(_.links).toList
 
-  def addNode(node: NodeLike) = {
-    val n = new ViewerNode(node.name, node.content, node.id)
+  def addNode(node: Nodal) = {
+    val n = new ViewerNode(node.name, node.content.text, node.id, eventDispatcher)
     nodes += n
     children += n
 
     n
   }
 
-  def updateNode(node: NodeLike): Unit = {
+  def updateNode(node: Nodal, updatedNode: Nodal): Unit = {
     nodes find (_.id == node.id) foreach { n =>
-      n.name = node.name
-      n.content = node.content
+      n.name = updatedNode.name
+      n.content = updatedNode.content.text
     }
   }
 
-  def removeNode(node: NodeLike): Unit = {
+  def removeNode(node: Nodal): Unit = {
     nodes find (_.id == node.id) foreach { n =>
       children -= n
       linkGroups --= linkGroups filter (_.endPoints.contains(n))
@@ -56,12 +60,11 @@ class StoryViewerContent extends Control {
     nodes.clear()
   }
 
-  // <editor-fold desc="Utility Methods for a ScalaFX-like access pattern">
+  // <editor-fold desc="Utility Methods for a Scala-like access pattern">
 
   def children = getChildren
 
   def onMouseClicked = getOnMouseClicked
-
   def onMouseClicked_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: T => Unit)(implicit jfx2sfx: U => T) = {
     setOnMouseClicked(new EventHandler[U] {
       override def handle(event: U): Unit = lambda(event)

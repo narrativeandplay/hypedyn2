@@ -3,74 +3,98 @@ package org.narrativeandplay.hypedyn.events
 import rx.lang.scala.subjects.{PublishSubject, SerializedSubject}
 
 object EventBus {
-  private val eventBus = SerializedSubject[Event](PublishSubject())
+  private val eventBus = SerializedSubject(PublishSubject[Event]())
 
-  def send(event: Event): Unit = {
+  /**
+   * Send an event to the application
+   * @param event The event to be sent
+   */
+  def send(event: Event) = {
+    println(event)
     eventBus.onNext(event)
   }
 
-  /**
-   * All Observable streams are considered private API, no plugin should be using the streams, and they are subject
-   * to breaking at any time
-   */
-  def requests = eventBus collect { case e: Request => e }
 
-  def uiActions = eventBus collect { case e: UiAction => e }
-
-  def actions = eventBus collect { case e: Action => e }
-
-  def completions = eventBus collect { case e: Completion => e }
 
   /**
-   * Request streams
+   * Event stream of all `Event`s
    */
-  def newNodeRequests = eventBus collect { case NewNodeRequest => NewNodeRequest }
+  val Events = eventBus collect { case e: Event => e }
 
-  def editNodeRequests = eventBus collect { case e: EditNodeRequest => e }
-
-  def deleteNodeRequests = eventBus collect { case e: DeleteNodeRequest => e }
-
-  def cutNodeRequests = eventBus collect { case e: CutNodeRequest => e }
-
-  def copyNodeRequests = eventBus collect { case e: CopyNodeRequest => e }
-
-  def pasteNodeRequests = eventBus collect { case PasteNodeRequest => PasteNodeRequest }
 
   /**
-   * UiAction streams
+   * Event stream of all `Request`s
    */
-  def newNodeEvents = eventBus collect { case NewNode => NewNode }
+  val Requests = eventBus collect { case e: Request => e }
 
-  def editNodeEvents = eventBus collect { case e: EditNode => e }
+  val NewNodeRequests = eventBus collect { case e: NewNodeRequest => e }
+  val EditNodeRequests = eventBus collect { case e: EditNodeRequest => e }
+  val DeleteNodeRequests = eventBus collect { case e: DeleteNodeRequest => e }
 
-  def deleteNodeEvents = eventBus collect { case e: DeleteNode => e }
+  val SaveRequests = eventBus collect { case e: SaveRequest => e }
+  val LoadRequests = eventBus collect { case e: LoadRequest => e }
+
+  val CutNodeRequests = eventBus collect { case e: CutNodeRequest => e }
+  val CopyNodeRequests = eventBus collect { case e: CopyNodeRequest => e }
+  val PasteNodeRequests = eventBus collect { case e: PasteNodeRequest => e }
+
+  val NewStoryRequests = eventBus collect { case e: NewStoryRequest => e }
+
+  val UndoRequests = eventBus collect { case e: UndoRequest => e }
+  val RedoRequests = eventBus collect { case e: RedoRequest => e }
+
 
   /**
-   * Action streams
+   * Event stream of all `Response`s
    */
-  def createNodeEvents = eventBus collect { case e: CreateNode => e }
+  val Responses = eventBus collect { case e: Response => e }
 
-  def updateNodeEvents = eventBus collect { case e: UpdateNode => e }
+  val NewNodeResponses = eventBus collect { case e: NewNodeResponse => e }
+  val EditNodeResponses = eventBus collect { case e: EditNodeResponse => e }
+  val DeleteNodeResponses = eventBus collect { case e: DeleteNodeResponse => e }
 
-  def destroyNodeEvents = eventBus collect { case e: DestroyNode => e }
+  val SaveResponses = eventBus collect { case e: SaveResponse => e }
+  val LoadResponses = eventBus collect { case e: LoadResponse => e }
+
+  val CutNodeResponses = eventBus collect { case e: CutNodeResponse => e }
+  val CopyNodeResponses = eventBus collect { case e: CopyNodeResponse => e }
+  val PasteNodeResponses = eventBus collect { case e: PasteNodeResponse => e }
+
+  val NewStoryResponses = eventBus collect { case e: NewStoryResponse => e }
+
+  val UndoResponses = eventBus collect { case e: UndoResponse => e }
+  val RedoResponses = eventBus collect { case e: RedoResponse => e }
+
 
   /**
-   * Completion streams
+   * Event stream of all `Action`s
    */
-  def nodeCreatedEvents = eventBus collect { case e: NodeCreated => e }
+  val Actions = eventBus collect { case e: Action => e }
 
-  def nodeUpdatedEvents = eventBus collect { case e: NodeUpdated => e }
+  val CreateNodeEvents = eventBus collect { case e: CreateNode => e }
+  val UpdateNodeEvents = eventBus collect { case e: UpdateNode => e }
+  val DestroyNodeEvents = eventBus collect { case e: DestroyNode => e }
 
-  def nodeDestroyedEvents = eventBus collect { case e: NodeDestroyed => e }
+  val SaveDataEvents = eventBus collect { case e: SaveData => e }
+  val SaveToFileEvents = eventBus collect { case e: SaveToFile => e }
+  val LoadFromFileEvents = eventBus collect { case e: LoadFromFile => e }
 
-  def nodeSelectedEvents = eventBus collect { case e: NodeSelected => e }
-
-  def nodeDeselectedEvents = eventBus collect { case e: NodeDeselected => e }
-
-  def storyLoadedEvents = eventBus collect { case e: StoryLoadedEvent => e }
+  val CreateStoryEvents = eventBus collect { case e: CreateStory => e }
 
 
-  def saveEvents = eventBus.collect { case e: SaveEvent => e }
+  /**
+   * Event stream of all `Completion`s
+   */
+  val Completions = eventBus collect { case e: Completion => e }
 
-  def loadEvents = eventBus.collect { case e: LoadEvent => e }
+  val NodeCreatedEvents = eventBus collect { case e: NodeCreated => e }
+  val NodeUpdatedEvents = eventBus collect { case e: NodeUpdated => e }
+  val NodeDestroyedEvents = eventBus collect { case e: NodeDestroyed => e }
+
+  val StorySavedEvents = eventBus collect { case e: StorySaved => e }
+  val StoryLoadedEvents = eventBus collect { case e: StoryLoaded => e }
+  val DataLoadedEvents = eventBus collect { case e: DataLoaded => e }
+
+  val UiNodeSelectedEvents = eventBus collect { case e: UiNodeSelected => e }
+  val UiNodeDeselectedEvents = eventBus collect { case e: UiNodeDeselected => e }
 }

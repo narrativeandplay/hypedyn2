@@ -1,57 +1,47 @@
 package org.narrativeandplay.hypedyn.story
 
-import org.narrativeandplay.hypedyn.events.{NodeDestroyed, NodeUpdated, NodeCreated, EventBus}
-import org.narrativeandplay.hypedyn.serialisation.SaveHash
 import org.narrativeandplay.hypedyn.story.internal.{Node, Story}
-import org.narrativeandplay.hypedyn.undo.{NodeDestroyedChange, NodeEditedChange, NodeCreatedChange, UndoController}
 
 object StoryController {
   private var currentStory = new Story()
-  private var firstUnusedId = 0L
+  private var firstUnusedId = NodeId(0)
 
   def story = currentStory
 
-  def find(id: Long) = currentStory.nodes find (_.id == id)
+  def newStory(title: String, author: String, description: String): Unit = {
+    currentStory = new Story(title, author, description)
+  }
 
-  def create(node: NodeLike, undoable: Boolean = true): Unit = {
-    val newNode = new Node(node.name, node.content, if (node.id < 0) firstUnusedId else node.id)
+  def load(story: Story): Unit = {
+    currentStory = story
+    firstUnusedId = (story.nodes map (_.id)).max.inc
+  }
+
+  def find(nodeId: NodeId) = currentStory.nodes find (_.id == nodeId)
+
+  def create(node: Nodal): Node = {
+    val newNode = Node(if (node.id.isValid) node.id else firstUnusedId, node.name, node.content, node.isStartNode)
     currentStory = currentStory addNode newNode
-    firstUnusedId = math.max(firstUnusedId, newNode.id + 1)
+    firstUnusedId = List(firstUnusedId, newNode.id.inc).max
 
-    EventBus send NodeCreated(newNode)
-
-    if (undoable) {
-      UndoController send new NodeCreatedChange(newNode)
-    }
+    newNode
   }
 
-  def destroy(node: NodeLike, undoable: Boolean = true): Unit = {
-    val nodeToRemove = currentStory.nodes find (_.id == node.id)
-    nodeToRemove foreach { n => currentStory = currentStory removeNode n }
+  def update(node: Nodal, editedNode: Nodal): Option[(Node, Node)] = {
+    val toUpdate = find(node.id)
+    val updated = new Node(editedNode.id, editedNode.name, editedNode.content, editedNode.isStartNode)
 
-    nodeToRemove foreach (EventBus send NodeDestroyed(_))
+    toUpdate foreach { n => currentStory = currentStory updateNode (n, updated) }
 
-    if (undoable) {
-      nodeToRemove foreach (UndoController send new NodeDestroyedChange(_))
-    }
+    toUpdate map ((_, updated))
   }
 
-  def update(uneditedNode: NodeLike, editedNode: NodeLike, undoable: Boolean = true): Unit = {
-    val nodeToUpdate = currentStory.nodes find (_.id == uneditedNode.id)
-    val updatedNode = new Node(editedNode.name, editedNode.content, editedNode.id)
-    nodeToUpdate foreach { n => currentStory = currentStory updateNode (n, updatedNode) }
+  def destroy(node: Nodal): Option[Node] = {
+    val toDestroy = find(node.id)
 
-    EventBus.send(NodeUpdated(updatedNode))
+    toDestroy foreach { n => currentStory = currentStory removeNode n }
 
-    if (undoable) {
-      UndoController send new NodeEditedChange(editedNode, uneditedNode)
-    }
+    toDestroy
   }
 
-  def save = currentStory.serialise
-
-  def load(story: SaveHash): Unit = {
-    currentStory = Story deserialise story
-    firstUnusedId = (currentStory.nodes map (_.id)).max + 1
-  }
 }

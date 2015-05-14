@@ -5,22 +5,19 @@ import java.io.{PrintWriter, File}
 import scala.io.Source
 
 object IoController {
-  def save(file: File): Unit = {
-    val dataToSave = SaveController.getSaveData
-    val serialisedData = Serialiser serialise dataToSave
+  def save(data: String, file: File): Unit = {
     val fileWriter = new PrintWriter(file)
 
-    fileWriter.write(serialisedData)
+    fileWriter.write(data)
     fileWriter.close()
   }
 
-  def load(file: File): Unit = {
+  def load(file: File): String = {
     val fileSource = Source.fromFile(file)
-    val fileData = fileSource.mkString
+    val data = fileSource.mkString
 
     fileSource.close()
 
-    val saveData = Serialiser deserialise fileData
-    SaveController.loadSaveData(saveData)
+    data
   }
 }

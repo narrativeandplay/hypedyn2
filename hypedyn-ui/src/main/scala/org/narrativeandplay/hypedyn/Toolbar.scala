@@ -1,29 +1,27 @@
 package org.narrativeandplay.hypedyn
 
-import org.narrativeandplay.hypedyn.events._
-
 import scalafx.Includes._
 import scalafx.event.ActionEvent
 import scalafx.scene.control.{Button, ToolBar}
 
-object Toolbar {
-  val toolbar = new ToolBar() {
-    items.addAll(newNode, deleteNode, editNode)
-  }
+import org.narrativeandplay.hypedyn.events.UiEventDispatcher
+
+object Toolbar extends ToolBar {
+  items.addAll(newNode, deleteNode, editNode)
 
   private lazy val newNode = new Button("New Node") {
     onAction = { actionEvent: ActionEvent =>
-      EventBus send NewNodeRequest
+      UiEventDispatcher.requestNewNode()
     }
   }
   private lazy val deleteNode = new Button("Delete Node") {
     onAction = { actionEvent: ActionEvent =>
-      UiEventDispatcher.selectedNodeId foreach { id => EventBus send DeleteNodeRequest(id) }
+      UiEventDispatcher.requestDeleteNode()
     }
   }
   private lazy val editNode = new Button("Edit Node") {
     onAction = { actionEvent: ActionEvent =>
-      UiEventDispatcher.selectedNodeId foreach { id => EventBus send EditNodeRequest(id) }
+      UiEventDispatcher.requestEditNode()
     }
   }
 }

@@ -3,24 +3,14 @@ package org.narrativeandplay.hypedyn
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.event.ActionEvent
-import scalafx.scene.control.{Menu, MenuBar, MenuItem, SeparatorMenuItem}
+import scalafx.scene.control.{MenuItem, SeparatorMenuItem, Menu, MenuBar}
 
-import org.narrativeandplay.hypedyn.events._
+import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 import org.narrativeandplay.hypedyn.keycombinations.KeyCombinations
-import org.narrativeandplay.hypedyn.undo.UndoController
 
-/**
- * Object containing the menu bar
- *
- * All menu items are declared after the menu itself, for organisation purposes. As such all menu items must be lazily
- * evaluated, to guarantee correct execution
- */
-object Menubar {
-  val menuBar = new MenuBar() {
-    useSystemMenuBar = true
-
-    menus.addAll(fileMenu, editMenu, helpMenu)
-  }
+object Menubar extends MenuBar {
+  useSystemMenuBar = true
+  menus.addAll(fileMenu, editMenu, helpMenu)
 
   /**
    * File Menu
@@ -31,13 +21,17 @@ object Menubar {
 
   private lazy val newStory = new MenuItem("New") {
     accelerator = KeyCombinations.New
+
+    onAction = { ae: ActionEvent =>
+      UiEventDispatcher.requestNewStory()
+    }
   }
 
   private lazy val openStory = new MenuItem("Open"){
     accelerator = KeyCombinations.Open
 
     onAction = { ae: ActionEvent =>
-      UiEventDispatcher.load()
+      UiEventDispatcher.requestLoad()
     }
   }
 
@@ -45,7 +39,7 @@ object Menubar {
     accelerator = KeyCombinations.Save
 
     onAction = { ae: ActionEvent =>
-      UiEventDispatcher.save()
+      UiEventDispatcher.requestSave()
     }
   }
 
@@ -65,7 +59,7 @@ object Menubar {
     accelerator = KeyCombinations.Undo
 
     onAction = { actionEvent: ActionEvent =>
-      UndoController.undo()
+      UiEventDispatcher.requestUndo()
     }
   }
 
@@ -73,7 +67,7 @@ object Menubar {
     accelerator = if (System.getProperty("os.name") == "Windows") KeyCombinations.RedoWin else KeyCombinations.RedoUnix
 
     onAction = { actionEvent: ActionEvent =>
-      UndoController.redo()
+      UiEventDispatcher.requestRedo()
     }
   }
 
@@ -81,7 +75,7 @@ object Menubar {
     accelerator = KeyCombinations.Cut
 
     onAction = { actionEvent: ActionEvent =>
-      UiEventDispatcher.selectedNodeId foreach (EventBus send CutNodeRequest(_))
+      UiEventDispatcher.requestCut()
     }
   }
 
@@ -89,7 +83,7 @@ object Menubar {
     accelerator = KeyCombinations.Copy
 
     onAction = { actionEvent: ActionEvent =>
-      UiEventDispatcher.selectedNodeId foreach (EventBus send CopyNodeRequest(_))
+      UiEventDispatcher.requestCopy()
     }
   }
 
@@ -97,7 +91,7 @@ object Menubar {
     accelerator = KeyCombinations.Paste
 
     onAction = { actionEvent: ActionEvent =>
-      EventBus send PasteNodeRequest
+      UiEventDispatcher.requestPaste()
     }
   }
 

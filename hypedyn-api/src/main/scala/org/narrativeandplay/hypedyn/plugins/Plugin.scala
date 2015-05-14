@@ -1,19 +1,25 @@
 package org.narrativeandplay.hypedyn.plugins
 
 import org.narrativeandplay.hypedyn.events.EventBus
-import org.narrativeandplay.hypedyn.story.StoryLike
+import org.narrativeandplay.hypedyn.story.Narrative
 
 trait Plugin {
+  EventBus.StoryLoadedEvents foreach { evt => onStoryLoaded(evt.story) }
+
   /**
    * Returns the name of the plugin
    */
   def name: String
 
   /**
-   * Returns the version of the plugin (as per Semantic Versioning 2.0.0 - see http://semver.org/spec/v2.0.0.html)
+   * Returns the version of the plugin
    */
-  def version: String //TODO: change this to a SemVer Version structure
+  def version: String
 
-  EventBus.storyLoadedEvents subscribe { evt => onStoryLoaded(evt.story) }
-  def onStoryLoaded(story: StoryLike): Unit = {}
+  /**
+   * Defines what to do when a story is loaded
+   *
+   * @param story The story that is loaded
+   */
+  def onStoryLoaded(story: Narrative): Unit
 }

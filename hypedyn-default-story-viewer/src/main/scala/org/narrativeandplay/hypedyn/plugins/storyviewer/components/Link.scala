@@ -1,33 +1,30 @@
-package org.narrativeandplay.hypedyn.plugins.storyviewer
+package org.narrativeandplay.hypedyn.plugins.storyviewer.components
 
-import com.github.benedictleejh.scala.math.vector.Vector2
-
-import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, StringProperty}
-
-import utils.BezierCurve
-import utils.VectorImplicitConversions._
-import utils.DoubleUtils._
-
 import scalafx.geometry.{Point2D, Pos}
 import scalafx.scene.control.Label
 import scalafx.scene.paint.Color
-import scalafx.scene.shape._
+import scalafx.scene.shape.{Polygon, Rectangle}
+
+import com.github.benedictleejh.scala.math.vector.Vector2
+
+import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.BezierCurve
+import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.BezierCurve.UiBezierCurve
+import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.DoubleUtils._
+import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.VectorImplicitConversions._
 
 class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private val parentLinkGroup: LinkGroup) {
   private var closestBezierParam = -1d
+  private var clickedPoint = Vector2(-1d, -1d)
+  private var linkPath = BezierCurve((-1d, -1d), (-1d, -1d), (-1d, -1d), (-1d, -1d))
 
-  var clickedPoint = Vector2(-1d, -1d)
-  var linkPath = BezierCurve((-1d, -1d), (-1d, -1d), (-1d, -1d), (-1d, -1d))
+  val nameProperty = StringProperty(initName)
+  val selectedProperty = BooleanProperty(false)
 
-  val _name = new StringProperty(initName)
-  val _selected = BooleanProperty(false)
+  def name: String = nameProperty()
+  def name_=(newName: String) = nameProperty() = newName
 
-  def name: String = _name()
-
-  def name_=(newName: String) = _name() = newName
-
-  def selected = _selected()
+  def selected = selectedProperty()
 
   private val linkLabel = new Label {
     minWidth = Link.labelWidth
@@ -37,7 +34,7 @@ class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private v
     alignment = Pos.Center
     wrapText = true
 
-    text <== _name
+    text <== nameProperty
   }
 
   private val labelBackground = new Rectangle {
@@ -46,7 +43,7 @@ class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private v
     fill = Color.LightGrey
   }
 
-  private def computeEndPoints = {
+  private def endPoints = {
     var minDistPoints = (Vector2(0d, 0d), Vector2(0d, 0d), Double.MaxValue)
     val fromPoints = from.edgePoints
     val toPoints = to.edgePoints
@@ -70,26 +67,25 @@ class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private v
   }
 
   def select(x: Double, y: Double): Unit = {
-    _selected() = true
+    selectedProperty() = true
     clickedPoint = (x, y)
     closestBezierParam = linkPath closestPointParameterValue clickedPoint
   }
 
   def deselect(): Unit = {
-    _selected() = false
+    selectedProperty() = false
     clickedPoint = (-1d, -1d)
     closestBezierParam = -1d
   }
 
-  def contains(x: Double, y: Double): Boolean = path contains new Point2D(x, y)
+  def contains(x: Double, y: Double): Boolean = path.toFxPath contains new Point2D(x, y)
 
-  def computePath(): Unit = {
-    val endPoints = computeEndPoints
+  def path = {
+    val endPts = endPoints
 
     val edgeGroupIndex = parentLinkGroup.indexOf(this)
 
-    val startPoint = endPoints._1
-    val endPoint = endPoints._2
+    val (startPoint, endPoint, _) = endPoints
 
     val x = parentLinkGroup.size
     val y = (endPoint - startPoint).length / 100
@@ -126,35 +122,14 @@ class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private v
       ctrlPt2 -= (v2 - o)
     }
 
-    linkPath = BezierCurve(startPoint, ctrlPt1, ctrlPt2, endPoint)
+    BezierCurve(startPoint, ctrlPt1, ctrlPt2, endPoint)
   }
 
-  def path = {
-    val moveTo = new MoveTo {
-      x = linkPath.startPoint.x
-      y = linkPath.startPoint.y
-    }
-    val curveTo = new CubicCurveTo {
-      controlX1 = linkPath.controlPoint1.x
-      controlY1 = linkPath.controlPoint1.y
-      controlX2 = linkPath.controlPoint2.x
-      controlY2 = linkPath.controlPoint2.y
-      x = linkPath.endPoint.x
-      y = linkPath.endPoint.y
-    }
-    val line = new Path
-    line.elements.addAll(moveTo, curveTo)
-
-    line
-  }
-
-  def graphicElements = {
-    computePath()
-
-    val line = path
+  def draw = {
+    val line = path.toFxPath
 
     val highlight = if (selected) {
-      val h = path
+      val h = path.toFxPath
       h.stroke = Color.Red
       h.strokeWidth = 5
       Some(h)
@@ -194,11 +169,9 @@ class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private v
     val tail1 = triangleHead + headToTail1
     val tail2 = triangleHead + headToTail2
 
-    val arrowhead = Polygon(
-      triangleHead.x, triangleHead.y,
-      tail1.x, tail1.y,
-      tail2.x, tail2.y
-    )
+    val arrowhead = Polygon(triangleHead.x, triangleHead.y,
+                            tail1.x, tail1.y,
+                            tail2.x, tail2.y)
     arrowhead.fill = Color.Black
 
 

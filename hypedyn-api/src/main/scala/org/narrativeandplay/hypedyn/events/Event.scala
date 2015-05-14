@@ -2,41 +2,112 @@ package org.narrativeandplay.hypedyn.events
 
 import java.io.File
 
-import org.narrativeandplay.hypedyn.serialisation.SaveHash
-import org.narrativeandplay.hypedyn.story.{StoryLike, NodeLike}
+import org.narrativeandplay.hypedyn.serialisation.AstElement
+import org.narrativeandplay.hypedyn.story.{NodeId, Narrative, Nodal}
 
-sealed trait Event
+/**
+ * A generic trait representing an event in the HypeDyn event system
+ *
+ * HypeDyn relies almost entirely on events to communicate between different layers of the application.
+ * The main event flow is as follows:
+ *
+ * <pre>
+ *   Request -> Response -> Action -> Completion
+ * </pre>
+ *
+ * The UI or a plugin would generate a `Request`; the core would generate the appropriate `Response`; the UI or plugin
+ * would perform some action/computation and generate an `Action`; the core would perform a resulting action and
+ * generate the appropriate `Completion`
+ *
+ *
+ */
+sealed trait Event {
+  /**
+   * Returns the originator of the event
+   */
+  def src: String
+}
 
 
+/**
+ * Requests for information or signifying that the UI/plugin would like something done
+ *
+ * Only the UI or plugins may send Requests
+ */
 sealed trait Request extends Event
-case object NewNodeRequest extends Request
-sealed case class EditNodeRequest(nodeId: Long) extends Request
-sealed case class DeleteNodeRequest(nodeId: Long) extends Request
-sealed case class CutNodeRequest(nodeId: Long) extends Request
-sealed case class CopyNodeRequest(nodeId: Long) extends Request
-case object PasteNodeRequest extends Request
+sealed case class NewNodeRequest(src: String) extends Request
+sealed case class EditNodeRequest(id: NodeId, src: String) extends Request
+sealed case class DeleteNodeRequest(id: NodeId, src: String) extends Request
+
+sealed case class SaveRequest(src: String) extends Request
+sealed case class LoadRequest(src: String) extends Request
+
+sealed case class CutNodeRequest(id: NodeId, src: String) extends Request
+sealed case class CopyNodeRequest(id: NodeId, src: String) extends Request
+sealed case class PasteNodeRequest(src: String) extends Request
+
+sealed case class NewStoryRequest(src: String) extends Request
+
+sealed case class UndoRequest(src: String) extends Request
+sealed case class RedoRequest(src: String) extends Request
 
 
-sealed trait UiAction extends Event
-case object NewNode extends UiAction
-sealed case class EditNode(node: NodeLike) extends UiAction
-sealed case class DeleteNode(node: NodeLike) extends UiAction
+/**
+ * Responses to a request, either containing information, or simply being an acknowledgement of one
+ *
+ * Sent only by the core
+ */
+sealed trait Response extends Event
+sealed case class NewNodeResponse(src: String) extends Response
+sealed case class EditNodeResponse(node: Nodal, src: String) extends Response
+sealed case class DeleteNodeResponse(node: Nodal, src: String) extends Response
+
+sealed case class SaveResponse(src: String) extends Response
+sealed case class LoadResponse(src: String) extends Response
+
+sealed case class CutNodeResponse(node: Nodal, src: String) extends Response
+sealed case class CopyNodeResponse(node: Nodal, src: String) extends Response
+sealed case class PasteNodeResponse(src: String) extends Response
+
+sealed case class NewStoryResponse(src: String) extends Response
+
+sealed case class UndoResponse(src: String) extends Response
+sealed case class RedoResponse(src: String) extends Response
 
 
+/**
+ * Events containing the result of something having been done on the UI, resulting in a request to update something
+ *
+ * Sent only by the UI or plugins
+ */
 sealed trait Action extends Event
-sealed case class CreateNode(node: NodeLike) extends Action
-sealed case class UpdateNode(uneditedNode: NodeLike, editedNode: NodeLike) extends Action
-sealed case class DestroyNode(node: NodeLike) extends Action
+sealed case class CreateNode(node: Nodal, src: String) extends Action
+sealed case class UpdateNode(node: Nodal, updatedNode: Nodal, src: String) extends Action
+sealed case class DestroyNode(node: Nodal, src: String) extends Action
+
+sealed case class SaveData(pluginName: String, data: AstElement, src: String) extends Action
+sealed case class SaveToFile(file: File, src: String) extends Action
+sealed case class LoadFromFile(file: File, src: String) extends Action
+
+sealed case class CreateStory(title: String = "Untitled",
+                              author: String = "",
+                              desc: String = "",
+                              src: String) extends Action
 
 
+/**
+ * Events signifying the completion of an Action, mainly to inform plugins that something has happened
+ *
+ * Sent only by the core
+ */
 sealed trait Completion extends Event
-sealed case class NodeCreated(node: NodeLike) extends Completion
-sealed case class NodeUpdated(node: NodeLike) extends Completion
-sealed case class NodeDestroyed(node: NodeLike) extends Completion
-sealed case class NodeSelected(nodeId: Long) extends Completion
-sealed case class NodeDeselected(nodeId: Long) extends Completion
-sealed case class StoryLoadedEvent(story: StoryLike) extends Completion
+sealed case class NodeCreated(node: Nodal, src: String) extends Completion
+sealed case class NodeUpdated(node: Nodal, updatedNode: Nodal, src: String) extends Completion
+sealed case class NodeDestroyed(node: Nodal, src: String) extends Completion
 
+sealed case class StorySaved(src: String) extends Completion
+sealed case class StoryLoaded(story: Narrative, src: String) extends Completion
+sealed case class DataLoaded(data: Map[String, AstElement], src: String) extends Completion
 
-case class SaveEvent(saveFile: File) extends Event
-case class LoadEvent(saveFile: File) extends Event
+sealed case class UiNodeSelected(id: NodeId, src: String) extends Completion
+sealed case class UiNodeDeselected(id: NodeId, src: String) extends Completion

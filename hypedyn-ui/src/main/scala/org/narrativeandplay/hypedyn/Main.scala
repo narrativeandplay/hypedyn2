@@ -1,19 +1,24 @@
 package org.narrativeandplay.hypedyn
 
-import org.narrativeandplay.hypedyn.events.{EventDispatcher, UiEventDispatcher, EventBus}
-import org.narrativeandplay.hypedyn.plugins.storyviewer.StoryViewersController
-
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.scene.layout.{VBox, BorderPane}
 
+import org.narrativeandplay.hypedyn.dialogs.FileDialog
+import org.narrativeandplay.hypedyn.events._
+import org.narrativeandplay.hypedyn.plugins.PluginsController
+import org.narrativeandplay.hypedyn.plugins.storyviewer.NarrativeViewersController
+
 object Main extends JFXApp {
   EventBus
-  EventDispatcher
+  PluginsController
+  CoreEventDispatcher
   UiEventDispatcher
+  ClipboardEventDispatcher
+  UndoEventDispatcher
 
-  UiEventDispatcher.mainStage = stage
+  def fileDialog = new FileDialog(stage)
 
   stage = new PrimaryStage {
     title = "HypeDyn"
@@ -21,10 +26,10 @@ object Main extends JFXApp {
     scene = new Scene {
       root = new BorderPane() {
         top = new VBox() {
-          children.addAll(Menubar.menuBar, Toolbar.toolbar)
+          children.addAll(Menubar, Toolbar)
         }
 
-        center = StoryViewersController.defaultViewer
+        center = NarrativeViewersController.DefaultViewer
       }
     }
   }

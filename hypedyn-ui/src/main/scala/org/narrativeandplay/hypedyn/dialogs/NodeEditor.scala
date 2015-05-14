@@ -1,20 +1,20 @@
 package org.narrativeandplay.hypedyn.dialogs
 
-import org.fxmisc.richtext.StyleClassedTextArea
-import org.narrativeandplay.hypedyn.story.NodeLike
-import org.tbee.javafx.scene.layout.MigPane
-
-import scalafx.Includes._
 import scalafx.scene.control.{Label, TextField, ButtonType, Dialog}
 import scalafx.stage.Modality
 
-class NodeEditor(dialogTitle: String, nodeToEdit: Option[NodeLike]) extends Dialog[NodeLike] {
+import org.fxmisc.richtext.StyleClassedTextArea
+import org.tbee.javafx.scene.layout.MigPane
+
+import org.narrativeandplay.hypedyn.story.{NodeContent, NodeId, Nodal}
+
+class NodeEditor(dialogTitle: String, nodeToEdit: Option[Nodal]) extends Dialog[Nodal] {
   def this(dialogTitle: String) = this(dialogTitle, None)
 
-  def this(dialogTitle: String, nodeToEdit: NodeLike) = {
+  def this(dialogTitle: String, nodeToEdit: Nodal) = {
     this(dialogTitle, Some(nodeToEdit))
     nodeNameField.text = nodeToEdit.name
-    nodeContentField.replaceText(nodeToEdit.content)
+    nodeContentField.replaceText(nodeToEdit.content.text)
     nodeContentField.getUndoManager.forgetHistory()
   }
 
@@ -41,18 +41,23 @@ class NodeEditor(dialogTitle: String, nodeToEdit: Option[NodeLike]) extends Dial
 
   resultConverter = {
     case ButtonType.OK =>
-      new NodeLike {
+      new Nodal {
         override def name: String = nodeNameField.text.value
 
-        override def content: String = nodeContentField.getText
+        override def content: NodeContent = NodeContent(nodeContentField.getText)
 
-        override def id: Long = nodeToEdit map (_.id) getOrElse -1
+        override def id: NodeId = nodeToEdit map (_.id) getOrElse NodeId(-1)
+
+        /**
+         * Determines if this node represents the start of the story
+         */
+        override def isStartNode: Boolean = false
       }
 
     case _ => null
   }
 
-  def showAndWait(): Option[NodeLike] = {
+  def showAndWait(): Option[Nodal] = {
     val result = delegate.showAndWait()
 
     if (result.isPresent) Some(result.get()) else None

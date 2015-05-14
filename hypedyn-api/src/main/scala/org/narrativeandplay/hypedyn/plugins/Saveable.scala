@@ -1,25 +1,26 @@
 package org.narrativeandplay.hypedyn.plugins
 
-import org.narrativeandplay.hypedyn.events.{LoadEvent, SaveEvent, EventBus}
-import org.narrativeandplay.hypedyn.serialisation.SaveElement
+import org.narrativeandplay.hypedyn.events.{SaveData, EventBus}
+import org.narrativeandplay.hypedyn.serialisation.AstElement
 
 trait Saveable {
   /**
-   * Ensures that anything that extends Saveable is also a Plugin.
+   * Ensure that a Saveable is also a Plugin
    */
   this: Plugin =>
 
-  //EventBus.loadEvents subscribe { evt => onLoad(evt.data(name)) }
+  EventBus.SaveToFileEvents foreach { _ => EventBus.send(SaveData(name, onSave, s"Plugin - $name")) }
+  EventBus.DataLoadedEvents foreach { evt => onLoad(evt.data(name)) }
 
   /**
-   * Returns the formatted data that a plugin wishes to save
+   * Returns the data that this Saveable would like saved
    */
-  def onSave: SaveElement
+  def onSave(): AstElement
 
   /**
-   * Transforms formatted data into a plugin's internal data structures
+   * Restore the state of this Saveable that was saved
    *
-   * @param data A formatted data object
+   * @param data The saved data
    */
-  def onLoad(data: SaveElement): Unit
+  def onLoad(data: AstElement): Unit
 }

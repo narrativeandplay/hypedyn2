@@ -1,92 +1,87 @@
-package org.narrativeandplay.hypedyn.plugins.storyviewer
+package org.narrativeandplay.hypedyn.plugins.storyviewer.components
 
+import javafx.{event => jfxe}
 import javafx.event.EventHandler
 import javafx.scene.control.Control
-import javafx.{event => jfxe}
 import javafx.scene.{input => jfxsi}
-
-import scalafx.event.Event
-import scalafx.scene.input.MouseEvent
-
-import org.narrativeandplay.hypedyn.serialisation.{SaveFloat, SaveInt, SaveHash}
-
-import com.github.benedictleejh.scala.math.vector.Vector2
-import org.narrativeandplay.hypedyn.events.{EditNodeRequest, NodeDeselected, NodeSelected, EventBus}
-import org.narrativeandplay.hypedyn.story.NodeLike
-import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoController}
 
 import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, StringProperty}
+import scalafx.event.Event
+import scalafx.scene.input.MouseEvent
 
-//import utils.SAMConversions._
-import utils.VectorImplicitConversions._
+import com.github.benedictleejh.scala.math.vector.Vector2
 
-class ViewerNode(initName: String, initContent: String, val id: Long) extends Control with NodeLike {
+import org.narrativeandplay.hypedyn.plugins.storyviewer.StoryViewer
+import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.VectorImplicitConversions._
+import org.narrativeandplay.hypedyn.story.NodeId
+
+class ViewerNode(initName: String,
+                 initContent: String,
+                 val id: NodeId,
+                 private val eventDispatcher: StoryViewer) extends Control {
   private var anchor = Vector2(0.0, 0.0)
   private var topLeft = ViewerNode.defaultLocation
 
-  val _name = new StringProperty(initName)
-  val _content = new StringProperty(initContent)
-  val _selected = BooleanProperty(false)
+  val nameProperty = StringProperty(initName)
+  val contentProperty = StringProperty(initContent)
+  val selectedProperty = BooleanProperty(false)
 
   width = ViewerNode.width
   height = ViewerNode.height
 
-  relocate(topLeft.x, topLeft.y)
-
   setSkin(new ViewerNodeSkin(this))
+
+  relocate(topLeft.x, topLeft.y)
 
   onMouseClicked = { me =>
     me.clickCount match {
       case 1 =>
         if (selected) deselect() else select()
         requestLayout()
-        me.consume() // Prevent mouse event from propagating to parent pane
-      case 2 => EventBus send EditNodeRequest(id)
+      case 2 => eventDispatcher.requestNodeEdit(id)
       case _ =>
     }
   }
 
   onMousePressed = { me =>
     anchor = (me.sceneX, me.sceneY)
-    topLeft = (getLayoutX, getLayoutY)
+    topLeft = (layoutX, layoutY)
   }
   onMouseDragged = { me =>
-    val translation = Vector2(me.getSceneX, me.getSceneY) - anchor
+    val translation = Vector2(me.sceneX, me.sceneY) - anchor
     val finalPos = topLeft + translation
 
-    UndoController send new NodeMovedChange(this, topLeft, finalPos)
+    eventDispatcher.notifyNodeMove(id, topLeft, finalPos)
 
     relocate(finalPos.x, finalPos.y)
     anchor = (me.sceneX, me.sceneY)
     topLeft = (layoutX, layoutY)
   }
 
+  def name = nameProperty()
+  def name_=(newName: String) = nameProperty() = newName
+
+  def content = contentProperty()
+  def content_=(newContent: String) = contentProperty() = newContent
+
+  def selected = selectedProperty()
+
+  def centre = topLeft + Vector2(ViewerNode.width / 2, ViewerNode.height / 2)
+
   override def relocate(x: Double, y: Double): Unit = {
     super.relocate(x, y)
     topLeft = (x, y)
   }
 
-  override def name: String = _name()
-
-  def name_=(newName: String): Unit = _name() = newName
-
-  override def content: String = _content()
-
-  def content_=(newContent: String): Unit = _content() = newContent
-
-  def selected = _selected()
-
-  def centre = topLeft + (ViewerNode.width / 2, ViewerNode.height / 2)
-
   def select(): Unit = {
-    EventBus.send(NodeSelected(id))
-    _selected() = true
+    selectedProperty() = true
+    eventDispatcher.notifyNodeSelection(id)
   }
 
   def deselect(): Unit = {
-    EventBus.send(NodeDeselected(id))
-    _selected() = false
+    selectedProperty() = false
+    eventDispatcher.notifyNodeDeselection(id)
   }
 
   def edgePoints = {
@@ -96,9 +91,7 @@ class ViewerNode(initName: String, initContent: String, val id: Long) extends Co
     Map("left" -> (centre - widthVector), "right" -> (centre + widthVector), "top" -> (centre - heightVector), "bottom" -> (centre + heightVector))
   }
 
-  override def toString = s" Node(id = $id)"
-
-  // <editor-fold desc="Utility Methods for a ScalaFX-like access pattern">
+  // <editor-fold desc="Utility Methods for a Scala-like access pattern">
 
   def width = getWidth
 
@@ -112,22 +105,13 @@ class ViewerNode(initName: String, initContent: String, val id: Long) extends Co
   def layoutY = getLayoutY
 
   def onMouseClicked = getOnMouseClicked
-
-  //def onMouseClicked_=(value: EventHandler[_ >: jfxsi.MouseEvent]) = setOnMouseClicked(value)
   def onMouseClicked_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: T => Unit)(implicit jfx2sfx: U => T) = {
     setOnMouseClicked(new EventHandler[U] {
       override def handle(event: U): Unit = lambda(event)
     })
   }
-  def onMouseClicked_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: () => Unit) = {
-    setOnMouseClicked(new EventHandler[U] {
-      override def handle(event: U): Unit = lambda()
-    })
-  }
 
   def onMousePressed = getOnMousePressed
-
-  //def onMousePressed_=(value: EventHandler[_ >: jfxsi.MouseEvent]) = setOnMousePressed(value)
   def onMousePressed_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: T => Unit)(implicit jfx2sfx: U => T) = {
     setOnMousePressed(new EventHandler[U] {
       override def handle(event: U): Unit = lambda(event)
@@ -135,8 +119,6 @@ class ViewerNode(initName: String, initContent: String, val id: Long) extends Co
   }
 
   def onMouseDragged = getOnMouseDragged
-
-  //def onMouseDragged_=(value: EventHandler[_ >: jfxsi.MouseEvent]) = setOnMouseDragged(value)
   def onMouseDragged_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: T => Unit)(implicit jfx2sfx: U => T) = {
     setOnMouseDragged(new EventHandler[U] {
       override def handle(event: U): Unit = lambda(event)

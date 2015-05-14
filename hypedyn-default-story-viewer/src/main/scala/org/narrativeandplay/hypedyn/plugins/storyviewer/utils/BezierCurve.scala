@@ -1,7 +1,10 @@
 package org.narrativeandplay.hypedyn.plugins.storyviewer.utils
 
+import scalafx.scene.shape.{Path, CubicCurveTo, MoveTo}
+
 import com.github.benedictleejh.scala.math.vector.Vector2
-import DoubleUtils._
+
+import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.DoubleUtils._
 
 case class BezierCurve(startPoint: Vector2[Double],
                        controlPoint1: Vector2[Double],
@@ -41,5 +44,28 @@ case class BezierCurve(startPoint: Vector2[Double],
     }
 
     tMin
+  }
+}
+
+object BezierCurve {
+  implicit class UiBezierCurve(curve: BezierCurve) {
+    def toFxPath = {
+      val moveTo = new MoveTo {
+        x = curve.startPoint.x
+        y = curve.startPoint.y
+      }
+      val curveTo = new CubicCurveTo {
+        controlX1 = curve.controlPoint1.x
+        controlY1 = curve.controlPoint1.y
+        controlX2 = curve.controlPoint2.x
+        controlY2 = curve.controlPoint2.y
+        x = curve.endPoint.x
+        y = curve.endPoint.y
+      }
+      val line = new Path()
+      line.elements.addAll(moveTo, curveTo)
+
+      line
+    }
   }
 }

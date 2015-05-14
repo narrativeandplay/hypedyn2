@@ -1,52 +1,77 @@
 package org.narrativeandplay.hypedyn.events
 
-import java.io.File
-
-import scala.language.reflectiveCalls
-
-import scalafx.Includes._
-import scalafx.stage.{Window, Stage, FileChooser}
-import scalafx.stage.FileChooser.ExtensionFilter
-
+import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
+import org.narrativeandplay.hypedyn.story.NodeId
 
 object UiEventDispatcher {
-  var mainStage: Stage = _
-  val saveLoadFileChooser = new FileChooser() {
-    extensionFilters += new ExtensionFilter("HypeDyn Story", "*.dyn")
+  val UiEventSourceIdentity = "UI"
+  private var selectedNode: Option[NodeId] = None
 
-    def showOpenFileDialog(ownerWindow: Window): Option[File] = Option(showOpenDialog(ownerWindow))
-
-    def showSaveFileDialog(ownerWindow: Window): Option[File] = Option(showSaveDialog(ownerWindow))
-  }
-
-
-  var selectedNodeId: Option[Long] = None
-
-  EventBus.newNodeEvents subscribe { evt =>
+  EventBus.NewNodeResponses foreach { _ =>
     val newNode = new NodeEditor("New Node").showAndWait()
 
-    newNode foreach (EventBus send CreateNode(_))
+    newNode foreach { n => EventBus.send(CreateNode(n, UiEventSourceIdentity)) }
   }
-
-  EventBus.editNodeEvents subscribe { evt =>
+  EventBus.EditNodeResponses foreach { evt =>
     val editedNode = new NodeEditor("Edit Node", evt.node).showAndWait()
 
-    editedNode foreach (EventBus send UpdateNode(evt.node, _))
+    editedNode foreach { n => EventBus.send(UpdateNode(evt.node, n, UiEventSourceIdentity)) }
+  }
+  EventBus.DeleteNodeResponses foreach { evt => EventBus.send(DestroyNode(evt.node, UiEventSourceIdentity)) }
+
+  EventBus.SaveResponses foreach { _ =>
+    val fileToSaveTo = Main.fileDialog.showSaveFileDialog()
+
+    fileToSaveTo foreach { f => EventBus.send(SaveToFile(f, UiEventSourceIdentity)) }
+  }
+  EventBus.LoadResponses foreach { _ =>
+    val fileToLoad = Main.fileDialog.showOpenFileDialog()
+
+    fileToLoad foreach { f => EventBus.send(LoadFromFile(f, UiEventSourceIdentity)) }
   }
 
-  EventBus.nodeSelectedEvents subscribe { evt => selectedNodeId = Some(evt.nodeId) }
-  EventBus.nodeDeselectedEvents subscribe { evt => selectedNodeId = None }
+  EventBus.NewStoryResponses foreach { _ => EventBus.send(CreateStory(src = UiEventSourceIdentity)) }
 
-  def save(): Unit = {
-    val saveFile = saveLoadFileChooser.showSaveFileDialog(mainStage)
+  EventBus.UiNodeSelectedEvents foreach { evt => selectedNode = Some(evt.id) }
+  EventBus.UiNodeDeselectedEvents foreach { _ => selectedNode = None }
 
-    saveFile foreach (EventBus send SaveEvent(_))
+  def requestNewNode(): Unit = {
+    EventBus.send(NewNodeRequest(UiEventSourceIdentity))
+  }
+  def requestEditNode(): Unit = {
+    selectedNode foreach { id => EventBus.send(EditNodeRequest(id, UiEventSourceIdentity)) }
+  }
+  def requestDeleteNode(): Unit = {
+    selectedNode foreach { id => EventBus.send(DeleteNodeRequest(id, UiEventSourceIdentity)) }
   }
 
-  def load(): Unit = {
-    val saveFile = saveLoadFileChooser.showOpenFileDialog(mainStage)
-
-    saveFile foreach (EventBus send LoadEvent(_))
+  def requestNewStory(): Unit = {
+    EventBus.send(NewStoryRequest(UiEventSourceIdentity))
   }
+
+  def requestSave(): Unit = {
+    EventBus.send(SaveRequest(UiEventSourceIdentity))
+  }
+  def requestLoad(): Unit = {
+    EventBus.send(LoadRequest(UiEventSourceIdentity))
+  }
+
+  def requestCut(): Unit = {
+    selectedNode foreach { id => EventBus.send(CutNodeRequest(id, UiEventSourceIdentity)) }
+  }
+  def requestCopy(): Unit = {
+    selectedNode foreach { id => EventBus.send(CopyNodeRequest(id, UiEventSourceIdentity)) }
+  }
+  def requestPaste(): Unit = {
+    EventBus.send(PasteNodeRequest(UiEventSourceIdentity))
+  }
+
+  def requestUndo(): Unit = {
+    EventBus.send(UndoRequest(UiEventSourceIdentity))
+  }
+  def requestRedo(): Unit = {
+    EventBus.send(RedoRequest(UiEventSourceIdentity))
+  }
+
 }

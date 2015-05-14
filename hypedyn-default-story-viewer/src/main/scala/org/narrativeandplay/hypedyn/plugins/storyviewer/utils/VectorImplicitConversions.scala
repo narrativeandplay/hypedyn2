@@ -3,9 +3,9 @@ package org.narrativeandplay.hypedyn.plugins.storyviewer.utils
 import java.awt.Point
 import java.awt.geom.Point2D
 
-import com.github.benedictleejh.scala.math.vector.{Vector2, VectorN}
-
 import scala.language.implicitConversions
+
+import com.github.benedictleejh.scala.math.vector.{Vector2, VectorN}
 
 object VectorImplicitConversions {
   implicit def Tuple2ToVector2[T](t: (T, T))(implicit n: Numeric[T]): Vector2[T] = new Vector2[T](t._1, t._2)
