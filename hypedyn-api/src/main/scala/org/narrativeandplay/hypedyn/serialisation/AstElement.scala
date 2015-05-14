@@ -30,7 +30,7 @@ case object AstNothing extends AstElement
  */
 
 sealed case class AstList(elems: AstElement*) extends AstElement
-sealed case class AstMap(fields: AstHashField*) extends AstElement {
+sealed case class AstMap(fields: AstField*) extends AstElement {
   /**
    * Retrieves an element from the Map
    *
