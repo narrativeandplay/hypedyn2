@@ -29,8 +29,13 @@ case object AstNothing extends AstElement
  * Collection types
  */
 
-sealed case class AstList(elems: AstElement*) extends AstElement
-sealed case class AstMap(fields: AstHashField*) extends AstElement {
+sealed case class AstList(elems: AstElement*) extends AstElement{
+  /**
+   * Converts an `AstList` to a Scala `List`
+   */
+  def toList = elems.toList
+}
+sealed case class AstMap(fields: AstField*) extends AstElement {
   /**
    * Retrieves an element from the Map
    *
@@ -56,4 +61,9 @@ sealed case class AstMap(fields: AstHashField*) extends AstElement {
       case Some((k, v)) => Some(v)
       case None => None
     }
+
+  /**
+   * Converts an `AstMap` to a Scala `Map`
+   */
+  def toMap = fields.toMap
 }
