@@ -30,6 +30,8 @@ class ViewerNode(initName: String,
   width = ViewerNode.width
   height = ViewerNode.height
 
+  setSkin(new ViewerNodeSkin(this))
+
   relocate(topLeft.x, topLeft.y)
 
   onMouseClicked = { me =>
