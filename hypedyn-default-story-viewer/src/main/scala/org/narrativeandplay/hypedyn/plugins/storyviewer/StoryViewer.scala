@@ -13,6 +13,8 @@ import org.narrativeandplay.hypedyn.story.{NodeId, Narrative, Nodal}
 import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoController}
 
 class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Saveable {
+  prefWidth = 800
+  prefHeight = 600
   /**
    * Returns the name of the plugin
    */
