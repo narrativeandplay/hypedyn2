@@ -74,10 +74,12 @@ class ViewerNode(initName: String,
 
   def select(): Unit = {
     selectedProperty() = true
+    eventDispatcher.notifyNodeSelection(id)
   }
 
   def deselect(): Unit = {
     selectedProperty() = false
+    eventDispatcher.notifyNodeDeselection(id)
   }
 
   def edgePoints = {
