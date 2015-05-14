@@ -83,6 +83,11 @@ sealed case class SaveData(pluginName: String, data: AstElement, src: String) ex
 sealed case class SaveToFile(file: File, src: String) extends Action
 sealed case class LoadFromFile(file: File, src: String) extends Action
 
+sealed case class CreateStory(title: String = "Untitled",
+                              author: String = "",
+                              desc: String = "",
+                              src: String) extends Action
+
 
 /**
  * Events signifying the completion of an Action, mainly to inform plugins that something has happened
