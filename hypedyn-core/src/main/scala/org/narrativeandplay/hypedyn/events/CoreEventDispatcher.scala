@@ -1,5 +1,7 @@
 package org.narrativeandplay.hypedyn.events
 
+import java.io.File
+
 import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement}
 import org.narrativeandplay.hypedyn.serialisation.serialisers._
@@ -9,6 +11,7 @@ import org.narrativeandplay.hypedyn.story.StoryController
 
 object CoreEventDispatcher {
   val CoreEventSourceIdentity = "Core"
+  private var loadedFile: Option[File] = None
 
   EventBus.NewNodeRequests foreach { evt => EventBus.send(NewNodeResponse(CoreEventSourceIdentity)) }
   EventBus.EditNodeRequests foreach { evt =>
@@ -58,7 +61,8 @@ object CoreEventDispatcher {
   }
   EventBus.PasteNodeRequests foreach { evt => EventBus.send(PasteNodeResponse(CoreEventSourceIdentity)) }
 
-  EventBus.SaveRequests foreach { _ => EventBus.send(SaveResponse(CoreEventSourceIdentity)) }
+  EventBus.SaveRequests foreach { _ => EventBus.send(SaveResponse(loadedFile, CoreEventSourceIdentity)) }
+  EventBus.SaveAsRequests foreach { _ => EventBus.send(SaveAsResponse(CoreEventSourceIdentity)) }
   EventBus.LoadRequests foreach { _ => EventBus.send(LoadResponse(CoreEventSourceIdentity)) }
 
   EventBus.SaveDataEvents tumbling PluginsController.plugins.size zip EventBus.SaveToFileEvents foreach {
@@ -73,6 +77,8 @@ object CoreEventDispatcher {
 
         IoController.save(Serialiser toString saveData, saveFileEvt.file)
 
+        loadedFile = Some(saveFileEvt.file)
+
         EventBus.send(StorySaved(CoreEventSourceIdentity))
       }
   }
@@ -86,6 +92,8 @@ object CoreEventDispatcher {
     val story = Serialiser.deserialise[Story](dataAst("story"))
     StoryController load story
 
+    loadedFile = Some(evt.file)
+
     UndoController.clearHistory()
 
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
@@ -95,6 +103,8 @@ object CoreEventDispatcher {
   EventBus.NewStoryRequests foreach { _ => EventBus.send(NewStoryResponse(CoreEventSourceIdentity)) }
   EventBus.CreateStoryEvents foreach { evt =>
     StoryController.newStory(evt.title, evt.author, evt.desc)
+
+    loadedFile = None
 
     UndoController.clearHistory()
 

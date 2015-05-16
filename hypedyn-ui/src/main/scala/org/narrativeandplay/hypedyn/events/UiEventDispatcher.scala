@@ -20,7 +20,16 @@ object UiEventDispatcher {
   }
   EventBus.DeleteNodeResponses foreach { evt => EventBus.send(DestroyNode(evt.node, UiEventSourceIdentity)) }
 
-  EventBus.SaveResponses foreach { _ =>
+  EventBus.SaveResponses foreach { evt =>
+    evt.loadedFile match {
+      case Some(file) => EventBus.send(SaveToFile(file, UiEventSourceIdentity))
+      case None =>
+        val fileToSaveTo = Main.fileDialog.showSaveFileDialog()
+
+        fileToSaveTo foreach { f => EventBus.send(SaveToFile(f, UiEventSourceIdentity)) }
+    }
+  }
+  EventBus.SaveAsResponses foreach { _ =>
     val fileToSaveTo = Main.fileDialog.showSaveFileDialog()
 
     fileToSaveTo foreach { f => EventBus.send(SaveToFile(f, UiEventSourceIdentity)) }
@@ -52,6 +61,9 @@ object UiEventDispatcher {
 
   def requestSave(): Unit = {
     EventBus.send(SaveRequest(UiEventSourceIdentity))
+  }
+  def requestSaveAs(): Unit = {
+    EventBus.send(SaveAsRequest(UiEventSourceIdentity))
   }
   def requestLoad(): Unit = {
     EventBus.send(LoadRequest(UiEventSourceIdentity))

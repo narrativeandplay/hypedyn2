@@ -14,4 +14,5 @@ object KeyCombinations {
   val New = new KeyCodeCombination(KeyCode.N, KeyCombination.ShortcutDown)
   val Open = new KeyCodeCombination(KeyCode.O, KeyCombination.ShortcutDown)
   val Save = new KeyCodeCombination(KeyCode.S, KeyCombination.ShortcutDown)
+  val SaveAs = new KeyCodeCombination(KeyCode.S, KeyCombination.ShortcutDown, KeyCombination.ShiftDown)
 }

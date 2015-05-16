@@ -32,6 +32,7 @@ object EventBus {
   val DeleteNodeRequests = eventBus collect { case e: DeleteNodeRequest => e }
 
   val SaveRequests = eventBus collect { case e: SaveRequest => e }
+  val SaveAsRequests = eventBus collect { case e: SaveAsRequest => e }
   val LoadRequests = eventBus collect { case e: LoadRequest => e }
 
   val CutNodeRequests = eventBus collect { case e: CutNodeRequest => e }
@@ -54,6 +55,7 @@ object EventBus {
   val DeleteNodeResponses = eventBus collect { case e: DeleteNodeResponse => e }
 
   val SaveResponses = eventBus collect { case e: SaveResponse => e }
+  val SaveAsResponses = eventBus collect { case e: SaveAsResponse => e }
   val LoadResponses = eventBus collect { case e: LoadResponse => e }
 
   val CutNodeResponses = eventBus collect { case e: CutNodeResponse => e }

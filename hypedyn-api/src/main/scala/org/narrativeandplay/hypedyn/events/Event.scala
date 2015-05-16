@@ -40,6 +40,7 @@ sealed case class EditNodeRequest(id: NodeId, src: String) extends Request
 sealed case class DeleteNodeRequest(id: NodeId, src: String) extends Request
 
 sealed case class SaveRequest(src: String) extends Request
+sealed case class SaveAsRequest(src: String) extends Request
 sealed case class LoadRequest(src: String) extends Request
 
 sealed case class CutNodeRequest(id: NodeId, src: String) extends Request
@@ -62,7 +63,8 @@ sealed case class NewNodeResponse(src: String) extends Response
 sealed case class EditNodeResponse(node: Nodal, src: String) extends Response
 sealed case class DeleteNodeResponse(node: Nodal, src: String) extends Response
 
-sealed case class SaveResponse(src: String) extends Response
+sealed case class SaveResponse(loadedFile: Option[File], src: String) extends Response
+sealed case class SaveAsResponse(src: String) extends Response
 sealed case class LoadResponse(src: String) extends Response
 
 sealed case class CutNodeResponse(node: Nodal, src: String) extends Response
