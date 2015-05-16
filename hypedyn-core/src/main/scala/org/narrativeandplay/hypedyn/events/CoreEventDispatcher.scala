@@ -22,7 +22,7 @@ object CoreEventDispatcher {
     val created = StoryController.create(evt.node)
 
     if (evt.src != UndoEventSourceIdentity) {
-      UndoController.send(new NodeCreatedChange(created))
+      UndoableStream.send(new NodeCreatedChange(created))
     }
 
     EventBus.send(NodeCreated(created, CoreEventSourceIdentity))
@@ -32,7 +32,7 @@ object CoreEventDispatcher {
 
     updatedUnupdatedPair foreach { case (unupdated, updated) =>
       if (evt.src != UndoEventSourceIdentity) {
-        UndoController.send(new NodeUpdatedChange(unupdated, updated))
+        UndoableStream.send(new NodeUpdatedChange(unupdated, updated))
       }
 
       EventBus.send(NodeUpdated(unupdated, updated, CoreEventSourceIdentity))
@@ -43,7 +43,7 @@ object CoreEventDispatcher {
 
     destroyed foreach { n =>
       if (evt.src != UndoEventSourceIdentity) {
-        UndoController.send(new NodeDestroyedChange(n))
+        UndoableStream.send(new NodeDestroyedChange(n))
       }
 
       EventBus.send(NodeDestroyed(n, CoreEventSourceIdentity))

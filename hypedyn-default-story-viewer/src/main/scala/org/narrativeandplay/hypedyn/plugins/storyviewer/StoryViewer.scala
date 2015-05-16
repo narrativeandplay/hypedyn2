@@ -10,7 +10,7 @@ import org.narrativeandplay.hypedyn.plugins.{Saveable, Plugin}
 import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
 import org.narrativeandplay.hypedyn.serialisation._
 import org.narrativeandplay.hypedyn.story.{NodeId, Narrative, Nodal}
-import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoController}
+import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoableStream}
 
 class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Saveable {
   prefWidth = 800
@@ -91,7 +91,7 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   }
 
   def notifyNodeMove(id: NodeId, initialPos: Vector2[Double], finalPos: Vector2[Double]): Unit = {
-    UndoController.send(new NodeMovedChange(viewer, id, initialPos, finalPos))
+    UndoableStream.send(new NodeMovedChange(viewer, id, initialPos, finalPos))
   }
 
   def notifyNodeSelection(id: NodeId): Unit = {
