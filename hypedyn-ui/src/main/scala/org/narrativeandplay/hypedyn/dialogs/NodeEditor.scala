@@ -41,18 +41,10 @@ class NodeEditor(dialogTitle: String, nodeToEdit: Option[Nodal]) extends Dialog[
 
   resultConverter = {
     case ButtonType.OK =>
-      new Nodal {
-        override def name: String = nodeNameField.text.value
-
-        override def content: NodeContent = NodeContent(nodeContentField.getText)
-
-        override def id: NodeId = nodeToEdit map (_.id) getOrElse NodeId(-1)
-
-        /**
-         * Determines if this node represents the start of the story
-         */
-        override def isStartNode: Boolean = false
-      }
+      UiNode(nodeToEdit map (_.id) getOrElse NodeId(-1),
+             nodeNameField.text.value,
+             NodeContent(nodeContentField.getText),
+             isStartNode = false)
 
     case _ => null
   }
