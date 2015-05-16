@@ -86,6 +86,8 @@ object CoreEventDispatcher {
     val story = Serialiser.deserialise[Story](dataAst("story"))
     StoryController load story
 
+    UndoController.clearHistory()
+
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
     EventBus.send(DataLoaded(pluginData, CoreEventSourceIdentity))
   }
@@ -93,6 +95,8 @@ object CoreEventDispatcher {
   EventBus.NewStoryRequests foreach { _ => EventBus.send(NewStoryResponse(CoreEventSourceIdentity)) }
   EventBus.CreateStoryEvents foreach { evt =>
     StoryController.newStory(evt.title, evt.author, evt.desc)
+
+    UndoController.clearHistory()
 
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
   }
