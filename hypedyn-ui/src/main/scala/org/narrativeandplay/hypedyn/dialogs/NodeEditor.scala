@@ -6,7 +6,7 @@ import scalafx.stage.Modality
 import org.fxmisc.richtext.StyleClassedTextArea
 import org.tbee.javafx.scene.layout.MigPane
 
-import org.narrativeandplay.hypedyn.story.{NodeContent, NodeId, Nodal}
+import org.narrativeandplay.hypedyn.story.{UiNode, NodeContent, NodeId, Nodal}
 
 class NodeEditor(dialogTitle: String, nodeToEdit: Option[Nodal]) extends Dialog[Nodal] {
   def this(dialogTitle: String) = this(dialogTitle, None)
@@ -22,7 +22,7 @@ class NodeEditor(dialogTitle: String, nodeToEdit: Option[Nodal]) extends Dialog[
   headerText = None
   resizable = true
 
-  initModality(Modality.APPLICATION_MODAL)
+  initModality(Modality.NONE)
 
   dialogPane.value.getButtonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
 
@@ -50,6 +50,8 @@ class NodeEditor(dialogTitle: String, nodeToEdit: Option[Nodal]) extends Dialog[
   }
 
   def showAndWait(): Option[Nodal] = {
+    initModality(Modality.APPLICATION_MODAL)
+
     val result = delegate.showAndWait()
 
     if (result.isPresent) Some(result.get()) else None

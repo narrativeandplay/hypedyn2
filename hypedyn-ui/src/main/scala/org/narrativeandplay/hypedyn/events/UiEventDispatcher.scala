@@ -1,5 +1,8 @@
 package org.narrativeandplay.hypedyn.events
 
+import scalafx.Includes._
+import scalafx.beans.property.ObjectProperty
+
 import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
 import org.narrativeandplay.hypedyn.story.NodeId
@@ -9,14 +12,30 @@ object UiEventDispatcher {
   private var selectedNode: Option[NodeId] = None
 
   EventBus.NewNodeResponses foreach { _ =>
-    val newNode = new NodeEditor("New Node").showAndWait()
+    val editor = new NodeEditor("New Node")
 
-    newNode foreach { n => EventBus.send(CreateNode(n, UiEventSourceIdentity)) }
+    editor.result onChange { (_, _, newNode) =>
+      // The onChange listener takes 3 values: the observable whose value changes, the old value of the observable,
+      // and the new value of the observable. Due to ScalaFX not properly wrapping JavaFX, and there being no guarantee
+      // from JavaFX that the new value will not be null, the new value is first wrapped into an Option for null-safety,
+      // then processed.
+      Option(newNode) foreach { n => EventBus.send(CreateNode(n, UiEventSourceIdentity)) }
+    }
+
+    editor.show()
   }
   EventBus.EditNodeResponses foreach { evt =>
-    val editedNode = new NodeEditor("Edit Node", evt.node).showAndWait()
+    val editor = new NodeEditor("Edit Node", evt.node)
 
-    editedNode foreach { n => EventBus.send(UpdateNode(evt.node, n, UiEventSourceIdentity)) }
+    editor.result onChange { (_, _, editedNode) =>
+      // The onChange listener takes 3 values: the observable whose value changes, the old value of the observable,
+      // and the new value of the observable. Due to ScalaFX not properly wrapping JavaFX, and there being no guarantee
+      // from JavaFX that the new value will not be null, the new value is first wrapped into an Option for null-safety,
+      // then processed.
+      Option(editedNode) foreach { n => EventBus.send(UpdateNode(evt.node, n, UiEventSourceIdentity)) }
+    }
+
+    editor.show()
   }
   EventBus.DeleteNodeResponses foreach { evt => EventBus.send(DestroyNode(evt.node, UiEventSourceIdentity)) }
 
