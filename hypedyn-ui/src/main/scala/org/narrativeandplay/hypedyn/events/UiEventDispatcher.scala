@@ -1,7 +1,6 @@
 package org.narrativeandplay.hypedyn.events
 
 import scalafx.Includes._
-import scalafx.beans.property.ObjectProperty
 
 import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
@@ -10,6 +9,7 @@ import org.narrativeandplay.hypedyn.story.NodeId
 object UiEventDispatcher {
   val UiEventSourceIdentity = "UI"
   private var selectedNode: Option[NodeId] = None
+  private var openedNodeEditors = Map.empty[NodeId, NodeEditor]
 
   EventBus.NewNodeResponses foreach { _ =>
     val editor = Main.nodeEditor("New Node")
@@ -24,18 +24,29 @@ object UiEventDispatcher {
 
     editor.show()
   }
-  EventBus.EditNodeResponses foreach { evt =>
+  EventBus.EditNodeResponses foreach { response =>
+    openedNodeEditors get response.node.id match {
+      case Some(editor) => editor.dialogPane.value.getScene.getWindow.requestFocus()
+      case None =>
         val editor = Main.nodeEditor("Edit Node", response.node)
 
-    editor.result onChange { (_, _, editedNode) =>
-      // The onChange listener takes 3 values: the observable whose value changes, the old value of the observable,
-      // and the new value of the observable. Due to ScalaFX not properly wrapping JavaFX, and there being no guarantee
-      // from JavaFX that the new value will not be null, the new value is first wrapped into an Option for null-safety,
-      // then processed.
-      Option(editedNode) foreach { n => EventBus.send(UpdateNode(evt.node, n, UiEventSourceIdentity)) }
-    }
+        editor.result onChange { (_, _, editedNode) =>
+          // The onChange listener takes 3 values: the observable whose value changes, the old value of the observable,
+          // and the new value of the observable. Due to ScalaFX not properly wrapping JavaFX, and there being no guarantee
+          // from JavaFX that the new value will not be null, the new value is first wrapped into an Option for null-safety,
+          // then processed.
+          Option(editedNode) foreach { n =>
+            EventBus.send(UpdateNode(response.node, n, UiEventSourceIdentity))
+          }
+        }
 
-    editor.show()
+        editor.onCloseRequest = { dialogEvent =>
+          openedNodeEditors -= response.node.id
+        }
+
+        openedNodeEditors += response.node.id -> editor
+        editor.show()
+    }
   }
   EventBus.DeleteNodeResponses foreach { evt => EventBus.send(DestroyNode(evt.node, UiEventSourceIdentity)) }
 
