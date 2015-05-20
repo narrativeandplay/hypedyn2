@@ -1,18 +1,18 @@
 package org.narrativeandplay.hypedyn.dialogs
 
 import scalafx.scene.control.{Label, TextField, ButtonType, Dialog}
-import scalafx.stage.Modality
+import scalafx.stage.{Window, Modality}
 
 import org.fxmisc.richtext.StyleClassedTextArea
 import org.tbee.javafx.scene.layout.MigPane
 
 import org.narrativeandplay.hypedyn.story.{UiNode, NodeContent, NodeId, Nodal}
 
-class NodeEditor(dialogTitle: String, nodeToEdit: Option[Nodal]) extends Dialog[Nodal] {
-  def this(dialogTitle: String) = this(dialogTitle, None)
+class NodeEditor(dialogTitle: String, nodeToEdit: Option[Nodal], ownerWindow: Window) extends Dialog[Nodal] {
+  def this(dialogTitle: String, ownerWindow: Window) = this(dialogTitle, None, ownerWindow)
 
-  def this(dialogTitle: String, nodeToEdit: Nodal) = {
-    this(dialogTitle, Some(nodeToEdit))
+  def this(dialogTitle: String, nodeToEdit: Nodal, ownerWindow: Window) = {
+    this(dialogTitle, Some(nodeToEdit), ownerWindow)
     nodeNameField.text = nodeToEdit.name
     nodeContentField.replaceText(nodeToEdit.content.text)
     nodeContentField.getUndoManager.forgetHistory()
@@ -22,6 +22,7 @@ class NodeEditor(dialogTitle: String, nodeToEdit: Option[Nodal]) extends Dialog[
   headerText = None
   resizable = true
 
+  initOwner(ownerWindow)
   initModality(Modality.NONE)
 
   dialogPane.value.getButtonTypes.addAll(ButtonType.OK, ButtonType.Cancel)

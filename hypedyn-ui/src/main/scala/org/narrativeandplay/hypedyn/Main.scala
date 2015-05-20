@@ -19,6 +19,8 @@ object Main extends JFXApp {
   UndoEventDispatcher
 
   def fileDialog = new FileDialog(stage)
+  def nodeEditor(dialogTitle: String, nodeToEdit: Nodal) = new NodeEditor(dialogTitle, nodeToEdit, stage)
+  def nodeEditor(dialogTitle: String) = new NodeEditor(dialogTitle, stage)
 
   stage = new PrimaryStage {
     title = "HypeDyn"

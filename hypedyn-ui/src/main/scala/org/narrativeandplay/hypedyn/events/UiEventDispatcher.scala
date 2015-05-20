@@ -12,7 +12,7 @@ object UiEventDispatcher {
   private var selectedNode: Option[NodeId] = None
 
   EventBus.NewNodeResponses foreach { _ =>
-    val editor = new NodeEditor("New Node")
+    val editor = Main.nodeEditor("New Node")
 
     editor.result onChange { (_, _, newNode) =>
       // The onChange listener takes 3 values: the observable whose value changes, the old value of the observable,
@@ -25,7 +25,7 @@ object UiEventDispatcher {
     editor.show()
   }
   EventBus.EditNodeResponses foreach { evt =>
-    val editor = new NodeEditor("Edit Node", evt.node)
+        val editor = Main.nodeEditor("Edit Node", response.node)
 
     editor.result onChange { (_, _, editedNode) =>
       // The onChange listener takes 3 values: the observable whose value changes, the old value of the observable,
