@@ -1,14 +1,15 @@
 package org.narrativeandplay.hypedyn
 
-import scalafx.application.JFXApp
+import scalafx.application.{Platform, JFXApp}
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.scene.layout.{VBox, BorderPane}
 
-import org.narrativeandplay.hypedyn.dialogs.FileDialog
+import org.narrativeandplay.hypedyn.dialogs.{NodeEditor, FileDialog}
 import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.plugins.storyviewer.NarrativeViewersController
+import org.narrativeandplay.hypedyn.story.Nodal
 
 object Main extends JFXApp {
   EventBus
@@ -24,6 +25,12 @@ object Main extends JFXApp {
 
   stage = new PrimaryStage {
     title = "HypeDyn"
+
+    // CLose all windows when closing the main application window, i.e. make closing the main window equivalent to
+    // an exiting of the program
+    onCloseRequest = { _ =>
+      Platform.exit()
+    }
 
     scene = new Scene {
       root = new BorderPane() {
