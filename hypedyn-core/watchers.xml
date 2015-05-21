@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TaskOptions>
+  <TaskOptions>
+    <option name="arguments" value="--map --output ../../javascripts/ --compile $FileName$" />
+    <option name="checkSyntaxErrors" value="true" />
+    <option name="description" value="Compiles .coffee files into .js files" />
+    <option name="exitCodeBehavior" value="ERROR" />
+    <option name="fileExtension" value="coffee" />
+    <option name="immediateSync" value="true" />
+    <option name="name" value="CoffeeScript" />
+    <option name="output" value="../../javascripts/$FileNameWithoutExtension$.js:../../javascripts/$FileNameWithoutExtension$.map:../../javascripts/$FileNameWithoutExtension$.js.map" />
+    <option name="outputFilters">
+      <array>
+        <FilterInfo>
+          <option name="description" value="coffee error format" />
+          <option name="name" value="coffee" />
+          <option name="regExp" value="$FILE_PATH$:$LINE$:$COLUMN$: $MESSAGE$$" />
+        </FilterInfo>
+      </array>
+    </option>
+    <option name="outputFromStdout" value="false" />
+    <option name="passParentEnvs" value="true" />
+    <option name="program" value="coffee" />
+    <option name="scopeName" value="Project Files" />
+    <option name="trackOnlyRoot" value="true" />
+    <option name="workingDir" value="$FileDir$" />
+    <envs />
+  </TaskOptions>
+  <TaskOptions>
+    <option name="arguments" value="--no-cache --update $FileName$:../../stylesheets/$FileNameWithoutExtension$.css" />
+    <option name="checkSyntaxErrors" value="true" />
+    <option name="description" value="Compiles .sass files into .css files" />
+    <option name="exitCodeBehavior" value="ERROR" />
+    <option name="fileExtension" value="sass" />
+    <option name="immediateSync" value="true" />
+    <option name="name" value="Sass" />
+    <option name="output" value="../../stylesheets/$FileNameWithoutExtension$.css:../../stylesheets/$FileNameWithoutExtension$.css.map" />
+    <option name="outputFilters">
+      <array />
+    </option>
+    <option name="outputFromStdout" value="false" />
+    <option name="passParentEnvs" value="true" />
+    <option name="program" value="sass" />
+    <option name="scopeName" value="Project Files" />
+    <option name="trackOnlyRoot" value="true" />
+    <option name="workingDir" value="$FileDir$" />
+    <envs />
+  </TaskOptions>
+  <TaskOptions>
+    <option name="arguments" value="-p $FilePath$ --trace" />
+    <option name="checkSyntaxErrors" value="true" />
+    <option name="description" value="Compiles .slim files into .html files" />
+    <option name="exitCodeBehavior" value="ERROR" />
+    <option name="fileExtension" value="slim" />
+    <option name="immediateSync" value="true" />
+    <option name="name" value="Slim" />
+    <option name="output" value="../$FileNameWithoutExtension$.html" />
+    <option name="outputFilters">
+      <array />
+    </option>
+    <option name="outputFromStdout" value="true" />
+    <option name="passParentEnvs" value="true" />
+    <option name="program" value="slimrb" />
+    <option name="scopeName" value="Project Files" />
+    <option name="trackOnlyRoot" value="false" />
+    <option name="workingDir" value="$FileDir$" />
+    <envs />
+  </TaskOptions>
+</TaskOptions>
+
