@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.story
 
-trait Narrative {
+trait Narrative extends NarrativeElement {
   /**
    * Returns the title of the story
    */

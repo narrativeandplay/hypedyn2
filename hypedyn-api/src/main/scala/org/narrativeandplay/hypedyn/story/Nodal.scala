@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.story
 
-trait Nodal extends Serializable {
+trait Nodal extends Serializable with NarrativeElement {
   /**
    * Gets the ID of the node.
    *
