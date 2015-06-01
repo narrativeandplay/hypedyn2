@@ -1,6 +1,8 @@
 package org.narrativeandplay.hypedyn.story
 
-trait Nodal extends Serializable with NarrativeElement {
+import org.narrativeandplay.hypedyn.story.rules.Rule
+
+trait Nodal extends NarrativeElement[Nodal] with Serializable {
   /**
    * Gets the ID of the node.
    *
@@ -23,6 +25,11 @@ trait Nodal extends Serializable with NarrativeElement {
    * Determines if this node represents the start of the story
    */
   def isStartNode: Boolean
+
+  /**
+   * The list of rules of the node
+   */
+  def rules: List[Rule]
 }
 
 case class NodeId(value: Long) extends AnyVal with Ordered[NodeId] {

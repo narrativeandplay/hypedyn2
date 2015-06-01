@@ -16,4 +16,9 @@ package org.narrativeandplay.hypedyn.story.rules
  *  - comparison with given value
  *  - comparison with another integer fact
  */
-trait Condition
+trait Condition {
+  def conditionType: String
+  def params: Map[String, String]
+}
+
+sealed case class ConditionDefinition(conditionType: String, parameters: List[RuleParameter])

@@ -1,14 +1,16 @@
 package org.narrativeandplay.hypedyn.story.rules
 
-import org.narrativeandplay.hypedyn.story.Nodal
-
-trait Rule[T] {
-  def parent: T
-  def triggerTiming: RuleTriggerTiming[T]
+trait Rule {
+  def id: RuleId
   def conditions: List[Condition]
   def actions: List[Action]
 }
 
-sealed trait RuleTriggerTiming[T]
-case object NodeEntry extends RuleTriggerTiming[Nodal]
-case object NodeExit extends RuleTriggerTiming[Nodal]
+case class RuleId(value: Long) extends AnyVal with Ordered[RuleId] {
+  override def compare(that: RuleId): Int = value compare that.value
+
+  def increment = new RuleId(value + 1)
+  def inc = increment
+
+  def isValid = value >= 0
+}

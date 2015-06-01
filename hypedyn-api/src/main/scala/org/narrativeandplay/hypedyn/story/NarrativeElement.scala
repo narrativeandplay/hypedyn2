@@ -1,3 +1,5 @@
 package org.narrativeandplay.hypedyn.story
 
-trait NarrativeElement
+trait NarrativeElement[T <: NarrativeElement[T]] {
+  self: T =>
+}

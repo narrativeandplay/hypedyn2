@@ -1,6 +1,8 @@
 package org.narrativeandplay.hypedyn.story
 
-trait Narrative extends NarrativeElement {
+import org.narrativeandplay.hypedyn.story.rules.Rule
+
+trait Narrative extends NarrativeElement[Narrative] {
   /**
    * Returns the title of the story
    */
@@ -20,4 +22,9 @@ trait Narrative extends NarrativeElement {
    * Returns the nodes contained in the story
    */
   def nodes: List[Nodal]
+
+  /**
+   * Returns the story-level rules
+   */
+  def rules: List[Rule]
 }

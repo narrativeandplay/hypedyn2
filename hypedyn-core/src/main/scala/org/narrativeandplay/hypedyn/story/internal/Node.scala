@@ -1,5 +1,6 @@
 package org.narrativeandplay.hypedyn.story.internal
 
+import org.narrativeandplay.hypedyn.story.rules.Rule
 import org.narrativeandplay.hypedyn.story.{NodeId, NodeContent, Nodal}
 
 /**
@@ -10,8 +11,12 @@ import org.narrativeandplay.hypedyn.story.{NodeId, NodeContent, Nodal}
  * @param content The content of the node
  * @param isStartNode Determines whether this node is the starting of the story. In each story, only 1 node is allowed
  *                    to be the start node
+ * @param rules The list of rules associated directly with this node
  */
-case class Node(id: NodeId, name: String, content: NodeContent, isStartNode: Boolean) extends Nodal {
+case class Node(id: NodeId, name: String,
+                content: NodeContent,
+                isStartNode: Boolean,
+                rules: List[Rule] = Nil) extends Nodal {
   override def hashCode(): Int = id.hashCode()
 
   override def equals(that: Any): Boolean = that match {

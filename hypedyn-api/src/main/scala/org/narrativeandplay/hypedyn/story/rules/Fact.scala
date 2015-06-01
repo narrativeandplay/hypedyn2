@@ -13,4 +13,11 @@ sealed case class BooleanFact(id: FactId, name: String, value: Boolean) extends 
 sealed case class HFactList(id: FactId, name: String, facts: FactPrimitive*) extends Fact
 sealed case class FactList[T <: FactPrimitive](id: FactId, name: String, facts: T*) extends Fact
 
-case class FactId(value: Long) extends AnyVal
+case class FactId(value: Long) extends AnyVal with Ordered[FactId] {
+  override def compare(that: FactId): Int = value compare that.value
+
+  def increment = new FactId(value + 1)
+  def inc = increment
+
+  def isValid = value >= 0
+}
