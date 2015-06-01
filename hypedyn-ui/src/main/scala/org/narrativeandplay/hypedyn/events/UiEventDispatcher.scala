@@ -40,7 +40,7 @@ object UiEventDispatcher {
           }
         }
 
-        editor.onCloseRequest = { dialogEvent =>
+        editor.onCloseRequest = { _ =>
           openedNodeEditors -= response.node.id
         }
 
