@@ -3,6 +3,7 @@ package org.narrativeandplay.hypedyn
 import scalafx.application.{Platform, JFXApp}
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
+import scalafx.scene.image.Image
 import scalafx.scene.layout.{VBox, BorderPane}
 
 import org.narrativeandplay.hypedyn.dialogs.{NodeEditor, FileDialog}
@@ -19,12 +20,15 @@ object Main extends JFXApp {
   ClipboardEventDispatcher
   UndoEventDispatcher
 
+  private val icon = new Image(getClass.getResourceAsStream("hypedyn-icon.jpg"))
+
   def fileDialog = new FileDialog(stage)
   def nodeEditor(dialogTitle: String, nodeToEdit: Nodal) = new NodeEditor(dialogTitle, nodeToEdit, stage)
   def nodeEditor(dialogTitle: String) = new NodeEditor(dialogTitle, stage)
 
   stage = new PrimaryStage {
     title = "HypeDyn"
+    icons.add(icon)
 
     // CLose all windows when closing the main application window, i.e. make closing the main window equivalent to
     // an exiting of the program
