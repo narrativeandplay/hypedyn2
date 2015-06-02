@@ -5,13 +5,13 @@ sealed trait Fact {
   def name: String
 }
 
-sealed trait FactPrimitive extends Fact
-sealed case class IntegerFact(id: FactId, name: String, value: BigInt) extends FactPrimitive
-sealed case class StringFact(id: FactId, name: String, value: String) extends FactPrimitive
-sealed case class BooleanFact(id: FactId, name: String, value: Boolean) extends FactPrimitive
+sealed case class IntegerFact(id: FactId, name: String, value: BigInt) extends Fact
+sealed case class StringFact(id: FactId, name: String, value: String) extends Fact
+sealed case class BooleanFact(id: FactId, name: String, value: Boolean) extends Fact
 
-sealed case class HFactList(id: FactId, name: String, facts: FactPrimitive*) extends Fact
-sealed case class FactList[T <: FactPrimitive](id: FactId, name: String, facts: T*) extends Fact
+sealed case class IntegerFactList(id: FactId, name: String, facts: IntegerFact*) extends Fact
+sealed case class StringFactList(id: FactId, name: String, facts: StringFact*) extends Fact
+sealed case class BooleanFactList(id: FactId, name: String, facts: BooleanFact*) extends Fact
 
 case class FactId(value: Long) extends AnyVal with Ordered[FactId] {
   override def compare(that: FactId): Int = value compare that.value
