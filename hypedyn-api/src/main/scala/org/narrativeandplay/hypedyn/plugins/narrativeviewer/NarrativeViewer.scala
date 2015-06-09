@@ -10,7 +10,7 @@ trait NarrativeViewer {
   /**
    * Ensure that a NarrativeViewer is also a ScalaFX control, and a Plugin
    */
-  this: Control with Plugin =>
+  self: Control with Plugin =>
 
   EventBus.NodeCreatedEvents foreach { n => onNodeCreated(n.node) }
   EventBus.NodeUpdatedEvents foreach { n => onNodeUpdated(n.node, n.updatedNode) }
