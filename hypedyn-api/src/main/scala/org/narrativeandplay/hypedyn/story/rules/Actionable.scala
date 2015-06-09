@@ -24,4 +24,12 @@ package org.narrativeandplay.hypedyn.story.rules
  * - enable link to this node from anywhere
  * - show disabled anywhere link
  */
-trait Action
+trait Actionable {
+  def actionType: String
+  def params: Map[String, String]
+}
+
+sealed case class ActionDefinition(actionName: String,
+                                   description: String,
+                                   actionType: List[ActionType],
+                                   parameters: List[RuleParameter])

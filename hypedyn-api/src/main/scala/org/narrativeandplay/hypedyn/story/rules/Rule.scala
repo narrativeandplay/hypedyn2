@@ -2,8 +2,8 @@ package org.narrativeandplay.hypedyn.story.rules
 
 trait Rule {
   def id: RuleId
-  def conditions: List[Condition]
-  def actions: List[Action]
+  def conditions: List[Conditional]
+  def actions: List[Actionable]
 }
 
 case class RuleId(value: Long) extends AnyVal with Ordered[RuleId] {
