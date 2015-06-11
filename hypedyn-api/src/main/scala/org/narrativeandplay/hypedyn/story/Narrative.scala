@@ -24,6 +24,11 @@ trait Narrative extends NarrativeElement[Narrative] {
   def nodes: List[Nodal]
 
   /**
+   * Returns the list of facts of the story
+   */
+  def facts: List[Fact]
+
+  /**
    * Returns the story-level rules
    */
   def rules: List[RuleLike]
