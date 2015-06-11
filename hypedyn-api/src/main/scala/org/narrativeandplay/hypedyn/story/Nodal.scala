@@ -32,7 +32,7 @@ trait Nodal extends NarrativeElement[Nodal] with Serializable {
   def rules: List[RuleLike]
 }
 
-case class NodeId(value: Long) extends AnyVal with Ordered[NodeId] {
+case class NodeId(value: BigInt) extends AnyVal with Ordered[NodeId] {
   override def compare(that: NodeId): Int = value compare that.value
 
   def increment = new NodeId(value + 1)

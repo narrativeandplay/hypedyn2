@@ -13,7 +13,7 @@ sealed case class IntegerFactList(id: FactId, name: String, facts: IntegerFact*)
 sealed case class StringFactList(id: FactId, name: String, facts: StringFact*) extends Fact
 sealed case class BooleanFactList(id: FactId, name: String, facts: BooleanFact*) extends Fact
 
-case class FactId(value: Long) extends AnyVal with Ordered[FactId] {
+case class FactId(value: BigInt) extends AnyVal with Ordered[FactId] {
   override def compare(that: FactId): Int = value compare that.value
 
   def increment = new FactId(value + 1)

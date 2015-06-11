@@ -10,7 +10,7 @@ sealed trait AstElement
  * Base data types
  */
 
-sealed case class AstInteger(i: Long) extends AstElement
+sealed case class AstInteger(i: BigInt) extends AstElement
 sealed case class AstFloat(f: Double) extends AstElement
 sealed case class AstDecimal(d: BigDecimal) extends AstElement
 sealed case class AstString(s: String) extends AstElement
