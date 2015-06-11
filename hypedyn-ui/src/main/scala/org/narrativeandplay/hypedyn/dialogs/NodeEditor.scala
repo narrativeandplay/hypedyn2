@@ -6,7 +6,7 @@ import scalafx.stage.{Window, Modality}
 import org.fxmisc.richtext.StyleClassedTextArea
 import org.tbee.javafx.scene.layout.MigPane
 
-import org.narrativeandplay.hypedyn.story.{UiNode, NodeContent, NodeId, Nodal}
+import org.narrativeandplay.hypedyn.story.{UiNodeContent, UiNode, NodeId, Nodal}
 
 class NodeEditor(dialogTitle: String, nodeToEdit: Option[Nodal], ownerWindow: Window) extends Dialog[Nodal] {
   def this(dialogTitle: String, ownerWindow: Window) = this(dialogTitle, None, ownerWindow)
@@ -44,8 +44,9 @@ class NodeEditor(dialogTitle: String, nodeToEdit: Option[Nodal], ownerWindow: Wi
     case ButtonType.OK =>
       UiNode(nodeToEdit map (_.id) getOrElse NodeId(-1),
              nodeNameField.text.value,
-             NodeContent(nodeContentField.getText),
-             isStartNode = false)
+             UiNodeContent(nodeContentField.getText, Map.empty), // The map must be replaced with the actual map of rules
+             isStartNode = false,
+             Nil) // Must be replaced with the actual rules
 
     case _ => null
   }
