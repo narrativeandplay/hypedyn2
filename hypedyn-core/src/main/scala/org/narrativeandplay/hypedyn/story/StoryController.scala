@@ -1,6 +1,7 @@
 package org.narrativeandplay.hypedyn.story
 
 import org.narrativeandplay.hypedyn.story.internal.{Node, Story}
+import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions._
 
 object StoryController {
   private var currentStory = new Story()

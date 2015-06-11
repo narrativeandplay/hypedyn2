@@ -5,6 +5,7 @@ import scalafx.scene.input.{ClipboardContent, Clipboard, DataFormat}
 import org.narrativeandplay.hypedyn.events.ClipboardEventDispatcher
 import org.narrativeandplay.hypedyn.story.{Nodal, NodeId}
 import org.narrativeandplay.hypedyn.story.internal.Node
+import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions._
 
 package object clipboard {
   implicit object NodeCopier extends Copyable[Nodal] {
