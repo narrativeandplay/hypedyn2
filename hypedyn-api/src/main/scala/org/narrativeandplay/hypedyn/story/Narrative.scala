@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.story
 
-import org.narrativeandplay.hypedyn.story.rules.Rule
+import org.narrativeandplay.hypedyn.story.rules.{Fact, RuleLike}
 
 trait Narrative extends NarrativeElement[Narrative] {
   /**
@@ -26,5 +26,5 @@ trait Narrative extends NarrativeElement[Narrative] {
   /**
    * Returns the story-level rules
    */
-  def rules: List[Rule]
+  def rules: List[RuleLike]
 }
