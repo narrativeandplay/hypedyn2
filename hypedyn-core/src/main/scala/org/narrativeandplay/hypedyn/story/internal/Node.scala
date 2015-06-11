@@ -1,7 +1,7 @@
 package org.narrativeandplay.hypedyn.story.internal
 
-import org.narrativeandplay.hypedyn.story.rules.Rule
-import org.narrativeandplay.hypedyn.story.{NodeId, NodeContent, Nodal}
+import org.narrativeandplay.hypedyn.story.rules.internal.Rule
+import org.narrativeandplay.hypedyn.story.{NodeId, Nodal}
 
 /**
  * Class representing a node of a story
@@ -13,7 +13,8 @@ import org.narrativeandplay.hypedyn.story.{NodeId, NodeContent, Nodal}
  *                    to be the start node
  * @param rules The list of rules associated directly with this node
  */
-case class Node(id: NodeId, name: String,
+case class Node(id: NodeId,
+                name: String,
                 content: NodeContent,
                 isStartNode: Boolean,
                 rules: List[Rule] = Nil) extends Nodal {
