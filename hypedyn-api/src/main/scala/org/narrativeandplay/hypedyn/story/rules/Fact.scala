@@ -3,6 +3,15 @@ package org.narrativeandplay.hypedyn.story.rules
 sealed trait Fact {
   def id: FactId
   def name: String
+
+  override def hashCode(): Int = id.hashCode()
+
+  override def equals(that: Any): Boolean = that match {
+    case that: Fact => (that canEqual this) && (id == that.id)
+    case _ => false
+  }
+
+  def canEqual(that: Any): Boolean = that.isInstanceOf[Fact]
 }
 
 sealed case class IntegerFact(id: FactId, name: String, initalValue: BigInt) extends Fact
