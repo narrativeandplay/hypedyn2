@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.story
 
-import org.narrativeandplay.hypedyn.story.internal.{Node, Story}
+import org.narrativeandplay.hypedyn.story.internal.{NodeContent, Node, Story}
 import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions._
 import org.narrativeandplay.hypedyn.story.rules._
 
@@ -8,6 +8,7 @@ object StoryController {
   private var currentStory = new Story()
   private var firstUnusedNodeId = NodeId(0)
   private var firstUnusedFactId = FactId(0)
+  private var firstUnusedRuleId = RuleId(0)
 
   def story = currentStory
 
@@ -24,16 +25,38 @@ object StoryController {
   def find(factId: FactId) = currentStory.facts find (_.id == factId)
 
   def create(node: Nodal): Node = {
-    val newNode = Node(if (node.id.isValid) node.id else firstUnusedId, node.name, node.content, node.isStartNode)
+    val newNodeContent = NodeContent(node.content.text, node.content.rulesets map { case (indexes, rule) =>
+      val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
+      firstUnusedRuleId = List(firstUnusedRuleId, r.id.inc).max
+      indexes -> r
+    })
+    val newNodeRules = node.rules map { rule =>
+      val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
+      firstUnusedRuleId = List(firstUnusedRuleId, r.id.inc).max
+      r
+    }
+    val newNode = Node(if (node.id.isValid) node.id else firstUnusedNodeId,
+                       node.name, newNodeContent, node.isStartNode, newNodeRules)
     currentStory = currentStory addNode newNode
-    firstUnusedId = List(firstUnusedId, newNode.id.inc).max
+    firstUnusedNodeId = List(firstUnusedNodeId, newNode.id.inc).max
 
     newNode
   }
 
   def update(node: Nodal, editedNode: Nodal): Option[(Node, Node)] = {
+    val editedNodeContent = NodeContent(editedNode.content.text, editedNode.content.rulesets map { case (indexes, rule) =>
+      val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
+      firstUnusedRuleId = List(firstUnusedRuleId, r.id.inc).max
+      indexes -> r
+    })
+    val editedNodeRules = editedNode.rules map { rule =>
+      val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
+      firstUnusedRuleId = List(firstUnusedRuleId, r.id.inc).max
+      r
+    }
+
     val toUpdate = find(node.id)
-    val updated = new Node(editedNode.id, editedNode.name, editedNode.content, editedNode.isStartNode)
+    val updated = new Node(editedNode.id, editedNode.name, editedNodeContent, editedNode.isStartNode, editedNodeRules)
 
     toUpdate foreach { n => currentStory = currentStory updateNode (n, updated) }
 
