@@ -19,6 +19,11 @@ case class Story(title: String = "Untitled",
                                                         newNode :: (nodes filter (_ != node)), facts, rules)
   def removeNode(node: Node) = new Story(title, author, description, nodes filter (_ != node), facts, rules)
 
+  def addFact(fact: Fact) = new Story(title, author, description, nodes, fact :: facts, rules)
+  def updateFact(fact: Fact, newFact: Fact) = new Story(title, author, description, nodes,
+                                                        newFact :: (facts filter (_ != fact)), rules)
+  def removeFact(fact: Fact) = new Story(title, author, description, nodes, facts filter (_ != fact), rules)
+
   def addRule(rule: Rule) = new Story(title, author, description, nodes, facts, rule :: rules)
   def updateRule(rule: Rule, newRule: Rule) = new Story(title, author, description, nodes, facts,
                                                         newRule :: (rules filter (_ != rule)))
