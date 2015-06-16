@@ -31,6 +31,10 @@ object EventBus {
   val EditNodeRequests = eventBus collect { case e: EditNodeRequest => e }
   val DeleteNodeRequests = eventBus collect { case e: DeleteNodeRequest => e }
 
+  val NewFactRequests = eventBus collect { case e: NewFactRequest => e }
+  val EditFactRequests = eventBus collect { case e: EditFactRequest => e }
+  val DeleteFactRequests = eventBus collect { case e: DeleteFactRequest => e }
+
   val SaveRequests = eventBus collect { case e: SaveRequest => e }
   val SaveAsRequests = eventBus collect { case e: SaveAsRequest => e }
   val LoadRequests = eventBus collect { case e: LoadRequest => e }
@@ -53,6 +57,10 @@ object EventBus {
   val NewNodeResponses = eventBus collect { case e: NewNodeResponse => e }
   val EditNodeResponses = eventBus collect { case e: EditNodeResponse => e }
   val DeleteNodeResponses = eventBus collect { case e: DeleteNodeResponse => e }
+
+  val NewFactResponses = eventBus collect { case e: NewFactResponse => e }
+  val EditFactResponses = eventBus collect { case e: EditFactResponse => e }
+  val DeleteFactResponses = eventBus collect { case e: DeleteFactResponse => e }
 
   val SaveResponses = eventBus collect { case e: SaveResponse => e }
   val SaveAsResponses = eventBus collect { case e: SaveAsResponse => e }
@@ -77,6 +85,10 @@ object EventBus {
   val UpdateNodeEvents = eventBus collect { case e: UpdateNode => e }
   val DestroyNodeEvents = eventBus collect { case e: DestroyNode => e }
 
+  val CreateFactEvents = eventBus collect { case e: CreateFact => e }
+  val UpdateFactEvents = eventBus collect { case e: UpdateFact => e }
+  val DestroyFactEvents = eventBus collect { case e: DestroyFact => e }
+
   val SaveDataEvents = eventBus collect { case e: SaveData => e }
   val SaveToFileEvents = eventBus collect { case e: SaveToFile => e }
   val LoadFromFileEvents = eventBus collect { case e: LoadFromFile => e }
@@ -92,6 +104,10 @@ object EventBus {
   val NodeCreatedEvents = eventBus collect { case e: NodeCreated => e }
   val NodeUpdatedEvents = eventBus collect { case e: NodeUpdated => e }
   val NodeDestroyedEvents = eventBus collect { case e: NodeDestroyed => e }
+
+  val FactCreatedEvents = eventBus collect { case e: FactCreated => e }
+  val FactUpdatedEvents = eventBus collect { case e: FactUpdated => e }
+  val FactDestroyedEvents = eventBus collect { case e: FactDestroyed => e }
 
   val StorySavedEvents = eventBus collect { case e: StorySaved => e }
   val StoryLoadedEvents = eventBus collect { case e: StoryLoaded => e }
