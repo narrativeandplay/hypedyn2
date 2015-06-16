@@ -6,6 +6,7 @@ import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement}
 import org.narrativeandplay.hypedyn.serialisation.serialisers._
 import org.narrativeandplay.hypedyn.story.internal.Story
+import org.narrativeandplay.hypedyn.story.rules.internal.FactSettings
 import org.narrativeandplay.hypedyn.undo._
 import org.narrativeandplay.hypedyn.story.StoryController
 
@@ -13,12 +14,26 @@ object CoreEventDispatcher {
   val CoreEventSourceIdentity = "Core"
   private var loadedFile: Option[File] = None
 
-  EventBus.NewNodeRequests foreach { evt => EventBus.send(NewNodeResponse(CoreEventSourceIdentity)) }
+  EventBus.NewNodeRequests foreach { _ => EventBus.send(NewNodeResponse(CoreEventSourceIdentity)) }
   EventBus.EditNodeRequests foreach { evt =>
     StoryController find evt.id foreach { n => EventBus.send(EditNodeResponse(n, CoreEventSourceIdentity)) }
   }
   EventBus.DeleteNodeRequests foreach { evt =>
     StoryController find evt.id foreach { n => EventBus.send(DeleteNodeResponse(n, CoreEventSourceIdentity)) }
+  }
+
+  EventBus.NewFactRequests foreach { _ =>
+    EventBus.send(NewFactResponse(FactSettings.EnabledFacts, CoreEventSourceIdentity))
+  }
+  EventBus.EditFactRequests foreach { evt =>
+    StoryController find evt.id foreach { f =>
+      EventBus.send(EditFactResponse(f, FactSettings.EnabledFacts, CoreEventSourceIdentity))
+    }
+  }
+  EventBus.DeleteFactRequests foreach { evt =>
+    StoryController find evt.id foreach { f =>
+      EventBus.send(DeleteFactResponse(f, CoreEventSourceIdentity))
+    }
   }
 
   EventBus.CreateNodeEvents foreach { evt =>
