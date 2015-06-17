@@ -21,8 +21,8 @@ object StoryController {
     firstUnusedNodeId = (story.nodes map (_.id)).max.inc
   }
 
-  def find(nodeId: NodeId) = currentStory.nodes find (_.id == nodeId)
-  def find(factId: FactId) = currentStory.facts find (_.id == factId)
+  def findNode(nodeId: NodeId) = currentStory.nodes find (_.id == nodeId)
+  def findFact(factId: FactId) = currentStory.facts find (_.id == factId)
 
   def create(node: Nodal): Node = {
     val newNodeContent = NodeContent(node.content.text, node.content.rulesets map { case (indexes, rule) =>
@@ -55,7 +55,7 @@ object StoryController {
       r
     }
 
-    val toUpdate = find(node.id)
+    val toUpdate = findNode(node.id)
     val updated = new Node(editedNode.id, editedNode.name, editedNodeContent, editedNode.isStartNode, editedNodeRules)
 
     toUpdate foreach { n => currentStory = currentStory updateNode (n, updated) }
@@ -64,7 +64,7 @@ object StoryController {
   }
 
   def destroy(node: Nodal): Option[Node] = {
-    val toDestroy = find(node.id)
+    val toDestroy = findNode(node.id)
 
     toDestroy foreach { n => currentStory = currentStory removeNode n }
 
@@ -82,7 +82,7 @@ object StoryController {
   }
 
   def update(fact: Fact, editedFact: Fact): Option[(Fact, Fact)] = {
-    val toUpdate = find(fact.id)
+    val toUpdate = findFact(fact.id)
     val updated = instantiateFact(editedFact)
 
     toUpdate foreach { f => currentStory = currentStory updateFact (f, updated) }
@@ -91,7 +91,7 @@ object StoryController {
   }
 
   def destroy(fact: Fact): Option[Fact] = {
-    val toDestroy = find(fact.id)
+    val toDestroy = findFact(fact.id)
 
     toDestroy foreach { f => currentStory = currentStory removeFact f }
 

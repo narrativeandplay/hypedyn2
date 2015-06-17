@@ -16,22 +16,22 @@ object CoreEventDispatcher {
 
   EventBus.NewNodeRequests foreach { _ => EventBus.send(NewNodeResponse(CoreEventSourceIdentity)) }
   EventBus.EditNodeRequests foreach { evt =>
-    StoryController find evt.id foreach { n => EventBus.send(EditNodeResponse(n, CoreEventSourceIdentity)) }
+    StoryController findNode evt.id foreach { n => EventBus.send(EditNodeResponse(n, CoreEventSourceIdentity)) }
   }
   EventBus.DeleteNodeRequests foreach { evt =>
-    StoryController find evt.id foreach { n => EventBus.send(DeleteNodeResponse(n, CoreEventSourceIdentity)) }
+    StoryController findNode evt.id foreach { n => EventBus.send(DeleteNodeResponse(n, CoreEventSourceIdentity)) }
   }
 
   EventBus.NewFactRequests foreach { _ =>
     EventBus.send(NewFactResponse(Fact.EnabledFacts, CoreEventSourceIdentity))
   }
   EventBus.EditFactRequests foreach { evt =>
-    StoryController find evt.id foreach { f =>
+    StoryController findFact evt.id foreach { f =>
       EventBus.send(EditFactResponse(f, Fact.EnabledFacts, CoreEventSourceIdentity))
     }
   }
   EventBus.DeleteFactRequests foreach { evt =>
-    StoryController find evt.id foreach { f =>
+    StoryController findFact evt.id foreach { f =>
       EventBus.send(DeleteFactResponse(f, CoreEventSourceIdentity))
     }
   }
@@ -69,10 +69,10 @@ object CoreEventDispatcher {
   }
 
   EventBus.CutNodeRequests foreach { evt =>
-    StoryController find evt.id foreach { n => EventBus.send(CutNodeResponse(n, CoreEventSourceIdentity)) }
+    StoryController findNode evt.id foreach { n => EventBus.send(CutNodeResponse(n, CoreEventSourceIdentity)) }
   }
   EventBus.CopyNodeRequests foreach { evt =>
-    StoryController find evt.id foreach { n => EventBus.send(CopyNodeResponse(n, CoreEventSourceIdentity)) }
+    StoryController findNode evt.id foreach { n => EventBus.send(CopyNodeResponse(n, CoreEventSourceIdentity)) }
   }
   EventBus.PasteNodeRequests foreach { evt => EventBus.send(PasteNodeResponse(CoreEventSourceIdentity)) }
 
