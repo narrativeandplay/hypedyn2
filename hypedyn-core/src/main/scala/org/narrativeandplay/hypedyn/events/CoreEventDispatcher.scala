@@ -6,7 +6,7 @@ import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement}
 import org.narrativeandplay.hypedyn.serialisation.serialisers._
 import org.narrativeandplay.hypedyn.story.internal.Story
-import org.narrativeandplay.hypedyn.story.rules.internal.FactSettings
+import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.undo._
 import org.narrativeandplay.hypedyn.story.StoryController
 
@@ -23,11 +23,11 @@ object CoreEventDispatcher {
   }
 
   EventBus.NewFactRequests foreach { _ =>
-    EventBus.send(NewFactResponse(FactSettings.EnabledFacts, CoreEventSourceIdentity))
+    EventBus.send(NewFactResponse(Fact.EnabledFacts, CoreEventSourceIdentity))
   }
   EventBus.EditFactRequests foreach { evt =>
     StoryController find evt.id foreach { f =>
-      EventBus.send(EditFactResponse(f, FactSettings.EnabledFacts, CoreEventSourceIdentity))
+      EventBus.send(EditFactResponse(f, Fact.EnabledFacts, CoreEventSourceIdentity))
     }
   }
   EventBus.DeleteFactRequests foreach { evt =>

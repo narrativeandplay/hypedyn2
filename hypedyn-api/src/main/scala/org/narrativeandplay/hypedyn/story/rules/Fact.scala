@@ -14,6 +14,17 @@ sealed trait Fact {
   def canEqual(that: Any): Boolean = that.isInstanceOf[Fact]
 }
 
+object Fact {
+  val IntegerFact = "Number fact"
+  val StringFact = "String fact"
+  val BooleanFact = "True/false fact"
+  val IntegerFactList = "Number fact list"
+  val StringFactList = "String fact list"
+  val BooleanFactList = "True/false fact list"
+
+  val EnabledFacts = List(IntegerFact, StringFact, BooleanFact)
+}
+
 sealed case class IntegerFact(id: FactId, name: String, initalValue: BigInt) extends Fact
 sealed case class StringFact(id: FactId, name: String, initialValue: String) extends Fact
 sealed case class BooleanFact(id: FactId, name: String, initialValue: Boolean) extends Fact
