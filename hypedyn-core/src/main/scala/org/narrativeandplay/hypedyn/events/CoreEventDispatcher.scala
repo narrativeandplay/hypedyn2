@@ -68,6 +68,26 @@ object CoreEventDispatcher {
     }
   }
 
+  EventBus.CreateFactEvents foreach { evt =>
+    val created = StoryController.create(evt.fact)
+
+    EventBus.send(FactCreated(created, CoreEventSourceIdentity))
+  }
+  EventBus.UpdateFactEvents foreach { evt =>
+    val updatedUnupdatedPair = StoryController.update(evt.fact, evt.updatedFact)
+
+    updatedUnupdatedPair foreach { case (unupdated, updated) =>
+      EventBus.send(FactUpdated(unupdated, updated, CoreEventSourceIdentity))
+    }
+  }
+  EventBus.DestroyFactEvents foreach { evt =>
+    val destroyed = StoryController.destroy(evt.fact)
+
+    destroyed foreach { f =>
+      EventBus.send(FactDestroyed(f, CoreEventSourceIdentity))
+    }
+  }
+
   EventBus.CutNodeRequests foreach { evt =>
     StoryController findNode evt.id foreach { n => EventBus.send(CutNodeResponse(n, CoreEventSourceIdentity)) }
   }
