@@ -6,6 +6,7 @@ import javafx.util.Callback
 
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
+import scalafx.scene.control.Tooltip
 
 import org.narrativeandplay.hypedyn.story.rules.Fact
 
@@ -39,6 +40,16 @@ object FactViewer extends ListView[Fact] {
     facts.update(facts indexOf fact, newFact)
   }
 
+  private val deselectionInfo = new Tooltip() {
+    text = s"${if (System.getProperty("os.name").toLowerCase == "mac os x") "Cmd" else "Ctrl"}-Click deselects a selected fact"
+  }
+
+  tooltip = deselectionInfo
+
+//  focusedProperty().addListener({ (_, _, selected) =>
+//    if (!selected) selectionModel.clearSelection()
+//  })
+
   // <editor-fold="Functions for replicating Scala-like access style">
 
   def cellFactory = cellFactoryProperty
@@ -54,6 +65,9 @@ object FactViewer extends ListView[Fact] {
   def items_=(i: ObservableList[Fact]) = setItems(i)
 
   def selectionModel = getSelectionModel
+
+  def tooltip = getTooltip
+  def tooltip_=(tooltip: Tooltip) = setTooltip(tooltip)
 
   //</editor-fold>
 }
