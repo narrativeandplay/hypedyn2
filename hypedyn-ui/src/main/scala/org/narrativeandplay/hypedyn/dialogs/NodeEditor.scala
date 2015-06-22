@@ -8,7 +8,7 @@ import org.tbee.javafx.scene.layout.MigPane
 
 import org.narrativeandplay.hypedyn.story.{UiNodeContent, UiNode, NodeId, Nodal}
 
-class NodeEditor(dialogTitle: String, nodeToEdit: Option[Nodal], ownerWindow: Window) extends Dialog[Nodal] {
+class NodeEditor private (dialogTitle: String, nodeToEdit: Option[Nodal], ownerWindow: Window) extends Dialog[Nodal] {
   def this(dialogTitle: String, ownerWindow: Window) = this(dialogTitle, None, ownerWindow)
 
   def this(dialogTitle: String, nodeToEdit: Nodal, ownerWindow: Window) = {
