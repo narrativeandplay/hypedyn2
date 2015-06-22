@@ -30,6 +30,14 @@ object Toolbar extends ToolBar {
       UiEventDispatcher.requestNewFact()
     }
   }
-  private lazy val deleteFact = new Button("Delete Fact")
-  private lazy val editFact = new Button("Edit Fact")
+  private lazy val deleteFact = new Button("Delete Fact") {
+    onAction = { _ =>
+      UiEventDispatcher.requestDeleteFact()
+    }
+  }
+  private lazy val editFact = new Button("Edit Fact") {
+    onAction = { _ =>
+      UiEventDispatcher.requestEditFact()
+    }
+  }
 }

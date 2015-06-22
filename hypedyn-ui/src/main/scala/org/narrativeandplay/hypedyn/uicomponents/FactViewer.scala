@@ -53,5 +53,7 @@ object FactViewer extends ListView[Fact] {
   def items = itemsProperty()
   def items_=(i: ObservableList[Fact]) = setItems(i)
 
+  def selectionModel = getSelectionModel
+
   //</editor-fold>
 }

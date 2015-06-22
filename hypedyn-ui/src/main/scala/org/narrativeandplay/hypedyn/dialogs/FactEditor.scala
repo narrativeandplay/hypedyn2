@@ -107,6 +107,8 @@ class FactEditor private (dialogTitle: String,
   factToEdit foreach { f =>
     contentPane.add(initValLabel)
 
+    factNameField.text = f.name
+
     f match {
       case s: StringFact =>
         contentPane.add(stringFactInitValueField)
@@ -137,9 +139,15 @@ class FactEditor private (dialogTitle: String,
   resultConverter = {
     case ButtonType.OK =>
       factTypesField.value() match {
-        case "String fact" => StringFact(FactId(-1), factNameField.text(), stringFactInitValueField.text())
-        case "Number fact" => IntegerFact(FactId(-1), factNameField.text(), integerFactInitValueField.value())
-        case "True/false fact" => BooleanFact(FactId(-1), factNameField.text(), booleanFactInitValueField.value())
+        case "String fact" => StringFact(factToEdit map (_.id) getOrElse FactId(-1),
+                                         factNameField.text(),
+                                         stringFactInitValueField.text())
+        case "Number fact" => IntegerFact(factToEdit map (_.id) getOrElse FactId(-1),
+                                          factNameField.text(),
+                                          integerFactInitValueField.value())
+        case "True/false fact" => BooleanFact(factToEdit map (_.id) getOrElse FactId(-1),
+                                              factNameField.text(),
+                                              booleanFactInitValueField.value())
         case _ => throw new IllegalArgumentException("Invalid fact type")
       }
     case _ => null

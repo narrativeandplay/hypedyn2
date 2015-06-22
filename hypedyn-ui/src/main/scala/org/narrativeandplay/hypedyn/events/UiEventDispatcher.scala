@@ -57,9 +57,11 @@ object UiEventDispatcher {
     newFact foreach { f => EventBus.send(CreateFact(f, UiEventSourceIdentity)) }
   }
   EventBus.EditFactResponses foreach { res =>
+    val editedFact = Main.factEditor("Edit Fact", res.factTypes, res.fact).showAndWait()
+
+    editedFact foreach { f => EventBus.send(UpdateFact(res.fact, f, UiEventSourceIdentity)) }
   }
-  EventBus.DeleteFactResponses foreach { res =>
-  }
+  EventBus.DeleteFactResponses foreach { res => EventBus.send(DestroyFact(res.fact, UiEventSourceIdentity)) }
 
   EventBus.SaveResponses foreach { evt =>
     evt.loadedFile match {
@@ -102,6 +104,16 @@ object UiEventDispatcher {
 
   def requestNewFact(): Unit = {
     EventBus.send(NewFactRequest(UiEventSourceIdentity))
+  }
+  def requestEditFact(): Unit = {
+    Option(FactViewer.selectionModel.getSelectedItems.get(0)) foreach { f =>
+      EventBus.send(EditFactRequest(f.id, UiEventSourceIdentity))
+    }
+  }
+  def requestDeleteFact(): Unit = {
+    Option(FactViewer.selectionModel.getSelectedItems.get(0)) foreach { f =>
+      EventBus.send(DeleteFactRequest(f.id, UiEventSourceIdentity))
+    }
   }
 
   def requestNewStory(): Unit = {
