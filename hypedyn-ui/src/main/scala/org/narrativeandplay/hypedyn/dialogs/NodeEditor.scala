@@ -1,5 +1,6 @@
 package org.narrativeandplay.hypedyn.dialogs
 
+import scalafx.Includes._
 import scalafx.scene.control.{Label, TextField, ButtonType, Dialog}
 import scalafx.stage.{Window, Modality}
 
@@ -25,7 +26,7 @@ class NodeEditor private (dialogTitle: String, nodeToEdit: Option[Nodal], ownerW
   initOwner(ownerWindow)
   initModality(Modality.NONE)
 
-  dialogPane.value.getButtonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
+  dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
 
   private val nodeNameField = new TextField()
   private val nodeContentField = new StyleClassedTextArea() {
@@ -38,7 +39,7 @@ class NodeEditor private (dialogTitle: String, nodeToEdit: Option[Nodal], ownerW
     add(new Label("Content"), "grow 0 0, wrap")
     add(nodeContentField, "grow 100 100, wrap")
   }
-  dialogPane.value.setContent(contentPane)
+  dialogPane().content = contentPane
 
   resultConverter = {
     case ButtonType.OK =>
