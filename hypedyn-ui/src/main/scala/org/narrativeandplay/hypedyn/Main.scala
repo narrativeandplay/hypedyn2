@@ -1,16 +1,19 @@
 package org.narrativeandplay.hypedyn
 
+import scalafx.Includes._
 import scalafx.application.{Platform, JFXApp}
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.scene.image.Image
 import scalafx.scene.layout.{VBox, BorderPane}
 
-import org.narrativeandplay.hypedyn.dialogs.{NodeEditor, FileDialog}
+import org.narrativeandplay.hypedyn.dialogs.{FactEditor, NodeEditor, FileDialog}
 import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.plugins.storyviewer.NarrativeViewersController
 import org.narrativeandplay.hypedyn.story.Nodal
+import org.narrativeandplay.hypedyn.story.rules.Fact
+import org.narrativeandplay.hypedyn.uicomponents.FactViewer
 
 object Main extends JFXApp {
   EventBus
@@ -25,6 +28,10 @@ object Main extends JFXApp {
   def fileDialog = new FileDialog(stage)
   def nodeEditor(dialogTitle: String, nodeToEdit: Nodal) = new NodeEditor(dialogTitle, nodeToEdit, stage)
   def nodeEditor(dialogTitle: String) = new NodeEditor(dialogTitle, stage)
+  def factEditor(dialogTitle: String, availableFactTypes: List[String], factToEdit: Fact) =
+    new FactEditor(dialogTitle, availableFactTypes, factToEdit, stage)
+  def factEditor(dialogTitle: String, availableFactTypes: List[String]) =
+    new FactEditor(dialogTitle, availableFactTypes, stage)
 
   stage = new PrimaryStage {
     title = "HypeDyn"
@@ -41,6 +48,8 @@ object Main extends JFXApp {
         top = new VBox() {
           children.addAll(Menubar, Toolbar)
         }
+
+        left = FactViewer
 
         center = NarrativeViewersController.DefaultViewer
       }

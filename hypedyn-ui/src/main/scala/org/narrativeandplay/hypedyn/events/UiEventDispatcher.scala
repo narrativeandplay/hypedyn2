@@ -5,6 +5,7 @@ import scalafx.Includes._
 import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
 import org.narrativeandplay.hypedyn.story.NodeId
+import org.narrativeandplay.hypedyn.uicomponents.FactViewer
 
 object UiEventDispatcher {
   val UiEventSourceIdentity = "UI"
@@ -50,6 +51,16 @@ object UiEventDispatcher {
   }
   EventBus.DeleteNodeResponses foreach { evt => EventBus.send(DestroyNode(evt.node, UiEventSourceIdentity)) }
 
+  EventBus.NewFactResponses foreach { res =>
+    val newFact = Main.factEditor("New Fact", res.factTypes).showAndWait()
+
+    newFact foreach { f => EventBus.send(CreateFact(f, UiEventSourceIdentity)) }
+  }
+  EventBus.EditFactResponses foreach { res =>
+  }
+  EventBus.DeleteFactResponses foreach { res =>
+  }
+
   EventBus.SaveResponses foreach { evt =>
     evt.loadedFile match {
       case Some(file) => EventBus.send(SaveToFile(file, UiEventSourceIdentity))
@@ -75,6 +86,10 @@ object UiEventDispatcher {
   EventBus.UiNodeSelectedEvents foreach { evt => selectedNode = Some(evt.id) }
   EventBus.UiNodeDeselectedEvents foreach { _ => selectedNode = None }
 
+  EventBus.FactCreatedEvents foreach { evt => FactViewer.add(evt.fact) }
+  EventBus.FactUpdatedEvents foreach { evt => FactViewer.update(evt.fact, evt.updatedFact) }
+  EventBus.FactDestroyedEvents foreach { evt => FactViewer.remove(evt.fact) }
+
   def requestNewNode(): Unit = {
     EventBus.send(NewNodeRequest(UiEventSourceIdentity))
   }
@@ -83,6 +98,10 @@ object UiEventDispatcher {
   }
   def requestDeleteNode(): Unit = {
     selectedNode foreach { id => EventBus.send(DeleteNodeRequest(id, UiEventSourceIdentity)) }
+  }
+
+  def requestNewFact(): Unit = {
+    EventBus.send(NewFactRequest(UiEventSourceIdentity))
   }
 
   def requestNewStory(): Unit = {

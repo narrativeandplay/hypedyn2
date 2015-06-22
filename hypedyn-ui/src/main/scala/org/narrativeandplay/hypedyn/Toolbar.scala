@@ -7,7 +7,7 @@ import scalafx.scene.control.{Button, ToolBar}
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 
 object Toolbar extends ToolBar {
-  items.addAll(newNode, editNode, deleteNode)
+  items.addAll(newNode, editNode, deleteNode, newFact, editFact, deleteFact)
 
   private lazy val newNode = new Button("New Node") {
     onAction = { actionEvent: ActionEvent =>
@@ -24,4 +24,12 @@ object Toolbar extends ToolBar {
       UiEventDispatcher.requestEditNode()
     }
   }
+
+  private lazy val newFact = new Button("New Fact") {
+    onAction = { actionEvent: ActionEvent =>
+      UiEventDispatcher.requestNewFact()
+    }
+  }
+  private lazy val deleteFact = new Button("Delete Fact")
+  private lazy val editFact = new Button("Edit Fact")
 }
