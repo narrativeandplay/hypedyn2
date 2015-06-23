@@ -14,9 +14,11 @@ import org.narrativeandplay.hypedyn.plugins.storyviewer.NarrativeViewersControll
 import org.narrativeandplay.hypedyn.story.Nodal
 import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.uicomponents.FactViewer
+import org.narrativeandplay.hypedyn.undo.UndoController
 
 object Main extends JFXApp {
   EventBus
+  UndoController
   PluginsController
   CoreEventDispatcher
   UiEventDispatcher
