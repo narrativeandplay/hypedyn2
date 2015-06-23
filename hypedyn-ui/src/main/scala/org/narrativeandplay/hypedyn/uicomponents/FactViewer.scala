@@ -6,7 +6,7 @@ import javafx.util.Callback
 
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
-import scalafx.scene.control.Tooltip
+import scalafx.scene.control.{MultipleSelectionModel, Tooltip}
 
 import org.narrativeandplay.hypedyn.story.rules.Fact
 
@@ -64,7 +64,7 @@ object FactViewer extends ListView[Fact] {
   def items = itemsProperty()
   def items_=(i: ObservableList[Fact]) = setItems(i)
 
-  def selectionModel = getSelectionModel
+  def selectionModel: MultipleSelectionModel[Fact] = getSelectionModel
 
   def tooltip = getTooltip
   def tooltip_=(tooltip: Tooltip) = setTooltip(tooltip)
