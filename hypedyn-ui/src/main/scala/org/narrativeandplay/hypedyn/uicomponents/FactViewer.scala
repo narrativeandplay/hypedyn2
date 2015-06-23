@@ -9,6 +9,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.{MultipleSelectionModel, Tooltip}
 
 import org.narrativeandplay.hypedyn.story.rules.Fact
+import org.narrativeandplay.hypedyn.utils.System
 
 object FactViewer extends ListView[Fact] {
   val facts = new ObservableBuffer[Fact]()
@@ -41,7 +42,7 @@ object FactViewer extends ListView[Fact] {
   }
 
   private val deselectionInfo = new Tooltip() {
-    text = s"${if (System.getProperty("os.name").toLowerCase == "mac os x") "Cmd" else "Ctrl"}-Click deselects a selected fact"
+    text = s"${if (System.isMac) "Cmd" else "Ctrl"}-Click deselects a selected fact"
   }
 
   tooltip = deselectionInfo

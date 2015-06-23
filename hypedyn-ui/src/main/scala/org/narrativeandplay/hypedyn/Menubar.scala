@@ -7,6 +7,7 @@ import scalafx.scene.control.{MenuItem, SeparatorMenuItem, Menu, MenuBar}
 
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 import org.narrativeandplay.hypedyn.keycombinations.KeyCombinations
+import org.narrativeandplay.hypedyn.utils.System
 
 object Menubar extends MenuBar {
   useSystemMenuBar = true
@@ -72,7 +73,7 @@ object Menubar extends MenuBar {
   }
 
   private lazy val redo = new MenuItem("Redo") {
-    accelerator = if (System.getProperty("os.name") == "Windows") KeyCombinations.RedoWin else KeyCombinations.RedoUnix
+    accelerator = if (System.isWindows) KeyCombinations.RedoWin else KeyCombinations.RedoUnix
 
     onAction = { actionEvent: ActionEvent =>
       UiEventDispatcher.requestRedo()
