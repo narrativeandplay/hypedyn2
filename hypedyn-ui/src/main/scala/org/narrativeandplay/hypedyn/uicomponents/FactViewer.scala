@@ -67,7 +67,7 @@ object FactViewer extends ListView[Fact] {
 
   def selectionModel: MultipleSelectionModel[Fact] = getSelectionModel
 
-  def tooltip = getTooltip
+  def tooltip: Tooltip = getTooltip
   def tooltip_=(tooltip: Tooltip) = setTooltip(tooltip)
 
   //</editor-fold>
