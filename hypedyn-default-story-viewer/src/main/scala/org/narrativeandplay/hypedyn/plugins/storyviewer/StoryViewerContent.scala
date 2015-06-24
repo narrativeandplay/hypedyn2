@@ -71,5 +71,15 @@ class StoryViewerContent(private val eventDispatcher: StoryViewer) extends Contr
     })
   }
 
+  def prefWidth = getPrefWidth
+  def prefWidth_=(width: Double) = setPrefWidth(width)
+
+  def prefHeight = getPrefHeight
+  def prefHeight_=(width: Double) = setPrefHeight(width)
+
+  def width = getWidth
+
+  def height = getHeight
+
   // </editor-fold>
 }

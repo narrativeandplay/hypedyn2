@@ -8,6 +8,7 @@ import javafx.scene.{input => jfxsi}
 import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, StringProperty}
 import scalafx.event.Event
+import scalafx.geometry.Bounds
 import scalafx.scene.input.MouseEvent
 
 import com.github.benedictleejh.scala.math.vector.Vector2
@@ -22,6 +23,9 @@ class ViewerNode(initName: String,
                  private val eventDispatcher: StoryViewer) extends Control {
   private var anchor = Vector2(0.0, 0.0)
   private var topLeft = ViewerNode.defaultLocation
+
+  // Alias for the event dispatcher for where the name doesn't make sense
+  private val storyViewer = eventDispatcher
 
   val nameProperty = StringProperty(initName)
   val contentProperty = StringProperty(initContent)
@@ -57,6 +61,8 @@ class ViewerNode(initName: String,
     relocate(finalPos.x, finalPos.y)
     anchor = (me.sceneX, me.sceneY)
     topLeft = (layoutX, layoutY)
+
+    storyViewer.sizeToChildren()
   }
 
   def name = nameProperty()
@@ -94,15 +100,15 @@ class ViewerNode(initName: String,
   // <editor-fold desc="Utility Methods for a Scala-like access pattern">
 
   def width = getWidth
-
   def width_=(value: Double) = setWidth(value)
 
   def height = getHeight
-
   def height_=(value: Double) = setHeight(value)
 
   def layoutX = getLayoutX
   def layoutY = getLayoutY
+
+  def bounds: Bounds = getBoundsInParent
 
   def onMouseClicked = getOnMouseClicked
   def onMouseClicked_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: T => Unit)(implicit jfx2sfx: U => T) = {

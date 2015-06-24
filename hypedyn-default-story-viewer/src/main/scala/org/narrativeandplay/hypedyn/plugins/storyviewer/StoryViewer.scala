@@ -15,6 +15,10 @@ import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoableStream}
 class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Saveable {
   prefWidth = 800
   prefHeight = 600
+
+  fitToHeight = true
+  fitToWidth = true
+
   /**
    * Returns the name of the plugin
    */
@@ -75,6 +79,8 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
 
       viewer.nodes find (_.id == id) foreach (_.relocate(x, y))
     }
+
+    sizeToChildren()
   }
 
   /**
@@ -84,6 +90,16 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
     val nodes = AstList(viewer.nodes.toList map serialise: _*)
 
     AstMap("nodes" -> nodes)
+  }
+
+  def sizeToChildren(): Unit = {
+    val allBounds = viewer.nodes map (_.bounds)
+    // Ensure that the lists of values is non-empty, to prevent calling max on an empty list
+    val maxX = ((allBounds map (_.maxX)) += 0d).max
+    val maxY = ((allBounds map (_.maxY)) += 0d).max
+
+    if (maxX > viewportBounds().getWidth) { fitToWidth = false; viewer.prefWidth = maxX } else fitToWidth = true
+    if (maxY > viewportBounds().getHeight) { fitToHeight = false; viewer.prefHeight = maxY } else fitToHeight = true
   }
 
   def requestNodeEdit(id: NodeId): Unit = {
