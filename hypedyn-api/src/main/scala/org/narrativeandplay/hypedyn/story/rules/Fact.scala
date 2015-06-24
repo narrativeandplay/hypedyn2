@@ -3,6 +3,26 @@ package org.narrativeandplay.hypedyn.story.rules
 sealed trait Fact {
   def id: FactId
   def name: String
+
+  override def hashCode(): Int = id.hashCode()
+
+  override def equals(that: Any): Boolean = that match {
+    case that: Fact => (that canEqual this) && (id == that.id)
+    case _ => false
+  }
+
+  def canEqual(that: Any): Boolean = that.isInstanceOf[Fact]
+}
+
+object Fact {
+  val IntegerFact = "Number fact"
+  val StringFact = "String fact"
+  val BooleanFact = "True/false fact"
+  val IntegerFactList = "Number fact list"
+  val StringFactList = "String fact list"
+  val BooleanFactList = "True/false fact list"
+
+  val EnabledFacts = List(IntegerFact, StringFact, BooleanFact)
 }
 
 sealed case class IntegerFact(id: FactId, name: String, initalValue: BigInt) extends Fact

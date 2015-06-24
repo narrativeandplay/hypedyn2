@@ -3,6 +3,7 @@ package org.narrativeandplay.hypedyn.events
 import java.io.File
 
 import org.narrativeandplay.hypedyn.serialisation.AstElement
+import org.narrativeandplay.hypedyn.story.rules.{Fact, FactId}
 import org.narrativeandplay.hypedyn.story.{NodeId, Narrative, Nodal}
 
 /**
@@ -39,6 +40,10 @@ sealed case class NewNodeRequest(src: String) extends Request
 sealed case class EditNodeRequest(id: NodeId, src: String) extends Request
 sealed case class DeleteNodeRequest(id: NodeId, src: String) extends Request
 
+sealed case class NewFactRequest(src: String) extends Request
+sealed case class EditFactRequest(id: FactId, src: String) extends Request
+sealed case class DeleteFactRequest(id: FactId, src: String) extends Request
+
 sealed case class SaveRequest(src: String) extends Request
 sealed case class SaveAsRequest(src: String) extends Request
 sealed case class LoadRequest(src: String) extends Request
@@ -62,6 +67,10 @@ sealed trait Response extends Event
 sealed case class NewNodeResponse(src: String) extends Response
 sealed case class EditNodeResponse(node: Nodal, src: String) extends Response
 sealed case class DeleteNodeResponse(node: Nodal, src: String) extends Response
+
+sealed case class NewFactResponse(factTypes: List[String], src: String) extends Response
+sealed case class EditFactResponse(fact: Fact, factTypes: List[String], src: String) extends Response
+sealed case class DeleteFactResponse(fact: Fact, src: String) extends Response
 
 sealed case class SaveResponse(loadedFile: Option[File], src: String) extends Response
 sealed case class SaveAsResponse(src: String) extends Response
@@ -87,6 +96,10 @@ sealed case class CreateNode(node: Nodal, src: String) extends Action
 sealed case class UpdateNode(node: Nodal, updatedNode: Nodal, src: String) extends Action
 sealed case class DestroyNode(node: Nodal, src: String) extends Action
 
+sealed case class CreateFact(fact: Fact, src: String) extends Action
+sealed case class UpdateFact(fact: Fact, updatedFact: Fact, src: String) extends Action
+sealed case class DestroyFact(fact: Fact, src: String) extends Action
+
 sealed case class SaveData(pluginName: String, data: AstElement, src: String) extends Action
 sealed case class SaveToFile(file: File, src: String) extends Action
 sealed case class LoadFromFile(file: File, src: String) extends Action
@@ -106,6 +119,10 @@ sealed trait Completion extends Event
 sealed case class NodeCreated(node: Nodal, src: String) extends Completion
 sealed case class NodeUpdated(node: Nodal, updatedNode: Nodal, src: String) extends Completion
 sealed case class NodeDestroyed(node: Nodal, src: String) extends Completion
+
+sealed case class FactCreated(fact: Fact, src: String) extends Completion
+sealed case class FactUpdated(fact: Fact, updatedFact: Fact, src: String) extends Completion
+sealed case class FactDestroyed(fact: Fact, src: String) extends Completion
 
 sealed case class StorySaved(src: String) extends Completion
 sealed case class StoryLoaded(story: Narrative, src: String) extends Completion

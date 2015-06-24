@@ -6,6 +6,7 @@ import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement}
 import org.narrativeandplay.hypedyn.serialisation.serialisers._
 import org.narrativeandplay.hypedyn.story.internal.Story
+import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.undo._
 import org.narrativeandplay.hypedyn.story.StoryController
 
@@ -13,12 +14,26 @@ object CoreEventDispatcher {
   val CoreEventSourceIdentity = "Core"
   private var loadedFile: Option[File] = None
 
-  EventBus.NewNodeRequests foreach { evt => EventBus.send(NewNodeResponse(CoreEventSourceIdentity)) }
+  EventBus.NewNodeRequests foreach { _ => EventBus.send(NewNodeResponse(CoreEventSourceIdentity)) }
   EventBus.EditNodeRequests foreach { evt =>
-    StoryController find evt.id foreach { n => EventBus.send(EditNodeResponse(n, CoreEventSourceIdentity)) }
+    StoryController findNode evt.id foreach { n => EventBus.send(EditNodeResponse(n, CoreEventSourceIdentity)) }
   }
   EventBus.DeleteNodeRequests foreach { evt =>
-    StoryController find evt.id foreach { n => EventBus.send(DeleteNodeResponse(n, CoreEventSourceIdentity)) }
+    StoryController findNode evt.id foreach { n => EventBus.send(DeleteNodeResponse(n, CoreEventSourceIdentity)) }
+  }
+
+  EventBus.NewFactRequests foreach { _ =>
+    EventBus.send(NewFactResponse(Fact.EnabledFacts, CoreEventSourceIdentity))
+  }
+  EventBus.EditFactRequests foreach { evt =>
+    StoryController findFact evt.id foreach { f =>
+      EventBus.send(EditFactResponse(f, Fact.EnabledFacts, CoreEventSourceIdentity))
+    }
+  }
+  EventBus.DeleteFactRequests foreach { evt =>
+    StoryController findFact evt.id foreach { f =>
+      EventBus.send(DeleteFactResponse(f, CoreEventSourceIdentity))
+    }
   }
 
   EventBus.CreateNodeEvents foreach { evt =>
@@ -53,11 +68,43 @@ object CoreEventDispatcher {
     }
   }
 
+  EventBus.CreateFactEvents foreach { evt =>
+    val created = StoryController.create(evt.fact)
+
+    if (evt.src != UndoEventSourceIdentity) {
+      UndoableStream.send(new FactCreatedChange(created))
+    }
+
+    EventBus.send(FactCreated(created, CoreEventSourceIdentity))
+  }
+  EventBus.UpdateFactEvents foreach { evt =>
+    val updatedUnupdatedPair = StoryController.update(evt.fact, evt.updatedFact)
+
+    updatedUnupdatedPair foreach { case (unupdated, updated) =>
+      if (evt.src != UndoEventSourceIdentity) {
+        UndoableStream.send(new FactUpdatedChange(unupdated, updated))
+      }
+
+      EventBus.send(FactUpdated(unupdated, updated, CoreEventSourceIdentity))
+    }
+  }
+  EventBus.DestroyFactEvents foreach { evt =>
+    val destroyed = StoryController.destroy(evt.fact)
+
+    destroyed foreach { f =>
+      if (evt.src != UndoEventSourceIdentity) {
+        UndoableStream.send(new FactDestroyedChange(f))
+      }
+
+      EventBus.send(FactDestroyed(f, CoreEventSourceIdentity))
+    }
+  }
+
   EventBus.CutNodeRequests foreach { evt =>
-    StoryController find evt.id foreach { n => EventBus.send(CutNodeResponse(n, CoreEventSourceIdentity)) }
+    StoryController findNode evt.id foreach { n => EventBus.send(CutNodeResponse(n, CoreEventSourceIdentity)) }
   }
   EventBus.CopyNodeRequests foreach { evt =>
-    StoryController find evt.id foreach { n => EventBus.send(CopyNodeResponse(n, CoreEventSourceIdentity)) }
+    StoryController findNode evt.id foreach { n => EventBus.send(CopyNodeResponse(n, CoreEventSourceIdentity)) }
   }
   EventBus.PasteNodeRequests foreach { evt => EventBus.send(PasteNodeResponse(CoreEventSourceIdentity)) }
 
