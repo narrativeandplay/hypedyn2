@@ -46,6 +46,7 @@ package object clipboard {
       }
       val node = Node(NodeId(-1), t.name, nodeContent, isStartNode = false, nodeRules)
       clipboardContent.put(NodeDataFormat, node)
+      clipboardContent.putString(nodeContent.text)
 
       clipboard.setContent(clipboardContent)
     }
