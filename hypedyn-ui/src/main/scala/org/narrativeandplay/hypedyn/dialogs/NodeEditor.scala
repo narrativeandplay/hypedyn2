@@ -1,19 +1,40 @@
 package org.narrativeandplay.hypedyn.dialogs
 
+import javafx.{scene => jfxs}
+import javafx.scene.{control => jfxsc}
+
 import scalafx.Includes._
-import scalafx.scene.control.{Label, TextField, ButtonType, Dialog}
+import scalafx.beans.property.StringProperty
+import scalafx.collections.ObservableBuffer
+import scalafx.scene.Node
+import scalafx.scene.control._
+import scalafx.scene.layout.{Priority, VBox, HBox, BorderPane}
 import scalafx.stage.{Window, Modality}
 
 import org.fxmisc.richtext.StyleClassedTextArea
 import org.tbee.javafx.scene.layout.MigPane
 
+import org.narrativeandplay.hypedyn.story.NodalContent.RulesetIndexes
+import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.{UiNodeContent, UiNode, NodeId, Nodal}
+import org.narrativeandplay.hypedyn.uicomponents.RulesPane
 
-class NodeEditor private (dialogTitle: String, nodeToEdit: Option[Nodal], ownerWindow: Window) extends Dialog[Nodal] {
-  def this(dialogTitle: String, ownerWindow: Window) = this(dialogTitle, None, ownerWindow)
+class NodeEditor private (dialogTitle: String,
+                          conditionDefinitions: List[ConditionDefinition],
+                          actionDefinitions: List[ActionDefinition],
+                          nodeToEdit: Option[Nodal],
+                          ownerWindow: Window) extends Dialog[Nodal] {
+  def this(dialogTitle: String,
+           conditionDefinitions: List[ConditionDefinition],
+           actionDefinitions: List[ActionDefinition],
+           ownerWindow: Window) = this(dialogTitle, conditionDefinitions, actionDefinitions, None, ownerWindow)
 
-  def this(dialogTitle: String, nodeToEdit: Nodal, ownerWindow: Window) = {
-    this(dialogTitle, Some(nodeToEdit), ownerWindow)
+  def this(dialogTitle: String,
+           nodeToEdit: Nodal,
+           conditionDefinitions: List[ConditionDefinition],
+           actionDefinitions: List[ActionDefinition],
+           ownerWindow: Window) = {
+    this(dialogTitle, conditionDefinitions, actionDefinitions, Some(nodeToEdit), ownerWindow)
     nodeNameField.text = nodeToEdit.name
     nodeContentField.replaceText(nodeToEdit.content.text)
     nodeContentField.getUndoManager.forgetHistory()
@@ -27,18 +48,35 @@ class NodeEditor private (dialogTitle: String, nodeToEdit: Option[Nodal], ownerW
   initModality(Modality.NONE)
 
   dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
+  private val okButton: Node = dialogPane().lookupButton(ButtonType.OK)
 
-  private val nodeNameField = new TextField()
+  private val nodeNameField = new TextField() {
+    text onChange { (_, _, name) =>
+      okButton.disable = name.trim().isEmpty
+    }
+  }
   private val nodeContentField = new StyleClassedTextArea() {
     setWrapText(true)
   }
 
-  private val contentPane = new MigPane("fill") {
-    add(new Label("Name"), "grow 0 0, wrap")
-    add(nodeNameField, "growx 100, wrap")
-    add(new Label("Content"), "grow 0 0, wrap")
-    add(nodeContentField, "grow 100 100, wrap")
+  private val contentPane = new VBox() {
+    children += new Label("Name: ")
+    children += nodeNameField
+    children += new Label("Content: ")
+    children += nodeContentField
+    children += new RulesPane(conditionDefinitions, actionDefinitions, List(new RuleLike {
+      override def conditionsOp: BooleanOperator = And
+
+      override def actions: List[Actionable] = Nil
+
+      override def name: String = "Hello"
+
+      override def conditions: List[Conditional] = Nil
+
+      override def id: RuleId = RuleId(-1)
+    }))
   }
+  VBox.setVgrow(nodeContentField, Priority.Always)
   dialogPane().content = contentPane
 
   resultConverter = {
