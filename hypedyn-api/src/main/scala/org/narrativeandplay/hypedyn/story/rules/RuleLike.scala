@@ -14,6 +14,9 @@ case class RuleId(value: BigInt) extends AnyVal with Ordered[RuleId] {
   def increment = new RuleId(value + 1)
   def inc = increment
 
+  def decrement = new RuleId(value - 1)
+  def dec = decrement
+
   def isValid = value >= 0
 }
 
