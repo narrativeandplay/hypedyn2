@@ -28,8 +28,8 @@ object Main extends JFXApp {
   private val icon = new Image(getClass.getResourceAsStream("hypedyn-icon.jpg"))
 
   def fileDialog = new FileDialog(stage)
-  def nodeEditor(dialogTitle: String, nodeToEdit: Nodal) = new NodeEditor(dialogTitle, nodeToEdit, stage)
-  def nodeEditor(dialogTitle: String) = new NodeEditor(dialogTitle, stage)
+  def nodeEditor(dialogTitle: String, nodeToEdit: Nodal) = new NodeEditor(dialogTitle, nodeToEdit, Nil, Nil, stage)
+  def nodeEditor(dialogTitle: String) = new NodeEditor(dialogTitle, Nil, Nil, stage)
   def factEditor(dialogTitle: String, availableFactTypes: List[String], factToEdit: Fact) =
     new FactEditor(dialogTitle, availableFactTypes, factToEdit, stage)
   def factEditor(dialogTitle: String, availableFactTypes: List[String]) =
