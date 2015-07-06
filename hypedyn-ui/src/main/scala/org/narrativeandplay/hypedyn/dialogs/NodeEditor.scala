@@ -10,13 +10,14 @@ import scalafx.scene.Node
 import scalafx.scene.control._
 import scalafx.scene.layout.{Priority, VBox, HBox, BorderPane}
 import scalafx.stage.{Window, Modality}
+import scalafx.scene.Parent.sfxParent2jfx
 
 import org.fxmisc.richtext.StyleClassedTextArea
 import org.tbee.javafx.scene.layout.MigPane
 
 import org.narrativeandplay.hypedyn.story.NodalContent.RulesetIndexes
 import org.narrativeandplay.hypedyn.story.rules._
-import org.narrativeandplay.hypedyn.story.{UiNodeContent, UiNode, NodeId, Nodal}
+import org.narrativeandplay.hypedyn.story._
 import org.narrativeandplay.hypedyn.uicomponents.RulesPane
 
 class NodeEditor private (dialogTitle: String,
@@ -64,17 +65,8 @@ class NodeEditor private (dialogTitle: String,
     children += nodeNameField
     children += new Label("Content: ")
     children += nodeContentField
-    children += new RulesPane(conditionDefinitions, actionDefinitions, List(new RuleLike {
-      override def conditionsOp: BooleanOperator = And
-
-      override def actions: List[Actionable] = Nil
-
-      override def name: String = "Hello"
-
-      override def conditions: List[Conditional] = Nil
-
-      override def id: RuleId = RuleId(-1)
-    }))
+    children += new RulesPane(conditionDefinitions, actionDefinitions, List(new UiRule(RuleId(-1), "Hello", And, Nil, Nil),
+                                                                            new UiRule(RuleId(-1), "Hello2", Or, Nil, Nil)))
   }
   VBox.setVgrow(nodeContentField, Priority.Always)
   dialogPane().content = contentPane
@@ -84,7 +76,7 @@ class NodeEditor private (dialogTitle: String,
       UiNode(nodeToEdit map (_.id) getOrElse NodeId(-1),
              nodeNameField.text.value,
              UiNodeContent(nodeContentField.getText, Map.empty), // The map must be replaced with the actual map of rules
-             isStartNode = false,
+             initIsStartNode = false,
              Nil) // Must be replaced with the actual rules
 
     case _ => null
