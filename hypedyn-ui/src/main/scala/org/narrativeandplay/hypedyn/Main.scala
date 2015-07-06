@@ -10,10 +10,9 @@ import scalafx.scene.layout.{VBox, BorderPane}
 import org.narrativeandplay.hypedyn.dialogs.{FactEditor, NodeEditor, FileDialog}
 import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.plugins.PluginsController
-import org.narrativeandplay.hypedyn.plugins.storyviewer.NarrativeViewersController
 import org.narrativeandplay.hypedyn.story.Nodal
 import org.narrativeandplay.hypedyn.story.rules.Fact
-import org.narrativeandplay.hypedyn.uicomponents.FactViewer
+import org.narrativeandplay.hypedyn.uicomponents._
 import org.narrativeandplay.hypedyn.undo.UndoController
 
 object Main extends JFXApp {
@@ -51,9 +50,9 @@ object Main extends JFXApp {
           children.addAll(Menubar, Toolbar)
         }
 
-        left = FactViewer
+        left = Sidebar
 
-        center = NarrativeViewersController.DefaultViewer
+        center = CentrePane
       }
     }
   }
