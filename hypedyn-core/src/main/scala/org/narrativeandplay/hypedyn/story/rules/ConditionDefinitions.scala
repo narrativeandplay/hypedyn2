@@ -24,7 +24,7 @@ object ConditionDefinitions {
                                                                                                             "!=")),
                                                                      RuleParameter("comparisonValue",
                                                                                    Union(List(
-                                                                                     RuleParameter("input", UserInput),
+                                                                                     RuleParameter("input", UserInputInteger),
                                                                                      RuleParameter("otherFact", IntegerFacts)))))
     )
   )
