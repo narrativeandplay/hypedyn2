@@ -21,28 +21,28 @@ object ActionDefinitions {
     ActionDefinition("UpdateIntegerFacts", "Update number fact", List(NodeAction, NodeContentAction, StoryAction),
                      List(
                       RuleParameter("fact", IntegerFacts),
-                      RuleParameter("updateValue", Union(List(
-                        RuleParameter("inputValue", UserInputInteger),
-                        RuleParameter("integerFactValue", IntegerFacts),
-                        RuleParameter("randomValue", Product(List(
-                          RuleParameter("start", Union(List(
-                            RuleParameter("startInput", UserInputInteger),
-                            RuleParameter("startFact", IntegerFacts)
+                      RuleParameter("updateValue", Union(Map(
+                        "Input" -> RuleParameter("inputValue", UserInputInteger),
+                        "Fact" -> RuleParameter("integerFactValue", IntegerFacts),
+                        "Random" -> RuleParameter("randomValue", Product(List(
+                          RuleParameter("start", Union(Map(
+                            "Input" -> RuleParameter("startInput", UserInputInteger),
+                            "Fact" -> RuleParameter("startFact", IntegerFacts)
                           ))),
-                          RuleParameter("end", Union(List(
-                            RuleParameter("endInput", UserInputInteger),
-                            RuleParameter("endFact", IntegerFacts)
+                          RuleParameter("end", Union(Map(
+                            "Input" -> RuleParameter("endInput", UserInputInteger),
+                            "Fact" -> RuleParameter("endFact", IntegerFacts)
                           )))
                         ))),
-                        RuleParameter("computation", Product(List(
+                        "Math" -> RuleParameter("computation", Product(List(
                           RuleParameter("operator", ListOfValues("+", "-", "x", "/", "%")),
-                          RuleParameter("operand1", Union(List(
-                            RuleParameter("factOperand1", IntegerFacts),
-                            RuleParameter("userOperand1", UserInputInteger)
+                          RuleParameter("operand1", Union(Map(
+                            "Fact" -> RuleParameter("factOperand1", IntegerFacts),
+                            "Input" -> RuleParameter("userOperand1", UserInputInteger)
                           ))),
-                          RuleParameter("operand2", Union(List(
-                            RuleParameter("factOperand1", IntegerFacts),
-                            RuleParameter("userOperand2", UserInputInteger)
+                          RuleParameter("operand2", Union(Map(
+                            "Fact" -> RuleParameter("factOperand2", IntegerFacts),
+                            "Input" -> RuleParameter("userOperand2", UserInputInteger)
                           )))
                         )))
                       )))

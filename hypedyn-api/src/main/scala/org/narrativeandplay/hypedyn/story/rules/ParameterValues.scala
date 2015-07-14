@@ -14,5 +14,5 @@ case object UserInputInteger extends ParameterValues
 
 sealed case class ListOfValues(values: String*) extends ParameterValues
 
-sealed case class Union(valueTypes: List[RuleParameter]) extends ParameterValues
+sealed case class Union(valueTypes: Map[String, RuleParameter]) extends ParameterValues
 sealed case class Product(valueTypes: List[RuleParameter]) extends ParameterValues
