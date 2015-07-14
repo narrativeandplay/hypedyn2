@@ -23,19 +23,22 @@ import org.narrativeandplay.hypedyn.uicomponents.RulesPane
 class NodeEditor private (dialogTitle: String,
                           conditionDefinitions: List[ConditionDefinition],
                           actionDefinitions: List[ActionDefinition],
+                          story: Narrative,
                           nodeToEdit: Option[Nodal],
                           ownerWindow: Window) extends Dialog[Nodal] {
   def this(dialogTitle: String,
            conditionDefinitions: List[ConditionDefinition],
            actionDefinitions: List[ActionDefinition],
-           ownerWindow: Window) = this(dialogTitle, conditionDefinitions, actionDefinitions, None, ownerWindow)
+           story: Narrative,
+           ownerWindow: Window) = this(dialogTitle, conditionDefinitions, actionDefinitions, story, None, ownerWindow)
 
   def this(dialogTitle: String,
            nodeToEdit: Nodal,
            conditionDefinitions: List[ConditionDefinition],
            actionDefinitions: List[ActionDefinition],
+           story: Narrative,
            ownerWindow: Window) = {
-    this(dialogTitle, conditionDefinitions, actionDefinitions, Some(nodeToEdit), ownerWindow)
+    this(dialogTitle, conditionDefinitions, actionDefinitions, story, Some(nodeToEdit), ownerWindow)
     nodeNameField.text = nodeToEdit.name
     nodeContentField.replaceText(nodeToEdit.content.text)
     nodeContentField.getUndoManager.forgetHistory()
