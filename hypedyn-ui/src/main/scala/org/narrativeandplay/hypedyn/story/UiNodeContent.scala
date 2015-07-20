@@ -4,13 +4,14 @@ import javafx.beans.property.SimpleMapProperty
 
 import scalafx.Includes._
 import scalafx.beans.property.StringProperty
+import scalafx.collections.ObservableMap
 
 import org.narrativeandplay.hypedyn.story.NodalContent.RulesetIndexes
 import org.narrativeandplay.hypedyn.story.rules.RuleLike
 
 class UiNodeContent(initText: String, initRulesets: Map[NodalContent.RulesetIndexes, UiRule]) extends NodalContent {
   val textProperty = StringProperty(initText)
-  val rulesetsProperty = new SimpleMapProperty[NodalContent.RulesetIndexes, UiRule]()
+  val rulesetsProperty = ObservableMap(initRulesets.toSeq: _*)
 
   initRulesets foreach { case (k, v) =>
     rulesetsProperty.put(k, v)
