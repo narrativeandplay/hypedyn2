@@ -166,13 +166,13 @@ object RuleCellComponents {
             setText(item.name)
           }
         }
-
-        converter = new StringConverter[UiNode] {
-          override def fromString(string: String): UiNode = (story().nodes find (_.name == string)).get
-
-          override def toString(t: UiNode): String = t.name
-        }
       }
+    }
+
+    converter = new StringConverter[UiNode] {
+      override def fromString(string: String): UiNode = (story().nodes find (_.name == string)).get
+
+      override def toString(t: UiNode): String = t.name
     }
 
     onAction = { _ =>
