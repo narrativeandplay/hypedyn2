@@ -83,6 +83,10 @@ object UiEventDispatcher {
     fileToLoad foreach { f => EventBus.send(LoadFromFile(f, UiEventSourceIdentity)) }
   }
 
+  EventBus.StoryLoadedEvents foreach { evt =>
+    evt.story.facts foreach { f => FactViewer.facts += f }
+  }
+
   EventBus.NewStoryResponses foreach { _ => EventBus.send(CreateStory(src = UiEventSourceIdentity)) }
 
   EventBus.UiNodeSelectedEvents foreach { evt => selectedNode = Some(evt.id) }
