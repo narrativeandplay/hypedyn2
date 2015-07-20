@@ -40,7 +40,7 @@ allprojects {
         scalaCompileOptions.useCompileDaemon = true
         scalaCompileOptions.additionalParameters = [
                 "-Xexperimental", // for Single Abstract Method conversion support without needing implicits
-                "-Xlint",
+                "-Xlint:-nullary-unit,_",
                 "-feature",
                 "-Xfatal-warnings",
                 "-deprecation",
