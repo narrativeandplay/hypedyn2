@@ -100,6 +100,14 @@ class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
     }
   }
 
+  cell.rule.conditions foreach { condition =>
+    conditionsNode.children += new RuleCellComponents.ConditionCell(condition, cell.conditionDefs, cell.story)
+  }
+  cell.rule.actions foreach { action =>
+    actionsNode.children += new RuleCellComponents.ActionCell(action, cell.actionDefs, cell.story)
+
+  }
+
   override def dispose(): Unit = {}
 
   override def getSkinnable: RuleCell = cell
