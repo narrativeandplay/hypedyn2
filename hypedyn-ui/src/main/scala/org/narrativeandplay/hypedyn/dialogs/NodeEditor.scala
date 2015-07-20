@@ -68,9 +68,9 @@ class NodeEditor private (dialogTitle: String,
     children += nodeNameField
     children += new Label("Content: ")
     children += nodeContentField
-    children += new RulesPane(conditionDefinitions, actionDefinitions, List(new UiRule(RuleId(-1), "Hello", And, Nil, Nil),
-                                                                            new UiRule(RuleId(-1), "Hello2", Or, Nil, Nil)),
-                              story)
+//    children += new RulesPane(conditionDefinitions, actionDefinitions, List(new UiRule(RuleId(-1), "Hello", And, List(UiCondition("NodeCondition", Map("status" -> "visited"))), Nil),
+//                                                                            new UiRule(RuleId(-1), "Hello2", Or, Nil, Nil)),
+//                              story)
   }
   VBox.setVgrow(nodeContentField, Priority.Always)
   dialogPane().content = contentPane
