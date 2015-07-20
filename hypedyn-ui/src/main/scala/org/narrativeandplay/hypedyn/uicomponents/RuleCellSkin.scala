@@ -48,16 +48,15 @@ class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
 
   lazy val addCondButton = new Button("Add condition") {
     onAction = { _ =>
-      println("hello")
-
-      val newCond = new UiCondition("NodeCondition", Map.empty)
-
-      cell.rule.conditionsProperty += newCond
-      conditionsNode.children += new RuleCell.ConditionCell(newCond, cell.conditionDefs, cell.story)
+      val newCond = cell.addCondition()
+      conditionsNode.children += new RuleCellComponents.ConditionCell(newCond, cell.conditionDefs, cell.story)
     }
   }
   lazy val addActionButton = new Button("Add action") {
-
+    onAction = { _ =>
+      val newAction = cell.addAction()
+      actionsNode.children += new RuleCellComponents.ActionCell(newAction, cell.actionDefs, cell.story)
+    }
   }
 
   lazy val conditionCombineType = new ComboBox[BooleanOperator]() {
