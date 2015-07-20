@@ -24,7 +24,9 @@ class RulesPane(val conditionDefinitions: List[ConditionDefinition],
     new RulesPane.RulesPaneCell(this)
   }
 
-  def rules = _rules.toList
+  def addRule(): Unit = {
+    rules += new UiRule(RuleId(-1), "New Rule", Or, Nil, Nil)
+  }
 }
 
 object RulesPane {
