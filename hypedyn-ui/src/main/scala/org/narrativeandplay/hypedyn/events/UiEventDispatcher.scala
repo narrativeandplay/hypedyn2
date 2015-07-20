@@ -3,14 +3,14 @@ package org.narrativeandplay.hypedyn.events
 import scalafx.Includes._
 
 import org.narrativeandplay.hypedyn.Main
-import org.narrativeandplay.hypedyn.dialogs.NodeEditor
+import org.narrativeandplay.hypedyn.dialogs.{NodeEditor2, NodeEditor}
 import org.narrativeandplay.hypedyn.story.NodeId
 import org.narrativeandplay.hypedyn.uicomponents.FactViewer
 
 object UiEventDispatcher {
   val UiEventSourceIdentity = "UI"
   private var selectedNode: Option[NodeId] = None
-  private var openedNodeEditors = Map.empty[NodeId, NodeEditor]
+  private var openedNodeEditors = Map.empty[NodeId, NodeEditor2]
 
   EventBus.NewNodeResponses foreach { response =>
     val editor = Main.nodeEditor("New Node", response.conditionDefinitions, response.actionDefinitions, response.story)
