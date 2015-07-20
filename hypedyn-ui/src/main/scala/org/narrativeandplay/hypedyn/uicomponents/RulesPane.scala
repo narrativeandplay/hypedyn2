@@ -17,6 +17,7 @@ class RulesPane(val conditionDefinitions: List[ConditionDefinition],
                 val actionDefinitions: List[ActionDefinition],
                 val rules: ObservableBuffer[UiRule],
                 val story: ObjectProperty[UiStory]) extends ListView[UiRule] {
+  prefHeight = 200
 
   items = rules
 
