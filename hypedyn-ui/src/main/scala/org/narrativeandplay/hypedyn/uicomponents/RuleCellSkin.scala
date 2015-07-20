@@ -23,6 +23,8 @@ class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
   lazy val treeRoot = new TreeItem[String]("") {
     graphic = ruleNameField
 
+    expanded = true
+
     children += conditionsNode
     children += new TreeItem[String]("", addCondButton)
     children += actionsNode
@@ -32,12 +34,16 @@ class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
     text <==> cell.rule.nameProperty
   }
   lazy val conditionsNode = new TreeItem[String]("") {
+    expanded = true
+
     graphic = new HBox(new Label("If "), conditionCombineType, new Label(" of the following conditions are true:")) {
       alignment = Pos.CenterLeft
     }
   }
   lazy val actionsNode = new TreeItem[String]() {
     value = "Then perform the following actions:"
+
+    expanded = true
   }
 
   lazy val addCondButton = new Button("Add condition") {
