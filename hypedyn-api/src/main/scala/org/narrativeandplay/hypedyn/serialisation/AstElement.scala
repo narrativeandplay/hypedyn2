@@ -46,7 +46,7 @@ sealed case class AstMap(fields: AstField*) extends AstElement {
   def apply(key: String): AstElement =
     fields find { case (k, _) => k == key } match {
       case Some((k, v)) => v
-      case None => throw new NoSuchElementException("No value found for the given key")
+      case None => throw new NoSuchElementException(s"No value found for the given key: $key")
     }
 
   /**
