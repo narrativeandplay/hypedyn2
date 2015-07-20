@@ -1,18 +1,11 @@
 package org.narrativeandplay.hypedyn.uicomponents
 
-import javafx.scene.control.{Control => JfxControl, SpinnerValueFactory => JfxSpinnerValueFactory, ListCell => JfxListCell}
-
-import scala.util.Try
+import javafx.scene.control.{Control => JfxControl}
 
 import scalafx.Includes._
-import scalafx.collections.{ObservableMap, ObservableBuffer}
-import scalafx.scene.control.{ComboBox, TreeItem, Spinner, TextArea}
-import scalafx.scene.layout.HBox
-import scalafx.util.StringConverter
-import scalafx.util.StringConverter.sfxStringConverter2jfx
 
 import org.narrativeandplay.hypedyn.story.rules._
-import org.narrativeandplay.hypedyn.story.{UiCondition, Narrative, Nodal, UiRule}
+import org.narrativeandplay.hypedyn.story._
 
 class RuleCell(val rule: UiRule,
                val conditionDefs: List[ConditionDefinition],
@@ -20,7 +13,15 @@ class RuleCell(val rule: UiRule,
                val story: Narrative) extends JfxControl {
   setSkin(new RuleCellSkin(this))
 
+  def addCondition(): UiCondition = {
+    val newCond = new UiCondition("NodeCondition", Map.empty)
+    rule.conditionsProperty += newCond
+    newCond
   }
 
+  def addAction(): UiAction = {
+    val newAction = new UiAction(actionDefs.head.actionName, Map.empty)
+    rule.actionsProperty += newAction
+    newAction
   }
 }
