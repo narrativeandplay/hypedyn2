@@ -154,7 +154,7 @@ package object serialisers {
      * @param condition The object to serialise
      */
     override def serialise(condition: Condition): AstElement =
-      AstMap("actionType" -> AstString(condition.conditionType),
+      AstMap("conditionType" -> AstString(condition.conditionType),
              "params" -> AstMap((condition.params map { case (k, v) =>
                k -> AstString(v)
              }).toSeq: _*))
