@@ -82,7 +82,9 @@ class NodeEditor private (dialogTitle: String,
           VBox.setVgrow(textRulesList, Priority.Always)
         }
         items += new VBox {
-          children += new Label("Content:")
+          children += new Label("Content:") {
+            padding = Insets(5)
+          }
           children += nodeContentText
 
           VBox.setVgrow(nodeContentText, Priority.Always)
