@@ -1,18 +1,21 @@
 package org.narrativeandplay.hypedyn.dialogs
 
+import scala.language.reflectiveCalls
+
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
-import scalafx.collections.ObservableBuffer
+import scalafx.collections.{ObservableMap, ObservableBuffer}
 import scalafx.geometry.{Pos, Insets, Orientation}
 import scalafx.scene.control._
 import scalafx.scene.layout.{Priority, HBox, VBox}
 import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
 
-import org.fxmisc.richtext.StyleClassedTextArea
+import org.fxmisc.richtext.{StyleSpan, InlineStyleTextArea}
 
+import org.narrativeandplay.hypedyn.dialogs.NodeEditor.LinkStyleInfo
 import org.narrativeandplay.hypedyn.story._
-import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition}
+import org.narrativeandplay.hypedyn.story.rules.{And, RuleId, ActionDefinition, ConditionDefinition}
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.uicomponents.RulesPane
 
@@ -58,10 +61,20 @@ class NodeEditor private (dialogTitle: String,
     prefHeight = 200
     prefWidth = 150
   }
-  val nodeContentText = new StyleClassedTextArea() {
+  val nodeContentText = new InlineStyleTextArea[NodeEditor.LinkStyleInfo](
+    new NodeEditor.LinkStyleInfo(),
+    new Function[NodeEditor.LinkStyleInfo, String] {
+      override def apply(t: LinkStyleInfo): String = t.css
+    }) {
     setWrapText(true)
     replaceText(node.content.text)
     getUndoManager.forgetHistory() // Ensure that the initialisation of the text done above is not undoable
+
+    def styleSpans = {
+      val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
+      getStyleSpans(0, getText.length) forEach { styleSpan => spans += styleSpan }
+      spans.toList
+    }
   }
   val textRulesPane = new RulesPane(conditionDefinitions, actionDefinitions, ObservableBuffer.empty, story)
   val nodeRulesPane = new RulesPane(conditionDefinitions, actionDefinitions, node.rulesProperty, story)
@@ -132,6 +145,15 @@ class NodeEditor private (dialogTitle: String,
       node.contentProperty().textProperty() = nodeContentText.getText
       node
     case _ => null
+  }
+
+  def makeNodeContentRulesetsMap(): ObservableMap[NodalContent.RulesetIndexes, UiRule] = {
+    import NodalContent._
+    val initRuleset = RulesetIndexes(TextIndex(0), TextIndex(0)) -> Option(new UiRule(RuleId(-1), "", And, Nil, Nil))
+    ObservableMap(nodeContentText.styleSpans.scanLeft(initRuleset) { case ((prevIndexes, _), currentStyleSpan) =>
+      val end = prevIndexes.endIndex.index + currentStyleSpan.getLength
+      RulesetIndexes(prevIndexes.endIndex, TextIndex(end)) -> currentStyleSpan.getStyle.rule
+    } collect { case (indexes, Some(rule)) =>  indexes -> rule })
   }
 
   def showAndWait(): Option[Nodal] = {
