@@ -42,6 +42,8 @@ class NodeEditor private (dialogTitle: String,
            ownerWindow: Window) =
     this(dialogTitle, conditionDefinitions, actionDefinitions, story, Some(nodeToEdit), ownerWindow)
 
+  private var firstUnusedRuleId = RuleId(-1)
+
   title = dialogTitle
   headerText = None
   resizable = true
