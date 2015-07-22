@@ -1,29 +1,25 @@
 package org.narrativeandplay.hypedyn.dialogs
 
-import javafx.{scene => jfxs}
-import javafx.scene.{control => jfxsc}
-
 import scalafx.Includes._
-import scalafx.beans.property.StringProperty
+import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
-import scalafx.scene.Node
+import scalafx.geometry.Orientation
 import scalafx.scene.control._
-import scalafx.scene.layout.{Priority, VBox, HBox, BorderPane}
-import scalafx.stage.{Window, Modality}
+import scalafx.scene.layout.{Priority, HBox, VBox}
+import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
 
 import org.fxmisc.richtext.StyleClassedTextArea
-import org.tbee.javafx.scene.layout.MigPane
 
-import org.narrativeandplay.hypedyn.story.NodalContent.RulesetIndexes
-import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story._
+import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition}
+import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.uicomponents.RulesPane
 
 class NodeEditor private (dialogTitle: String,
                           conditionDefinitions: List[ConditionDefinition],
                           actionDefinitions: List[ActionDefinition],
-                          story: Narrative,
+                          narrative: Narrative,
                           nodeToEdit: Option[Nodal],
                           ownerWindow: Window) extends Dialog[Nodal] {
   def this(dialogTitle: String,
@@ -37,12 +33,8 @@ class NodeEditor private (dialogTitle: String,
            conditionDefinitions: List[ConditionDefinition],
            actionDefinitions: List[ActionDefinition],
            story: Narrative,
-           ownerWindow: Window) = {
+           ownerWindow: Window) =
     this(dialogTitle, conditionDefinitions, actionDefinitions, story, Some(nodeToEdit), ownerWindow)
-    nodeNameField.text = nodeToEdit.name
-    nodeContentField.replaceText(nodeToEdit.content.text)
-    nodeContentField.getUndoManager.forgetHistory()
-  }
 
   title = dialogTitle
   headerText = None
@@ -51,38 +43,92 @@ class NodeEditor private (dialogTitle: String,
   initOwner(ownerWindow)
   initModality(Modality.NONE)
 
-  dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
-  private val okButton: Node = dialogPane().lookupButton(ButtonType.OK)
+  width = 640
+  height = 480
 
-  private val nodeNameField = new TextField() {
-    text onChange { (_, _, name) =>
-      okButton.disable = name.trim().isEmpty
+  dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
+
+  val story: ObjectProperty[UiStory] = ObjectProperty(narrative)
+  val node: UiNode = nodeToEdit getOrElse new UiNode(NodeId(-1), "New Node", new UiNodeContent("", Map.empty), false, Nil)
+
+  def initEdit(): Unit = {}
+
+  val nodeNameField = new TextField() {
+    text <==> node.nameProperty
+  }
+  val textRulesList = new ListView[UiRule]() {
+    prefHeight = 200
+    prefWidth = 150
+  }
+  val nodeContentText = new StyleClassedTextArea() {
+    setWrapText(true)
+    replaceText(node.content.text)
+    getUndoManager.forgetHistory() // Ensure that the initialisation of the text done above is not undoable
+  }
+  val textRulesPane = new RulesPane(conditionDefinitions, actionDefinitions, ObservableBuffer.empty, story)
+  val nodeRulesPane = new RulesPane(conditionDefinitions, actionDefinitions, node.rulesProperty, story)
+
+  val contentPane = new VBox() {
+    children += new Label("Name:")
+    children += nodeNameField
+    children += new SplitPane() {
+      orientation = Orientation.VERTICAL
+      VBox.setVgrow(this, Priority.Always)
+
+      items += new SplitPane() {
+        orientation = Orientation.HORIZONTAL
+        items += new VBox {
+          children += new Label("Text Rules")
+          children += textRulesList
+
+          VBox.setVgrow(textRulesList, Priority.Always)
+        }
+        items += new VBox {
+          children += new Label("Content:")
+          children += nodeContentText
+
+          VBox.setVgrow(nodeContentText, Priority.Always)
+        }
+
+        dividerPositions = 0.3
+      }
+
+      items += new SplitPane() {
+        orientation = Orientation.HORIZONTAL
+        items += new VBox {
+          children += new HBox {
+            children += new Label("Text Rules")
+            children += new Button("Add text rule")
+          }
+          children += textRulesPane
+          VBox.setVgrow(textRulesPane, Priority.Always)
+        }
+
+        items += new VBox {
+          children += new HBox {
+            children += new Label("Node Rules")
+            children += new Button("Add node rule") {
+              onAction = { _ => nodeRulesPane.addRule() }
+            }
+          }
+          children += nodeRulesPane
+
+          VBox.setVgrow(nodeRulesPane, Priority.Always)
+        }
+
+        dividerPositions = 0.5
+      }
+
+      dividerPositions = 0.75
     }
   }
-  private val nodeContentField = new StyleClassedTextArea() {
-    setWrapText(true)
-  }
 
-  private val contentPane = new VBox() {
-    children += new Label("Name: ")
-    children += nodeNameField
-    children += new Label("Content: ")
-    children += nodeContentField
-//    children += new RulesPane(conditionDefinitions, actionDefinitions, List(new UiRule(RuleId(-1), "Hello", And, List(UiCondition("NodeCondition", Map("status" -> "visited"))), Nil),
-//                                                                            new UiRule(RuleId(-1), "Hello2", Or, Nil, Nil)),
-//                              story)
-  }
-  VBox.setVgrow(nodeContentField, Priority.Always)
   dialogPane().content = contentPane
 
   resultConverter = {
     case ButtonType.OK =>
-      UiNode(nodeToEdit map (_.id) getOrElse NodeId(-1),
-             nodeNameField.text.value,
-             UiNodeContent(nodeContentField.getText, Map.empty), // The map must be replaced with the actual map of rules
-             initIsStartNode = false,
-             Nil) // Must be replaced with the actual rules
-
+      node.contentProperty().textProperty() = nodeContentText.getText
+      node
     case _ => null
   }
 

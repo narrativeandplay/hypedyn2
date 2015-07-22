@@ -7,7 +7,7 @@ import scalafx.scene.Scene
 import scalafx.scene.image.Image
 import scalafx.scene.layout.{VBox, BorderPane}
 
-import org.narrativeandplay.hypedyn.dialogs.{NodeEditor2, FactEditor, NodeEditor, FileDialog}
+import org.narrativeandplay.hypedyn.dialogs.{NodeEditor, FactEditor, FileDialog}
 import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
@@ -31,11 +31,11 @@ object Main extends JFXApp {
                  conditionDefinitions: List[ConditionDefinition],
                  actionDefinitions: List[ActionDefinition],
                  story: Narrative,
-                 nodeToEdit: Nodal) = new NodeEditor2(dialogTitle, nodeToEdit, conditionDefinitions, actionDefinitions, story, stage)
+                 nodeToEdit: Nodal) = new NodeEditor(dialogTitle, nodeToEdit, conditionDefinitions, actionDefinitions, story, stage)
   def nodeEditor(dialogTitle: String,
                  conditionDefinitions: List[ConditionDefinition],
                  actionDefinitions: List[ActionDefinition],
-                 story: Narrative) = new NodeEditor2(dialogTitle, conditionDefinitions, actionDefinitions, story, stage)
+                 story: Narrative) = new NodeEditor(dialogTitle, conditionDefinitions, actionDefinitions, story, stage)
   def factEditor(dialogTitle: String, availableFactTypes: List[String], factToEdit: Fact) =
     new FactEditor(dialogTitle, availableFactTypes, factToEdit, stage)
   def factEditor(dialogTitle: String, availableFactTypes: List[String]) =
