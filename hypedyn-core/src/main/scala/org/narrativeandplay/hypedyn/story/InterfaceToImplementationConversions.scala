@@ -20,8 +20,11 @@ object InterfaceToImplementationConversions {
   implicit def conditionalList2ConditionList(conditionalList: List[Conditional]): List[Condition] =
     conditionalList map conditional2Condition
 
+  implicit def rulesetLike2Ruleset(rulesetLike: NodalContent.RulesetLike): NodeContent.Ruleset =
+    NodeContent.Ruleset(rulesetLike.id, rulesetLike.name, rulesetLike.indexes, rulesetLike.rules map ruleLike2Rule)
+
   implicit def nodalContent2NodeContent(nodalContent: NodalContent): NodeContent =
-    NodeContent(nodalContent.text, nodalContent.rulesets map { case (k, v) => k -> ruleLike2Rule(v) })
+    NodeContent(nodalContent.text, nodalContent.rulesets map rulesetLike2Ruleset)
   implicit def nodal2Node(nodal: Nodal): Node = Node(nodal.id,
                                                      nodal.name,
                                                      nodalContent2NodeContent(nodal.content),

@@ -5,7 +5,7 @@ import scalafx.scene.input.{ClipboardContent, Clipboard, DataFormat}
 import org.narrativeandplay.hypedyn.events.ClipboardEventDispatcher
 import org.narrativeandplay.hypedyn.story.rules.RuleId
 import org.narrativeandplay.hypedyn.story.rules.internal.Rule
-import org.narrativeandplay.hypedyn.story.{Nodal, NodeId}
+import org.narrativeandplay.hypedyn.story.{NodalContent, Nodal, NodeId}
 import org.narrativeandplay.hypedyn.story.internal.{NodeContent, Node}
 import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions._
 
@@ -37,9 +37,9 @@ package object clipboard {
     override def copy(t: Nodal): Unit = {
       val clipboardContent = new ClipboardContent()
 
-      val nodeContent = NodeContent(t.content.text, t.content.rulesets map {
-        case (idxs, rule) =>
-          idxs -> Rule(RuleId(-1), rule.name, rule.conditionsOp, rule.conditions, rule.actions)
+      val nodeContent = NodeContent(t.content.text, t.content.rulesets map { ruleset =>
+        ruleset.copy(id = NodalContent.RulesetId(-1),
+                     rules = ruleset.rules map (_.copy(id = RuleId(-1))))
       })
       val nodeRules = t.rules map { rule =>
         Rule(RuleId(-1), rule.name, rule.conditionsOp, rule.conditions, rule.actions)

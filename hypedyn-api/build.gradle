@@ -1,4 +1,4 @@
-version = '0.7.0'
+version = '0.8.0'
 
 dependencies {
     compile 'io.reactivex:rxscala_2.11:0.24.1'
