@@ -1,5 +1,6 @@
 package org.narrativeandplay.hypedyn.dialogs
 
+import java.util.function.Function
 import scala.language.reflectiveCalls
 
 import scalafx.Includes._
@@ -11,6 +12,7 @@ import scalafx.scene.layout.{Priority, HBox, VBox}
 import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
 
+import org.fxmisc.easybind.EasyBind
 import org.fxmisc.richtext.{StyleSpan, InlineStyleTextArea}
 
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor.LinkStyleInfo
@@ -18,6 +20,7 @@ import org.narrativeandplay.hypedyn.story._
 import org.narrativeandplay.hypedyn.story.rules.{And, RuleId, ActionDefinition, ConditionDefinition}
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.uicomponents.RulesPane
+import org.narrativeandplay.hypedyn.utils.ScalaJavaImplicits._
 
 class NodeEditor private (dialogTitle: String,
                           conditionDefinitions: List[ConditionDefinition],
@@ -112,7 +115,11 @@ class NodeEditor private (dialogTitle: String,
           children += new HBox {
             alignment = Pos.CenterLeft
             children += new Label("Text Rules")
-            children += new Button("Add text rule")
+            children += new Button("Add text rule") {
+              disable <== EasyBind.map(nodeContentText.selectedTextProperty, { s: String =>
+                Boolean box s.trim.isEmpty  // Need to manually transform Scala Boolean to java.lang.Boolean because bloody Java<->Scala issues
+              })
+            }
           }
           children += textRulesPane
           VBox.setVgrow(textRulesPane, Priority.Always)
