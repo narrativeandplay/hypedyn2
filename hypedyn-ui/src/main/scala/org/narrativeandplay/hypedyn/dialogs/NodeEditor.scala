@@ -3,7 +3,7 @@ package org.narrativeandplay.hypedyn.dialogs
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
-import scalafx.geometry.Orientation
+import scalafx.geometry.{Pos, Insets, Orientation}
 import scalafx.scene.control._
 import scalafx.scene.layout.{Priority, HBox, VBox}
 import scalafx.stage.{Modality, Window}
@@ -97,6 +97,7 @@ class NodeEditor private (dialogTitle: String,
         orientation = Orientation.HORIZONTAL
         items += new VBox {
           children += new HBox {
+            alignment = Pos.CenterLeft
             children += new Label("Text Rules")
             children += new Button("Add text rule")
           }
@@ -106,6 +107,7 @@ class NodeEditor private (dialogTitle: String,
 
         items += new VBox {
           children += new HBox {
+            alignment = Pos.CenterLeft
             children += new Label("Node Rules")
             children += new Button("Add node rule") {
               onAction = { _ => nodeRulesPane.addRule() }
