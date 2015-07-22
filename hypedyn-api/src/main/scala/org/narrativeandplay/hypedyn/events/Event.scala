@@ -3,7 +3,7 @@ package org.narrativeandplay.hypedyn.events
 import java.io.File
 
 import org.narrativeandplay.hypedyn.serialisation.AstElement
-import org.narrativeandplay.hypedyn.story.rules.{Fact, FactId}
+import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition, Fact, FactId}
 import org.narrativeandplay.hypedyn.story.{NodeId, Narrative, Nodal}
 
 /**
@@ -64,9 +64,9 @@ sealed case class RedoRequest(src: String) extends Request
  * Sent only by the core
  */
 sealed trait Response extends Event
-sealed case class NewNodeResponse(src: String) extends Response
-sealed case class EditNodeResponse(node: Nodal, src: String) extends Response
-sealed case class DeleteNodeResponse(node: Nodal, src: String) extends Response
+sealed case class NewNodeResponse(story: Narrative, conditionDefinitions: List[ConditionDefinition], actionDefinitions: List[ActionDefinition], src: String) extends Response
+sealed case class EditNodeResponse(node: Nodal, story: Narrative, conditionDefinitions: List[ConditionDefinition], actionDefinitions: List[ActionDefinition], src: String) extends Response
+sealed case class DeleteNodeResponse(node: Nodal, story: Narrative, conditionDefinitions: List[ConditionDefinition], actionDefinitions: List[ActionDefinition], src: String) extends Response
 
 sealed case class NewFactResponse(factTypes: List[String], src: String) extends Response
 sealed case class EditFactResponse(fact: Fact, factTypes: List[String], src: String) extends Response

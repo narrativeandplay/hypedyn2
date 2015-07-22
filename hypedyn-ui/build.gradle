@@ -2,6 +2,7 @@ dependencies {
     compile 'org.scalafx:scalafx_2.11:8.0.40-R8'
     compile 'com.miglayout:miglayout-javafx:5.0'
     compile 'org.fxmisc.richtext:richtextfx:0.6.4'
+    compile 'org.fxmisc.easybind:easybind:1.0.3'
 
     compile project(':hypedyn-api')
     compile project(':hypedyn-core')

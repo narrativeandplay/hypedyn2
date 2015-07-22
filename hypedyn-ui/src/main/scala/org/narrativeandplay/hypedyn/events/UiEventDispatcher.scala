@@ -12,8 +12,8 @@ object UiEventDispatcher {
   private var selectedNode: Option[NodeId] = None
   private var openedNodeEditors = Map.empty[NodeId, NodeEditor]
 
-  EventBus.NewNodeResponses foreach { _ =>
-    val editor = Main.nodeEditor("New Node")
+  EventBus.NewNodeResponses foreach { response =>
+    val editor = Main.nodeEditor("New Node", response.conditionDefinitions, response.actionDefinitions, response.story)
 
     editor.result onChange { (_, _, newNode) =>
       // The onChange listener takes 3 values: the observable whose value changes, the old value of the observable,
@@ -29,7 +29,7 @@ object UiEventDispatcher {
     openedNodeEditors get response.node.id match {
       case Some(editor) => editor.dialogPane.value.getScene.getWindow.requestFocus()
       case None =>
-        val editor = Main.nodeEditor("Edit Node", response.node)
+        val editor = Main.nodeEditor("Edit Node", response.conditionDefinitions, response.actionDefinitions, response.story, response.node)
 
         editor.result onChange { (_, _, editedNode) =>
           // The onChange listener takes 3 values: the observable whose value changes, the old value of the observable,
@@ -81,6 +81,10 @@ object UiEventDispatcher {
     val fileToLoad = Main.fileDialog.showOpenFileDialog()
 
     fileToLoad foreach { f => EventBus.send(LoadFromFile(f, UiEventSourceIdentity)) }
+  }
+
+  EventBus.StoryLoadedEvents foreach { evt =>
+    evt.story.facts foreach { f => FactViewer.facts += f }
   }
 
   EventBus.NewStoryResponses foreach { _ => EventBus.send(CreateStory(src = UiEventSourceIdentity)) }

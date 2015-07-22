@@ -1,0 +1,37 @@
+package org.narrativeandplay.hypedyn.story
+
+import scala.language.implicitConversions
+
+import org.narrativeandplay.hypedyn.story.rules.{RuleLike, Conditional, Actionable}
+
+object InterfaceToUiImplementation {
+  implicit def actionable2UiAction(actionable: Actionable): UiAction = new UiAction(actionable.actionType,
+                                                                                    actionable.params)
+  implicit def conditional2UiCondition(conditional: Conditional): UiCondition = new UiCondition(conditional.conditionType,
+                                                                                                conditional.params)
+
+  implicit def actionableList2UiActionList(actionableList: List[Actionable]): List[UiAction] =
+    actionableList map actionable2UiAction
+  implicit def conditionalList2UiConditionList(conditionalList: List[Conditional]): List[UiCondition] =
+    conditionalList map conditional2UiCondition
+
+  implicit def ruleLike2UiRule(ruleLike: RuleLike): UiRule = new UiRule(ruleLike.id,
+                                                                        ruleLike.name,
+                                                                        ruleLike.conditionsOp,
+                                                                        ruleLike.conditions,
+                                                                        ruleLike.actions)
+  implicit def ruleLikeList2UiRuleList(ruleLikes: List[RuleLike]): List[UiRule] = ruleLikes map ruleLike2UiRule
+
+  implicit def nodalContent2UiNodeContent(nodalContent: NodalContent): UiNodeContent =
+    UiNodeContent(nodalContent.text, nodalContent.rulesets map { case (k, v) => k -> ruleLike2UiRule(v) })
+
+  implicit def nodal2UiNode(nodal: Nodal): UiNode = new UiNode(nodal.id, nodal.name, nodal.content, nodal.isStartNode, nodal.rules)
+  implicit def nodalList2UiNodeList(nodals: List[Nodal]): List[UiNode] = nodals map nodal2UiNode
+
+  implicit def narrative2UiStory(narrative: Narrative): UiStory = new UiStory(narrative.title,
+                                                                              narrative.description,
+                                                                              narrative.author,
+                                                                              narrative.facts,
+                                                                              narrative.nodes,
+                                                                              narrative.rules)
+}

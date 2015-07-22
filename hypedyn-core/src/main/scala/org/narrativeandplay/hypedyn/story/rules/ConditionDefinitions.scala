@@ -23,9 +23,9 @@ object ConditionDefinitions {
                                                                                                             "==",
                                                                                                             "!=")),
                                                                      RuleParameter("comparisonValue",
-                                                                                   Union(List(
-                                                                                     RuleParameter("input", UserInput),
-                                                                                     RuleParameter("otherFact", IntegerFacts)))))
+                                                                                   Union(Map(
+                                                                                     "Input" -> RuleParameter("input", UserInputInteger),
+                                                                                     "Fact" -> RuleParameter("otherFact", IntegerFacts)))))
     )
   )
 }

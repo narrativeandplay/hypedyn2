@@ -94,9 +94,9 @@ class FactEditor private (dialogTitle: String,
     contentPane.remove(stringFactInitValueField)
 
     factTypesField.value() match {
-      case "String fact" => contentPane.add(stringFactInitValueField)
-      case "Number fact" => contentPane.add(integerFactInitValueField)
-      case "True/false fact" => contentPane.add(booleanFactInitValueField)
+      case Fact.StringFact => contentPane.add(stringFactInitValueField)
+      case Fact.IntegerFact => contentPane.add(integerFactInitValueField)
+      case Fact.BooleanFact => contentPane.add(booleanFactInitValueField)
       case _ => println("error")
     }
 
@@ -139,15 +139,15 @@ class FactEditor private (dialogTitle: String,
   resultConverter = {
     case ButtonType.OK =>
       factTypesField.value() match {
-        case "String fact" => StringFact(factToEdit map (_.id) getOrElse FactId(-1),
-                                         factNameField.text(),
-                                         stringFactInitValueField.text())
-        case "Number fact" => IntegerFact(factToEdit map (_.id) getOrElse FactId(-1),
-                                          factNameField.text(),
-                                          integerFactInitValueField.value())
-        case "True/false fact" => BooleanFact(factToEdit map (_.id) getOrElse FactId(-1),
-                                              factNameField.text(),
-                                              booleanFactInitValueField.value())
+        case Fact.StringFact => StringFact(factToEdit map (_.id) getOrElse FactId(-1),
+                                           factNameField.text(),
+                                           stringFactInitValueField.text())
+        case Fact.IntegerFact => IntegerFact(factToEdit map (_.id) getOrElse FactId(-1),
+                                             factNameField.text(),
+                                             integerFactInitValueField.value())
+        case Fact.BooleanFact => BooleanFact(factToEdit map (_.id) getOrElse FactId(-1),
+                                             factNameField.text(),
+                                             booleanFactInitValueField.value())
         case _ => throw new IllegalArgumentException("Invalid fact type")
       }
     case _ => null

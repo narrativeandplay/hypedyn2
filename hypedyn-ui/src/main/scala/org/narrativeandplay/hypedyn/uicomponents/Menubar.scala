@@ -1,9 +1,9 @@
-package org.narrativeandplay.hypedyn
+package org.narrativeandplay.hypedyn.uicomponents
 
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.event.ActionEvent
-import scalafx.scene.control.{MenuItem, SeparatorMenuItem, Menu, MenuBar}
+import scalafx.scene.control.{Menu, MenuBar, MenuItem, SeparatorMenuItem}
 
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 import org.narrativeandplay.hypedyn.keycombinations.KeyCombinations

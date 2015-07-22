@@ -1,4 +1,4 @@
-package org.narrativeandplay.hypedyn
+package org.narrativeandplay.hypedyn.uicomponents
 
 import scalafx.Includes._
 import scalafx.event.ActionEvent

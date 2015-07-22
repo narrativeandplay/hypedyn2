@@ -1,5 +1,28 @@
 package org.narrativeandplay.hypedyn.story
 
+import javafx.beans.property.SimpleMapProperty
+
+import scalafx.Includes._
+import scalafx.beans.property.StringProperty
+import scalafx.collections.ObservableMap
+
+import org.narrativeandplay.hypedyn.story.NodalContent.RulesetIndexes
 import org.narrativeandplay.hypedyn.story.rules.RuleLike
 
-case class UiNodeContent(text: String, rulesets: Map[NodalContent.RulesetIndexes, RuleLike]) extends NodalContent
+class UiNodeContent(initText: String, initRulesets: Map[NodalContent.RulesetIndexes, UiRule]) extends NodalContent {
+  val textProperty = StringProperty(initText)
+  val rulesetsProperty = ObservableMap(initRulesets.toSeq: _*)
+
+  initRulesets foreach { case (k, v) =>
+    rulesetsProperty.put(k, v)
+  }
+
+  override def text: String = textProperty()
+
+  override def rulesets: Map[RulesetIndexes, RuleLike] = rulesetsProperty.toMap
+}
+
+object UiNodeContent {
+  def apply(initText: String, initRulesets: Map[NodalContent.RulesetIndexes, UiRule]) =
+    new UiNodeContent(initText, initRulesets)
+}

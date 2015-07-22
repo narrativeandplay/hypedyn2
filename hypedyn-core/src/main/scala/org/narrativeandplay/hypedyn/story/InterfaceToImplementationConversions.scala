@@ -13,8 +13,12 @@ object InterfaceToImplementationConversions {
                                                               ruleLike.conditions map conditional2Condition,
                                                               ruleLike.actions map actionable2Action)
   implicit def actionable2Action(actionable: Actionable): Action = Action(actionable.actionType, actionable.params)
+  implicit def actionableList2ActionList(actionableList: List[Actionable]): List[Action] =
+    actionableList map actionable2Action
   implicit def conditional2Condition(conditional: Conditional): Condition = Condition(conditional.conditionType,
                                                                                       conditional.params)
+  implicit def conditionalList2ConditionList(conditionalList: List[Conditional]): List[Condition] =
+    conditionalList map conditional2Condition
 
   implicit def nodalContent2NodeContent(nodalContent: NodalContent): NodeContent =
     NodeContent(nodalContent.text, nodalContent.rulesets map { case (k, v) => k -> ruleLike2Rule(v) })

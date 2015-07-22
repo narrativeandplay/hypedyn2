@@ -15,7 +15,8 @@ package object serialisers {
     override def serialise(node: Node): AstElement = AstMap("id" -> AstInteger(node.id.value),
                                                          "name" -> AstString(node.name),
                                                          "content" -> NodeContentSerialiser.serialise(node.content),
-                                                         "isStart" -> AstBoolean(node.isStartNode))
+                                                         "isStart" -> AstBoolean(node.isStartNode),
+                                                         "rules" -> AstList((node.rules map RuleSerialiser.serialise).toSeq: _*))
 
     /**
      * Returns an object given it's serialised representation
@@ -28,8 +29,9 @@ package object serialisers {
       val name = data("name").asInstanceOf[AstString].s
       val content = NodeContentSerialiser.deserialise(data("content"))
       val isStart = data("isStart").asInstanceOf[AstBoolean].boolean
+      val rules = data("rules").asInstanceOf[AstList].toList map RuleSerialiser.deserialise
 
-      new Node(NodeId(id), name, content, isStart)
+      new Node(NodeId(id), name, content, isStart, rules)
     }
   }
 
@@ -152,7 +154,7 @@ package object serialisers {
      * @param condition The object to serialise
      */
     override def serialise(condition: Condition): AstElement =
-      AstMap("actionType" -> AstString(condition.conditionType),
+      AstMap("conditionType" -> AstString(condition.conditionType),
              "params" -> AstMap((condition.params map { case (k, v) =>
                k -> AstString(v)
              }).toSeq: _*))

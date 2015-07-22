@@ -17,7 +17,7 @@ case class Node(id: NodeId,
                 name: String,
                 content: NodeContent,
                 isStartNode: Boolean,
-                rules: List[Rule] = Nil) extends Nodal {
+                rules: List[Rule]) extends Nodal {
   override def hashCode(): Int = id.hashCode()
 
   override def equals(that: Any): Boolean = that match {
