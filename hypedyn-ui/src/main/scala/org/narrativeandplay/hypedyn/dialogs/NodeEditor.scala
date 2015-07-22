@@ -140,3 +140,13 @@ class NodeEditor private (dialogTitle: String,
     if (result.isPresent) Some(result.get()) else None
   }
 }
+
+object NodeEditor {
+  class LinkStyleInfo(val rule: Option[UiRule] = None) {
+    private val linkStyle = "-fx-font-weight: bold; -fx-underline: true;"
+
+    def css = if (rule.isDefined) linkStyle else ""
+
+    override def toString = s"hasRule: ${rule.isDefined}"
+  }
+}
