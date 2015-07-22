@@ -51,8 +51,6 @@ class NodeEditor private (dialogTitle: String,
   val story: ObjectProperty[UiStory] = ObjectProperty(narrative)
   val node: UiNode = nodeToEdit getOrElse new UiNode(NodeId(-1), "New Node", new UiNodeContent("", Map.empty), false, Nil)
 
-  def initEdit(): Unit = {}
-
   val nodeNameField = new TextField() {
     text <==> node.nameProperty
   }
