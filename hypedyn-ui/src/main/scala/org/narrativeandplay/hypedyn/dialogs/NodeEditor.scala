@@ -175,7 +175,10 @@ class NodeEditor private (dialogTitle: String,
 
   val contentPane = new VBox() {
     children += new Label("Name:")
-    children += nodeNameField
+    children += new StackPane {
+      padding = Insets(5, 0, 5, 0)
+      children += nodeNameField
+    }
     children += new SplitPane() {
       orientation = Orientation.VERTICAL
       VBox.setVgrow(this, Priority.Always)
@@ -183,7 +186,11 @@ class NodeEditor private (dialogTitle: String,
       items += new SplitPane() {
         orientation = Orientation.HORIZONTAL
         items += new VBox {
-          children += new Label("Text Rules")
+          children += new HBox {
+            padding = Insets(5)
+            alignment = Pos.CenterLeft
+            children += new Label("Text Rules")
+          }
           children += textRulesList
 
           VBox.setVgrow(textRulesList, Priority.Always)
@@ -204,6 +211,7 @@ class NodeEditor private (dialogTitle: String,
         orientation = Orientation.HORIZONTAL
         items += new VBox {
           children += new HBox {
+            padding = Insets(5)
             alignment = Pos.CenterLeft
             children += new Label("Text Rules")
             children += new Button("Add text rule") {
@@ -218,6 +226,7 @@ class NodeEditor private (dialogTitle: String,
 
         items += new VBox {
           children += new HBox {
+            padding = Insets(5)
             alignment = Pos.CenterLeft
             children += new Label("Node Rules")
             children += new Button("Add node rule") {
