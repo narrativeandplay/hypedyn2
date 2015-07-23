@@ -5,6 +5,7 @@ import javafx.event.EventHandler
 import javafx.scene.control.{ListCell => JfxListCell}
 import javafx.scene.input
 import javafx.scene.input.KeyCode
+
 import scala.language.reflectiveCalls
 
 import scalafx.Includes._
@@ -271,6 +272,10 @@ class NodeEditor private (dialogTitle: String,
       updateNodeContentRulesetsIndexes()
       node
     case _ => null
+  }
+
+  onShown = { _ =>
+    nodeNameField.requestFocus()
   }
 
   def updateNodeContentRulesetsIndexes(): Unit = {
