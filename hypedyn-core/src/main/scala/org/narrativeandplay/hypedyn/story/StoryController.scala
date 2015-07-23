@@ -19,7 +19,10 @@ object StoryController {
 
   def load(story: Story): Unit = {
     currentStory = story
-    firstUnusedNodeId = (story.nodes map (_.id)).max.inc
+    firstUnusedNodeId = story.nodes map (_.id) match {
+      case Nil => NodeId(0)
+      case ids => ids.max.inc
+    }
   }
 
   def findNode(nodeId: NodeId) = currentStory.nodes find (_.id == nodeId)
