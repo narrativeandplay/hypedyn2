@@ -67,6 +67,44 @@ class NodeEditor private (dialogTitle: String,
   val textRulesList = new ListView[UiNodeContent.UiRuleset]() {
     cellFactory = { _ =>
       new JfxListCell[UiNodeContent.UiRuleset] {
+        override def startEdit(): Unit = {
+          super.startEdit()
+
+          setText("")
+          setGraphic(new TextField {
+            text = itemProperty().get().name
+
+            onKeyReleased = new EventHandler[input.KeyEvent] {
+              override def handle(event: input.KeyEvent): Unit = event.getCode match {
+                case KeyCode.ENTER =>
+                  if (!text().trim.isEmpty) {
+                    itemProperty().get.nameProperty() = text()
+                    commitEdit(itemProperty().get())
+                  }
+                  else {
+                    cancelEdit()
+                  }
+                case KeyCode.ESCAPE => cancelEdit()
+                case _ =>
+              }
+            }
+          })
+        }
+
+        override def cancelEdit(): Unit = {
+          super.cancelEdit()
+
+          setText(itemProperty().get().name)
+          setGraphic(null)
+        }
+
+        override def commitEdit(newValue: UiRuleset): Unit = {
+          super.commitEdit(newValue)
+
+          setText(itemProperty().get().name)
+          setGraphic(null)
+        }
+
         override def updateItem(item: UiRuleset, empty: Boolean): Unit = {
           super.updateItem(item, empty)
 
