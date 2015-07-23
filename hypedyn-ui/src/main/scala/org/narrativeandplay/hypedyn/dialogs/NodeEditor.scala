@@ -140,6 +140,12 @@ class NodeEditor private (dialogTitle: String,
     }) {
     setWrapText(true)
     replaceText(node.content.text)
+    node.content.rulesetsProperty foreach { ruleset =>
+      setStyle(ruleset.indexes.startIndex.index.toInt,
+               ruleset.indexes.endIndex.index.toInt,
+               new LinkStyleInfo(Some(ruleset)))
+    }
+
     getUndoManager.forgetHistory() // Ensure that the initialisation of the text done above is not undoable
 
     def styleSpans = {
