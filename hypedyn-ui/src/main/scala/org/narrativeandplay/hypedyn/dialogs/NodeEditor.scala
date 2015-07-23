@@ -16,8 +16,10 @@ import org.fxmisc.easybind.EasyBind
 import org.fxmisc.richtext.{StyleSpan, InlineStyleTextArea}
 
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor.LinkStyleInfo
+import org.narrativeandplay.hypedyn.story.NodalContent.{RulesetId, TextIndex, RulesetIndexes}
+import org.narrativeandplay.hypedyn.story.UiNodeContent.UiRuleset
 import org.narrativeandplay.hypedyn.story._
-import org.narrativeandplay.hypedyn.story.rules.{And, RuleId, ActionDefinition, ConditionDefinition}
+import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.uicomponents.RulesPane
 import org.narrativeandplay.hypedyn.utils.ScalaJavaImplicits._
@@ -42,7 +44,7 @@ class NodeEditor private (dialogTitle: String,
            ownerWindow: Window) =
     this(dialogTitle, conditionDefinitions, actionDefinitions, story, Some(nodeToEdit), ownerWindow)
 
-  private var firstUnusedRuleId = RuleId(-1)
+  private var firstUnusedRulesetId = RulesetId(-1)
 
   title = dialogTitle
   headerText = None
@@ -57,14 +59,41 @@ class NodeEditor private (dialogTitle: String,
   dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
 
   val story: ObjectProperty[UiStory] = ObjectProperty(narrative)
-  val node: UiNode = nodeToEdit getOrElse new UiNode(NodeId(-1), "New Node", new UiNodeContent("", Map.empty), false, Nil)
+  val node: UiNode = nodeToEdit getOrElse new UiNode(NodeId(-1), "New Node", new UiNodeContent("", Nil), false, Nil)
 
   val nodeNameField = new TextField() {
     text <==> node.nameProperty
   }
-  val textRulesList = new ListView[UiRule]() {
-    prefHeight = 200
-    prefWidth = 150
+  val textRulesList = new ListView[UiNodeContent.UiRuleset]() {
+    cellFactory = { _ =>
+      new JfxListCell[UiNodeContent.UiRuleset] {
+        override def updateItem(item: UiRuleset, empty: Boolean): Unit = {
+          super.updateItem(item, empty)
+
+          if (!empty && item != null) {
+            setText(item.name)
+          }
+          else {
+            setText("")
+          }
+        }
+      }
+    }
+
+    selectionModel().selectedItemProperty onChange { (_, _, `new`) =>
+      Option(`new`) match {
+        case Some(ruleset) =>
+          nodeContentText.selectRange(ruleset.indexes.startIndex.index.toInt, ruleset.indexes.endIndex.index.toInt)
+          textRulesPane.rules() = ruleset.rulesProperty
+        case None =>
+          textRulesPane.rules() = ObservableBuffer.empty[UiRule]
+      }
+    }
+
+    nodeContentText.focused onChange { (_, _, focus) => if (focus) selectionModel().clearSelection() }
+
+    items = node.contentProperty().rulesetsProperty
+    editable = true
   }
   val nodeContentText = new InlineStyleTextArea[NodeEditor.LinkStyleInfo](
     new NodeEditor.LinkStyleInfo(),
@@ -175,11 +204,11 @@ class NodeEditor private (dialogTitle: String,
 }
 
 object NodeEditor {
-  class LinkStyleInfo(val rule: Option[UiRule] = None) {
+  class LinkStyleInfo(val ruleset: Option[UiRuleset] = None) {
     private val linkStyle = "-fx-font-weight: bold; -fx-underline: true;"
 
-    def css = if (rule.isDefined) linkStyle else ""
+    def css = if (ruleset.isDefined) linkStyle else ""
 
-    override def toString = s"hasRule: ${rule.isDefined}"
+    override def toString = s"hasRule: ${ruleset.isDefined}"
   }
 }
