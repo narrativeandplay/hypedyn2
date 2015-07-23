@@ -88,7 +88,7 @@ object StoryController {
   }
 
   def create(fact: Fact): Fact = {
-    val newFact: Fact = instantiateFact(fact)
+    val newFact = instantiateFact(fact)
 
     currentStory = currentStory addFact newFact
 
