@@ -12,7 +12,14 @@ class RuleCell(val rule: UiRule,
                val conditionDefs: List[ConditionDefinition],
                val actionDefs: List[ActionDefinition],
                val story: ObjectProperty[UiStory]) extends JfxControl {
-  setSkin(new RuleCellSkin(this))
+  val cellSkin = new RuleCellSkin(this)
+  setSkin(cellSkin)
+
+  // Shrink the display when the rule is collapsed
+  // However, because the height of a TreeView can't be set directly, we can only set the preferred height.
+  // The problem with this is that preferred height changes don't result in actual height changes without a redraw,
+  // and there is no way to force a redraw without clicking outside of the cell
+  prefHeightProperty <== when (cellSkin.rootNode.expandedItemCount === 1) choose 37 otherwise 175
 
   def addCondition(): UiCondition = {
     val newCond = new UiCondition("NodeCondition", Map.empty)
