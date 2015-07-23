@@ -133,7 +133,7 @@ class NodeEditor private (dialogTitle: String,
     items = node.contentProperty().rulesetsProperty
     editable = true
   }
-  val nodeContentText = new InlineStyleTextArea[NodeEditor.LinkStyleInfo](
+  lazy val nodeContentText = new InlineStyleTextArea[NodeEditor.LinkStyleInfo](
     new NodeEditor.LinkStyleInfo(),
     new Function[NodeEditor.LinkStyleInfo, String] {
       override def apply(t: LinkStyleInfo): String = t.css
@@ -147,6 +147,12 @@ class NodeEditor private (dialogTitle: String,
     }
 
     getUndoManager.forgetHistory() // Ensure that the initialisation of the text done above is not undoable
+
+    beingUpdatedProperty onChange { (_, _, beingUpdated) =>
+      if (!beingUpdated) {
+        updateNodeContentRulesetsIndexes()
+      }
+    }
 
     def styleSpans = {
       val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
