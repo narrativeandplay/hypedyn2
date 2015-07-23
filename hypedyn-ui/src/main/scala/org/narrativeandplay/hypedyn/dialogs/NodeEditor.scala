@@ -233,6 +233,9 @@ class NodeEditor private (dialogTitle: String,
             padding = Insets(5)
             alignment = Pos.CenterLeft
             children += new Label("Text Rules")
+            children += new Button("Add rule") {
+              disable <== textRulesList.selectionModel().selectedItemProperty().isNull
+              onAction = { _ => textRulesPane.addRule() }
             }
           }
           children += textRulesPane
