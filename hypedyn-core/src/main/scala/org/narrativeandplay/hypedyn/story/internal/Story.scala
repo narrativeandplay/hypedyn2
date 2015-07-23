@@ -28,4 +28,6 @@ case class Story(title: String = "Untitled",
   def updateRule(rule: Rule, newRule: Rule) = new Story(title, author, description, nodes, facts,
                                                         newRule :: (rules filter (_ != rule)))
   def removeRule(rule: Rule) = new Story(title, author, description, nodes, facts, rules filter (_ != rule))
+
+  def allRules = rules ++ (nodes flatMap (_.rules)) ++ (nodes flatMap (_.content.rulesets) flatMap (_.rules))
 }
