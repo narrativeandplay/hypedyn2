@@ -1,14 +1,18 @@
 package org.narrativeandplay.hypedyn.dialogs
 
 import java.util.function.Function
+import javafx.event.EventHandler
+import javafx.scene.control.{ListCell => JfxListCell}
+import javafx.scene.input
+import javafx.scene.input.KeyCode
 import scala.language.reflectiveCalls
 
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
-import scalafx.collections.{ObservableMap, ObservableBuffer}
+import scalafx.collections.ObservableBuffer
 import scalafx.geometry.{Pos, Insets, Orientation}
 import scalafx.scene.control._
-import scalafx.scene.layout.{Priority, HBox, VBox}
+import scalafx.scene.layout.{StackPane, Priority, HBox, VBox}
 import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
 
@@ -160,8 +164,14 @@ class NodeEditor private (dialogTitle: String,
       spans.toList
     }
   }
-  val textRulesPane = new RulesPane(conditionDefinitions, actionDefinitions, ObservableBuffer.empty, story)
-  val nodeRulesPane = new RulesPane(conditionDefinitions, actionDefinitions, node.rulesProperty, story)
+  lazy val textRulesPane = new RulesPane(conditionDefinitions,
+                                    actionDefinitions filter (_.actionType contains NodeContentAction),
+                                    ObservableBuffer.empty,
+                                    story)
+  val nodeRulesPane = new RulesPane(conditionDefinitions,
+                                    actionDefinitions filter (_.actionType contains NodeAction),
+                                    node.rulesProperty,
+                                    story)
 
   val contentPane = new VBox() {
     children += new Label("Name:")
