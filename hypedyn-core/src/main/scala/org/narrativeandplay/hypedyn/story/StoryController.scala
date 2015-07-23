@@ -23,6 +23,18 @@ object StoryController {
       case Nil => NodeId(0)
       case ids => ids.max.inc
     }
+    firstUnusedFactId = story.facts map (_.id) match {
+      case Nil => FactId(0)
+      case ids => ids.max.inc
+    }
+    firstUnusedRuleId = (story.nodes flatMap (_.rules) map (_.id)) ++ (story.nodes map (_.content) flatMap (_.rulesets) flatMap (_.rules) map (_.id)) match {
+      case Nil => RuleId(0)
+      case ids => ids.max.inc
+    }
+    firstUnusedRulesetId = story.nodes flatMap (_.content.rulesets) map (_.id) match {
+      case Nil => NodalContent.RulesetId(0)
+      case ids => ids.max.inc
+    }
   }
 
   def findNode(nodeId: NodeId) = currentStory.nodes find (_.id == nodeId)
