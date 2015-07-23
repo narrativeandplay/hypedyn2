@@ -15,8 +15,6 @@ import org.narrativeandplay.hypedyn.story.rules.{Or, And, BooleanOperator}
 
 class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
   val rootNode = new TreeView[String]() {
-    prefHeight = 175
-
     root = treeRoot
   }
 

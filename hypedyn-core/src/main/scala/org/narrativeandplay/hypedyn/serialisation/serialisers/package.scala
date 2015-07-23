@@ -1,6 +1,7 @@
 package org.narrativeandplay.hypedyn.serialisation
 
-import org.narrativeandplay.hypedyn.story.NodeId
+import org.narrativeandplay.hypedyn.story.{NodalContent, NodeId}
+import org.narrativeandplay.hypedyn.story.internal.NodeContent.Ruleset
 import org.narrativeandplay.hypedyn.story.internal.{NodeContent, Story, Node}
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.rules.internal.{Action, Condition, Rule}
@@ -83,9 +84,7 @@ package object serialisers {
      */
     override def serialise(nodeContent: NodeContent): AstElement =
       AstMap("text" -> AstString(nodeContent.text),
-             "rulesets" -> AstMap((nodeContent.rulesets map { case (k, v) =>
-                s"${k.startIndex.index}:${k.endIndex.index}" -> (RuleSerialiser serialise v)
-             }).toSeq: _*))
+             "rulesets" -> AstList(nodeContent.rulesets map RulesetSerialiser.serialise: _*))
 
     /**
      * Returns an object given it's serialised representation
@@ -95,18 +94,40 @@ package object serialisers {
     override def deserialise(serialised: AstElement): NodeContent = {
       val data = serialised.asInstanceOf[AstMap]
       val text = data("text").asInstanceOf[AstString].s
-      val rulesets = data("rulesets").asInstanceOf[AstMap].toMap map { case (k, v) =>
-          val (start, end) = k split ':' map (_.toInt) match {
-            case Array(s, e) => (s, e)
-            case unknown =>
-              throw DeserialisationException(s"Expected exactly 2 numbers for ruleset indexes, got: $unknown")
-          }
-
-          import org.narrativeandplay.hypedyn.story.NodalContent._
-          RulesetIndexes(TextIndex(start), TextIndex(end)) -> (RuleSerialiser deserialise v)
-      }
+      val rulesets = data("rulesets").asInstanceOf[AstList].toList map RulesetSerialiser.deserialise
 
       NodeContent(text, rulesets)
+    }
+  }
+  
+  implicit object RulesetSerialiser extends Serialisable[NodeContent.Ruleset] {
+    /**
+     * Returns the serialised representation of an object
+     *
+     * @param ruleset The object to serialise
+     */
+    override def serialise(ruleset: Ruleset): AstElement =
+      AstMap("id" -> AstInteger(ruleset.id.value),
+             "name" -> AstString(ruleset.name),
+             "start" -> AstInteger(ruleset.indexes.startIndex.index),
+             "end" -> AstInteger(ruleset.indexes.endIndex.index),
+             "rules" -> AstList(ruleset.rules map RuleSerialiser.serialise: _*))
+
+    /**
+     * Returns an object given it's serialised representation
+     *
+     * @param serialised The serialised form of the object
+     */
+    override def deserialise(serialised: AstElement): Ruleset = {
+      import NodalContent._
+      val data = serialised.asInstanceOf[AstMap]
+      val id = RulesetId(data("id").asInstanceOf[AstInteger].i)
+      val name = data("name").asInstanceOf[AstString].s
+      val indexes = RulesetIndexes(TextIndex(data("start").asInstanceOf[AstInteger].i),
+                                   TextIndex(data("end").asInstanceOf[AstInteger].i))
+      val rules = data("rules").asInstanceOf[AstList].toList map RuleSerialiser.deserialise
+
+      Ruleset(id, name, indexes, rules)
     }
   }
 

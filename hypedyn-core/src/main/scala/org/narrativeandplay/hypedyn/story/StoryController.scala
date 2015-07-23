@@ -9,6 +9,7 @@ object StoryController {
   private var firstUnusedNodeId = NodeId(0)
   private var firstUnusedFactId = FactId(0)
   private var firstUnusedRuleId = RuleId(0)
+  private var firstUnusedRulesetId = NodalContent.RulesetId(0)
 
   def story = currentStory
 
@@ -25,10 +26,15 @@ object StoryController {
   def findFact(factId: FactId) = currentStory.facts find (_.id == factId)
 
   def create(node: Nodal): Node = {
-    val newNodeContent = NodeContent(node.content.text, node.content.rulesets map { case (indexes, rule) =>
-      val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
-      firstUnusedRuleId = List(firstUnusedRuleId, r.id.inc).max
-      indexes -> r
+    val newNodeContent = NodeContent(node.content.text, node.content.rulesets map { rulesetLike =>
+      val ruleset = rulesetLike.copy(id = if (rulesetLike.id.isValid) rulesetLike.id else firstUnusedRulesetId,
+                                     rules = rulesetLike.rules map { rule =>
+                                       val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
+                                       firstUnusedRuleId = List(firstUnusedRuleId, r.id.inc).max
+                                       r
+                                     })
+      firstUnusedRulesetId = List(firstUnusedRulesetId, ruleset.id.inc).max
+      ruleset
     })
     val newNodeRules = node.rules map { rule =>
       val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
@@ -44,10 +50,15 @@ object StoryController {
   }
 
   def update(node: Nodal, editedNode: Nodal): Option[(Node, Node)] = {
-    val editedNodeContent = NodeContent(editedNode.content.text, editedNode.content.rulesets map { case (indexes, rule) =>
-      val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
-      firstUnusedRuleId = List(firstUnusedRuleId, r.id.inc).max
-      indexes -> r
+    val editedNodeContent = NodeContent(editedNode.content.text, editedNode.content.rulesets map { rulesetLike =>
+      val ruleset = rulesetLike.copy(id = if (rulesetLike.id.isValid) rulesetLike.id else firstUnusedRulesetId,
+                                     rules = rulesetLike.rules map { rule =>
+                                       val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
+                                       firstUnusedRuleId = List(firstUnusedRuleId, r.id.inc).max
+                                       r
+                                     })
+      firstUnusedRulesetId = List(firstUnusedRulesetId, ruleset.id.inc).max
+      ruleset
     })
     val editedNodeRules = editedNode.rules map { rule =>
       val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)

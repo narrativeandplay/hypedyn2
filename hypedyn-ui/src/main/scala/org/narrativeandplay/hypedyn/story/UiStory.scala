@@ -49,7 +49,7 @@ class UiStory(initTitle: String,
    */
   override def rules: List[UiRule] = rulesProperty.toList
 
-  def links = nodesProperty map (_.contentProperty().rulesetsProperty) flatMap (_.values.toList) filter { rule =>
-    rule.actions map (_.actionType) contains "LinkTo"
+  def links = nodesProperty flatMap (_.contentProperty().rulesetsProperty) filter { ruleset =>
+    ruleset.rules flatMap (_.actions) map (_.actionType) contains "LinkTo"
   }
 }
