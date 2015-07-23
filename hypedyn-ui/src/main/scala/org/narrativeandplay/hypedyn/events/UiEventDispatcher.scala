@@ -84,6 +84,7 @@ object UiEventDispatcher {
   }
 
   EventBus.StoryLoadedEvents foreach { evt =>
+    FactViewer.facts.clear()
     evt.story.facts foreach { f => FactViewer.facts += f }
   }
 
