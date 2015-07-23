@@ -190,6 +190,11 @@ class NodeEditor private (dialogTitle: String,
             padding = Insets(5)
             alignment = Pos.CenterLeft
             children += new Label("Text Rules")
+            children += new Button("Add text rule") {
+              disable <== EasyBind.map(nodeContentText.selectedTextProperty, { s: String =>
+                Boolean box s.trim.isEmpty  // Need to manually transform Scala Boolean to java.lang.Boolean because bloody Java<->Scala issues
+              })
+            }
           }
           children += textRulesList
 
@@ -214,10 +219,6 @@ class NodeEditor private (dialogTitle: String,
             padding = Insets(5)
             alignment = Pos.CenterLeft
             children += new Label("Text Rules")
-            children += new Button("Add text rule") {
-              disable <== EasyBind.map(nodeContentText.selectedTextProperty, { s: String =>
-                Boolean box s.trim.isEmpty  // Need to manually transform Scala Boolean to java.lang.Boolean because bloody Java<->Scala issues
-              })
             }
           }
           children += textRulesPane
