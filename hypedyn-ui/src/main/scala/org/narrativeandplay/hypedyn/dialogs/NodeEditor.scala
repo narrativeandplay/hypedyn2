@@ -265,6 +265,7 @@ class NodeEditor private (dialogTitle: String,
   resultConverter = {
     case ButtonType.OK =>
       node.contentProperty().textProperty() = nodeContentText.getText
+      updateNodeContentRulesetsIndexes()
       node
     case _ => null
   }
