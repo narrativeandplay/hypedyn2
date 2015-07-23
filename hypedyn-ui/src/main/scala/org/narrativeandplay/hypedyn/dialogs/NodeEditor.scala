@@ -269,13 +269,19 @@ class NodeEditor private (dialogTitle: String,
     case _ => null
   }
 
-  def makeNodeContentRulesetsMap(): ObservableMap[NodalContent.RulesetIndexes, UiRule] = {
+  def updateNodeContentRulesetsIndexes(): Unit = {
     import NodalContent._
-    val initRuleset = RulesetIndexes(TextIndex(0), TextIndex(0)) -> Option(new UiRule(RuleId(-1), "", And, Nil, Nil))
-    ObservableMap(nodeContentText.styleSpans.scanLeft(initRuleset) { case ((prevIndexes, _), currentStyleSpan) =>
-      val end = prevIndexes.endIndex.index + currentStyleSpan.getLength
-      RulesetIndexes(prevIndexes.endIndex, TextIndex(end)) -> currentStyleSpan.getStyle.rule
-    } collect { case (indexes, Some(rule)) =>  indexes -> rule })
+    val spans = nodeContentText.styleSpans.scanLeft((0, 0, None: Option[UiRuleset])) {
+      case ((_, end, rulesetOption), styleSpan) =>
+        (end, end + styleSpan.getLength, styleSpan.getStyle.ruleset)
+    }
+    (spans.tail foldLeft List(spans.head)) {
+      case (resList @ (headStart, _, headSpan) :: tail, (start, end, span)) =>
+        if (headSpan == span) (headStart, end, span) :: tail else (start, end, span) :: resList
+      case (Nil, input) => input :: Nil
+    } collect { case (start, end, Some(ruleset)) =>
+      ruleset.indexesProperty() = RulesetIndexes(TextIndex(start), TextIndex(end))
+    }
   }
 
   def showAndWait(): Option[Nodal] = {
