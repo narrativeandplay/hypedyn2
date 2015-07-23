@@ -5,6 +5,8 @@ import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions._
 import org.narrativeandplay.hypedyn.story.rules._
 
 object StoryController {
+  import Ordering.Implicits._
+
   private var currentStory = new Story()
   private var firstUnusedNodeId = NodeId(0)
   private var firstUnusedFactId = FactId(0)
@@ -19,22 +21,10 @@ object StoryController {
 
   def load(story: Story): Unit = {
     currentStory = story
-    firstUnusedNodeId = story.nodes map (_.id) match {
-      case Nil => NodeId(0)
-      case ids => ids.max.inc
-    }
-    firstUnusedFactId = story.facts map (_.id) match {
-      case Nil => FactId(0)
-      case ids => ids.max.inc
-    }
-    firstUnusedRuleId = (story.nodes flatMap (_.rules) map (_.id)) ++ (story.nodes map (_.content) flatMap (_.rulesets) flatMap (_.rules) map (_.id)) match {
-      case Nil => RuleId(0)
-      case ids => ids.max.inc
-    }
-    firstUnusedRulesetId = story.nodes flatMap (_.content.rulesets) map (_.id) match {
-      case Nil => NodalContent.RulesetId(0)
-      case ids => ids.max.inc
-    }
+    firstUnusedNodeId = story.nodes map (_.id) reduceOption (_ max _) map (_.inc) getOrElse NodeId(0)
+    firstUnusedFactId = story.facts map (_.id) reduceOption (_ max _) map (_.inc) getOrElse FactId(0)
+    firstUnusedRuleId = story.allRules map (_.id) reduceOption (_ max _) map (_.inc) getOrElse RuleId(0)
+    firstUnusedRulesetId = story.nodes flatMap (_.content.rulesets) map (_.id) reduceOption (_ max _) map (_.inc) getOrElse NodalContent.RulesetId(0)
   }
 
   def findNode(nodeId: NodeId) = currentStory.nodes find (_.id == nodeId)
@@ -45,21 +35,21 @@ object StoryController {
       val ruleset = rulesetLike.copy(id = if (rulesetLike.id.isValid) rulesetLike.id else firstUnusedRulesetId,
                                      rules = rulesetLike.rules map { rule =>
                                        val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
-                                       firstUnusedRuleId = List(firstUnusedRuleId, r.id.inc).max
+                                       firstUnusedRuleId = firstUnusedRuleId max r.id.inc
                                        r
                                      })
-      firstUnusedRulesetId = List(firstUnusedRulesetId, ruleset.id.inc).max
+      firstUnusedRulesetId = firstUnusedRulesetId max ruleset.id.inc
       ruleset
     })
     val newNodeRules = node.rules map { rule =>
       val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
-      firstUnusedRuleId = List(firstUnusedRuleId, r.id.inc).max
+      firstUnusedRuleId = firstUnusedRuleId max r.id.inc
       r
     }
     val newNode = Node(if (node.id.isValid) node.id else firstUnusedNodeId,
                        node.name, newNodeContent, node.isStartNode, newNodeRules)
     currentStory = currentStory addNode newNode
-    firstUnusedNodeId = List(firstUnusedNodeId, newNode.id.inc).max
+    firstUnusedNodeId = firstUnusedNodeId max newNode.id.inc
 
     newNode
   }
@@ -69,15 +59,15 @@ object StoryController {
       val ruleset = rulesetLike.copy(id = if (rulesetLike.id.isValid) rulesetLike.id else firstUnusedRulesetId,
                                      rules = rulesetLike.rules map { rule =>
                                        val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
-                                       firstUnusedRuleId = List(firstUnusedRuleId, r.id.inc).max
+                                       firstUnusedRuleId = firstUnusedRuleId max r.id.inc
                                        r
                                      })
-      firstUnusedRulesetId = List(firstUnusedRulesetId, ruleset.id.inc).max
+      firstUnusedRulesetId = firstUnusedRulesetId max ruleset.id.inc
       ruleset
     })
     val editedNodeRules = editedNode.rules map { rule =>
       val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
-      firstUnusedRuleId = List(firstUnusedRuleId, r.id.inc).max
+      firstUnusedRuleId = firstUnusedRuleId max r.id.inc
       r
     }
 
@@ -146,7 +136,7 @@ object StoryController {
                         (initVal map instantiateFact).asInstanceOf[List[BooleanFact]])
     }
 
-    firstUnusedFactId = List(factInstance.id.inc, firstUnusedFactId).max
+    firstUnusedFactId = firstUnusedFactId max factInstance.id.inc
 
     factInstance
   }
