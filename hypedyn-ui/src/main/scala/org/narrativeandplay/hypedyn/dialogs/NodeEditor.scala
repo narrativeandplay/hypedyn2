@@ -194,6 +194,20 @@ class NodeEditor private (dialogTitle: String,
               disable <== EasyBind.map(nodeContentText.selectedTextProperty, { s: String =>
                 Boolean box s.trim.isEmpty  // Need to manually transform Scala Boolean to java.lang.Boolean because bloody Java<->Scala issues
               })
+
+              onAction = { _ =>
+                val start = nodeContentText.getSelection.getStart
+                val end = nodeContentText.getSelection.getEnd
+                val newRuleset = new UiRuleset(firstUnusedRulesetId,
+                                               "new rule",
+                                               RulesetIndexes(TextIndex(start), TextIndex(end)),
+                                               Nil)
+                firstUnusedRulesetId = firstUnusedRulesetId.dec
+                node.contentProperty().rulesetsProperty += newRuleset
+                nodeContentText.setStyle(start,
+                                         end,
+                                         new LinkStyleInfo(Some(newRuleset)))
+              }
             }
           }
           children += textRulesList
