@@ -90,8 +90,6 @@ object StoryController {
   def create(fact: Fact): Fact = {
     val newFact: Fact = instantiateFact(fact)
 
-    firstUnusedFactId = List(newFact.id.inc, firstUnusedFactId).max
-
     currentStory = currentStory addFact newFact
 
     newFact
@@ -123,15 +121,21 @@ object StoryController {
       case BooleanFact(id, name, initVal) => BooleanFact(if (id.isValid) id else firstUnusedFactId,
                                                          name, initVal)
       case IntegerFactList(id, name, initVal) =>
-        IntegerFactList(if (id.isValid) id else firstUnusedFactId,
+        val actualId = if (id.isValid) id else firstUnusedFactId
+        firstUnusedFactId = firstUnusedFactId max actualId.inc
+        IntegerFactList(actualId,
                         name,
                         (initVal map instantiateFact).asInstanceOf[List[IntegerFact]])
       case StringFactList(id, name, initVal) =>
-        StringFactList(if (id.isValid) id else firstUnusedFactId,
+        val actualId = if (id.isValid) id else firstUnusedFactId
+        firstUnusedFactId = firstUnusedFactId max actualId.inc
+        StringFactList(actualId,
                        name,
                        (initVal map instantiateFact).asInstanceOf[List[StringFact]])
       case BooleanFactList(id, name, initVal) =>
-        BooleanFactList(if (id.isValid) id else firstUnusedFactId,
+        val actualId = if (id.isValid) id else firstUnusedFactId
+        firstUnusedFactId = firstUnusedFactId max actualId.inc
+        BooleanFactList(actualId,
                         name,
                         (initVal map instantiateFact).asInstanceOf[List[BooleanFact]])
     }
