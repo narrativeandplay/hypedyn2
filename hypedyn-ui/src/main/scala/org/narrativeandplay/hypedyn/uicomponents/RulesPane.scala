@@ -15,18 +15,20 @@ import org.narrativeandplay.hypedyn.story.rules._
 
 class RulesPane(val conditionDefinitions: List[ConditionDefinition],
                 val actionDefinitions: List[ActionDefinition],
-                val rules: ObservableBuffer[UiRule],
+                initRules: ObservableBuffer[UiRule],
                 val story: ObjectProperty[UiStory]) extends ListView[UiRule] {
   prefHeight = 200
 
-  items = rules
+  val rules = ObjectProperty(initRules)
+
+  items <== rules
 
   cellFactory = { _ =>
     new RulesPane.RulesPaneCell(this)
   }
 
   def addRule(): Unit = {
-    rules += new UiRule(RuleId(-1), "New Rule", Or, Nil, Nil)
+    rules() += new UiRule(RuleId(-1), "New Rule", Or, Nil, Nil)
   }
 }
 
@@ -42,7 +44,8 @@ object RulesPane {
         setGraphic(null)
       }
       else {
-        setGraphic(new RuleCell(item, parentView.conditionDefinitions, parentView.actionDefinitions, parentView.story))
+        val cell = new RuleCell(item, parentView.conditionDefinitions, parentView.actionDefinitions, parentView.story)
+        setGraphic(cell)
       }
     }
   }
