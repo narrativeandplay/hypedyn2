@@ -13,7 +13,7 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.{Pos, Insets, Orientation}
 import scalafx.scene.control._
-import scalafx.scene.layout.{StackPane, Priority, HBox, VBox}
+import scalafx.scene.layout._
 import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
 
@@ -27,6 +27,8 @@ import org.narrativeandplay.hypedyn.story._
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.uicomponents.RulesPane
+import org.narrativeandplay.hypedyn.uicomponents.Sidebar.SidebarButton
+import org.narrativeandplay.hypedyn.utils.CollapsibleSplitPane
 import org.narrativeandplay.hypedyn.utils.ScalaJavaImplicits._
 
 class NodeEditor private (dialogTitle: String,
@@ -174,93 +176,155 @@ class NodeEditor private (dialogTitle: String,
                                     node.rulesProperty,
                                     story)
 
-  val contentPane = new VBox() {
-    children += new Label("Name:")
-    children += new StackPane {
-      padding = Insets(5, 0, 5, 0)
-      children += nodeNameField
+  val rulesetsListVBox = new VBox {
+    children += new HBox {
+      padding = Insets(5)
+      alignment = Pos.CenterLeft
+      children += new Label("Text Rules")
+      children += new Button("Add text rule") {
+        disable <== EasyBind.map(nodeContentText.selectedTextProperty, { s: String =>
+          Boolean box s.trim.isEmpty  // Need to manually transform Scala Boolean to java.lang.Boolean because bloody Java<->Scala issues
+        })
+
+        onAction = { _ =>
+          val start = nodeContentText.getSelection.getStart
+          val end = nodeContentText.getSelection.getEnd
+          val newRuleset = new UiRuleset(firstUnusedRulesetId,
+                                         "new rule",
+                                         RulesetIndexes(TextIndex(start), TextIndex(end)),
+                                         Nil)
+          firstUnusedRulesetId = firstUnusedRulesetId.dec
+          node.contentProperty().rulesetsProperty += newRuleset
+          nodeContentText.setStyle(start,
+                                   end,
+                                   new LinkStyleInfo(Some(newRuleset)))
+        }
+      }
     }
-    children += new SplitPane() {
+    children += textRulesList
+
+    VBox.setVgrow(textRulesList, Priority.Always)
+  }
+  val contentTextAndRulesetsListPane = new CollapsibleSplitPane {
+    orientation = Orientation.HORIZONTAL
+    add(rulesetsListVBox)
+    add(new VBox {
+      children += new Label("Content:") {
+        padding = Insets(5)
+      }
+      children += nodeContentText
+
+      VBox.setVgrow(nodeContentText, Priority.Always)
+    })
+
+    dividerPositions = 0.3
+  }
+  val textRulesVBox = new VBox {
+    children += new HBox {
+      padding = Insets(5)
+      alignment = Pos.CenterLeft
+      children += new Label("Text Rules")
+      children += new Button("Add rule") {
+        disable <== textRulesList.selectionModel().selectedItemProperty().isNull
+        onAction = { _ => textRulesPane.addRule() }
+      }
+    }
+    children += textRulesPane
+    VBox.setVgrow(textRulesPane, Priority.Always)
+  }
+  val nodeRulesVBox = new VBox {
+    children += new HBox {
+      padding = Insets(5)
+      alignment = Pos.CenterLeft
+      children += new Label("Node Rules")
+      children += new Button("Add node rule") {
+        onAction = { _ => nodeRulesPane.addRule() }
+      }
+    }
+    children += nodeRulesPane
+
+    VBox.setVgrow(nodeRulesPane, Priority.Always)
+  }
+  val textAndNodeRulesPane = new CollapsibleSplitPane {
+    orientation = Orientation.HORIZONTAL
+    add(textRulesVBox)
+
+    add(nodeRulesVBox)
+
+    dividerPositions = 0.5
+  }
+
+  val mainContentPane = new CollapsibleSplitPane {
+    orientation = Orientation.VERTICAL
+    VBox.setVgrow(this, Priority.Always)
+
+    add(contentTextAndRulesetsListPane)
+
+    add(textAndNodeRulesPane)
+
+    dividerPositions = 0.75
+  }
+
+  val contentPane = new BorderPane() {
+    center = new VBox() {
+      children += new Label("Name:")
+      children += new StackPane {
+        padding = Insets(5, 0, 5, 0)
+        children += nodeNameField
+      }
+      children += mainContentPane
+    }
+
+    bottom = new ToolBar {
+      style = "-fx-background-color: transparent;"
+
+      // Blank and invisible button to push the next 2 buttons into a nice position
+      items += new Button("") {
+        minWidth = 35
+        visible = false
+      }
+      items += new Button("Text Rules") {
+        onAction = { _ =>
+          (textAndNodeRulesPane isShown textRulesVBox, mainContentPane isShown textAndNodeRulesPane) match {
+            case (true, true) =>
+              if (textAndNodeRulesPane isShown nodeRulesVBox) textAndNodeRulesPane.hide(textRulesVBox) else mainContentPane.hide(textAndNodeRulesPane)
+            case (false, true) => textAndNodeRulesPane.show(textRulesVBox)
+            case (true, false) => mainContentPane.show(textAndNodeRulesPane)
+            case (false, false) =>
+              textAndNodeRulesPane.hide(nodeRulesVBox)
+              textAndNodeRulesPane.show(textRulesVBox)
+              mainContentPane.show(textAndNodeRulesPane)
+          }
+        }
+      }
+      items += new Button("Node Rules") {
+        onAction = { _ =>
+          (textAndNodeRulesPane isShown nodeRulesVBox, mainContentPane isShown textAndNodeRulesPane) match {
+            case (true, true) =>
+              if (textAndNodeRulesPane isShown textRulesVBox) textAndNodeRulesPane.hide(nodeRulesVBox) else mainContentPane.hide(textAndNodeRulesPane)
+            case (false, true) => textAndNodeRulesPane.show(nodeRulesVBox)
+            case (true, false) => mainContentPane.show(textAndNodeRulesPane)
+            case (false, false) =>
+              textAndNodeRulesPane.hide(textRulesVBox)
+              textAndNodeRulesPane.show(nodeRulesVBox)
+              mainContentPane.show(textAndNodeRulesPane)
+          }
+        }
+      }
+    }
+
+    left = new ToolBar {
+      style = "-fx-background-color: transparent;"
       orientation = Orientation.VERTICAL
-      VBox.setVgrow(this, Priority.Always)
 
-      items += new SplitPane() {
-        orientation = Orientation.HORIZONTAL
-        items += new VBox {
-          children += new HBox {
-            padding = Insets(5)
-            alignment = Pos.CenterLeft
-            children += new Label("Text Rules")
-            children += new Button("Add text rule") {
-              disable <== EasyBind.map(nodeContentText.selectedTextProperty, { s: String =>
-                Boolean box s.trim.isEmpty  // Need to manually transform Scala Boolean to java.lang.Boolean because bloody Java<->Scala issues
-              })
-
-              onAction = { _ =>
-                val start = nodeContentText.getSelection.getStart
-                val end = nodeContentText.getSelection.getEnd
-                val newRuleset = new UiRuleset(firstUnusedRulesetId,
-                                               "new rule",
-                                               RulesetIndexes(TextIndex(start), TextIndex(end)),
-                                               Nil)
-                firstUnusedRulesetId = firstUnusedRulesetId.dec
-                node.contentProperty().rulesetsProperty += newRuleset
-                nodeContentText.setStyle(start,
-                                         end,
-                                         new LinkStyleInfo(Some(newRuleset)))
-              }
-            }
+      items += new SidebarButton("Text Rules") {
+        onAction = { _ =>
+          contentTextAndRulesetsListPane isShown rulesetsListVBox match {
+            case true => contentTextAndRulesetsListPane.hide(rulesetsListVBox)
+            case false => contentTextAndRulesetsListPane.show(rulesetsListVBox)
           }
-          children += textRulesList
-
-          VBox.setVgrow(textRulesList, Priority.Always)
         }
-        items += new VBox {
-          children += new Label("Content:") {
-            padding = Insets(5)
-          }
-          children += nodeContentText
-
-          VBox.setVgrow(nodeContentText, Priority.Always)
-        }
-
-        dividerPositions = 0.3
       }
-
-      items += new SplitPane() {
-        orientation = Orientation.HORIZONTAL
-        items += new VBox {
-          children += new HBox {
-            padding = Insets(5)
-            alignment = Pos.CenterLeft
-            children += new Label("Text Rules")
-            children += new Button("Add rule") {
-              disable <== textRulesList.selectionModel().selectedItemProperty().isNull
-              onAction = { _ => textRulesPane.addRule() }
-            }
-          }
-          children += textRulesPane
-          VBox.setVgrow(textRulesPane, Priority.Always)
-        }
-
-        items += new VBox {
-          children += new HBox {
-            padding = Insets(5)
-            alignment = Pos.CenterLeft
-            children += new Label("Node Rules")
-            children += new Button("Add node rule") {
-              onAction = { _ => nodeRulesPane.addRule() }
-            }
-          }
-          children += nodeRulesPane
-
-          VBox.setVgrow(nodeRulesPane, Priority.Always)
-        }
-
-        dividerPositions = 0.5
-      }
-
-      dividerPositions = 0.75
     }
   }
 
