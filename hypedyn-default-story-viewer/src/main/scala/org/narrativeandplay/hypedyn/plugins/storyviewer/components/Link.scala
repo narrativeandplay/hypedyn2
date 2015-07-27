@@ -5,6 +5,7 @@ import scalafx.geometry.{Point2D, Pos}
 import scalafx.scene.control.Label
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.{Polygon, Rectangle}
+import scalafx.scene.text.Text
 
 import com.github.benedictleejh.scala.math.vector.Vector2
 
@@ -12,13 +13,17 @@ import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.BezierCurve
 import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.BezierCurve.UiBezierCurve
 import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.DoubleUtils._
 import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.VectorImplicitConversions._
+import org.narrativeandplay.hypedyn.story.rules.RuleLike
 
-class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private val parentLinkGroup: LinkGroup) {
+class Link(val from: ViewerNode,
+           val to: ViewerNode,
+           val rule: RuleLike,
+           private val parentLinkGroup: LinkGroup) {
   private var closestBezierParam = -1d
   private var clickedPoint = Vector2(-1d, -1d)
   private var linkPath = BezierCurve((-1d, -1d), (-1d, -1d), (-1d, -1d), (-1d, -1d))
 
-  val nameProperty = StringProperty(initName)
+  val nameProperty = StringProperty(rule.name)
   val selectedProperty = BooleanProperty(false)
 
   def name: String = nameProperty()
@@ -27,10 +32,9 @@ class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private v
   def selected = selectedProperty()
 
   private val linkLabel = new Label {
-    minWidth = Link.labelWidth
-    minHeight = Link.labelHeight
-    maxWidth = Link.labelWidth
-    maxHeight = Link.labelHeight
+//    prefWidth = new Text(name).layoutBounds().getWidth
+//    maxWidth = Link.labelWidth
+//    maxHeight = Link.labelHeight
     alignment = Pos.Center
     wrapText = true
 
@@ -69,7 +73,7 @@ class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private v
   def select(x: Double, y: Double): Unit = {
     selectedProperty() = true
     clickedPoint = (x, y)
-    closestBezierParam = linkPath closestPointParameterValue clickedPoint
+    closestBezierParam = path closestPointParameterValue clickedPoint
   }
 
   def deselect(): Unit = {
@@ -81,8 +85,6 @@ class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private v
   def contains(x: Double, y: Double): Boolean = path.toFxPath contains new Point2D(x, y)
 
   def path = {
-    val endPts = endPoints
-
     val edgeGroupIndex = parentLinkGroup.indexOf(this)
 
     val (startPoint, endPoint, _) = endPoints
@@ -138,19 +140,19 @@ class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private v
 
     val label: Option[Label] = Link.LinkNameDisplayType match {
       case OnLinkAlways =>
-        val labelMidpoint = linkPath.pointAt(0.5)
+        val labelMidpoint = path.pointAt(0.5)
         linkLabel.relocate(labelMidpoint.x - Link.labelWidth / 2, labelMidpoint.y - Link.labelHeight / 2)
         Some(linkLabel)
       case OnLinkOnClick =>
         if (selected) {
-          val labelMidpoint = linkPath.pointAt(0.5)
+          val labelMidpoint = path.pointAt(0.5)
           linkLabel.relocate(labelMidpoint.x - Link.labelWidth / 2, labelMidpoint.y - Link.labelHeight / 2)
           Some(linkLabel)
         }
         else None
       case AtMouseOnClick =>
         if (selected) {
-          val labelMidpoint = linkPath.pointAt(closestBezierParam)
+          val labelMidpoint = path.pointAt(closestBezierParam)
           linkLabel.relocate(labelMidpoint.x - Link.labelWidth / 2, labelMidpoint.y - Link.labelHeight / 2)
           Some(linkLabel)
         }
@@ -162,10 +164,10 @@ class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private v
       labelBackground
     }
 
-    val tangentVector = -linkPath.gradientAt(0.85).normalise * 10
+    val tangentVector = -path.gradientAt(0.85).normalise * 10
     val headToTail1 = tangentVector.rotate(30)
     val headToTail2 = tangentVector.rotate(-30)
-    val triangleHead = linkPath.pointAt(0.85)
+    val triangleHead = path.pointAt(0.85)
     val tail1 = triangleHead + headToTail1
     val tail2 = triangleHead + headToTail2
 
@@ -181,7 +183,7 @@ class Link(val from: ViewerNode, val to: ViewerNode, initName: String, private v
 
 object Link {
   private val labelHeight = 20
-  private val labelWidth = 40
+  private val labelWidth = 100
 
   val LinkNameDisplayType: LinkNameDisplayType = OnLinkAlways
 }
