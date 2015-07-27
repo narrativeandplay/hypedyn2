@@ -13,7 +13,8 @@ import scalafx.event.Event
 import scalafx.scene.input.MouseEvent
 
 import org.narrativeandplay.hypedyn.plugins.storyviewer.components.{Link, ViewerNode, LinkGroup}
-import org.narrativeandplay.hypedyn.story.Nodal
+import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.UnorderedPair
+import org.narrativeandplay.hypedyn.story.{NodeId, Nodal}
 
 class StoryViewerContent(private val eventDispatcher: StoryViewer) extends Control {
   val nodes = ArrayBuffer.empty[ViewerNode]
@@ -36,6 +37,26 @@ class StoryViewerContent(private val eventDispatcher: StoryViewer) extends Contr
     nodes += n
     children += n
 
+    node.content.rulesets flatMap (_.rules) filter { rule =>
+      rule.actions map (_.actionType) contains "LinkTo"
+    } foreach { rule =>
+      val toNode = rule.actions find (_.actionType == "LinkTo") flatMap (_.params get "node") flatMap { idString =>
+        nodes find (_.id == NodeId(BigInt(idString)))
+      }
+
+      toNode foreach { to =>
+        val linkGroup = linkGroups find (_.endPoints == UnorderedPair(n, to)) match {
+          case Some(grp) => grp
+          case None =>
+            val grp = new LinkGroup(n, to)
+            linkGroups += grp
+            grp
+        }
+
+        linkGroup.insert(rule, n, to)
+      }
+    }
+
     n
   }
 
@@ -43,6 +64,26 @@ class StoryViewerContent(private val eventDispatcher: StoryViewer) extends Contr
     nodes find (_.id == node.id) foreach { n =>
       n.name = updatedNode.name
       n.content = updatedNode.content.text
+
+      updatedNode.content.rulesets flatMap (_.rules) filter { rule =>
+        rule.actions map (_.actionType) contains "LinkTo"
+      } foreach { rule =>
+        val toNode = rule.actions find (_.actionType == "LinkTo") flatMap (_.params get "node") flatMap { idString =>
+          nodes find (_.id == NodeId(BigInt(idString)))
+        }
+
+        toNode foreach { to =>
+          val linkGroup = linkGroups find (_.endPoints == UnorderedPair(n, to)) match {
+            case Some(grp) => grp
+            case None =>
+              val grp = new LinkGroup(n, to)
+              linkGroups += grp
+              grp
+          }
+
+          linkGroup.insert(rule, n, to)
+        }
+      }
     }
   }
 
