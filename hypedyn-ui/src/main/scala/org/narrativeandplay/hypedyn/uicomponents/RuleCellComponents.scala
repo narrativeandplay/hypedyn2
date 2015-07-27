@@ -193,10 +193,10 @@ object RuleCellComponents {
 
   class LinkComboBox(val paramMap: ObservableMap[String, String],
                      val paramName: String,
-                     val story: ObjectProperty[UiStory]) extends ComboBox[UiNodeContent.UiRuleset] with RuleCellParameterComponent {
+                     val story: ObjectProperty[UiStory]) extends ComboBox[UiRule] with RuleCellParameterComponent {
     cellFactory = { _ =>
-      new JfxListCell[UiNodeContent.UiRuleset] {
-        override def updateItem(item: UiNodeContent.UiRuleset, empty: Boolean): Unit = {
+      new JfxListCell[UiRule] {
+        override def updateItem(item: UiRule, empty: Boolean): Unit = {
           super.updateItem(item, empty)
 
           if (!empty && item != null) {
@@ -206,10 +206,10 @@ object RuleCellComponents {
       }
     }
 
-    converter = new StringConverter[UiNodeContent.UiRuleset] {
-      override def fromString(string: String): UiNodeContent.UiRuleset = (story().links find (_.name == string)).get
+    converter = new StringConverter[UiRule] {
+      override def fromString(string: String): UiRule = (story().links find (_.name == string)).get
 
-      override def toString(t: UiNodeContent.UiRuleset): String = t.name
+      override def toString(t: UiRule): String = t.name
     }
 
     onAction = { _ =>
