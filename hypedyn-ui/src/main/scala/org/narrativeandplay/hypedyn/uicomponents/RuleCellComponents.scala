@@ -7,7 +7,7 @@ import scala.util.Try
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.{ObservableBuffer, ObservableMap}
-import scalafx.scene.control.{Spinner, TextArea, ComboBox, TreeItem}
+import scalafx.scene.control._
 import scalafx.scene.layout.{Region, HBox}
 import scalafx.util.StringConverter
 import scalafx.util.StringConverter.sfxStringConverter2jfx
@@ -28,7 +28,11 @@ object RuleCellComponents {
   
   class ConditionCell(val condition: UiCondition, 
                       val conditionDefinitions: List[ConditionDefinition],
-                      val parentStory: ObjectProperty[UiStory]) extends TreeItem[String]("") {
+                      val parentStory: ObjectProperty[UiStory],
+                      parentRule: UiRule) extends TreeItem[String]("") {
+    private def parentTreeItem = parent()
+    private val self = this
+
     val condParamsChildren = ObservableBuffer.empty[Region with RuleCellParameterComponent]
 
     val condTypeCombo = new ComboBox[ConditionDefinition] {
@@ -59,15 +63,11 @@ object RuleCellComponents {
         condParams.children.clear()
         condParamsChildren.clear()
 
-        generateParamInputComponents()
+        generateParameterInputComponents(this)
       }
 
       value = (conditionDefinitions find (_.conditionType == condition.conditionType)).get
-      selectionModel().getSelectedItem.parameters foreach { p =>
-        val newComponent = createParameterInput(p, condition.paramsProperty, parentStory)
-        condParams.children += newComponent
-        condParamsChildren += newComponent
-      }
+      generateParameterInputComponents(this)
       condParamsChildren foreach { component =>
         condition.params get component.paramName foreach { v => component.`val` = v }
       }
@@ -75,13 +75,21 @@ object RuleCellComponents {
 
     lazy val condParams = new HBox()
 
-    private def generateParamInputComponents(): Unit = condTypeCombo.selectionModel().getSelectedItem.parameters foreach { p =>
-      val newComponent = createParameterInput(p, condition.paramsProperty, parentStory)
-      condParams.children += newComponent
-      condParamsChildren += newComponent
+    lazy val removeButton = new Button("-") {
+      onAction = { _ =>
+        parentTreeItem.getChildren.remove(self)
+        parentRule.conditionsProperty -= condition
+      }
     }
 
-    graphic = new HBox(condTypeCombo, condParams)
+    private def generateParameterInputComponents(comboBox: ComboBox[ConditionDefinition]) =
+      comboBox.selectionModel().getSelectedItem.parameters foreach { p =>
+        val newComponent = createParameterInput(p, condition.paramsProperty, parentStory)
+        condParams.children += newComponent
+        condParamsChildren += newComponent
+      }
+
+    graphic = new HBox(condTypeCombo, condParams, removeButton)
     
   }
 

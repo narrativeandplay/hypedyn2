@@ -47,7 +47,7 @@ class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
   lazy val addCondButton = new Button("Add condition") {
     onAction = { _ =>
       val newCond = cell.addCondition()
-      conditionsNode.children += new RuleCellComponents.ConditionCell(newCond, cell.conditionDefs, cell.story)
+      conditionsNode.children += new RuleCellComponents.ConditionCell(newCond, cell.conditionDefs, cell.story, cell.rule)
     }
   }
   lazy val addActionButton = new Button("Add action") {
@@ -99,7 +99,7 @@ class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
   }
 
   cell.rule.conditions foreach { condition =>
-    conditionsNode.children += new RuleCellComponents.ConditionCell(condition, cell.conditionDefs, cell.story)
+    conditionsNode.children += new RuleCellComponents.ConditionCell(condition, cell.conditionDefs, cell.story, cell.rule)
   }
   cell.rule.actions foreach { action =>
     actionsNode.children += new RuleCellComponents.ActionCell(action, cell.actionDefs, cell.story)
