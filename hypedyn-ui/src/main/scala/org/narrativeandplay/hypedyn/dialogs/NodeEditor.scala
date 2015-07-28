@@ -168,11 +168,11 @@ class NodeEditor private (dialogTitle: String,
     }
   }
   lazy val textRulesPane = new RulesPane(conditionDefinitions,
-                                    actionDefinitions filter (_.actionType contains NodeContentAction),
-                                    ObservableBuffer.empty,
-                                    story)
+                                         actionDefinitions filter (_.actionLocationTypes contains NodeContentAction),
+                                         ObservableBuffer.empty,
+                                         story)
   val nodeRulesPane = new RulesPane(conditionDefinitions,
-                                    actionDefinitions filter (_.actionType contains NodeAction),
+                                    actionDefinitions filter (_.actionLocationTypes contains NodeAction),
                                     node.rulesProperty,
                                     story)
 
