@@ -5,6 +5,7 @@ import javafx.scene.control.{Control => JfxControl}
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 
+import org.narrativeandplay.hypedyn.story.rules.Conditional.ConditionType
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story._
 
@@ -22,13 +23,13 @@ class RuleCell(val rule: UiRule,
   prefHeightProperty <== when (cellSkin.rootNode.expandedItemCount === 1) choose 37 otherwise 175
 
   def addCondition(): UiCondition = {
-    val newCond = new UiCondition("NodeCondition", Map.empty)
+    val newCond = new UiCondition(ConditionType("NodeCondition"), Map.empty)
     rule.conditionsProperty += newCond
     newCond
   }
 
   def addAction(): UiAction = {
-    val newAction = new UiAction(actionDefs.head.actionName, Map.empty)
+    val newAction = new UiAction(actionDefs.head.actionType, Map.empty)
     rule.actionsProperty += newAction
     newAction
   }

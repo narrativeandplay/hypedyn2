@@ -175,9 +175,9 @@ package object serialisers {
      * @param condition The object to serialise
      */
     override def serialise(condition: Condition): AstElement =
-      AstMap("conditionType" -> AstString(condition.conditionType),
+      AstMap("conditionType" -> AstString(condition.conditionType.value),
              "params" -> AstMap((condition.params map { case (k, v) =>
-               k -> AstString(v)
+               k.value -> AstString(v.value)
              }).toSeq: _*))
 
     /**
@@ -192,7 +192,9 @@ package object serialisers {
         k -> v.asInstanceOf[AstString].s
       }
 
-      Condition(conditionType, params)
+      Condition(Conditional.ConditionType(conditionType), params map { case (k, v) =>
+        RuleLike.ParamName(k) -> RuleLike.ParamValue(v)
+      })
     }
   }
   
@@ -202,9 +204,9 @@ package object serialisers {
      *
      * @param action The object to serialise
      */
-    override def serialise(action: Action): AstElement = AstMap("actionType" -> AstString(action.actionType),
+    override def serialise(action: Action): AstElement = AstMap("actionType" -> AstString(action.actionType.value),
                                                                 "params" -> AstMap((action.params map { case (k, v) =>
-                                                                    k -> AstString(v)
+                                                                    k.value -> AstString(v.value)
                                                                 }).toSeq: _*))
 
     /**
@@ -219,7 +221,9 @@ package object serialisers {
           k -> v.asInstanceOf[AstString].s
       }
 
-      Action(actionType, params)
+      Action(Actionable.ActionType(actionType), params map { case (k, v) =>
+        RuleLike.ParamName(k) -> RuleLike.ParamValue(v)
+      })
     }
   }
   

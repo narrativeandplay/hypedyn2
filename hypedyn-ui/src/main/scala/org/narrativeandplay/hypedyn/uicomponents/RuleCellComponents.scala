@@ -13,16 +13,17 @@ import scalafx.util.StringConverter
 import scalafx.util.StringConverter.sfxStringConverter2jfx
 
 import org.narrativeandplay.hypedyn.story.rules._
+import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
 import org.narrativeandplay.hypedyn.story._
 import org.narrativeandplay.hypedyn.utils.ScalaJavaImplicits._
 
 object RuleCellComponents {
   sealed trait RuleCellParameterComponent {
     def story: ObjectProperty[UiStory]
-    def paramName: String
-    def paramMap: ObservableMap[String, String]
-    def `val`: Option[String]
-    def val_=(string: String): Unit
+    def paramName: ParamName
+    def paramMap: ObservableMap[ParamName, ParamValue]
+    def `val`: Option[ParamValue]
+    def val_=(string: ParamValue): Unit
   }
   
   class ConditionCell(val condition: UiCondition, 
@@ -53,7 +54,7 @@ object RuleCellComponents {
 
       onAction = { _ =>
         condition.paramsProperty.clear()
-        condition.conditionTypeProperty() = selectionModel().getSelectedItem.conditionName
+        condition.conditionTypeProperty() = selectionModel().getSelectedItem.conditionType
 
         condParams.children.clear()
         condParamsChildren.clear()
@@ -61,7 +62,7 @@ object RuleCellComponents {
         generateParamInputComponents()
       }
 
-      value = (conditionDefinitions find (_.conditionName == condition.conditionType)).get
+      value = (conditionDefinitions find (_.conditionType == condition.conditionType)).get
       selectionModel().getSelectedItem.parameters foreach { p =>
         val newComponent = createParameterInput(p, condition.paramsProperty, parentStory)
         condParams.children += newComponent
@@ -112,7 +113,7 @@ object RuleCellComponents {
 
       onAction = { _ =>
         action.paramsProperty.clear()
-        action.actionTypeProperty() = selectionModel().getSelectedItem.actionName
+        action.actionTypeProperty() = selectionModel().getSelectedItem.actionType
 
         actionParams.children.clear()
         actionParamsChildren.clear()
@@ -120,7 +121,7 @@ object RuleCellComponents {
         generateParameterInputComponents(this)
       }
 
-      value = (actionDefinitions find (_.actionName == action.actionType)).get
+      value = (actionDefinitions find (_.actionType == action.actionType)).get
       generateParameterInputComponents(this)
       actionParamsChildren foreach { component =>
         action.params get component.paramName foreach { v => component.`val` = v }
@@ -140,22 +141,22 @@ object RuleCellComponents {
   }
 
   private def createParameterInput(ruleParameter: RuleParameter,
-                                   parameterMap: ObservableMap[String, String],
+                                   parameterMap: ObservableMap[ParamName, ParamValue],
                                    parentStory: ObjectProperty[UiStory]) = ruleParameter.possibleValues match {
-    case Nodes => new NodeComboBox(parameterMap, ruleParameter.name, parentStory)
-    case Links => new LinkComboBox(parameterMap, ruleParameter.name, parentStory)
-    case IntegerFacts => new IntegerFactsComboBox(parameterMap, ruleParameter.name, parentStory)
-    case BooleanFacts => new BooleanFactsComboBox(parameterMap, ruleParameter.name, parentStory)
-    case StringFacts => new StringFactsComboBox(parameterMap, ruleParameter.name, parentStory)
-    case UserInputString => new StringInput(parameterMap, ruleParameter.name, parentStory)
-    case UserInputInteger => new IntegerInput(parameterMap, ruleParameter.name, parentStory)
-    case ListOfValues(vals @ _*) => new ValuesListComboBox(parameterMap, ruleParameter.name, parentStory, vals)
-    case Union(params) => new UnionComboBoxPane(parameterMap, ruleParameter.name, parentStory, params)
-    case Product(params) => new ProductPane(parameterMap, ruleParameter.name, parentStory, params)
+    case Nodes => new NodeComboBox(parameterMap, ParamName(ruleParameter.name), parentStory)
+    case Links => new LinkComboBox(parameterMap, ParamName(ruleParameter.name), parentStory)
+    case IntegerFacts => new IntegerFactsComboBox(parameterMap, ParamName(ruleParameter.name), parentStory)
+    case BooleanFacts => new BooleanFactsComboBox(parameterMap, ParamName(ruleParameter.name), parentStory)
+    case StringFacts => new StringFactsComboBox(parameterMap, ParamName(ruleParameter.name), parentStory)
+    case UserInputString => new StringInput(parameterMap, ParamName(ruleParameter.name), parentStory)
+    case UserInputInteger => new IntegerInput(parameterMap, ParamName(ruleParameter.name), parentStory)
+    case ListOfValues(vals @ _*) => new ValuesListComboBox(parameterMap, ParamName(ruleParameter.name), parentStory, vals)
+    case Union(params) => new UnionComboBoxPane(parameterMap, ParamName(ruleParameter.name), parentStory, params)
+    case Product(params) => new ProductPane(parameterMap, ParamName(ruleParameter.name), parentStory, params)
   }
 
-  class NodeComboBox(val paramMap: ObservableMap[String, String],
-                     val paramName: String,
+  class NodeComboBox(val paramMap: ObservableMap[ParamName, ParamValue],
+                     val paramName: ParamName,
                      val story: ObjectProperty[UiStory]) extends ComboBox[UiNode] with RuleCellParameterComponent{
     cellFactory = { _ =>
       new JfxListCell[UiNode] {
@@ -176,7 +177,7 @@ object RuleCellComponents {
     }
 
     onAction = { _ =>
-      paramMap += paramName -> value().id.value.toString
+      paramMap += paramName -> ParamValue(value().id.value.toString())
     }
 
     items = story().nodesProperty
@@ -186,13 +187,13 @@ object RuleCellComponents {
       Option(`new`) foreach { s => items = s.nodesProperty }
     }
 
-    override def `val`: Option[String] = Option(value()) map (_.id.value.toString())
+    override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(string: String): Unit = story().nodes find (_.id.value == BigInt(string)) foreach { n => value = n }
+    override def val_=(paramValue: ParamValue): Unit = story().nodes find (_.id.value == BigInt(paramValue.value)) foreach { n => value = n }
   }
 
-  class LinkComboBox(val paramMap: ObservableMap[String, String],
-                     val paramName: String,
+  class LinkComboBox(val paramMap: ObservableMap[ParamName, ParamValue],
+                     val paramName: ParamName,
                      val story: ObjectProperty[UiStory]) extends ComboBox[UiRule] with RuleCellParameterComponent {
     cellFactory = { _ =>
       new JfxListCell[UiRule] {
@@ -213,7 +214,7 @@ object RuleCellComponents {
     }
 
     onAction = { _ =>
-      paramMap += paramName -> value().id.value.toString()
+      paramMap += paramName -> ParamValue(value().id.value.toString())
     }
 
     items = story().links
@@ -222,13 +223,13 @@ object RuleCellComponents {
       Option(`new`) foreach { s => items = s.links }
     }
 
-    override def `val`: Option[String] = Option(value()) map (_.id.value.toString())
+    override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(string: String): Unit = story().links find (_.id.value == BigInt(string)) foreach { r => value = r }
+    override def val_=(paramValue: ParamValue): Unit = story().links find (_.id.value == BigInt(paramValue.value)) foreach { r => value = r }
   }
 
-  class IntegerFactsComboBox(val paramMap: ObservableMap[String, String],
-                             val paramName: String,
+  class IntegerFactsComboBox(val paramMap: ObservableMap[ParamName, ParamValue],
+                             val paramName: ParamName,
                              val story: ObjectProperty[UiStory]) extends ComboBox[IntegerFact] with RuleCellParameterComponent {
     cellFactory = { _ =>
       new JfxListCell[IntegerFact] {
@@ -249,7 +250,7 @@ object RuleCellComponents {
     }
 
     onAction = { _ =>
-      paramMap += paramName -> selectionModel().getSelectedItem.id.value.toString()
+      paramMap += paramName -> ParamValue(selectionModel().getSelectedItem.id.value.toString())
     }
 
     items = intFacts
@@ -260,13 +261,13 @@ object RuleCellComponents {
 
     def intFacts = story().factsProperty collect { case f: IntegerFact => f }
 
-    override def `val`: Option[String] = Option(value()) map (_.id.value.toString())
+    override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(string: String): Unit = intFacts find (_.id.value == BigInt(string)) foreach { f => value =  f }
+    override def val_=(paramValue: ParamValue): Unit = intFacts find (_.id.value == BigInt(paramValue.value)) foreach { f => value =  f }
   }
 
-  class BooleanFactsComboBox(val paramMap: ObservableMap[String, String],
-                             val paramName: String,
+  class BooleanFactsComboBox(val paramMap: ObservableMap[ParamName, ParamValue],
+                             val paramName: ParamName,
                              val story: ObjectProperty[UiStory]) extends ComboBox[BooleanFact] with RuleCellParameterComponent {
     cellFactory = { _ =>
       new JfxListCell[BooleanFact] {
@@ -287,7 +288,7 @@ object RuleCellComponents {
     }
 
     onAction = { _ =>
-      paramMap += paramName -> selectionModel().getSelectedItem.id.toString
+      paramMap += paramName -> ParamValue(selectionModel().getSelectedItem.id.toString)
     }
 
     items = boolFacts
@@ -298,13 +299,13 @@ object RuleCellComponents {
 
     def boolFacts = story().factsProperty collect { case f: BooleanFact => f }
 
-    override def `val`: Option[String] = Option(value()) map (_.id.value.toString())
+    override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(string: String): Unit = boolFacts find (_.id.value == BigInt(string)) foreach { f => value =  f }
+    override def val_=(paramValue: ParamValue): Unit = boolFacts find (_.id.value == BigInt(paramValue.value)) foreach { f => value =  f }
   }
 
-  class StringFactsComboBox(val paramMap: ObservableMap[String, String],
-                            val paramName: String,
+  class StringFactsComboBox(val paramMap: ObservableMap[ParamName, ParamValue],
+                            val paramName: ParamName,
                             val story: ObjectProperty[UiStory]) extends ComboBox[StringFact] with RuleCellParameterComponent {
     cellFactory = { _ =>
       new JfxListCell[StringFact] {
@@ -325,7 +326,7 @@ object RuleCellComponents {
     }
 
     onAction = { _ =>
-      paramMap += paramName -> selectionModel().getSelectedItem.id.toString
+      paramMap += paramName -> ParamValue(selectionModel().getSelectedItem.id.toString)
     }
 
     items = stringFacts
@@ -336,32 +337,32 @@ object RuleCellComponents {
 
     def stringFacts = story().factsProperty collect { case f: StringFact => f }
 
-    override def `val`: Option[String] = Option(value()) map (_.id.value.toString())
+    override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(string: String): Unit = stringFacts find (_.id.value == BigInt(string)) foreach { f => value = f }
+    override def val_=(paramValue: ParamValue): Unit = stringFacts find (_.id.value == BigInt(paramValue.value)) foreach { f => value = f }
   }
 
-  class StringInput(val paramMap: ObservableMap[String, String],
-                    val paramName: String,
+  class StringInput(val paramMap: ObservableMap[ParamName, ParamValue],
+                    val paramName: ParamName,
                     val story: ObjectProperty[UiStory]) extends TextArea with RuleCellParameterComponent {
     text onChange { (_, _ , newValue) =>
-      Option(newValue) foreach (paramMap += paramName -> _)
+      Option(newValue) foreach (paramMap += paramName -> ParamValue(_))
     }
 
-    override def `val`: Option[String] = Option(text())
+    override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(string: String): Unit = text = string
+    override def val_=(paramValue: ParamValue): Unit = text = paramValue.value
   }
 
-  class IntegerInput(val paramMap: ObservableMap[String, String],
-                     val paramName: String,
+  class IntegerInput(val paramMap: ObservableMap[ParamName, ParamValue],
+                     val paramName: ParamName,
                      val story: ObjectProperty[UiStory]) extends Spinner[BigInt] with RuleCellParameterComponent {
     valueFactory = new JfxSpinnerValueFactory[BigInt] {
       editable = true
       setValue(0)
 
       setConverter(new StringConverter[BigInt] {
-        override def fromString(string: String): BigInt = Try(BigInt(string)) getOrElse BigInt(0)
+        override def fromString(string: String): BigInt = Try(BigInt(string)) getOrElse getValue
 
         override def toString(t: BigInt): String = t.toString()
       })
@@ -372,31 +373,31 @@ object RuleCellComponents {
     }
 
     value onChange { (_, _, newValue) =>
-      Option(newValue) foreach (paramMap += paramName -> _.toString())
+      Option(newValue) foreach { v => paramMap += paramName -> ParamValue(v.toString()) }
     }
 
-    override def `val`: Option[String] = Option(value()) map (_.toString())
+    override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(string: String): Unit = valueFactory().setValue(BigInt(string))
+    override def val_=(paramValue: ParamValue): Unit = valueFactory().setValue(BigInt(paramValue.value))
   }
 
-  class ValuesListComboBox(val paramMap: ObservableMap[String, String],
-                           val paramName: String,
+  class ValuesListComboBox(val paramMap: ObservableMap[ParamName, ParamValue],
+                           val paramName: ParamName,
                            val story: ObjectProperty[UiStory],
                            values: Seq[String]) extends ComboBox[String] with RuleCellParameterComponent {
     items = ObservableBuffer(values)
 
     onAction = { _ =>
-      paramMap += paramName -> selectionModel().getSelectedItem
+      paramMap += paramName -> ParamValue(selectionModel().getSelectedItem)
     }
 
-    override def `val`: Option[String] = Option(value())
+    override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(string: String): Unit = value = string
+    override def val_=(paramValue: ParamValue): Unit = value = paramValue.value
   }
 
-  class UnionComboBoxPane(val paramMap: ObservableMap[String, String],
-                          val paramName: String,
+  class UnionComboBoxPane(val paramMap: ObservableMap[ParamName, ParamValue],
+                          val paramName: ParamName,
                           val story: ObjectProperty[UiStory],
                           params: Map[String, RuleParameter]) extends HBox with RuleCellParameterComponent {
     val unionValue = new ComboBox[(String, RuleParameter)]() {
@@ -425,7 +426,7 @@ object RuleCellComponents {
 
         pane.children.clear()
 
-        paramMap += paramName -> selected.name
+        paramMap += paramName -> ParamValue(selected.name)
 
         pane.children += createParameterInput(selected, paramMap, story)
       }
@@ -435,21 +436,21 @@ object RuleCellComponents {
 
     children.addAll(unionValue, pane)
 
-    override def `val`: Option[String] = Option(unionValue.value()) map (_._2.name)
+    override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(string: String): Unit = params find (_._2.name == string) foreach { p => unionValue.value = p }
+    override def val_=(string: ParamValue): Unit = params find { case (_, param) => param.name == paramName.value } foreach { p => unionValue.value = p }
   }
 
-  class ProductPane(val paramMap: ObservableMap[String, String],
-                    val paramName: String,
+  class ProductPane(val paramMap: ObservableMap[ParamName, ParamValue],
+                    val paramName: ParamName,
                     val story: ObjectProperty[UiStory],
                     params: List[RuleParameter]) extends HBox with RuleCellParameterComponent {
-    paramMap += paramName -> (params map (_.name) mkString ":")
+    paramMap += paramName -> ParamValue(params map (_.name) mkString ":")
 
     params foreach (children += createParameterInput(_, paramMap, story))
 
-    override def `val`: Option[String] = paramMap get paramName
+    override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(string: String): Unit = {}
+    override def val_=(paramValue: ParamValue): Unit = ()
   }
 }

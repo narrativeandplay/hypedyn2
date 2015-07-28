@@ -25,11 +25,20 @@ package org.narrativeandplay.hypedyn.story.rules
  * - show disabled anywhere link
  */
 trait Actionable {
-  def actionType: String
-  def params: Map[String, String]
+  def actionType: Actionable.ActionType
+  def params: Map[RuleLike.ParamName, RuleLike.ParamValue]
 }
 
-sealed case class ActionDefinition(actionName: String,
+object Actionable {
+  case class ActionType(value: String) extends AnyVal
+}
+
+sealed case class ActionDefinition(actionType: Actionable.ActionType,
                                    description: String,
-                                   actionType: List[ActionType],
+                                   actionLocationTypes: List[ActionLocationType],
                                    parameters: List[RuleParameter])
+
+sealed trait ActionLocationType
+case object NodeAction extends ActionLocationType
+case object NodeContentAction extends ActionLocationType
+case object StoryAction extends ActionLocationType
