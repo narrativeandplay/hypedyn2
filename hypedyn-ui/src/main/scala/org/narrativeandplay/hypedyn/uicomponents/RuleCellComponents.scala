@@ -7,10 +7,12 @@ import scala.util.Try
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.{ObservableBuffer, ObservableMap}
+import scalafx.geometry.Insets
 import scalafx.scene.control._
-import scalafx.scene.layout.{Region, HBox}
+import scalafx.scene.layout.{StackPane, Region, HBox}
 import scalafx.util.StringConverter
 import scalafx.util.StringConverter.sfxStringConverter2jfx
+import scalafx.scene.Parent.sfxParent2jfx
 
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
@@ -75,10 +77,13 @@ object RuleCellComponents {
 
     lazy val condParams = new HBox()
 
-    lazy val removeButton = new Button("-") {
-      onAction = { _ =>
-        parentTreeItem.getChildren.remove(self)
-        parentRule.conditionsProperty -= condition
+    lazy val removeButton = new StackPane {
+      padding = Insets(0, 0, 0, 10)
+      children += new Button("-") {
+        onAction = { _ =>
+          parentTreeItem.getChildren.remove(self)
+          parentRule.conditionsProperty -= condition
+        }
       }
     }
 
