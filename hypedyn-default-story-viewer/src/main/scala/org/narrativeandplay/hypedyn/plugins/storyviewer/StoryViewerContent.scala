@@ -14,6 +14,7 @@ import scalafx.scene.input.MouseEvent
 
 import org.narrativeandplay.hypedyn.plugins.storyviewer.components.{Link, ViewerNode, LinkGroup}
 import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.UnorderedPair
+import org.narrativeandplay.hypedyn.story.rules.{Actionable, RuleLike}
 import org.narrativeandplay.hypedyn.story.{NodeId, Nodal}
 
 class StoryViewerContent(private val eventDispatcher: StoryViewer) extends Control {
@@ -38,10 +39,10 @@ class StoryViewerContent(private val eventDispatcher: StoryViewer) extends Contr
     children += n
 
     node.content.rulesets flatMap (_.rules) filter { rule =>
-      rule.actions map (_.actionType) contains "LinkTo"
+      rule.actions map (_.actionType) contains Actionable.ActionType("LinkTo")
     } foreach { rule =>
-      val toNode = rule.actions find (_.actionType == "LinkTo") flatMap (_.params get "node") flatMap { idString =>
-        nodes find (_.id == NodeId(BigInt(idString)))
+      val toNode = rule.actions find (_.actionType == Actionable.ActionType("LinkTo")) flatMap (_.params get RuleLike.ParamName("node")) flatMap { idString =>
+        nodes find (_.id == NodeId(BigInt(idString.value)))
       }
 
       toNode foreach { to =>
@@ -66,10 +67,10 @@ class StoryViewerContent(private val eventDispatcher: StoryViewer) extends Contr
       n.content = updatedNode.content.text
 
       updatedNode.content.rulesets flatMap (_.rules) filter { rule =>
-        rule.actions map (_.actionType) contains "LinkTo"
+        rule.actions map (_.actionType) contains Actionable.ActionType("LinkTo")
       } foreach { rule =>
-        val toNode = rule.actions find (_.actionType == "LinkTo") flatMap (_.params get "node") flatMap { idString =>
-          nodes find (_.id == NodeId(BigInt(idString)))
+        val toNode = rule.actions find (_.actionType == Actionable.ActionType("LinkTo")) flatMap (_.params get RuleLike.ParamName("node")) flatMap { idString =>
+          nodes find (_.id == NodeId(BigInt(idString.value)))
         }
 
         toNode foreach { to =>
