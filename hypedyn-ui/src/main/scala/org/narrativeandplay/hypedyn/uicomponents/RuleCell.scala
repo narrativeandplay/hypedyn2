@@ -4,6 +4,7 @@ import javafx.scene.control.{Control => JfxControl}
 
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
+import scalafx.collections.ObservableBuffer
 
 import org.narrativeandplay.hypedyn.story.rules.Conditional.ConditionType
 import org.narrativeandplay.hypedyn.story.rules._
@@ -12,7 +13,8 @@ import org.narrativeandplay.hypedyn.story._
 class RuleCell(val rule: UiRule,
                val conditionDefs: List[ConditionDefinition],
                val actionDefs: List[ActionDefinition],
-               val story: ObjectProperty[UiStory]) extends JfxControl {
+               val story: ObjectProperty[UiStory],
+               val ruleList: ObservableBuffer[UiRule]) extends JfxControl {
   val cellSkin = new RuleCellSkin(this)
   setSkin(cellSkin)
 
