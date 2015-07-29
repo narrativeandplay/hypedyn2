@@ -93,10 +93,10 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   }
 
   def sizeToChildren(): Unit = {
-    val allBounds = viewer.nodes map (_.bounds)
+    val allBounds = (viewer.nodes map (_.bounds)).toList
     // Ensure that the lists of values is non-empty, to prevent calling max on an empty list
-    val maxX = ((allBounds map (_.maxX)) += 0d).max
-    val maxY = ((allBounds map (_.maxY)) += 0d).max
+    val maxX = (0d :: (allBounds map (_.maxX))).max
+    val maxY = (0d :: (allBounds map (_.maxY))).max
 
     if (maxX > viewportBounds().getWidth) { fitToWidth = false; viewer.prefWidth = maxX } else fitToWidth = true
     if (maxY > viewportBounds().getHeight) { fitToHeight = false; viewer.prefHeight = maxY } else fitToHeight = true
