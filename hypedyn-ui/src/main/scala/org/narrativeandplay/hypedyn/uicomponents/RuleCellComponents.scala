@@ -100,7 +100,11 @@ object RuleCellComponents {
 
   class ActionCell(val action: UiAction,
                    val actionDefinitions: List[ActionDefinition],
-                   val parentStory: ObjectProperty[UiStory]) extends TreeItem[String]("") {
+                   val parentStory: ObjectProperty[UiStory],
+                   parentRule: UiRule) extends TreeItem[String]("") {
+    private def parentTreeItem = parent()
+    private val self = this
+
     val actionParamsChildren = ObservableBuffer.empty[Region with RuleCellParameterComponent]
 
     val actionTypeCombo = new ComboBox[ActionDefinition]() {
@@ -143,6 +147,16 @@ object RuleCellComponents {
 
     lazy val actionParams = new HBox()
 
+    lazy val removeButton = new StackPane {
+      padding = Insets(0, 0, 0, 10)
+      children += new Button("-") {
+        onAction = { _ =>
+          parentTreeItem.getChildren.remove(self)
+          parentRule.actionsProperty -= action
+        }
+      }
+    }
+
     private def generateParameterInputComponents(comboBox: ComboBox[ActionDefinition]) =
       comboBox.selectionModel().getSelectedItem.parameters foreach { p =>
         val newComponent = createParameterInput(p, action.paramsProperty, parentStory)
@@ -150,7 +164,7 @@ object RuleCellComponents {
         actionParamsChildren += newComponent
       }
 
-    graphic = new HBox(actionTypeCombo, actionParams)
+    graphic = new HBox(actionTypeCombo, actionParams, removeButton)
   }
 
   private def createParameterInput(ruleParameter: RuleParameter,
