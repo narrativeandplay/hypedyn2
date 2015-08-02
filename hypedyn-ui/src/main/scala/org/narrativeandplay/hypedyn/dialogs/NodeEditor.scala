@@ -2,9 +2,8 @@ package org.narrativeandplay.hypedyn.dialogs
 
 import java.util.function.Function
 import javafx.event.EventHandler
-import javafx.scene.control.{ListCell => JfxListCell, TableCell => JfxTableCell}
-import javafx.scene.{control, input}
-import javafx.scene.input.KeyCode
+import javafx.scene.control.{TableCell => JfxTableCell, IndexRange => JfxIndexRange}
+import javafx.scene.input.{KeyCode => JfxKeyCode, KeyEvent => JfxKeyEvent}
 
 import scala.language.reflectiveCalls
 
@@ -85,9 +84,9 @@ class NodeEditor private (dialogTitle: String,
             val nameField = new TextField {
               text = itemProperty().get().name
 
-              onKeyReleased = new EventHandler[input.KeyEvent] {
-                override def handle(event: input.KeyEvent): Unit = event.getCode match {
-                  case KeyCode.ENTER =>
+              onKeyReleased = new EventHandler[JfxKeyEvent] {
+                override def handle(event: JfxKeyEvent): Unit = event.getCode match {
+                  case JfxKeyCode.ENTER =>
                     if (!text().trim.isEmpty) {
                       itemProperty().get.nameProperty() = text()
                       commitEdit(itemProperty().get())
@@ -95,7 +94,7 @@ class NodeEditor private (dialogTitle: String,
                     else {
                       cancelEdit()
                     }
-                  case KeyCode.ESCAPE => cancelEdit()
+                  case JfxKeyCode.ESCAPE => cancelEdit()
                   case _ =>
                 }
               }
@@ -251,7 +250,7 @@ class NodeEditor private (dialogTitle: String,
       alignment = Pos.CenterLeft
       children += new Label("Text Rules")
       children += new Button("Add text rule") {
-        disable <== EasyBind combine (nodeContentText.selectedTextProperty, nodeContentText.selectionProperty, { (s: String, i: control.IndexRange) =>
+        disable <== EasyBind combine (nodeContentText.selectedTextProperty, nodeContentText.selectionProperty, { (s: String, i: JfxIndexRange) =>
           val spansInSelection = nodeContentText styleSpansAt i map (_.getStyle.ruleset)
           val selectionAlreadyContainsRuleset = !(spansInSelection forall (_.isEmpty))
           // Need to manually transform Scala Boolean to java.lang.Boolean because bloody Java<->Scala issues
