@@ -137,6 +137,11 @@ class NodeEditor private (dialogTitle: String,
           }
         }
       }
+
+      // Sets the width of this table column to fill the rest of the width
+      // of the table view. The width of the remove button column is 30, and 32 adds a couple of pixels
+      // so that the scroll bar at the bottom of the view doesn't show up
+      prefWidth <== tableWidth - 32
     }
     val removeButtonColumn = new TableColumn[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset]("Delete") {
       minWidth = 30
