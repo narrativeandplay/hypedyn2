@@ -2,7 +2,7 @@ package org.narrativeandplay.hypedyn.dialogs
 
 import java.util.function.Function
 import javafx.event.EventHandler
-import javafx.scene.control.{ListCell => JfxListCell}
+import javafx.scene.control.{ListCell => JfxListCell, TableCell => JfxTableCell}
 import javafx.scene.input
 import javafx.scene.input.KeyCode
 
@@ -71,55 +71,98 @@ class NodeEditor private (dialogTitle: String,
   val nodeNameField = new TextField() {
     text <==> node.nameProperty
   }
-  val textRulesList = new ListView[UiNodeContent.UiRuleset]() {
-    cellFactory = { _ =>
-      new JfxListCell[UiNodeContent.UiRuleset] {
-        override def startEdit(): Unit = {
-          super.startEdit()
+  val textRulesTable = new TableView[UiNodeContent.UiRuleset] {
+    val tableWidth = width
 
-          setText("")
-          setGraphic(new TextField {
-            text = itemProperty().get().name
+    val rulesetColumn = new TableColumn[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset]("RulesetName") {
+      cellValueFactory = { v => ObjectProperty(v.value) }
 
-            onKeyReleased = new EventHandler[input.KeyEvent] {
-              override def handle(event: input.KeyEvent): Unit = event.getCode match {
-                case KeyCode.ENTER =>
-                  if (!text().trim.isEmpty) {
-                    itemProperty().get.nameProperty() = text()
-                    commitEdit(itemProperty().get())
-                  }
-                  else {
-                    cancelEdit()
-                  }
-                case KeyCode.ESCAPE => cancelEdit()
-                case _ =>
+      cellFactory = { _ =>
+        new JfxTableCell[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset] {
+          override def startEdit(): Unit = {
+            super.startEdit()
+
+            val nameField = new TextField {
+              text = itemProperty().get().name
+
+              onKeyReleased = new EventHandler[input.KeyEvent] {
+                override def handle(event: input.KeyEvent): Unit = event.getCode match {
+                  case KeyCode.ENTER =>
+                    if (!text().trim.isEmpty) {
+                      itemProperty().get.nameProperty() = text()
+                      commitEdit(itemProperty().get())
+                    }
+                    else {
+                      cancelEdit()
+                    }
+                  case KeyCode.ESCAPE => cancelEdit()
+                  case _ =>
+                }
+              }
+
+              focused onChange { (_, _, isFocused) =>
+                if (!isFocused) {
+                  itemProperty().get.nameProperty() = text()
+                  commitEdit(itemProperty().get())
+                }
               }
             }
-          })
-        }
 
-        override def cancelEdit(): Unit = {
-          super.cancelEdit()
-
-          setText(itemProperty().get().name)
-          setGraphic(null)
-        }
-
-        override def commitEdit(newValue: UiRuleset): Unit = {
-          super.commitEdit(newValue)
-
-          setText(itemProperty().get().name)
-          setGraphic(null)
-        }
-
-        override def updateItem(item: UiRuleset, empty: Boolean): Unit = {
-          super.updateItem(item, empty)
-
-          if (!empty && item != null) {
-            setText(item.name)
-          }
-          else {
             setText("")
+            setGraphic(nameField)
+          }
+
+          override def commitEdit(newValue: UiRuleset): Unit = {
+            super.commitEdit(newValue)
+
+            setText(newValue.name)
+            setGraphic(null)
+          }
+
+          override def cancelEdit(): Unit = {
+            super.cancelEdit()
+
+            setGraphic(null)
+          }
+
+          override def updateItem(item: UiRuleset, empty: Boolean): Unit = {
+            super.updateItem(item, empty)
+
+            if (!empty && item != null) {
+              setText(item.name)
+            }
+            else {
+              setText("")
+            }
+          }
+        }
+      }
+    }
+    val removeButtonColumn = new TableColumn[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset]("Delete") {
+      minWidth = 30
+      maxWidth = 30
+      cellValueFactory = { v => ObjectProperty(v.value) }
+
+      cellFactory = { _ =>
+        new JfxTableCell[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset] {
+          val removeButton = new Button("-")
+
+          override def updateItem(item: UiNodeContent.UiRuleset, empty: Boolean): Unit = {
+            super.updateItem(item, empty)
+
+            if (!empty && item != null) {
+              removeButton.onAction = { _ =>
+                node.contentProperty().rulesetsProperty -= item
+                nodeContentText.setStyle(item.indexes.startIndex.index.toInt,
+                                         item.indexes.endIndex.index.toInt,
+                                         new LinkStyleInfo())
+              }
+
+              setGraphic(removeButton)
+            }
+            else {
+              setGraphic(null)
+            }
           }
         }
       }
@@ -136,6 +179,9 @@ class NodeEditor private (dialogTitle: String,
     }
 
     nodeContentText.focused onChange { (_, _, focus) => if (focus) selectionModel().clearSelection() }
+
+    columns += rulesetColumn
+    columns += removeButtonColumn
 
     items = node.contentProperty().rulesetsProperty
     editable = true
@@ -201,9 +247,9 @@ class NodeEditor private (dialogTitle: String,
         }
       }
     }
-    children += textRulesList
+    children += textRulesTable
 
-    VBox.setVgrow(textRulesList, Priority.Always)
+    VBox.setVgrow(textRulesTable, Priority.Always)
   }
   val contentTextAndRulesetsListPane = new CollapsibleSplitPane {
     orientation = Orientation.HORIZONTAL
@@ -225,7 +271,7 @@ class NodeEditor private (dialogTitle: String,
       alignment = Pos.CenterLeft
       children += new Label("Text Rules")
       children += new Button("Add rule") {
-        disable <== textRulesList.selectionModel().selectedItemProperty().isNull
+        disable <== textRulesTable.selectionModel().selectedItemProperty().isNull
         onAction = { _ => textRulesPane.addRule() }
       }
     }
