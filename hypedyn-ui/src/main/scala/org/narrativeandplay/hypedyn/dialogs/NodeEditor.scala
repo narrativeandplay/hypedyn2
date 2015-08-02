@@ -3,7 +3,7 @@ package org.narrativeandplay.hypedyn.dialogs
 import java.util.function.Function
 import javafx.event.EventHandler
 import javafx.scene.control.{ListCell => JfxListCell, TableCell => JfxTableCell}
-import javafx.scene.input
+import javafx.scene.{control, input}
 import javafx.scene.input.KeyCode
 
 import scala.language.reflectiveCalls
@@ -229,6 +229,12 @@ class NodeEditor private (dialogTitle: String,
       getStyleSpans(0, getText.length) forEach { styleSpan => spans += styleSpan }
       spans.toList
     }
+
+    def styleSpansAt(indexRange: IndexRange) = {
+      val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
+      getStyleSpans(indexRange) forEach { styleSpan => spans += styleSpan }
+      spans.toList
+    }
   }
   lazy val textRulesPane = new RulesPane(conditionDefinitions,
                                          actionDefinitions filter (_.actionLocationTypes contains NodeContentAction),
@@ -245,8 +251,11 @@ class NodeEditor private (dialogTitle: String,
       alignment = Pos.CenterLeft
       children += new Label("Text Rules")
       children += new Button("Add text rule") {
-        disable <== EasyBind.map(nodeContentText.selectedTextProperty, { s: String =>
-          Boolean box s.trim.isEmpty  // Need to manually transform Scala Boolean to java.lang.Boolean because bloody Java<->Scala issues
+        disable <== EasyBind combine (nodeContentText.selectedTextProperty, nodeContentText.selectionProperty, { (s: String, i: control.IndexRange) =>
+          val spansInSelection = nodeContentText styleSpansAt i map (_.getStyle.ruleset)
+          val selectionAlreadyContainsRuleset = !(spansInSelection forall (_.isEmpty))
+          // Need to manually transform Scala Boolean to java.lang.Boolean because bloody Java<->Scala issues
+          Boolean box (s.trim.isEmpty || selectionAlreadyContainsRuleset)
         })
 
         onAction = { _ =>
