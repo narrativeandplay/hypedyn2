@@ -185,6 +185,17 @@ class NodeEditor private (dialogTitle: String,
 
     nodeContentText.focused onChange { (_, _, focus) => if (focus) selectionModel().clearSelection() }
 
+    // Hides the header of the table
+    width onChange { (_, _, _) =>
+      val header = lookup("TableHeaderRow").delegate.asInstanceOf[javafx.scene.layout.Pane]
+      if (header.visible()) {
+        header.setMaxHeight(0)
+        header.setMinHeight(0)
+        header.setPrefHeight(0)
+        header.setVisible(false)
+      }
+    }
+
     columns += rulesetColumn
     columns += removeButtonColumn
 
