@@ -1,4 +1,4 @@
-package org.narrativeandplay.hypedyn.plugins.storyviewer.utils
+package org.narrativeandplay.hypedyn.storyviewer.utils
 
 object DoubleUtils {
   private final val THRESHOLD = 1e-6

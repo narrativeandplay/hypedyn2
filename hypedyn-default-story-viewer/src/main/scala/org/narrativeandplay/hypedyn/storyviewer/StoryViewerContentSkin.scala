@@ -1,4 +1,4 @@
-package org.narrativeandplay.hypedyn.plugins.storyviewer
+package org.narrativeandplay.hypedyn.storyviewer
 
 import javafx.scene.Node
 import javafx.scene.control.Skin
@@ -6,7 +6,7 @@ import javafx.scene.control.Skin
 import scalafx.scene.layout.Pane
 
 class StoryViewerContentSkin(storyViewerContent: StoryViewerContent) extends Skin[StoryViewerContent] {
-  private val root = new Pane()
+  private val root = new Pane
 
   override def dispose(): Unit = {}
 

@@ -2,8 +2,8 @@ package org.narrativeandplay.hypedyn.dialogs
 
 import java.util.function.Function
 import javafx.event.EventHandler
-import javafx.scene.control.{ListCell => JfxListCell}
-import javafx.scene.input
+import javafx.scene.control.{ListCell => JfxListCell, TableCell => JfxTableCell}
+import javafx.scene.{control, input}
 import javafx.scene.input.KeyCode
 
 import scala.language.reflectiveCalls
@@ -71,55 +71,103 @@ class NodeEditor private (dialogTitle: String,
   val nodeNameField = new TextField() {
     text <==> node.nameProperty
   }
-  val textRulesList = new ListView[UiNodeContent.UiRuleset]() {
-    cellFactory = { _ =>
-      new JfxListCell[UiNodeContent.UiRuleset] {
-        override def startEdit(): Unit = {
-          super.startEdit()
+  val textRulesTable = new TableView[UiNodeContent.UiRuleset] {
+    val tableWidth = width
 
-          setText("")
-          setGraphic(new TextField {
-            text = itemProperty().get().name
+    val rulesetColumn = new TableColumn[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset]("RulesetName") {
+      cellValueFactory = { v => ObjectProperty(v.value) }
 
-            onKeyReleased = new EventHandler[input.KeyEvent] {
-              override def handle(event: input.KeyEvent): Unit = event.getCode match {
-                case KeyCode.ENTER =>
-                  if (!text().trim.isEmpty) {
-                    itemProperty().get.nameProperty() = text()
-                    commitEdit(itemProperty().get())
-                  }
-                  else {
-                    cancelEdit()
-                  }
-                case KeyCode.ESCAPE => cancelEdit()
-                case _ =>
+      cellFactory = { _ =>
+        new JfxTableCell[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset] {
+          override def startEdit(): Unit = {
+            super.startEdit()
+
+            val nameField = new TextField {
+              text = itemProperty().get().name
+
+              onKeyReleased = new EventHandler[input.KeyEvent] {
+                override def handle(event: input.KeyEvent): Unit = event.getCode match {
+                  case KeyCode.ENTER =>
+                    if (!text().trim.isEmpty) {
+                      itemProperty().get.nameProperty() = text()
+                      commitEdit(itemProperty().get())
+                    }
+                    else {
+                      cancelEdit()
+                    }
+                  case KeyCode.ESCAPE => cancelEdit()
+                  case _ =>
+                }
+              }
+
+              focused onChange { (_, _, isFocused) =>
+                if (!isFocused) {
+                  itemProperty().get.nameProperty() = text()
+                  commitEdit(itemProperty().get())
+                }
               }
             }
-          })
-        }
 
-        override def cancelEdit(): Unit = {
-          super.cancelEdit()
-
-          setText(itemProperty().get().name)
-          setGraphic(null)
-        }
-
-        override def commitEdit(newValue: UiRuleset): Unit = {
-          super.commitEdit(newValue)
-
-          setText(itemProperty().get().name)
-          setGraphic(null)
-        }
-
-        override def updateItem(item: UiRuleset, empty: Boolean): Unit = {
-          super.updateItem(item, empty)
-
-          if (!empty && item != null) {
-            setText(item.name)
-          }
-          else {
             setText("")
+            setGraphic(nameField)
+          }
+
+          override def commitEdit(newValue: UiRuleset): Unit = {
+            super.commitEdit(newValue)
+
+            setText(newValue.name)
+            setGraphic(null)
+          }
+
+          override def cancelEdit(): Unit = {
+            super.cancelEdit()
+
+            setGraphic(null)
+          }
+
+          override def updateItem(item: UiRuleset, empty: Boolean): Unit = {
+            super.updateItem(item, empty)
+
+            if (!empty && item != null) {
+              setText(item.name)
+            }
+            else {
+              setText("")
+            }
+          }
+        }
+      }
+
+      // Sets the width of this table column to fill the rest of the width
+      // of the table view. The width of the remove button column is 30, and 32 adds a couple of pixels
+      // so that the scroll bar at the bottom of the view doesn't show up
+      prefWidth <== tableWidth - 32
+    }
+    val removeButtonColumn = new TableColumn[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset]("Delete") {
+      minWidth = 30
+      maxWidth = 30
+      cellValueFactory = { v => ObjectProperty(v.value) }
+
+      cellFactory = { _ =>
+        new JfxTableCell[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset] {
+          val removeButton = new Button("-")
+
+          override def updateItem(item: UiNodeContent.UiRuleset, empty: Boolean): Unit = {
+            super.updateItem(item, empty)
+
+            if (!empty && item != null) {
+              removeButton.onAction = { _ =>
+                node.contentProperty().rulesetsProperty -= item
+                nodeContentText.setStyle(item.indexes.startIndex.index.toInt,
+                                         item.indexes.endIndex.index.toInt,
+                                         new LinkStyleInfo())
+              }
+
+              setGraphic(removeButton)
+            }
+            else {
+              setGraphic(null)
+            }
           }
         }
       }
@@ -137,8 +185,23 @@ class NodeEditor private (dialogTitle: String,
 
     nodeContentText.focused onChange { (_, _, focus) => if (focus) selectionModel().clearSelection() }
 
+    // Hides the header of the table
+    width onChange { (_, _, _) =>
+      val header = lookup("TableHeaderRow").delegate.asInstanceOf[javafx.scene.layout.Pane]
+      if (header.visible()) {
+        header.setMaxHeight(0)
+        header.setMinHeight(0)
+        header.setPrefHeight(0)
+        header.setVisible(false)
+      }
+    }
+
+    columns += rulesetColumn
+    columns += removeButtonColumn
+
     items = node.contentProperty().rulesetsProperty
     editable = true
+    placeholder = new Label("")
   }
   lazy val nodeContentText = new InlineStyleTextArea[NodeEditor.LinkStyleInfo](
     new NodeEditor.LinkStyleInfo(),
@@ -166,6 +229,12 @@ class NodeEditor private (dialogTitle: String,
       getStyleSpans(0, getText.length) forEach { styleSpan => spans += styleSpan }
       spans.toList
     }
+
+    def styleSpansAt(indexRange: IndexRange) = {
+      val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
+      getStyleSpans(indexRange) forEach { styleSpan => spans += styleSpan }
+      spans.toList
+    }
   }
   lazy val textRulesPane = new RulesPane(conditionDefinitions,
                                          actionDefinitions filter (_.actionLocationTypes contains NodeContentAction),
@@ -182,8 +251,11 @@ class NodeEditor private (dialogTitle: String,
       alignment = Pos.CenterLeft
       children += new Label("Text Rules")
       children += new Button("Add text rule") {
-        disable <== EasyBind.map(nodeContentText.selectedTextProperty, { s: String =>
-          Boolean box s.trim.isEmpty  // Need to manually transform Scala Boolean to java.lang.Boolean because bloody Java<->Scala issues
+        disable <== EasyBind combine (nodeContentText.selectedTextProperty, nodeContentText.selectionProperty, { (s: String, i: control.IndexRange) =>
+          val spansInSelection = nodeContentText styleSpansAt i map (_.getStyle.ruleset)
+          val selectionAlreadyContainsRuleset = !(spansInSelection forall (_.isEmpty))
+          // Need to manually transform Scala Boolean to java.lang.Boolean because bloody Java<->Scala issues
+          Boolean box (s.trim.isEmpty || selectionAlreadyContainsRuleset)
         })
 
         onAction = { _ =>
@@ -201,9 +273,9 @@ class NodeEditor private (dialogTitle: String,
         }
       }
     }
-    children += textRulesList
+    children += textRulesTable
 
-    VBox.setVgrow(textRulesList, Priority.Always)
+    VBox.setVgrow(textRulesTable, Priority.Always)
   }
   val contentTextAndRulesetsListPane = new CollapsibleSplitPane {
     orientation = Orientation.HORIZONTAL
@@ -225,7 +297,7 @@ class NodeEditor private (dialogTitle: String,
       alignment = Pos.CenterLeft
       children += new Label("Text Rules")
       children += new Button("Add rule") {
-        disable <== textRulesList.selectionModel().selectedItemProperty().isNull
+        disable <== textRulesTable.selectionModel().selectedItemProperty().isNull
         onAction = { _ => textRulesPane.addRule() }
       }
     }

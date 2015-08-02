@@ -1,10 +1,10 @@
-package org.narrativeandplay.hypedyn.plugins.storyviewer.utils
+package org.narrativeandplay.hypedyn.storyviewer.utils
 
-import scalafx.scene.shape.{Path, CubicCurveTo, MoveTo}
+import scalafx.scene.shape.{CubicCurveTo, MoveTo, Path}
 
 import com.github.benedictleejh.scala.math.vector.Vector2
 
-import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.DoubleUtils._
+import DoubleUtils._
 
 case class BezierCurve(startPoint: Vector2[Double],
                        controlPoint1: Vector2[Double],

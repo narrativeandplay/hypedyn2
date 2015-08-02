@@ -5,12 +5,12 @@ import javafx.scene.control.{Skin => JfxSkin, ListCell => JfxListCell}
 
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
-import scalafx.geometry.Pos
+import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control._
-import scalafx.scene.layout.HBox
+import scalafx.scene.layout.{StackPane, HBox}
 import scalafx.util.StringConverter
+import scalafx.scene.Parent.sfxParent2jfx
 
-import org.narrativeandplay.hypedyn.story.UiCondition
 import org.narrativeandplay.hypedyn.story.rules.{Or, And, BooleanOperator}
 
 class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
@@ -28,8 +28,21 @@ class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
     children += actionsNode
     children += new TreeItem[String]("", addActionButton)
   }
-  lazy val ruleNameField = new TextField() {
-    text <==> cell.rule.nameProperty
+  lazy val ruleNameField = new HBox {
+    children += new TextField() {
+      prefWidth = 400
+
+      text <==> cell.rule.nameProperty
+    }
+    children += new StackPane {
+      padding = Insets(0, 0, 0, 10)
+
+      children += new Button("-") {
+        onAction = { _ =>
+          cell.ruleList -= cell.rule
+        }
+      }
+    }
   }
   lazy val conditionsNode = new TreeItem[String]("") {
     expanded = true
@@ -47,13 +60,13 @@ class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
   lazy val addCondButton = new Button("Add condition") {
     onAction = { _ =>
       val newCond = cell.addCondition()
-      conditionsNode.children += new RuleCellComponents.ConditionCell(newCond, cell.conditionDefs, cell.story)
+      conditionsNode.children += new RuleCellComponents.ConditionCell(newCond, cell.conditionDefs, cell.story, cell.rule)
     }
   }
   lazy val addActionButton = new Button("Add action") {
     onAction = { _ =>
       val newAction = cell.addAction()
-      actionsNode.children += new RuleCellComponents.ActionCell(newAction, cell.actionDefs, cell.story)
+      actionsNode.children += new RuleCellComponents.ActionCell(newAction, cell.actionDefs, cell.story, cell.rule)
     }
   }
 
@@ -99,10 +112,10 @@ class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
   }
 
   cell.rule.conditions foreach { condition =>
-    conditionsNode.children += new RuleCellComponents.ConditionCell(condition, cell.conditionDefs, cell.story)
+    conditionsNode.children += new RuleCellComponents.ConditionCell(condition, cell.conditionDefs, cell.story, cell.rule)
   }
   cell.rule.actions foreach { action =>
-    actionsNode.children += new RuleCellComponents.ActionCell(action, cell.actionDefs, cell.story)
+    actionsNode.children += new RuleCellComponents.ActionCell(action, cell.actionDefs, cell.story, cell.rule)
 
   }
 

@@ -44,7 +44,7 @@ object RulesPane {
         setGraphic(null)
       }
       else {
-        val cell = new RuleCell(item, parentView.conditionDefinitions, parentView.actionDefinitions, parentView.story)
+        val cell = new RuleCell(item, parentView.conditionDefinitions, parentView.actionDefinitions, parentView.story, parentView.rules())
         setGraphic(cell)
       }
     }

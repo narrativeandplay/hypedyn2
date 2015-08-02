@@ -2,8 +2,8 @@ package org.narrativeandplay.hypedyn.undo
 
 import com.github.benedictleejh.scala.math.vector.Vector2
 
-import org.narrativeandplay.hypedyn.plugins.storyviewer.StoryViewerContent
 import org.narrativeandplay.hypedyn.story.NodeId
+import org.narrativeandplay.hypedyn.storyviewer.StoryViewerContent
 
 class NodeMovedChange(val nodeContainer: StoryViewerContent,
                       val nodeId: NodeId,
