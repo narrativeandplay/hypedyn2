@@ -201,6 +201,7 @@ class NodeEditor private (dialogTitle: String,
 
     items = node.contentProperty().rulesetsProperty
     editable = true
+    placeholder = new Label("")
   }
   lazy val nodeContentText = new InlineStyleTextArea[NodeEditor.LinkStyleInfo](
     new NodeEditor.LinkStyleInfo(),
