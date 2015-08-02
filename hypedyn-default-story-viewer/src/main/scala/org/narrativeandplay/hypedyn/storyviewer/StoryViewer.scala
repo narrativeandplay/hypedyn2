@@ -1,15 +1,16 @@
-package org.narrativeandplay.hypedyn.plugins.storyviewer
+package org.narrativeandplay.hypedyn.storyviewer
+
+import scala.util.Try
 
 import scalafx.scene.control.{Control, ScrollPane}
 
 import com.github.benedictleejh.scala.math.vector.Vector2
 
 import org.narrativeandplay.hypedyn.events.{UiNodeDeselected, UiNodeSelected, EditNodeRequest, EventBus}
-import org.narrativeandplay.hypedyn.plugins.storyviewer.components.ViewerNode
 import org.narrativeandplay.hypedyn.plugins.{Saveable, Plugin}
 import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
-import org.narrativeandplay.hypedyn.serialisation._
-import org.narrativeandplay.hypedyn.story.{NodeId, Narrative, Nodal}
+import org.narrativeandplay.hypedyn.serialisation.AstElement
+import org.narrativeandplay.hypedyn.story.{Narrative, Nodal, NodeId}
 import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoableStream}
 
 class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Saveable {
@@ -19,20 +20,20 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   fitToHeight = true
   fitToWidth = true
 
+  val StoryViewerEventSourceIdentity = s"Plugin - $name"
+  val viewer = new StoryViewerContent(this)
+
+  content = new Control(viewer) {}
+
   /**
    * Returns the name of the plugin
    */
-  val name: String = "Default Story Viewer"
-
-  val StoryViewerEventSourceIdentity = s"Plugin - $name"
+  override def name: String = "Default Story Viewer"
 
   /**
    * Returns the version of the plugin
    */
-  val version: String = "1.0.0"
-
-  private val viewer = new StoryViewerContent(this)
-  content = new Control(viewer) {}
+  override def version: String = "1.0.0"
 
   /**
    * Defines what to do when a story is loaded
@@ -41,7 +42,7 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
    */
   override def onStoryLoaded(story: Narrative): Unit = {
     viewer.clear()
-    story.nodes foreach onNodeCreated
+    viewer.loadStory(story)
   }
 
   /**
@@ -49,7 +50,7 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
    *
    * @param node The created node
    */
-  override def onNodeCreated(node: Nodal): Unit = viewer addNode node
+  override def onNodeCreated(node: Nodal): Unit = viewer.addNode(node)
 
   /**
    * Defines what to do when a node is updated
@@ -57,46 +58,31 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
    * @param node The node to be updated
    * @param updatedNode The same node with the updates already applied
    */
-  override def onNodeUpdated(node: Nodal, updatedNode: Nodal): Unit = viewer updateNode (node, updatedNode)
+  override def onNodeUpdated(node: Nodal, updatedNode: Nodal): Unit = viewer.updateNode(node, updatedNode)
 
   /**
    * Defines what to do when a node is destroyed
    *
    * @param node The node to be destroyed
    */
-  override def onNodeDestroyed(node: Nodal): Unit = viewer removeNode node
+  override def onNodeDestroyed(node: Nodal): Unit = viewer.removeNode(node)
 
   /**
    * Restore the state of this Saveable that was saved
    *
    * @param data The saved data
    */
-  override def onLoad(data: AstElement): Unit = {
-    val nodes = data.asInstanceOf[AstMap]("nodes").asInstanceOf[AstList].elems
-    nodes foreach { n =>
-      val nodeData = n.asInstanceOf[AstMap]
-      val (id, x, y) = deserialise(nodeData)
-
-      viewer.nodes find (_.id == id) foreach (_.relocate(x, y))
-    }
-
-    sizeToChildren()
-  }
+  override def onLoad(data: AstElement): Unit = ???
 
   /**
    * Returns the data that this Saveable would like saved
    */
-  override def onSave(): AstElement = {
-    val nodes = AstList(viewer.nodes.toList map serialise: _*)
-
-    AstMap("nodes" -> nodes)
-  }
+  override def onSave(): AstElement = ???
 
   def sizeToChildren(): Unit = {
     val allBounds = (viewer.nodes map (_.bounds)).toList
-    // Ensure that the lists of values is non-empty, to prevent calling max on an empty list
-    val maxX = (0d :: (allBounds map (_.maxX))).max
-    val maxY = (0d :: (allBounds map (_.maxY))).max
+    val maxX = Try((allBounds map (_.maxX)).max) getOrElse 0d
+    val maxY = Try((allBounds map (_.maxY)).max) getOrElse 0d
 
     if (maxX > viewportBounds().getWidth) { fitToWidth = false; viewer.prefWidth = maxX } else fitToWidth = true
     if (maxY > viewportBounds().getHeight) { fitToHeight = false; viewer.prefHeight = maxY } else fitToHeight = true
@@ -116,16 +102,5 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
 
   def notifyNodeDeselection(id: NodeId): Unit = {
     EventBus.send(UiNodeDeselected(id, StoryViewerEventSourceIdentity))
-  }
-
-  private def serialise(n: ViewerNode) = AstMap("id" -> AstInteger(n.id.value),
-                                                "x" -> AstFloat(n.layoutX),
-                                                "y" -> AstFloat(n.layoutY))
-  private def deserialise(nodeData: AstMap) = {
-    val id = nodeData("id").asInstanceOf[AstInteger].i
-    val x = nodeData("x").asInstanceOf[AstFloat].f
-    val y = nodeData("y").asInstanceOf[AstFloat].f
-
-    (NodeId(id), x, y)
   }
 }

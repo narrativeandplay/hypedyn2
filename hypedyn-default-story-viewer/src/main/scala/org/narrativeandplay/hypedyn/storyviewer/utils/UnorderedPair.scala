@@ -1,4 +1,4 @@
-package org.narrativeandplay.hypedyn.plugins.storyviewer.utils
+package org.narrativeandplay.hypedyn.storyviewer.utils
 
 case class UnorderedPair[T](_1: T, _2: T) {
   override def equals(that: Any) = that match {

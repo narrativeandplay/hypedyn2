@@ -1,6 +1,7 @@
-package org.narrativeandplay.hypedyn.plugins.storyviewer.components
+package org.narrativeandplay.hypedyn.storyviewer.components
 
-import scalafx.beans.property.{BooleanProperty, StringProperty}
+import scalafx.Includes.jfxObservableValue2sfx
+import scalafx.beans.property.{BooleanProperty, ObjectProperty}
 import scalafx.geometry.{Point2D, Pos}
 import scalafx.scene.control.Label
 import scalafx.scene.paint.Color
@@ -8,43 +9,38 @@ import scalafx.scene.shape.{Polygon, Rectangle}
 import scalafx.scene.text.Text
 
 import com.github.benedictleejh.scala.math.vector.Vector2
+import org.fxmisc.easybind.EasyBind
 
-import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.BezierCurve
-import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.BezierCurve.UiBezierCurve
-import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.DoubleUtils._
-import org.narrativeandplay.hypedyn.plugins.storyviewer.utils.VectorImplicitConversions._
+import org.narrativeandplay.hypedyn.storyviewer.utils.BezierCurve
 import org.narrativeandplay.hypedyn.story.rules.RuleLike
+import org.narrativeandplay.hypedyn.storyviewer.utils.FunctionImplicits._
+import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils._
+import org.narrativeandplay.hypedyn.storyviewer.utils.VectorImplicitConversions._
 
 class Link(val from: ViewerNode,
            val to: ViewerNode,
-           val rule: RuleLike,
+           initRule: RuleLike,
            private val parentLinkGroup: LinkGroup) {
   private var closestBezierParam = -1d
-  private var clickedPoint = Vector2(-1d, -1d)
-  private var linkPath = BezierCurve((-1d, -1d), (-1d, -1d), (-1d, -1d), (-1d, -1d))
 
-  val nameProperty = StringProperty(rule.name)
-  val selectedProperty = BooleanProperty(false)
-
-  def name: String = nameProperty()
-  def name_=(newName: String) = nameProperty() = newName
-
-  def selected = selectedProperty()
+  val rule = ObjectProperty(initRule)
+  val name = EasyBind map (rule, (_: RuleLike).name)
+  val selected = BooleanProperty(false)
 
   private val linkLabel = new Label {
-//    prefWidth = new Text(name).layoutBounds().getWidth
-//    maxWidth = Link.labelWidth
-//    maxHeight = Link.labelHeight
+    prefWidth <== EasyBind map (name, { s: String => Double box new Text(s).layoutBounds().getWidth })
+    maxWidth = Link.LabelWidth
+    maxHeight = Link.LabelHeight
     alignment = Pos.Center
     wrapText = true
 
-    text <== nameProperty
+    text <== name
   }
 
   private val labelBackground = new Rectangle {
-    width = Link.labelWidth
-    height = Link.labelHeight
-    fill = Color.LightGrey
+    width <== linkLabel.width
+    height = Link.LabelHeight
+    fill = Link.DefaultBackgroundColour
   }
 
   private def endPoints = {
@@ -70,15 +66,15 @@ class Link(val from: ViewerNode,
     minDistPoints
   }
 
+  def rule_=(newRule: RuleLike) = rule() = newRule
+
   def select(x: Double, y: Double): Unit = {
-    selectedProperty() = true
-    clickedPoint = (x, y)
-    closestBezierParam = path closestPointParameterValue clickedPoint
+    selected() = true
+    closestBezierParam = path closestPointParameterValue ((x, y))
   }
 
   def deselect(): Unit = {
-    selectedProperty() = false
-    clickedPoint = (-1d, -1d)
+    selected() = false
     closestBezierParam = -1d
   }
 
@@ -130,7 +126,7 @@ class Link(val from: ViewerNode,
   def draw = {
     val line = path.toFxPath
 
-    val highlight = if (selected) {
+    val highlight = if (selected()) {
       val h = path.toFxPath
       h.stroke = Color.Red
       h.strokeWidth = 5
@@ -138,22 +134,23 @@ class Link(val from: ViewerNode,
     }
     else None
 
-    val label: Option[Label] = Link.LinkNameDisplayType match {
+    import Link.NameDisplayType._
+    val label: Option[Label] = Link.NameDisplay match {
       case OnLinkAlways =>
-        val labelMidpoint = path.pointAt(0.5)
-        linkLabel.relocate(labelMidpoint.x - Link.labelWidth / 2, labelMidpoint.y - Link.labelHeight / 2)
+        val labelMidpoint = path pointAt 0.5
+        linkLabel.relocate(labelMidpoint.x - Link.LabelWidth / 2, labelMidpoint.y - Link.LabelHeight / 2)
         Some(linkLabel)
       case OnLinkOnClick =>
-        if (selected) {
-          val labelMidpoint = path.pointAt(0.5)
-          linkLabel.relocate(labelMidpoint.x - Link.labelWidth / 2, labelMidpoint.y - Link.labelHeight / 2)
+        if (selected()) {
+          val labelMidpoint = path pointAt 0.5
+          linkLabel.relocate(labelMidpoint.x - Link.LabelWidth / 2, labelMidpoint.y - Link.LabelHeight / 2)
           Some(linkLabel)
         }
         else None
       case AtMouseOnClick =>
-        if (selected) {
-          val labelMidpoint = path.pointAt(closestBezierParam)
-          linkLabel.relocate(labelMidpoint.x - Link.labelWidth / 2, labelMidpoint.y - Link.labelHeight / 2)
+        if (selected()) {
+          val labelMidpoint = path pointAt closestBezierParam
+          linkLabel.relocate(labelMidpoint.x - Link.LabelWidth / 2, labelMidpoint.y - Link.LabelHeight / 2)
           Some(linkLabel)
         }
         else None
@@ -164,10 +161,10 @@ class Link(val from: ViewerNode,
       labelBackground
     }
 
-    val tangentVector = -path.gradientAt(0.85).normalise * 10
-    val headToTail1 = tangentVector.rotate(30)
-    val headToTail2 = tangentVector.rotate(-30)
-    val triangleHead = path.pointAt(0.85)
+    val tangentVector = -(path gradientAt 0.85).normalise * 10
+    val headToTail1 = tangentVector rotate 30
+    val headToTail2 = tangentVector rotate -30
+    val triangleHead = path pointAt 0.85
     val tail1 = triangleHead + headToTail1
     val tail2 = triangleHead + headToTail2
 
@@ -182,8 +179,16 @@ class Link(val from: ViewerNode,
 }
 
 object Link {
-  private val labelHeight = 20
-  private val labelWidth = 100
+  private val LabelHeight = 20
+  private val LabelWidth = 100
+  private val DefaultBackgroundColour = Color.web("#f4f4f4")
 
-  val LinkNameDisplayType: LinkNameDisplayType = OnLinkAlways
+  val NameDisplay: NameDisplayType = NameDisplayType.OnLinkAlways
+
+  sealed trait NameDisplayType
+  object NameDisplayType {
+    case object AtMouseOnClick extends NameDisplayType
+    case object OnLinkAlways extends NameDisplayType
+    case object OnLinkOnClick extends NameDisplayType
+  }
 }

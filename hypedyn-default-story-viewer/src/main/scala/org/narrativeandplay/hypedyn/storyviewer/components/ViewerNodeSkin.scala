@@ -1,4 +1,4 @@
-package org.narrativeandplay.hypedyn.plugins.storyviewer.components
+package org.narrativeandplay.hypedyn.storyviewer.components
 
 import javafx.scene.Node
 import javafx.scene.control.Skin
@@ -10,54 +10,53 @@ import scalafx.scene.layout.{StackPane, Pane}
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 
-class ViewerNodeSkin(node: ViewerNode) extends Skin[ViewerNode] {
-  private val headingHeight: Double = 40
-  private val textPadding = 10
-  private val selectionOutlineWidth = 5
+class ViewerNodeSkin(viewerNode: ViewerNode) extends Skin[ViewerNode] {
+  import ViewerNodeSkin._
 
   // The -1 is for the rectangle to look nicer
   private val headingBarRect = new Rectangle {
-    width = node.width - 1
-    height = headingHeight
+    width = viewerNode.width - 1
+    height = HeadingHeight
     fill = Color.LightGrey
     stroke = Color.Black
   }
   private val contentRect = new Rectangle {
-    width = node.width
-    height = node.height
+    width = viewerNode.width
+    height = viewerNode.height
     fill = Color.White
     stroke = Color.Black
   }
   private val selectRect = new Rectangle {
-    width = node.width + 2 * selectionOutlineWidth
-    height = node.height + 2 * selectionOutlineWidth
+    width = viewerNode.width + 2 * SelectionOutlineWidth
+    height = viewerNode.height + 2 * SelectionOutlineWidth
     fill = Color.Red
-    translateX = -selectionOutlineWidth
-    translateY = -selectionOutlineWidth
+    translateX = -SelectionOutlineWidth
+    translateY = -SelectionOutlineWidth
 
-    visible <== node.selectedProperty
+    visible <== viewerNode.selected
   }
 
   private val nodeName = new Label {
     wrapText = true
     alignment = Pos.Center
 
-    maxWidth = node.width
-    maxHeight = headingHeight
+    maxWidth = viewerNode.width
+    maxHeight = ViewerNodeSkin.HeadingHeight
 
-    text <== node.nameProperty
+    text <== viewerNode.nodeName
   }
   private val nodeContent = new Label {
-    translateX = textPadding
-    translateY = textPadding + headingHeight
+    translateX = TextPadding
+    translateY = TextPadding + HeadingHeight
 
     wrapText = true
     alignment = Pos.TopLeft
     //textOverrun = OverrunStyle.WordEllipsis
 
-    delegate.setMaxSize(node.width - 2 * textPadding, node.height - 2 * textPadding - headingHeight)
+    maxWidth = viewerNode.width - 2 * TextPadding
+    maxHeight = viewerNode.height - 2 * TextPadding - HeadingHeight
 
-    text <== node.contentProperty
+    text <== viewerNode.contentText
   }
 
   private val contentBox = new Pane {
@@ -75,10 +74,16 @@ class ViewerNodeSkin(node: ViewerNode) extends Skin[ViewerNode] {
     children += contentBox
     children += headingBar
   }
-  
+
   override def dispose(): Unit = {}
 
-  override def getSkinnable: ViewerNode = node
+  override def getSkinnable: ViewerNode = viewerNode
 
   override def getNode: Node = root
+}
+
+object ViewerNodeSkin {
+  private val HeadingHeight = 40d
+  private val TextPadding = 10
+  private val SelectionOutlineWidth = 5
 }

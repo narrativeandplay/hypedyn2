@@ -1,4 +1,4 @@
-package org.narrativeandplay.hypedyn.plugins.storyviewer.utils
+package org.narrativeandplay.hypedyn.storyviewer.utils
 
 import java.awt.Point
 import java.awt.geom.Point2D
