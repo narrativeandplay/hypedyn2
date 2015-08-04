@@ -1,5 +1,8 @@
 package org.narrativeandplay.hypedyn.uicomponents
 
+import java.util.function.{Function => JFunction}
+import javafx.beans.property
+import javafx.collections.ObservableList
 import javafx.scene.control.{SpinnerValueFactory => JfxSpinnerValueFactory, ListCell => JfxListCell}
 
 import scala.util.Try
@@ -13,6 +16,8 @@ import scalafx.scene.layout.{StackPane, Region, HBox}
 import scalafx.util.StringConverter
 import scalafx.util.StringConverter.sfxStringConverter2jfx
 import scalafx.scene.Parent.sfxParent2jfx
+
+import org.fxmisc.easybind.EasyBind
 
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
@@ -59,7 +64,7 @@ object RuleCellComponents {
       }
 
       onAction = { _ =>
-        condition.paramsProperty.clear()
+        condition.paramsProperty().clear()
         condition.conditionTypeProperty() = selectionModel().getSelectedItem.conditionType
 
         condParams.children.clear()
@@ -82,14 +87,14 @@ object RuleCellComponents {
       children += new Button("-") {
         onAction = { _ =>
           parentTreeItem.getChildren.remove(self)
-          parentRule.conditionsProperty -= condition
+          parentRule.conditionsProperty() -= condition
         }
       }
     }
 
     private def generateParameterInputComponents(comboBox: ComboBox[ConditionDefinition]) =
       comboBox.selectionModel().getSelectedItem.parameters foreach { p =>
-        val newComponent = createParameterInput(p, condition.paramsProperty, parentStory)
+        val newComponent = createParameterInput(p, condition.paramsProperty(), parentStory)
         condParams.children += newComponent
         condParamsChildren += newComponent
       }
@@ -129,7 +134,7 @@ object RuleCellComponents {
       }
 
       onAction = { _ =>
-        action.paramsProperty.clear()
+        action.paramsProperty().clear()
         action.actionTypeProperty() = selectionModel().getSelectedItem.actionType
 
         actionParams.children.clear()
@@ -152,14 +157,14 @@ object RuleCellComponents {
       children += new Button("-") {
         onAction = { _ =>
           parentTreeItem.getChildren.remove(self)
-          parentRule.actionsProperty -= action
+          parentRule.actionsProperty() -= action
         }
       }
     }
 
     private def generateParameterInputComponents(comboBox: ComboBox[ActionDefinition]) =
       comboBox.selectionModel().getSelectedItem.parameters foreach { p =>
-        val newComponent = createParameterInput(p, action.paramsProperty, parentStory)
+        val newComponent = createParameterInput(p, action.paramsProperty(), parentStory)
         actionParams.children += newComponent
         actionParamsChildren += newComponent
       }
@@ -207,11 +212,8 @@ object RuleCellComponents {
       paramMap += paramName -> ParamValue(value().id.value.toString())
     }
 
-    items = story().nodesProperty
-
-
-    story onChange { (_, _, `new`) =>
-      Option(`new`) foreach { s => items = s.nodesProperty }
+    items <== EasyBind select story selectObject new JFunction[UiStory, javafx.beans.value.ObservableValue[ObservableList[UiNode]]] {
+      override def apply(t: UiStory): property.ObjectProperty[ObservableList[UiNode]] = t.nodesProperty
     }
 
     override def `val`: Option[ParamValue] = paramMap get paramName
@@ -286,7 +288,7 @@ object RuleCellComponents {
       Option(`new`) foreach { _ => items = intFacts }
     }
 
-    def intFacts = story().factsProperty collect { case f: IntegerFact => f }
+    def intFacts = story().factsProperty() collect { case f: IntegerFact => f }
 
     override def `val`: Option[ParamValue] = paramMap get paramName
 
@@ -324,7 +326,7 @@ object RuleCellComponents {
       items = boolFacts
     }
 
-    def boolFacts = story().factsProperty collect { case f: BooleanFact => f }
+    def boolFacts = story().factsProperty() collect { case f: BooleanFact => f }
 
     override def `val`: Option[ParamValue] = paramMap get paramName
 
@@ -362,7 +364,7 @@ object RuleCellComponents {
       items = stringFacts
     }
 
-    def stringFacts = story().factsProperty collect { case f: StringFact => f }
+    def stringFacts = story().factsProperty() collect { case f: StringFact => f }
 
     override def `val`: Option[ParamValue] = paramMap get paramName
 

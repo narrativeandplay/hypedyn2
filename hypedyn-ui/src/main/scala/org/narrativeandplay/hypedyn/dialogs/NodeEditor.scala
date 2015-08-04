@@ -156,7 +156,7 @@ class NodeEditor private (dialogTitle: String,
 
             if (!empty && item != null) {
               removeButton.onAction = { _ =>
-                node.contentProperty().rulesetsProperty -= item
+                node.contentProperty().rulesetsProperty() -= item
                 nodeContentText.setStyle(item.indexes.startIndex.index.toInt,
                                          item.indexes.endIndex.index.toInt,
                                          new LinkStyleInfo())
@@ -198,7 +198,7 @@ class NodeEditor private (dialogTitle: String,
     columns += rulesetColumn
     columns += removeButtonColumn
 
-    items = node.contentProperty().rulesetsProperty
+    items <== node.contentProperty().rulesetsProperty
     editable = true
     placeholder = new Label("")
   }
@@ -209,7 +209,7 @@ class NodeEditor private (dialogTitle: String,
     }) {
     setWrapText(true)
     replaceText(node.content.text)
-    node.content.rulesetsProperty foreach { ruleset =>
+    node.content.rulesetsProperty() foreach { ruleset =>
       setStyle(ruleset.indexes.startIndex.index.toInt,
                ruleset.indexes.endIndex.index.toInt,
                new LinkStyleInfo(Some(ruleset)))
@@ -241,7 +241,7 @@ class NodeEditor private (dialogTitle: String,
                                          story)
   val nodeRulesPane = new RulesPane(conditionDefinitions,
                                     actionDefinitions filter (_.actionLocationTypes contains NodeAction),
-                                    node.rulesProperty,
+                                    node.rulesProperty(),
                                     story)
 
   val rulesetsListVBox = new VBox {
@@ -265,7 +265,7 @@ class NodeEditor private (dialogTitle: String,
                                          RulesetIndexes(TextIndex(start), TextIndex(end)),
                                          Nil)
           firstUnusedRulesetId = firstUnusedRulesetId.dec
-          node.contentProperty().rulesetsProperty += newRuleset
+          node.contentProperty().rulesetsProperty() += newRuleset
           nodeContentText.setStyle(start,
                                    end,
                                    new LinkStyleInfo(Some(newRuleset)))
