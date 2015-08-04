@@ -9,11 +9,11 @@ import org.narrativeandplay.hypedyn.story.rules.RuleLike
 
 class UiNodeContent(initText: String, initRulesets: List[UiNodeContent.UiRuleset]) extends NodalContent {
   val textProperty = StringProperty(initText)
-  val rulesetsProperty = ObservableBuffer(initRulesets)
+  val rulesetsProperty = ObjectProperty(ObservableBuffer(initRulesets))
 
   override def text: String = textProperty()
 
-  override def rulesets: List[RulesetLike] = rulesetsProperty.toList
+  override def rulesets: List[RulesetLike] = rulesetsProperty().toList
 
   override def toString: String = s"${getClass.getCanonicalName}(text = '$text', rulesets = $rulesets"
 }

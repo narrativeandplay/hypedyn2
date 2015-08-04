@@ -1,9 +1,11 @@
 package org.narrativeandplay.hypedyn.story
 
-import scalafx.beans.property.StringProperty
+import scalafx.Includes._
+import scalafx.beans.property.{ObjectProperty, StringProperty}
 import scalafx.collections.ObservableBuffer
 
-import org.narrativeandplay.hypedyn.story.rules.{Fact, RuleLike}
+import org.narrativeandplay.hypedyn.story.rules.Actionable.ActionType
+import org.narrativeandplay.hypedyn.story.rules.Fact
 
 class UiStory(initTitle: String,
               initDescription: String,
@@ -15,9 +17,9 @@ class UiStory(initTitle: String,
   val descriptionProperty = StringProperty(initDescription)
   val authorProperty = StringProperty(initAuthor)
 
-  val factsProperty = ObservableBuffer(initFacts)
-  val nodesProperty = ObservableBuffer(initNodes)
-  val rulesProperty = ObservableBuffer(initRules)
+  val factsProperty = ObjectProperty(ObservableBuffer(initFacts))
+  val nodesProperty = ObjectProperty(ObservableBuffer(initNodes))
+  val rulesProperty = ObjectProperty(ObservableBuffer(initRules))
 
   /**
    * Returns the title of the story
@@ -37,19 +39,19 @@ class UiStory(initTitle: String,
   /**
    * Returns the list of facts of the story
    */
-  override def facts: List[Fact] = factsProperty.toList
+  override def facts: List[Fact] = factsProperty().toList
 
   /**
    * Returns the nodes contained in the story
    */
-  override def nodes: List[UiNode] = nodesProperty.toList
+  override def nodes: List[UiNode] = nodesProperty().toList
 
   /**
    * Returns the story-level rules
    */
-  override def rules: List[UiRule] = rulesProperty.toList
+  override def rules: List[UiRule] = rulesProperty().toList
 
-  def links: ObservableBuffer[UiRule] = nodesProperty flatMap (_.contentProperty().rulesetsProperty) flatMap (_.rulesProperty) filter { rule =>
-    rule.actions map (_.actionType) contains "LinkTo"
+  def links: ObservableBuffer[UiRule] = nodesProperty() flatMap (_.contentProperty().rulesetsProperty()) flatMap (_.rulesProperty) filter { rule =>
+    rule.actions map (_.actionType) contains ActionType("LinkTo")
   }
 }

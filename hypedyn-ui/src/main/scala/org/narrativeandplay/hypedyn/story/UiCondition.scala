@@ -10,7 +10,7 @@ import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
 
 class UiCondition(initConditionType: ConditionType, initParams: Map[ParamName, ParamValue]) extends Conditional {
   val conditionTypeProperty = ObjectProperty(initConditionType)
-  val paramsProperty = ObservableMap(initParams.toSeq: _*)
+  val paramsProperty = ObjectProperty(ObservableMap(initParams.toSeq: _*))
 
   /**
    * The type of the condition that is being instanced
@@ -20,7 +20,7 @@ class UiCondition(initConditionType: ConditionType, initParams: Map[ParamName, P
   /**
    * A mapping of the condition's parameter names to the instanced values
    */
-  override def params: Map[ParamName, ParamValue] = paramsProperty.toMap
+  override def params: Map[ParamName, ParamValue] = paramsProperty().toMap
 
   override def toString: String = s"UiCondition($conditionType, $params)"
 }

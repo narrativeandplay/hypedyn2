@@ -26,13 +26,13 @@ class RuleCell(val rule: UiRule,
 
   def addCondition(): UiCondition = {
     val newCond = new UiCondition(ConditionType("NodeCondition"), Map.empty)
-    rule.conditionsProperty += newCond
+    rule.conditionsProperty() += newCond
     newCond
   }
 
   def addAction(): UiAction = {
     val newAction = new UiAction(actionDefs.head.actionType, Map.empty)
-    rule.actionsProperty += newAction
+    rule.actionsProperty() += newAction
     newAction
   }
 }
