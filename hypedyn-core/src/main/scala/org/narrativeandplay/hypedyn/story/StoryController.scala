@@ -1,8 +1,11 @@
 package org.narrativeandplay.hypedyn.story
 
+import org.narrativeandplay.hypedyn.story.internal.NodeContent.Ruleset
 import org.narrativeandplay.hypedyn.story.internal.{NodeContent, Node, Story}
 import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions._
+import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamValue, ParamName}
 import org.narrativeandplay.hypedyn.story.rules._
+import org.narrativeandplay.hypedyn.story.rules.internal.Rule
 
 object StoryController {
   import Ordering.Implicits._
@@ -79,12 +82,52 @@ object StoryController {
     toUpdate map ((_, updated))
   }
 
-  def destroy(node: Nodal): Option[Node] = {
-    val toDestroy = findNode(node.id)
+  def destroy(node: Nodal): Option[(Node, Map[Node, Node])] = {
+    val toDestroyOption = findNode(node.id)
 
-    toDestroy foreach { n => currentStory = currentStory removeNode n }
+    toDestroyOption foreach { toDestroy => currentStory = currentStory removeNode toDestroy }
+    val retVal = toDestroyOption map { toDestroy =>
+      val nodesToEdit = currentStory.nodes filter { node =>
+        val nodeActionsReferenceToDestroy = node.rules flatMap (_.actions) flatMap (_.params get ParamName("node")) contains ParamValue(toDestroy.id.value.toString())
+        val nodeConditionsReferenceToDestroy = node.rules flatMap (_.conditions) flatMap (_.params get ParamName("node")) contains ParamValue(toDestroy.id.value.toString())
 
-    toDestroy
+        val textRules = node.content.rulesets flatMap (_.rules)
+        val textRulesActionsReferenceToDestroy = textRules flatMap (_.actions) flatMap (_.params get ParamName("node")) contains ParamValue(toDestroy.id.value.toString())
+        val textRulesConditionsReferenceToDestroy = textRules flatMap (_.conditions) flatMap (_.params get ParamName("node")) contains ParamValue(toDestroy.id.value.toString())
+
+        nodeActionsReferenceToDestroy || nodeConditionsReferenceToDestroy || textRulesActionsReferenceToDestroy || textRulesConditionsReferenceToDestroy
+      }
+
+      val editedNodePairs = nodesToEdit map { node =>
+        val modifiedNodeRules = node.rules map { rule =>
+          val modifiedActions = rule.actions filterNot { action => action.params.values.toList contains ParamValue(toDestroy.id.value.toString()) }
+          val modifiedConditions = rule.conditions filterNot { action => action.params.values.toList contains ParamValue(toDestroy.id.value.toString()) }
+
+          new Rule(rule.id, rule.name, rule.conditionsOp, modifiedConditions, modifiedActions)
+        }
+
+        val modifiedRulesets = node.content.rulesets map { ruleset =>
+          val modifiedRules = ruleset.rules map { rule =>
+            val modifiedActions = rule.actions filterNot { action => action.params.values.toList contains ParamValue(toDestroy.id.value.toString()) }
+            val modifiedConditions = rule.conditions filterNot { action => action.params.values.toList contains ParamValue(toDestroy.id.value.toString()) }
+
+            new Rule(rule.id, rule.name, rule.conditionsOp, modifiedConditions, modifiedActions)
+          }
+
+          new Ruleset(ruleset.id, ruleset.name, ruleset.indexes, modifiedRules)
+        }
+
+        node -> new Node(node.id, node.name, new NodeContent(node.content.text, modifiedRulesets), node.isStartNode, modifiedNodeRules)
+      }
+
+      editedNodePairs foreach { case (unedited, edited) =>
+        update(unedited, edited)
+      }
+
+      (toDestroy, editedNodePairs.toMap)
+    }
+
+    retVal
   }
 
   def create(fact: Fact): Fact = {
