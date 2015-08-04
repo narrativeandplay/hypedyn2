@@ -53,7 +53,11 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
    *
    * @param node The created node
    */
-  override def onNodeCreated(node: Nodal): Unit = viewer.addNode(node)
+  override def onNodeCreated(node: Nodal): Unit = {
+    val createdNode = viewer.addNode(node)
+
+    nodeLocations get createdNode.id foreach (moveNode(createdNode.id, _))
+  }
 
   /**
    * Defines what to do when a node is updated
