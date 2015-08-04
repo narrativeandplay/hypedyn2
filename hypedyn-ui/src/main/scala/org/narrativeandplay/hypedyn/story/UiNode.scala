@@ -1,5 +1,6 @@
 package org.narrativeandplay.hypedyn.story
 
+import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, ObjectProperty, StringProperty}
 import scalafx.collections.ObservableBuffer
 
@@ -11,7 +12,7 @@ class UiNode(val id: NodeId,
   val nameProperty = StringProperty(initName)
   val contentProperty = ObjectProperty(initContent)
   val isStartNodeProperty = BooleanProperty(initIsStartNode)
-  val rulesProperty = ObservableBuffer(initRules: _*)
+  val rulesProperty = ObjectProperty(ObservableBuffer(initRules: _*))
   
   /**
    * The name of the node
@@ -21,7 +22,7 @@ class UiNode(val id: NodeId,
   /**
    * The list of rules of the node
    */
-  override def rules: List[UiRule] = rulesProperty.toList
+  override def rules: List[UiRule] = rulesProperty().toList
 
   /**
    * The content of the node
