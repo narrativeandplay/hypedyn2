@@ -1,5 +1,6 @@
 package org.narrativeandplay.hypedyn.storyviewer
 
+import scala.collection.mutable
 import scala.util.Try
 
 import scalafx.scene.control.{Control, ScrollPane}
@@ -9,8 +10,9 @@ import com.github.benedictleejh.scala.math.vector.Vector2
 import org.narrativeandplay.hypedyn.events.{UiNodeDeselected, UiNodeSelected, EditNodeRequest, EventBus}
 import org.narrativeandplay.hypedyn.plugins.{Saveable, Plugin}
 import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
-import org.narrativeandplay.hypedyn.serialisation.AstElement
+import org.narrativeandplay.hypedyn.serialisation._
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal, NodeId}
+import org.narrativeandplay.hypedyn.storyviewer.components.ViewerNode
 import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoableStream}
 
 class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Saveable {
@@ -19,6 +21,8 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
 
   fitToHeight = true
   fitToWidth = true
+
+  val nodeLocations = mutable.Map.empty[NodeId, Vector2[Double]]
 
   val StoryViewerEventSourceIdentity = s"Plugin - $name"
   val viewer = new StoryViewerContent(this)
@@ -50,7 +54,11 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
    *
    * @param node The created node
    */
-  override def onNodeCreated(node: Nodal): Unit = viewer.addNode(node)
+  override def onNodeCreated(node: Nodal): Unit = {
+    val createdNode = viewer.addNode(node)
+
+    nodeLocations get createdNode.id foreach (moveNode(createdNode.id, _))
+  }
 
   /**
    * Defines what to do when a node is updated
@@ -72,12 +80,22 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
    *
    * @param data The saved data
    */
-  override def onLoad(data: AstElement): Unit = ???
+  override def onLoad(data: AstElement): Unit = {
+    val nodes = data.asInstanceOf[AstMap]("nodes").asInstanceOf[AstList].elems
+    nodes foreach { n =>
+      val nodeData = n.asInstanceOf[AstMap]
+      val (id, x, y) = deserialise(nodeData)
+
+      moveNode(id, Vector2(x, y))
+    }
+
+    sizeToChildren()
+  }
 
   /**
    * Returns the data that this Saveable would like saved
    */
-  override def onSave(): AstElement = ???
+  override def onSave(): AstElement = AstMap("nodes" -> AstList(viewer.nodes.toList map serialise: _*))
 
   def sizeToChildren(): Unit = {
     val allBounds = (viewer.nodes map (_.bounds)).toList
@@ -88,12 +106,22 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
     if (maxY > viewportBounds().getHeight) { fitToHeight = false; viewer.prefHeight = maxY } else fitToHeight = true
   }
 
+  def moveNode(nodeId: NodeId, position: Vector2[Double]): Unit = {
+    nodeLocations += nodeId -> position
+
+    viewer.nodes find (_.id == nodeId) foreach (_.relocate(position.x, position.y))
+
+    sizeToChildren()
+  }
+
   def requestNodeEdit(id: NodeId): Unit = {
     EventBus.send(EditNodeRequest(id, StoryViewerEventSourceIdentity))
   }
 
   def notifyNodeMove(id: NodeId, initialPos: Vector2[Double], finalPos: Vector2[Double]): Unit = {
-    UndoableStream.send(new NodeMovedChange(viewer, id, initialPos, finalPos))
+    nodeLocations += id -> finalPos
+
+    UndoableStream.send(new NodeMovedChange(this, id, initialPos, finalPos))
   }
 
   def notifyNodeSelection(id: NodeId): Unit = {
@@ -102,5 +130,16 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
 
   def notifyNodeDeselection(id: NodeId): Unit = {
     EventBus.send(UiNodeDeselected(id, StoryViewerEventSourceIdentity))
+  }
+
+  private def serialise(n: ViewerNode) = AstMap("id" -> AstInteger(n.id.value),
+                                                "x" -> AstFloat(n.layoutX),
+                                                "y" -> AstFloat(n.layoutY))
+  private def deserialise(nodeData: AstMap) = {
+    val id = nodeData("id").asInstanceOf[AstInteger].i
+    val x = nodeData("x").asInstanceOf[AstFloat].f
+    val y = nodeData("y").asInstanceOf[AstFloat].f
+
+    (NodeId(id), x, y)
   }
 }

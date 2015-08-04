@@ -38,10 +38,12 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     nodes.clear()
   }
 
-  def addNode(node: Nodal): Unit = {
+  def addNode(node: Nodal): ViewerNode = {
     val n = makeNode(node)
 
     makeLinks(n)
+
+    n
   }
 
   def updateNode(node: Nodal, updatedNode: Nodal): Unit = {
