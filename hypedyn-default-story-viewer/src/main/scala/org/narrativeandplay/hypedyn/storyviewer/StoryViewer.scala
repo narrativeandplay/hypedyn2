@@ -88,12 +88,18 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
     if (maxY > viewportBounds().getHeight) { fitToHeight = false; viewer.prefHeight = maxY } else fitToHeight = true
   }
 
+  def moveNode(nodeId: NodeId, position: Vector2[Double]): Unit = {
+    viewer.nodes find (_.id == nodeId) foreach (_.relocate(position.x, position.y))
+
+    sizeToChildren()
+  }
+
   def requestNodeEdit(id: NodeId): Unit = {
     EventBus.send(EditNodeRequest(id, StoryViewerEventSourceIdentity))
   }
 
   def notifyNodeMove(id: NodeId, initialPos: Vector2[Double], finalPos: Vector2[Double]): Unit = {
-    UndoableStream.send(new NodeMovedChange(viewer, id, initialPos, finalPos))
+    UndoableStream.send(new NodeMovedChange(this, id, initialPos, finalPos))
   }
 
   def notifyNodeSelection(id: NodeId): Unit = {
