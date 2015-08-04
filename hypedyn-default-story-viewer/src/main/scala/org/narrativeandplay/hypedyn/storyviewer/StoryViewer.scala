@@ -1,5 +1,6 @@
 package org.narrativeandplay.hypedyn.storyviewer
 
+import scala.collection.mutable
 import scala.util.Try
 
 import scalafx.scene.control.{Control, ScrollPane}
@@ -19,6 +20,8 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
 
   fitToHeight = true
   fitToWidth = true
+
+  val nodeLocations = mutable.Map.empty[NodeId, Vector2[Double]]
 
   val StoryViewerEventSourceIdentity = s"Plugin - $name"
   val viewer = new StoryViewerContent(this)
@@ -89,6 +92,8 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   }
 
   def moveNode(nodeId: NodeId, position: Vector2[Double]): Unit = {
+    nodeLocations += nodeId -> position
+
     viewer.nodes find (_.id == nodeId) foreach (_.relocate(position.x, position.y))
 
     sizeToChildren()
@@ -99,6 +104,8 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   }
 
   def notifyNodeMove(id: NodeId, initialPos: Vector2[Double], finalPos: Vector2[Double]): Unit = {
+    nodeLocations += id -> finalPos
+
     UndoableStream.send(new NodeMovedChange(this, id, initialPos, finalPos))
   }
 
