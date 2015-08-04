@@ -10,8 +10,9 @@ import com.github.benedictleejh.scala.math.vector.Vector2
 import org.narrativeandplay.hypedyn.events.{UiNodeDeselected, UiNodeSelected, EditNodeRequest, EventBus}
 import org.narrativeandplay.hypedyn.plugins.{Saveable, Plugin}
 import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
-import org.narrativeandplay.hypedyn.serialisation.AstElement
+import org.narrativeandplay.hypedyn.serialisation._
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal, NodeId}
+import org.narrativeandplay.hypedyn.storyviewer.components.ViewerNode
 import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoableStream}
 
 class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Saveable {
@@ -79,12 +80,22 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
    *
    * @param data The saved data
    */
-  override def onLoad(data: AstElement): Unit = ???
+  override def onLoad(data: AstElement): Unit = {
+    val nodes = data.asInstanceOf[AstMap]("nodes").asInstanceOf[AstList].elems
+    nodes foreach { n =>
+      val nodeData = n.asInstanceOf[AstMap]
+      val (id, x, y) = deserialise(nodeData)
+
+      moveNode(id, Vector2(x, y))
+    }
+
+    sizeToChildren()
+  }
 
   /**
    * Returns the data that this Saveable would like saved
    */
-  override def onSave(): AstElement = ???
+  override def onSave(): AstElement = AstMap("nodes" -> AstList(viewer.nodes.toList map serialise: _*))
 
   def sizeToChildren(): Unit = {
     val allBounds = (viewer.nodes map (_.bounds)).toList
@@ -119,5 +130,16 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
 
   def notifyNodeDeselection(id: NodeId): Unit = {
     EventBus.send(UiNodeDeselected(id, StoryViewerEventSourceIdentity))
+  }
+
+  private def serialise(n: ViewerNode) = AstMap("id" -> AstInteger(n.id.value),
+                                                "x" -> AstFloat(n.layoutX),
+                                                "y" -> AstFloat(n.layoutY))
+  private def deserialise(nodeData: AstMap) = {
+    val id = nodeData("id").asInstanceOf[AstInteger].i
+    val x = nodeData("x").asInstanceOf[AstFloat].f
+    val y = nodeData("y").asInstanceOf[AstFloat].f
+
+    (NodeId(id), x, y)
   }
 }
