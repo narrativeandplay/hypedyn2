@@ -154,6 +154,9 @@ object CoreEventDispatcher {
   }
 
   EventBus.NewStoryRequests foreach { _ => EventBus.send(NewStoryResponse(CoreEventSourceIdentity)) }
+  EventBus.EditStoryPropertiesRequests foreach { _ =>
+    EventBus.send(EditStoryPropertiesResponse(StoryController.story, CoreEventSourceIdentity))
+  }
   EventBus.CreateStoryEvents foreach { evt =>
     StoryController.newStory(evt.title, evt.author, evt.desc)
 
@@ -162,6 +165,11 @@ object CoreEventDispatcher {
     UndoController.clearHistory()
 
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
+  }
+  EventBus.UpdateStoryPropertiesEvents foreach { evt =>
+    StoryController.editStory(evt.title, evt.author, evt.description)
+
+    EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
   }
 
   EventBus.UndoRequests foreach { _ => EventBus.send(UndoResponse(CoreEventSourceIdentity)) }

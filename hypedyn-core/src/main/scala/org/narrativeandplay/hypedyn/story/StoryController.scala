@@ -22,6 +22,12 @@ object StoryController {
     currentStory = new Story(title, author, description)
   }
 
+  def editStory(title: String, author: String, description: String): Unit = {
+    currentStory = currentStory rename title
+    currentStory = currentStory changeAuthor author
+    currentStory = currentStory changeDescription description
+  }
+
   def load(story: Story): Unit = {
     currentStory = story
     firstUnusedNodeId = story.nodes map (_.id) reduceOption (_ max _) map (_.inc) getOrElse NodeId(0)
