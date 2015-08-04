@@ -65,12 +65,12 @@ object CoreEventDispatcher {
   EventBus.DestroyNodeEvents foreach { evt =>
     val destroyed = StoryController.destroy(evt.node)
 
-    destroyed foreach { n =>
+    destroyed foreach { case (destroyedNode, changedNodes) =>
       if (evt.src != UndoEventSourceIdentity) {
-        UndoableStream.send(new NodeDestroyedChange(n))
+        UndoableStream.send(new NodeDestroyedChange(destroyedNode, changedNodes))
       }
 
-      EventBus.send(NodeDestroyed(n, CoreEventSourceIdentity))
+      EventBus.send(NodeDestroyed(destroyedNode, CoreEventSourceIdentity))
     }
   }
 
