@@ -17,7 +17,7 @@ object Menubar extends MenuBar {
    * File Menu
    */
   private lazy val fileMenu = new Menu("File") {
-    items.addAll(newStory, openStory, saveStory, saveAs, new SeparatorMenuItem(), exit)
+    items.addAll(newStory, openStory, saveStory, saveAs, new SeparatorMenuItem(), editStoryProperties, new SeparatorMenuItem(), exit)
   }
 
   private lazy val newStory = new MenuItem("New") {
@@ -50,6 +50,10 @@ object Menubar extends MenuBar {
     onAction = { ae: ActionEvent =>
       UiEventDispatcher.requestSaveAs()
     }
+  }
+
+  private lazy val editStoryProperties = new MenuItem("Properties") {
+    onAction = { _ => UiEventDispatcher.requestEditStoryProperties() }
   }
 
   private lazy val exit = new MenuItem("Exit") {

@@ -89,6 +89,13 @@ object UiEventDispatcher {
   }
 
   EventBus.NewStoryResponses foreach { _ => EventBus.send(CreateStory(src = UiEventSourceIdentity)) }
+  EventBus.EditStoryPropertiesResponses foreach { evt =>
+    val editedProperties = Main.storyPropertiesEditor(evt.story).showAndWait()
+
+    editedProperties foreach { case (title, author, desc) =>
+      EventBus.send(UpdateStoryProperties(title, author, desc, UiEventSourceIdentity))
+    }
+  }
 
   EventBus.UiNodeSelectedEvents foreach { evt => selectedNode = Some(evt.id) }
   EventBus.UiNodeDeselectedEvents foreach { _ => selectedNode = None }
@@ -123,6 +130,9 @@ object UiEventDispatcher {
 
   def requestNewStory(): Unit = {
     EventBus.send(NewStoryRequest(UiEventSourceIdentity))
+  }
+  def requestEditStoryProperties(): Unit = {
+    EventBus.send(EditStoryPropertiesRequest(UiEventSourceIdentity))
   }
 
   def requestSave(): Unit = {

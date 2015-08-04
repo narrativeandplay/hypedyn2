@@ -7,7 +7,7 @@ import scalafx.scene.Scene
 import scalafx.scene.image.Image
 import scalafx.scene.layout.{VBox, BorderPane}
 
-import org.narrativeandplay.hypedyn.dialogs.{NodeEditor, FactEditor, FileDialog}
+import org.narrativeandplay.hypedyn.dialogs.{StoryPropertiesDialog, NodeEditor, FactEditor, FileDialog}
 import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
@@ -40,6 +40,7 @@ object Main extends JFXApp {
     new FactEditor(dialogTitle, availableFactTypes, factToEdit, stage)
   def factEditor(dialogTitle: String, availableFactTypes: List[String]) =
     new FactEditor(dialogTitle, availableFactTypes, stage)
+  def storyPropertiesEditor(story: Narrative) = new StoryPropertiesDialog(story, stage)
 
   stage = new PrimaryStage {
     title = "HypeDyn"
