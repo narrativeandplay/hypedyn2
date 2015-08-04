@@ -44,6 +44,7 @@ object EventBus {
   val PasteNodeRequests = eventBus collect { case e: PasteNodeRequest => e }
 
   val NewStoryRequests = eventBus collect { case e: NewStoryRequest => e }
+  val EditStoryPropertiesRequests = eventBus collect { case e: EditStoryPropertiesRequest => e }
 
   val UndoRequests = eventBus collect { case e: UndoRequest => e }
   val RedoRequests = eventBus collect { case e: RedoRequest => e }
@@ -71,6 +72,7 @@ object EventBus {
   val PasteNodeResponses = eventBus collect { case e: PasteNodeResponse => e }
 
   val NewStoryResponses = eventBus collect { case e: NewStoryResponse => e }
+  val EditStoryPropertiesResponses = eventBus collect { case e: EditStoryPropertiesResponse => e }
 
   val UndoResponses = eventBus collect { case e: UndoResponse => e }
   val RedoResponses = eventBus collect { case e: RedoResponse => e }
@@ -94,6 +96,7 @@ object EventBus {
   val LoadFromFileEvents = eventBus collect { case e: LoadFromFile => e }
 
   val CreateStoryEvents = eventBus collect { case e: CreateStory => e }
+  val UpdateStoryPropertiesEvents = eventBus collect { case e: UpdateStoryProperties => e }
 
 
   /**
@@ -110,6 +113,7 @@ object EventBus {
   val FactDestroyedEvents = eventBus collect { case e: FactDestroyed => e }
 
   val StorySavedEvents = eventBus collect { case e: StorySaved => e }
+  val StoryUpdatedEvents = eventBus collect { case e: StoryUpdated => e }
   val StoryLoadedEvents = eventBus collect { case e: StoryLoaded => e }
   val DataLoadedEvents = eventBus collect { case e: DataLoaded => e }
 

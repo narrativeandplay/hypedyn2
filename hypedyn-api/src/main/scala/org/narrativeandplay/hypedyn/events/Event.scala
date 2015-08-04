@@ -53,6 +53,7 @@ sealed case class CopyNodeRequest(id: NodeId, src: String) extends Request
 sealed case class PasteNodeRequest(src: String) extends Request
 
 sealed case class NewStoryRequest(src: String) extends Request
+sealed case class EditStoryPropertiesRequest(src: String) extends Request
 
 sealed case class UndoRequest(src: String) extends Request
 sealed case class RedoRequest(src: String) extends Request
@@ -81,6 +82,7 @@ sealed case class CopyNodeResponse(node: Nodal, src: String) extends Response
 sealed case class PasteNodeResponse(src: String) extends Response
 
 sealed case class NewStoryResponse(src: String) extends Response
+sealed case class EditStoryPropertiesResponse(story: Narrative, src: String) extends Response
 
 sealed case class UndoResponse(src: String) extends Response
 sealed case class RedoResponse(src: String) extends Response
@@ -108,6 +110,7 @@ sealed case class CreateStory(title: String = "Untitled",
                               author: String = "",
                               desc: String = "",
                               src: String) extends Action
+sealed case class UpdateStoryProperties(title: String, author: String, description: String, src: String) extends Action
 
 
 /**
@@ -126,6 +129,7 @@ sealed case class FactDestroyed(fact: Fact, src: String) extends Completion
 
 sealed case class StorySaved(src: String) extends Completion
 sealed case class StoryLoaded(story: Narrative, src: String) extends Completion
+sealed case class StoryUpdated(story: Narrative, src: String) extends Completion
 sealed case class DataLoaded(data: Map[String, AstElement], src: String) extends Completion
 
 sealed case class UiNodeSelected(id: NodeId, src: String) extends Completion
