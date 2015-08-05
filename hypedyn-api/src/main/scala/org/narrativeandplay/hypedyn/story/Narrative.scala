@@ -19,6 +19,11 @@ trait Narrative extends NarrativeElement[Narrative] {
   def description: String
 
   /**
+   * Returns the metadata of the story
+   */
+  def metadata: Narrative.Metadata
+
+  /**
    * Returns the nodes contained in the story
    */
   def nodes: List[Nodal]
@@ -32,4 +37,21 @@ trait Narrative extends NarrativeElement[Narrative] {
    * Returns the story-level rules
    */
   def rules: List[RuleLike]
+}
+
+object Narrative {
+  trait Metadata {
+    def comments: String
+
+    def readerStyle: ReaderStyle
+    def isBackButtonDisabled: Boolean
+    def isRestartButtonDisabled: Boolean
+  }
+
+  sealed trait ReaderStyle
+  object ReaderStyle {
+    case object Standard extends ReaderStyle
+    case object Fancy extends ReaderStyle
+    case class Custom(cssFilePath: String) extends ReaderStyle
+  }
 }
