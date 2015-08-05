@@ -2,6 +2,7 @@ package org.narrativeandplay.hypedyn.story
 
 import scala.language.implicitConversions
 
+import org.narrativeandplay.hypedyn.story.internal.Story.Metadata
 import org.narrativeandplay.hypedyn.story.internal.{Story, NodeContent, Node}
 import org.narrativeandplay.hypedyn.story.rules.{Conditional, Actionable, RuleLike}
 import org.narrativeandplay.hypedyn.story.rules.internal.{Condition, Action, Rule}
@@ -30,9 +31,12 @@ object InterfaceToImplementationConversions {
                                                      nodalContent2NodeContent(nodal.content),
                                                      nodal.isStartNode,
                                                      nodal.rules map ruleLike2Rule)
+  implicit def narrativeMetadata2StoryMetadata(metadata: Narrative.Metadata): Story.Metadata =
+    new Metadata(metadata.comments, metadata.readerStyle, metadata.isBackButtonDisabled, metadata.isRestartButtonDisabled)
   implicit def narrative2Story(narrative: Narrative): Story = Story(narrative.title,
                                                                     narrative.author,
                                                                     narrative.description,
+                                                                    narrative.metadata,
                                                                     narrative.nodes map nodal2Node,
                                                                     narrative.facts,
                                                                     narrative.rules map ruleLike2Rule)
