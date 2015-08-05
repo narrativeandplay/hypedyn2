@@ -1,6 +1,8 @@
 package org.narrativeandplay.hypedyn.serialisation
 
-import org.narrativeandplay.hypedyn.story.{NodalContent, NodeId}
+import org.narrativeandplay.hypedyn.story.Narrative.ReaderStyle
+import org.narrativeandplay.hypedyn.story.internal.Story.Metadata
+import org.narrativeandplay.hypedyn.story.{Narrative, NodalContent, NodeId}
 import org.narrativeandplay.hypedyn.story.internal.NodeContent.Ruleset
 import org.narrativeandplay.hypedyn.story.internal.{NodeContent, Story, Node}
 import org.narrativeandplay.hypedyn.story.rules._
@@ -50,6 +52,7 @@ package object serialisers {
       AstMap("title" -> AstString(story.title),
              "author" -> AstString(story.author),
              "description" -> AstString(story.description),
+             "metadata" -> StoryMetadataSerialiser.serialise(story.metadata),
              "nodes" -> AstList(story.nodes map NodeSerialiser.serialise: _*),
              "facts" -> AstList(story.facts map FactSerialiser.serialise: _*),
              "rules" -> AstList(story.rules map RuleSerialiser.serialise: _*))
@@ -64,11 +67,12 @@ package object serialisers {
       val title = data("title").asInstanceOf[AstString].s
       val author = data("author").asInstanceOf[AstString].s
       val description = data("description").asInstanceOf[AstString].s
+      val metadata = StoryMetadataSerialiser.deserialise(data("metadata"))
       val nodes = data("nodes").asInstanceOf[AstList].toList map NodeSerialiser.deserialise
       val facts = data("facts").asInstanceOf[AstList].toList map FactSerialiser.deserialise
       val rules = data("rules").asInstanceOf[AstList].toList map RuleSerialiser.deserialise
 
-      new Story(title, author, description, nodes, facts, rules)
+      new Story(title, author, description, metadata, nodes, facts, rules)
     }
   }
 
@@ -283,6 +287,57 @@ package object serialisers {
                           value.asInstanceOf[AstList].toList map deserialise map (_.asInstanceOf[BooleanFact]))
         case (factType, value) => throw DeserialisationException(s"Unknown fact type: $factType with value: $value")
       }
+    }
+  }
+
+  implicit object StoryMetadataSerialiser extends Serialisable[Story.Metadata] {
+    /**
+     * Returns the serialised representation of an object
+     *
+     * @param t The object to serialise
+     */
+    override def serialise(t: Metadata): AstElement = AstMap("comments" -> AstString(t.comments),
+                                                             "readerStyle" -> ReaderStyleSerialiser.serialise(t.readerStyle),
+                                                             "backDisabled" -> AstBoolean(t.isBackButtonDisabled),
+                                                             "restartDisabled" -> AstBoolean(t.isRestartButtonDisabled))
+
+    /**
+     * Returns an object given it's serialised representation
+     *
+     * @param serialised The serialised form of the object
+     */
+    override def deserialise(serialised: AstElement): Metadata = {
+      val data = serialised.asInstanceOf[AstMap]
+      val comments = data("comments").asInstanceOf[AstString].s
+      val readerStyle = ReaderStyleSerialiser deserialise data("readerStyle")
+      val backDisabled = data("backDisabled").asInstanceOf[AstBoolean].boolean
+      val restartDisabled = data("restartDisabled").asInstanceOf[AstBoolean].boolean
+
+      Story.Metadata(comments, readerStyle, backDisabled, restartDisabled)
+    }
+  }
+
+  implicit object ReaderStyleSerialiser extends Serialisable[Narrative.ReaderStyle] {
+    /**
+     * Returns the serialised representation of an object
+     *
+     * @param t The object to serialise
+     */
+    override def serialise(t: ReaderStyle): AstElement = t match {
+      case Narrative.ReaderStyle.Standard => AstString("standard")
+      case Narrative.ReaderStyle.Fancy => AstString("fancy")
+      case Narrative.ReaderStyle.Custom(file) => AstString(file)
+    }
+
+    /**
+     * Returns an object given it's serialised representation
+     *
+     * @param serialised The serialised form of the object
+     */
+    override def deserialise(serialised: AstElement): ReaderStyle = serialised.asInstanceOf[AstString].s match {
+      case "standard" => Narrative.ReaderStyle.Standard
+      case "fancy" => Narrative.ReaderStyle.Fancy
+      case file => Narrative.ReaderStyle.Custom(file)
     }
   }
 }
