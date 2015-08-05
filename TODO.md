@@ -8,6 +8,7 @@ TODO:
 - Move condition/action definitions into a plugin
 - ~~Create collapsible split pane~~
     - ~~Add hiding of rule panes, ruleset list to node editor~~
-- Edit story properties (title, author, description)
+- ~~Edit story properties (title, author, description)~~
+- Edit story start node
 - Story reader
     - Add story export
