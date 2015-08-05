@@ -1,6 +1,7 @@
 package org.narrativeandplay.hypedyn.story
 
 import org.narrativeandplay.hypedyn.story.internal.NodeContent.Ruleset
+import org.narrativeandplay.hypedyn.story.internal.Story.Metadata
 import org.narrativeandplay.hypedyn.story.internal.{NodeContent, Node, Story}
 import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions._
 import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamValue, ParamName}
@@ -22,10 +23,12 @@ object StoryController {
     currentStory = new Story(title, author, description)
   }
 
-  def editStory(title: String, author: String, description: String): Unit = {
+  def editStory(title: String, author: String, description: String, metadata: Narrative.Metadata): Unit = {
     currentStory = currentStory rename title
     currentStory = currentStory changeAuthor author
     currentStory = currentStory changeDescription description
+    currentStory = currentStory updateMetadata metadata
+
   }
 
   def load(story: Story): Unit = {

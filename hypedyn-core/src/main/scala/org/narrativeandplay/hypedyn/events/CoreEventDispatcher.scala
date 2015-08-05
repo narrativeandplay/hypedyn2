@@ -167,7 +167,7 @@ object CoreEventDispatcher {
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
   }
   EventBus.UpdateStoryPropertiesEvents foreach { evt =>
-    StoryController.editStory(evt.title, evt.author, evt.description)
+    StoryController.editStory(evt.title, evt.author, evt.description, evt.metadata)
 
     EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
   }
