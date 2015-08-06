@@ -54,9 +54,9 @@ object CoreEventDispatcher {
   EventBus.UpdateNodeEvents foreach { evt =>
     val updatedUnupdatedPair = StoryController.update(evt.node, evt.updatedNode)
 
-    updatedUnupdatedPair foreach { case (unupdated, updated) =>
+    updatedUnupdatedPair foreach { case (unupdated, updated, changedStartNodeOption) =>
       if (evt.src != UndoEventSourceIdentity) {
-        UndoableStream.send(new NodeUpdatedChange(unupdated, updated))
+        UndoableStream.send(new NodeUpdatedChange(unupdated, updated, changedStartNodeOption))
       }
 
       EventBus.send(NodeUpdated(unupdated, updated, CoreEventSourceIdentity))

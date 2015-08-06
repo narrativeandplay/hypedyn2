@@ -66,8 +66,20 @@ object StoryController {
     newNode
   }
 
-  def update(node: Nodal, editedNode: Nodal): Option[(Node, Node)] = {
-    val editedNodeContent = NodeContent(editedNode.content.text, editedNode.content.rulesets map { rulesetLike =>
+  def update(node: Nodal, editedNode: Nodal): Option[(Node, Node, Option[(Node, Node)])] = {
+    val updatedOldStartNodeOption = if (editedNode.isStartNode) {
+      currentStory.nodes find (_.isStartNode) flatMap { oldStartNode =>
+        updateNode(oldStartNode, oldStartNode.copy(isStartNode = false))
+      }
+    } else None
+
+    val updatedNode = updateNode(node, editedNode)
+
+    updatedNode map { case (unupdated, updated) => (unupdated, updated, updatedOldStartNodeOption) }
+  }
+
+  private def updateNode(node: Nodal, updatedNode: Nodal): Option[(Node, Node)] = {
+    val editedNodeContent = NodeContent(updatedNode.content.text, updatedNode.content.rulesets map { rulesetLike =>
       val ruleset = rulesetLike.copy(id = if (rulesetLike.id.isValid) rulesetLike.id else firstUnusedRulesetId,
                                      rules = rulesetLike.rules map { rule =>
                                        val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
@@ -77,18 +89,20 @@ object StoryController {
       firstUnusedRulesetId = firstUnusedRulesetId max ruleset.id.inc
       ruleset
     })
-    val editedNodeRules = editedNode.rules map { rule =>
+    val updatedNodeRules = updatedNode.rules map { rule =>
       val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
       firstUnusedRuleId = firstUnusedRuleId max r.id.inc
       r
     }
 
-    val toUpdate = findNode(node.id)
-    val updated = new Node(editedNode.id, editedNode.name, editedNodeContent, editedNode.isStartNode, editedNodeRules)
+    val toUpdateOption = findNode(node.id)
+    val updated = new Node(updatedNode.id, updatedNode.name, editedNodeContent, updatedNode.isStartNode, updatedNodeRules)
 
-    toUpdate foreach { n => currentStory = currentStory updateNode (n, updated) }
+    toUpdateOption foreach { n =>
+      currentStory = currentStory updateNode (n, updated)
+    }
 
-    toUpdate map ((_, updated))
+    toUpdateOption map ((_, updated))
   }
 
   def destroy(node: Nodal): Option[(Node, Map[Node, Node])] = {

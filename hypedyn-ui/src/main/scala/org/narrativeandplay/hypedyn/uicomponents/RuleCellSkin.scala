@@ -7,7 +7,7 @@ import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control._
-import scalafx.scene.layout.{StackPane, HBox}
+import scalafx.scene.layout.{Priority, StackPane, HBox}
 import scalafx.util.StringConverter
 import scalafx.scene.Parent.sfxParent2jfx
 
@@ -30,9 +30,9 @@ class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
   }
   lazy val ruleNameField = new HBox {
     children += new TextField() {
-      prefWidth = 400
-
       text <==> cell.rule.nameProperty
+
+      HBox.setHgrow(this, Priority.Always)
     }
     children += new StackPane {
       padding = Insets(0, 0, 0, 10)

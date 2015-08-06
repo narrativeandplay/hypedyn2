@@ -1,5 +1,6 @@
 package org.narrativeandplay.hypedyn.storyviewer.components
 
+import javafx.beans.binding.BooleanExpression
 import javafx.{event => jfxe}
 import javafx.event.EventHandler
 import javafx.scene.control.{Control => JfxControl, Skin}
@@ -32,7 +33,7 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
   val nodeName = EasyBind map (_node, (_: Nodal).name)
   val contentText = EasyBind map (_node, (_: Nodal).content.text)
   val selected = BooleanProperty(false)
-  val isAnywhere = EasyBind map (_node, { n: Nodal => Boolean box n.isAnywhere })
+  val isAnywhere = BooleanExpression.booleanExpression(EasyBind map (_node, { n: Nodal => Boolean box n.isAnywhere }))
 
   width = ViewerNode.Width
   height = ViewerNode.Height
