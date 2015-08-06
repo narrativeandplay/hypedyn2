@@ -9,6 +9,7 @@ TODO:
 - ~~Create collapsible split pane~~
     - ~~Add hiding of rule panes, ruleset list to node editor~~
 - ~~Edit story properties (title, author, description)~~
-- Edit story start node
+- ~~Edit story start node~~
+- ~~Set rule to stop if true~~
 - Story reader
     - Add story export
