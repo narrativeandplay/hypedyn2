@@ -71,6 +71,8 @@ class NodeEditor private (dialogTitle: String,
     text <==> node.nameProperty
   }
   val startNodeCheckbox = new CheckBox("Start node") {
+    allowIndeterminate = false
+
     selected <==> node.isStartNodeProperty
     disable <== selected
   }
