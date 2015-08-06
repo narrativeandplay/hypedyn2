@@ -21,6 +21,7 @@ object InterfaceToUiImplementation {
 
   implicit def ruleLike2UiRule(ruleLike: RuleLike): UiRule = new UiRule(ruleLike.id,
                                                                         ruleLike.name,
+                                                                        ruleLike.stopIfTrue,
                                                                         ruleLike.conditionsOp,
                                                                         ruleLike.conditions,
                                                                         ruleLike.actions)

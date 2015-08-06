@@ -42,7 +42,7 @@ package object clipboard {
                      rules = ruleset.rules map (_.copy(id = RuleId(-1))))
       })
       val nodeRules = t.rules map { rule =>
-        Rule(RuleId(-1), rule.name, rule.conditionsOp, rule.conditions, rule.actions)
+        rule.copy(id = RuleId(-1))
       }
       val node = Node(NodeId(-1), t.name, nodeContent, isStartNode = false, nodeRules)
       clipboardContent.put(NodeDataFormat, node)

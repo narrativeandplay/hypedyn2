@@ -10,6 +10,7 @@ import org.narrativeandplay.hypedyn.story.rules.internal.{Condition, Action, Rul
 object InterfaceToImplementationConversions {
   implicit def ruleLike2Rule(ruleLike: RuleLike): Rule = Rule(ruleLike.id,
                                                               ruleLike.name,
+                                                              ruleLike.stopIfTrue,
                                                               ruleLike.conditionsOp,
                                                               ruleLike.conditions map conditional2Condition,
                                                               ruleLike.actions map actionable2Action)

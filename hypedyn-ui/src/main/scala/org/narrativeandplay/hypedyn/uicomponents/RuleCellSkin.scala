@@ -28,20 +28,23 @@ class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
     children += actionsNode
     children += new TreeItem[String]("", addActionButton)
   }
-  lazy val ruleNameField = new HBox {
+  lazy val ruleNameField = new HBox(10) {
+    alignment = Pos.CenterLeft
+
     children += new TextField() {
       text <==> cell.rule.nameProperty
 
       HBox.setHgrow(this, Priority.Always)
     }
-    children += new StackPane {
-      padding = Insets(0, 0, 0, 10)
-
-      children += new Button("-") {
-        onAction = { _ =>
-          cell.ruleList -= cell.rule
-        }
+    children += new Button("-") {
+      onAction = { _ =>
+        cell.ruleList -= cell.rule
       }
+    }
+    children += new CheckBox("Stop if true") {
+      allowIndeterminate = false
+
+      selected <==> cell.rule.stopIfTrueProperty
     }
   }
   lazy val conditionsNode = new TreeItem[String]("") {

@@ -144,6 +144,7 @@ package object serialisers {
     override def serialise(rule: Rule): AstElement =
       AstMap("id" -> AstInteger(rule.id.value),
              "name" -> AstString(rule.name),
+             "stopIfTrue" -> AstBoolean(rule.stopIfTrue),
              "conditionsOp" -> AstString(rule.conditionsOp match {
                                            case And => "and"
                                            case Or => "or"
@@ -160,6 +161,7 @@ package object serialisers {
       val data = serialised.asInstanceOf[AstMap]
       val id = RuleId(data("id").asInstanceOf[AstInteger].i)
       val name = data("name").asInstanceOf[AstString].s
+      val stopIfTrue = data("stopIfTrue").asInstanceOf[AstBoolean].boolean
       val conditionsOp = data("conditionsOp").asInstanceOf[AstString].s match {
         case "and" => And
         case "or" => Or
@@ -168,7 +170,7 @@ package object serialisers {
       val conditions = data("conditions").asInstanceOf[AstList].toList map ConditionSerialiser.deserialise
       val actions = data("actions").asInstanceOf[AstList].toList map ActionSerialiser.deserialise
 
-      Rule(id, name, conditionsOp, conditions, actions)
+      Rule(id, name, stopIfTrue, conditionsOp, conditions, actions)
     }
   }
 
