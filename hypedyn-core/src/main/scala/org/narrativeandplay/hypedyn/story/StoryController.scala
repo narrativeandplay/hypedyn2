@@ -126,7 +126,7 @@ object StoryController {
           val modifiedActions = rule.actions filterNot { action => action.params.values.toList contains ParamValue(toDestroy.id.value.toString()) }
           val modifiedConditions = rule.conditions filterNot { action => action.params.values.toList contains ParamValue(toDestroy.id.value.toString()) }
 
-          new Rule(rule.id, rule.name, rule.conditionsOp, modifiedConditions, modifiedActions)
+          rule.copy(conditions = modifiedConditions, actions = modifiedActions)
         }
 
         val modifiedRulesets = node.content.rulesets map { ruleset =>
@@ -134,7 +134,7 @@ object StoryController {
             val modifiedActions = rule.actions filterNot { action => action.params.values.toList contains ParamValue(toDestroy.id.value.toString()) }
             val modifiedConditions = rule.conditions filterNot { action => action.params.values.toList contains ParamValue(toDestroy.id.value.toString()) }
 
-            new Rule(rule.id, rule.name, rule.conditionsOp, modifiedConditions, modifiedActions)
+            rule.copy(conditions = modifiedConditions, actions = modifiedActions)
           }
 
           new Ruleset(ruleset.id, ruleset.name, ruleset.indexes, modifiedRules)
