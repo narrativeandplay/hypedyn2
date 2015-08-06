@@ -70,6 +70,10 @@ class NodeEditor private (dialogTitle: String,
   val nodeNameField = new TextField() {
     text <==> node.nameProperty
   }
+  val startNodeCheckbox = new CheckBox("Start node") {
+    selected <==> node.isStartNodeProperty
+    disable <== selected
+  }
   val textRulesTable = new TableView[UiNodeContent.UiRuleset] {
     val tableWidth = width
 
@@ -339,9 +343,14 @@ class NodeEditor private (dialogTitle: String,
   val contentPane = new BorderPane() {
     center = new VBox() {
       children += new Label("Name:")
-      children += new StackPane {
+      children += new HBox(10) {
         padding = Insets(5, 0, 5, 0)
+        alignment = Pos.CenterLeft
+
         children += nodeNameField
+        children += startNodeCheckbox
+
+        HBox.setHgrow(nodeNameField, Priority.Always)
       }
       children += mainContentPane
     }
