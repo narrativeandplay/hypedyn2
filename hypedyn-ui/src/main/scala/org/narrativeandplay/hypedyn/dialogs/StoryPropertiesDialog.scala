@@ -44,9 +44,9 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
 
     content = new MigPane("fill") {
       add(new Label("Title: "))
-      add(titleField, "wrap")
+      add(titleField, "growx, wrap")
       add(new Label("Author: "))
-      add(authorField, "wrap")
+      add(authorField, "growx, wrap")
       add(new Label("Description: "))
       add(descriptionArea, "wrap")
       add(new Label("Comments: "))
@@ -80,7 +80,7 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
         children += customRadio
       }, "wrap")
       add(customCssFileSelector, "wrap")
-      add(new control.Separator(Orientation.HORIZONTAL), "wrap")
+      add(new control.Separator(Orientation.HORIZONTAL), "growx, wrap")
       add(new Label("Control"), "wrap")
       add(backDisabledCheckbox, "wrap")
       add(restartDisabledCheckbox)
