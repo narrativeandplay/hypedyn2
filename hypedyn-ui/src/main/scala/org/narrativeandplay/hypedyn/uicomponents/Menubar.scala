@@ -1,9 +1,16 @@
 package org.narrativeandplay.hypedyn.uicomponents
 
+import java.lang
+import javafx.beans.value.ObservableValue
+import javafx.scene.Scene
+import javafx.stage.Window
+
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.event.ActionEvent
 import scalafx.scene.control.{Menu, MenuBar, MenuItem, SeparatorMenuItem}
+
+import org.fxmisc.easybind.EasyBind
 
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 import org.narrativeandplay.hypedyn.keycombinations.KeyCombinations
@@ -12,6 +19,15 @@ import org.narrativeandplay.hypedyn.utils.System
 object Menubar extends MenuBar {
   useSystemMenuBar = true
   menus.addAll(fileMenu, editMenu, helpMenu)
+
+  class MenuItem(name: String) extends scalafx.scene.control.MenuItem(name) {
+    // Disable the menu items when the main window is not being selected,effectively preventing the shortcuts from
+    // propagating to node editor windows. Due to annoying conversions and interplays between ScalaFX and JavaFX,
+    // all casting has to be done on the JavaFX delegates of the ScalaFX properties
+    disable <== EasyBind select scene select { s: Scene => s.window.delegate.asInstanceOf[ObservableValue[Window]] } selectObject { w: Window =>
+      (!w.focused).delegate.asInstanceOf[ObservableValue[lang.Boolean]]
+    }
+  }
 
   /**
    * File Menu
