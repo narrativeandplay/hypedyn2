@@ -96,7 +96,7 @@ object StoryController {
     }
 
     val toUpdateOption = findNode(node.id)
-    val updated = new Node(updatedNode.id, updatedNode.name, editedNodeContent, updatedNode.isStartNode, updatedNodeRules)
+    val updated = updatedNode.copy(content = editedNodeContent)
 
     toUpdateOption foreach { n =>
       currentStory = currentStory updateNode (n, updated)
@@ -109,7 +109,7 @@ object StoryController {
     val toDestroyOption = findNode(node.id)
 
     toDestroyOption foreach { toDestroy => currentStory = currentStory removeNode toDestroy }
-    val retVal = toDestroyOption map { toDestroy =>
+    val destroyedNodeChangedNodesOption = toDestroyOption map { toDestroy =>
       val nodesToEdit = currentStory.nodes filter { node =>
         val nodeActionsReferenceToDestroy = node.rules flatMap (_.actions) flatMap (_.params get ParamName("node")) contains ParamValue(toDestroy.id.value.toString())
         val nodeConditionsReferenceToDestroy = node.rules flatMap (_.conditions) flatMap (_.params get ParamName("node")) contains ParamValue(toDestroy.id.value.toString())
@@ -137,10 +137,10 @@ object StoryController {
             rule.copy(conditions = modifiedConditions, actions = modifiedActions)
           }
 
-          new Ruleset(ruleset.id, ruleset.name, ruleset.indexes, modifiedRules)
+          ruleset.copy(rules = modifiedRules)
         }
 
-        node -> new Node(node.id, node.name, new NodeContent(node.content.text, modifiedRulesets), node.isStartNode, modifiedNodeRules)
+        node -> node.copy(content = node.content.copy(rulesets = modifiedRulesets), rules = modifiedNodeRules)
       }
 
       editedNodePairs foreach { case (unedited, edited) =>
@@ -150,7 +150,7 @@ object StoryController {
       (toDestroy, editedNodePairs.toMap)
     }
 
-    retVal
+    destroyedNodeChangedNodesOption
   }
 
   def create(fact: Fact): Fact = {
