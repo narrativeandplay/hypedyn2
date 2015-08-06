@@ -11,5 +11,6 @@ TODO:
 - ~~Edit story properties (title, author, description)~~
 - ~~Edit story start node~~
 - ~~Set rule to stop if true~~
+- Add logging system
 - Story reader
     - Add story export
