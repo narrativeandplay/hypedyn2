@@ -3,6 +3,7 @@ package org.narrativeandplay.hypedyn.story.rules
 trait RuleLike {
   def id: RuleId
   def name: String
+  def stopIfTrue: Boolean
   def conditionsOp: BooleanOperator
   def conditions: List[Conditional]
   def actions: List[Actionable]
