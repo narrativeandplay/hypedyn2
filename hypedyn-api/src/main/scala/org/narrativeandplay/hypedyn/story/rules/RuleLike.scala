@@ -27,5 +27,7 @@ case class RuleId(value: BigInt) extends AnyVal with Ordered[RuleId] {
 }
 
 sealed trait BooleanOperator
-case object And extends BooleanOperator
-case object Or extends BooleanOperator
+object BooleanOperator {
+  case object And extends BooleanOperator
+  case object Or extends BooleanOperator
+}

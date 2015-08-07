@@ -1,5 +1,7 @@
 package org.narrativeandplay.hypedyn.story.rules
 
+import org.narrativeandplay.hypedyn.story.rules.ParameterValues._
+
 object ConditionDefinitions {
   import Conditional.ConditionType
 

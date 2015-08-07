@@ -11,7 +11,8 @@ import scalafx.scene.layout.{Priority, StackPane, HBox}
 import scalafx.util.StringConverter
 import scalafx.scene.Parent.sfxParent2jfx
 
-import org.narrativeandplay.hypedyn.story.rules.{Or, And, BooleanOperator}
+import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.{And, Or}
+import org.narrativeandplay.hypedyn.story.rules.BooleanOperator
 
 class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
   val rootNode = new TreeView[String]() {

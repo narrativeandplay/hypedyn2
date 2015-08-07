@@ -19,6 +19,7 @@ import scalafx.scene.Parent.sfxParent2jfx
 
 import org.fxmisc.easybind.EasyBind
 
+import org.narrativeandplay.hypedyn.story.rules.ParameterValues._
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
 import org.narrativeandplay.hypedyn.story._

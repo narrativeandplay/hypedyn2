@@ -39,6 +39,8 @@ sealed case class ActionDefinition(actionType: Actionable.ActionType,
                                    parameters: List[RuleParameter])
 
 sealed trait ActionLocationType
-case object NodeAction extends ActionLocationType
-case object NodeContentAction extends ActionLocationType
-case object StoryAction extends ActionLocationType
+object ActionLocationType {
+  case object NodeAction extends ActionLocationType
+  case object NodeContentAction extends ActionLocationType
+  case object StoryAction extends ActionLocationType
+}

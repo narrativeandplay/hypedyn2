@@ -10,6 +10,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Insets
 import scalafx.scene.control._
 
+import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.Or
 import org.narrativeandplay.hypedyn.story.{UiStory, UiRule}
 import org.narrativeandplay.hypedyn.story.rules._
 

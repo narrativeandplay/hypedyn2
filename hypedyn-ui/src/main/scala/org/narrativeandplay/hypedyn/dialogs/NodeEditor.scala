@@ -23,6 +23,7 @@ import org.narrativeandplay.hypedyn.dialogs.NodeEditor.LinkStyleInfo
 import org.narrativeandplay.hypedyn.story.NodalContent.{RulesetId, TextIndex, RulesetIndexes}
 import org.narrativeandplay.hypedyn.story.UiNodeContent.UiRuleset
 import org.narrativeandplay.hypedyn.story._
+import org.narrativeandplay.hypedyn.story.rules.ActionLocationType.{NodeAction, NodeContentAction}
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.uicomponents.RulesPane
