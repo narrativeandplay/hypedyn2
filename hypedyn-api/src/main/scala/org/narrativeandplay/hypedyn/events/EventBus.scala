@@ -2,6 +2,14 @@ package org.narrativeandplay.hypedyn.events
 
 import rx.lang.scala.subjects.{PublishSubject, SerializedSubject}
 
+/**
+ * The object managing the event stream of the application
+ *
+ * All events are sent to this event bus, and all events can be obtained from this bus by tapping
+ * into one of its event streams. Each event type gets one stream.
+ *
+ * TODO: Use a compile-time macro or something to automatically generate event streams by reading the list of events
+ */
 object EventBus {
   private val eventBus = SerializedSubject(PublishSubject[Event]())
 

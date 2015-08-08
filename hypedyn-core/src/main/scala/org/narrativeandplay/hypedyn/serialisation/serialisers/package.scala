@@ -2,6 +2,7 @@ package org.narrativeandplay.hypedyn.serialisation
 
 import org.narrativeandplay.hypedyn.story.Narrative.ReaderStyle
 import org.narrativeandplay.hypedyn.story.internal.Story.Metadata
+import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.{And, Or}
 import org.narrativeandplay.hypedyn.story.{Narrative, NodalContent, NodeId}
 import org.narrativeandplay.hypedyn.story.internal.NodeContent.Ruleset
 import org.narrativeandplay.hypedyn.story.internal.{NodeContent, Story, Node}

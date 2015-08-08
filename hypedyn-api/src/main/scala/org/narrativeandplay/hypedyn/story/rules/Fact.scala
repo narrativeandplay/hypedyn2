@@ -1,7 +1,17 @@
 package org.narrativeandplay.hypedyn.story.rules
 
+/**
+ * An interface for a fact
+ */
 sealed trait Fact {
+  /**
+   * Returns the ID of the fact
+   */
   def id: FactId
+
+  /**
+   * Returns the name of the fact
+   */
   def name: String
 
   override def hashCode(): Int = id.hashCode()
@@ -33,11 +43,28 @@ sealed case class IntegerFactList(id: FactId, name: String, initialFacts: List[I
 sealed case class StringFactList(id: FactId, name: String, initialFacts: List[StringFact]) extends Fact
 sealed case class BooleanFactList(id: FactId, name: String, initialFacts: List[BooleanFact]) extends Fact
 
+/**
+ * A value type for the ID of a fact
+ *
+ * @param value The integer value of the ID
+ */
 case class FactId(value: BigInt) extends AnyVal with Ordered[FactId] {
   override def compare(that: FactId): Int = value compare that.value
 
+  /**
+   * Returns a FactId which has it's value incremented by one from the original
+   */
   def increment = new FactId(value + 1)
+
+  /**
+   * An alias for `increment`
+   */
   def inc = increment
 
+  /**
+   * Returns true if the FactId is valid, false otherwise
+   *
+   * A valid fact id is one whose value is greater than or equal to 0
+   */
   def isValid = value >= 0
 }

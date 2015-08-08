@@ -32,6 +32,11 @@ trait Conditional {
 }
 
 object Conditional {
+
+  /**
+   * A value type that represents the type of a condition
+   * @param value The type of the condition
+   */
   case class ConditionType(value: String) extends AnyVal
 }
 

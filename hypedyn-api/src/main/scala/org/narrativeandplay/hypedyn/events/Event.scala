@@ -33,7 +33,7 @@ sealed trait Event {
 /**
  * Requests for information or signifying that the UI/plugin would like something done
  *
- * Only the UI or plugins may send Requests
+ * Generally the UI or plugins send Requests
  */
 sealed trait Request extends Event
 sealed case class NewNodeRequest(src: String) extends Request
@@ -62,7 +62,7 @@ sealed case class RedoRequest(src: String) extends Request
 /**
  * Responses to a request, either containing information, or simply being an acknowledgement of one
  *
- * Sent only by the core
+ * Generally sent by the core
  */
 sealed trait Response extends Event
 sealed case class NewNodeResponse(story: Narrative, conditionDefinitions: List[ConditionDefinition], actionDefinitions: List[ActionDefinition], src: String) extends Response
@@ -91,7 +91,7 @@ sealed case class RedoResponse(src: String) extends Response
 /**
  * Events containing the result of something having been done on the UI, resulting in a request to update something
  *
- * Sent only by the UI or plugins
+ * Generally sent by the UI or plugins
  */
 sealed trait Action extends Event
 sealed case class CreateNode(node: Nodal, src: String) extends Action
@@ -120,7 +120,7 @@ sealed case class UpdateStoryProperties(title: String,
 /**
  * Events signifying the completion of an Action, mainly to inform plugins that something has happened
  *
- * Sent only by the core
+ * Generally sent by the core
  */
 sealed trait Completion extends Event
 sealed case class NodeCreated(node: Nodal, src: String) extends Completion
