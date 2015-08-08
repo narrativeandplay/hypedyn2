@@ -242,11 +242,15 @@ class NodeEditor private (dialogTitle: String,
       spans.toList
     }
   }
-  lazy val textRulesPane = new RulesPane(conditionDefinitions,
-                                         actionDefinitions filter (_.actionLocationTypes contains NodeContentAction),
-                                         ObservableBuffer.empty,
-                                         story)
-  val nodeRulesPane = new RulesPane(conditionDefinitions,
+  lazy val textRulesPane: RulesPane = new RulesPane("Text rules",
+                                                    conditionDefinitions,
+                                                    actionDefinitions filter (_.actionLocationTypes contains NodeContentAction),
+                                                    ObservableBuffer.empty,
+                                                    story) {
+    disableAddRule <== textRulesTable.selectionModel().selectedItem.isNull
+  }
+  val nodeRulesPane = new RulesPane("Node rules",
+                                    conditionDefinitions,
                                     actionDefinitions filter (_.actionLocationTypes contains NodeAction),
                                     node.rulesProperty(),
                                     story)
@@ -297,37 +301,11 @@ class NodeEditor private (dialogTitle: String,
 
     dividerPositions = 0.3
   }
-  val textRulesVBox = new VBox {
-    children += new HBox {
-      padding = Insets(5)
-      alignment = Pos.CenterLeft
-      children += new Label("Text Rules")
-      children += new Button("Add rule") {
-        disable <== textRulesTable.selectionModel().selectedItemProperty().isNull
-        onAction = { _ => textRulesPane.addRule() }
-      }
-    }
-    children += textRulesPane
-    VBox.setVgrow(textRulesPane, Priority.Always)
-  }
-  val nodeRulesVBox = new VBox {
-    children += new HBox {
-      padding = Insets(5)
-      alignment = Pos.CenterLeft
-      children += new Label("Node Rules")
-      children += new Button("Add node rule") {
-        onAction = { _ => nodeRulesPane.addRule() }
-      }
-    }
-    children += nodeRulesPane
-
-    VBox.setVgrow(nodeRulesPane, Priority.Always)
-  }
   val textAndNodeRulesPane = new CollapsibleSplitPane {
     orientation = Orientation.HORIZONTAL
-    add(textRulesVBox)
+    add(textRulesPane)
 
-    add(nodeRulesVBox)
+    add(nodeRulesPane)
 
     dividerPositions = 0.5
   }
@@ -368,28 +346,28 @@ class NodeEditor private (dialogTitle: String,
       }
       items += new Button("Text Rules") {
         onAction = { _ =>
-          (textAndNodeRulesPane isShown textRulesVBox, mainContentPane isShown textAndNodeRulesPane) match {
+          (textAndNodeRulesPane isShown textRulesPane, mainContentPane isShown textAndNodeRulesPane) match {
             case (true, true) =>
-              if (textAndNodeRulesPane isShown nodeRulesVBox) textAndNodeRulesPane.hide(textRulesVBox) else mainContentPane.hide(textAndNodeRulesPane)
-            case (false, true) => textAndNodeRulesPane.show(textRulesVBox)
+              if (textAndNodeRulesPane isShown nodeRulesPane) textAndNodeRulesPane.hide(textRulesPane) else mainContentPane.hide(textAndNodeRulesPane)
+            case (false, true) => textAndNodeRulesPane.show(textRulesPane)
             case (true, false) => mainContentPane.show(textAndNodeRulesPane)
             case (false, false) =>
-              textAndNodeRulesPane.hide(nodeRulesVBox)
-              textAndNodeRulesPane.show(textRulesVBox)
+              textAndNodeRulesPane.hide(nodeRulesPane)
+              textAndNodeRulesPane.show(textRulesPane)
               mainContentPane.show(textAndNodeRulesPane)
           }
         }
       }
       items += new Button("Node Rules") {
         onAction = { _ =>
-          (textAndNodeRulesPane isShown nodeRulesVBox, mainContentPane isShown textAndNodeRulesPane) match {
+          (textAndNodeRulesPane isShown nodeRulesPane, mainContentPane isShown textAndNodeRulesPane) match {
             case (true, true) =>
-              if (textAndNodeRulesPane isShown textRulesVBox) textAndNodeRulesPane.hide(nodeRulesVBox) else mainContentPane.hide(textAndNodeRulesPane)
-            case (false, true) => textAndNodeRulesPane.show(nodeRulesVBox)
+              if (textAndNodeRulesPane isShown textRulesPane) textAndNodeRulesPane.hide(nodeRulesPane) else mainContentPane.hide(textAndNodeRulesPane)
+            case (false, true) => textAndNodeRulesPane.show(nodeRulesPane)
             case (true, false) => mainContentPane.show(textAndNodeRulesPane)
             case (false, false) =>
-              textAndNodeRulesPane.hide(textRulesVBox)
-              textAndNodeRulesPane.show(nodeRulesVBox)
+              textAndNodeRulesPane.hide(textRulesPane)
+              textAndNodeRulesPane.show(nodeRulesPane)
               mainContentPane.show(textAndNodeRulesPane)
           }
         }
