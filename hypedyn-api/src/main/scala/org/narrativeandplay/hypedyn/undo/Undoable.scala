@@ -2,6 +2,9 @@ package org.narrativeandplay.hypedyn.undo
 
 import java.util.Optional
 
+/**
+ * Interface for creating an undoable acton
+ */
 trait Undoable {
   /**
    * Defines what to do when an undo action happens
