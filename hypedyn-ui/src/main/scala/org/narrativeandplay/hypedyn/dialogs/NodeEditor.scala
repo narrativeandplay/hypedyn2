@@ -5,8 +5,6 @@ import javafx.event.EventHandler
 import javafx.scene.control.{TableCell => JfxTableCell, IndexRange => JfxIndexRange}
 import javafx.scene.input.{KeyCode => JfxKeyCode, KeyEvent => JfxKeyEvent}
 
-import scala.language.reflectiveCalls
-
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
@@ -19,7 +17,7 @@ import scalafx.scene.Parent.sfxParent2jfx
 import org.fxmisc.easybind.EasyBind
 import org.fxmisc.richtext.{StyleSpan, InlineStyleTextArea}
 
-import org.narrativeandplay.hypedyn.dialogs.NodeEditor.LinkStyleInfo
+import org.narrativeandplay.hypedyn.dialogs.NodeEditor.{NodeContentTextArea, LinkStyleInfo}
 import org.narrativeandplay.hypedyn.story.NodalContent.{RulesetId, TextIndex, RulesetIndexes}
 import org.narrativeandplay.hypedyn.story.UiNodeContent.UiRuleset
 import org.narrativeandplay.hypedyn.story._
@@ -209,11 +207,7 @@ class NodeEditor private (dialogTitle: String,
     editable = true
     placeholder = new Label("")
   }
-  lazy val nodeContentText = new InlineStyleTextArea[NodeEditor.LinkStyleInfo](
-    new NodeEditor.LinkStyleInfo(),
-    new Function[NodeEditor.LinkStyleInfo, String] {
-      override def apply(t: LinkStyleInfo): String = t.css
-    }) {
+  lazy val nodeContentText = new NodeContentTextArea {
     setWrapText(true)
     replaceText(node.content.text)
     node.content.rulesetsProperty() foreach { ruleset =>
@@ -229,24 +223,16 @@ class NodeEditor private (dialogTitle: String,
         updateNodeContentRulesetsIndexes()
       }
     }
-
-    def styleSpans = {
-      val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
-      getStyleSpans(0, getText.length) forEach { styleSpan => spans += styleSpan }
-      spans.toList
-    }
-
-    def styleSpansAt(indexRange: IndexRange) = {
-      val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
-      getStyleSpans(indexRange) forEach { styleSpan => spans += styleSpan }
-      spans.toList
-    }
   }
-  lazy val textRulesPane = new RulesPane(conditionDefinitions,
-                                         actionDefinitions filter (_.actionLocationTypes contains NodeContentAction),
-                                         ObservableBuffer.empty,
-                                         story)
-  val nodeRulesPane = new RulesPane(conditionDefinitions,
+  lazy val textRulesPane: RulesPane = new RulesPane("Text rules",
+                                                    conditionDefinitions,
+                                                    actionDefinitions filter (_.actionLocationTypes contains NodeContentAction),
+                                                    ObservableBuffer.empty,
+                                                    story) {
+    disableAddRule <== textRulesTable.selectionModel().selectedItem.isNull
+  }
+  val nodeRulesPane = new RulesPane("Node rules",
+                                    conditionDefinitions,
                                     actionDefinitions filter (_.actionLocationTypes contains NodeAction),
                                     node.rulesProperty(),
                                     story)
@@ -297,37 +283,11 @@ class NodeEditor private (dialogTitle: String,
 
     dividerPositions = 0.3
   }
-  val textRulesVBox = new VBox {
-    children += new HBox {
-      padding = Insets(5)
-      alignment = Pos.CenterLeft
-      children += new Label("Text Rules")
-      children += new Button("Add rule") {
-        disable <== textRulesTable.selectionModel().selectedItemProperty().isNull
-        onAction = { _ => textRulesPane.addRule() }
-      }
-    }
-    children += textRulesPane
-    VBox.setVgrow(textRulesPane, Priority.Always)
-  }
-  val nodeRulesVBox = new VBox {
-    children += new HBox {
-      padding = Insets(5)
-      alignment = Pos.CenterLeft
-      children += new Label("Node Rules")
-      children += new Button("Add node rule") {
-        onAction = { _ => nodeRulesPane.addRule() }
-      }
-    }
-    children += nodeRulesPane
-
-    VBox.setVgrow(nodeRulesPane, Priority.Always)
-  }
   val textAndNodeRulesPane = new CollapsibleSplitPane {
     orientation = Orientation.HORIZONTAL
-    add(textRulesVBox)
+    add(textRulesPane)
 
-    add(nodeRulesVBox)
+    add(nodeRulesPane)
 
     dividerPositions = 0.5
   }
@@ -368,28 +328,28 @@ class NodeEditor private (dialogTitle: String,
       }
       items += new Button("Text Rules") {
         onAction = { _ =>
-          (textAndNodeRulesPane isShown textRulesVBox, mainContentPane isShown textAndNodeRulesPane) match {
+          (textAndNodeRulesPane isShown textRulesPane, mainContentPane isShown textAndNodeRulesPane) match {
             case (true, true) =>
-              if (textAndNodeRulesPane isShown nodeRulesVBox) textAndNodeRulesPane.hide(textRulesVBox) else mainContentPane.hide(textAndNodeRulesPane)
-            case (false, true) => textAndNodeRulesPane.show(textRulesVBox)
+              if (textAndNodeRulesPane isShown nodeRulesPane) textAndNodeRulesPane.hide(textRulesPane) else mainContentPane.hide(textAndNodeRulesPane)
+            case (false, true) => textAndNodeRulesPane.show(textRulesPane)
             case (true, false) => mainContentPane.show(textAndNodeRulesPane)
             case (false, false) =>
-              textAndNodeRulesPane.hide(nodeRulesVBox)
-              textAndNodeRulesPane.show(textRulesVBox)
+              textAndNodeRulesPane.hide(nodeRulesPane)
+              textAndNodeRulesPane.show(textRulesPane)
               mainContentPane.show(textAndNodeRulesPane)
           }
         }
       }
       items += new Button("Node Rules") {
         onAction = { _ =>
-          (textAndNodeRulesPane isShown nodeRulesVBox, mainContentPane isShown textAndNodeRulesPane) match {
+          (textAndNodeRulesPane isShown nodeRulesPane, mainContentPane isShown textAndNodeRulesPane) match {
             case (true, true) =>
-              if (textAndNodeRulesPane isShown textRulesVBox) textAndNodeRulesPane.hide(nodeRulesVBox) else mainContentPane.hide(textAndNodeRulesPane)
-            case (false, true) => textAndNodeRulesPane.show(nodeRulesVBox)
+              if (textAndNodeRulesPane isShown textRulesPane) textAndNodeRulesPane.hide(nodeRulesPane) else mainContentPane.hide(textAndNodeRulesPane)
+            case (false, true) => textAndNodeRulesPane.show(nodeRulesPane)
             case (true, false) => mainContentPane.show(textAndNodeRulesPane)
             case (false, false) =>
-              textAndNodeRulesPane.hide(textRulesVBox)
-              textAndNodeRulesPane.show(nodeRulesVBox)
+              textAndNodeRulesPane.hide(textRulesPane)
+              textAndNodeRulesPane.show(nodeRulesPane)
               mainContentPane.show(textAndNodeRulesPane)
           }
         }
@@ -456,5 +416,22 @@ object NodeEditor {
     def css = if (ruleset.isDefined) linkStyle else ""
 
     override def toString = s"hasRule: ${ruleset.isDefined}"
+  }
+
+  class NodeContentTextArea extends InlineStyleTextArea[LinkStyleInfo](new LinkStyleInfo(),
+                                                                       new Function[NodeEditor.LinkStyleInfo, String] {
+                                                                         override def apply(t: LinkStyleInfo): String = t.css
+                                                                       }) {
+    def styleSpans = {
+      val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
+      getStyleSpans(0, getText.length) forEach { styleSpan => spans += styleSpan }
+      spans.toList
+    }
+
+    def styleSpansAt(indexRange: IndexRange) = {
+      val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
+      getStyleSpans(indexRange) forEach { styleSpan => spans += styleSpan }
+      spans.toList
+    }
   }
 }
