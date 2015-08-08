@@ -5,8 +5,6 @@ import javafx.event.EventHandler
 import javafx.scene.control.{TableCell => JfxTableCell, IndexRange => JfxIndexRange}
 import javafx.scene.input.{KeyCode => JfxKeyCode, KeyEvent => JfxKeyEvent}
 
-import scala.language.reflectiveCalls
-
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
@@ -19,7 +17,7 @@ import scalafx.scene.Parent.sfxParent2jfx
 import org.fxmisc.easybind.EasyBind
 import org.fxmisc.richtext.{StyleSpan, InlineStyleTextArea}
 
-import org.narrativeandplay.hypedyn.dialogs.NodeEditor.LinkStyleInfo
+import org.narrativeandplay.hypedyn.dialogs.NodeEditor.{NodeContentTextArea, LinkStyleInfo}
 import org.narrativeandplay.hypedyn.story.NodalContent.{RulesetId, TextIndex, RulesetIndexes}
 import org.narrativeandplay.hypedyn.story.UiNodeContent.UiRuleset
 import org.narrativeandplay.hypedyn.story._
@@ -209,11 +207,7 @@ class NodeEditor private (dialogTitle: String,
     editable = true
     placeholder = new Label("")
   }
-  lazy val nodeContentText = new InlineStyleTextArea[NodeEditor.LinkStyleInfo](
-    new NodeEditor.LinkStyleInfo(),
-    new Function[NodeEditor.LinkStyleInfo, String] {
-      override def apply(t: LinkStyleInfo): String = t.css
-    }) {
+  lazy val nodeContentText = new NodeContentTextArea {
     setWrapText(true)
     replaceText(node.content.text)
     node.content.rulesetsProperty() foreach { ruleset =>
@@ -228,18 +222,6 @@ class NodeEditor private (dialogTitle: String,
       if (!beingUpdated) {
         updateNodeContentRulesetsIndexes()
       }
-    }
-
-    def styleSpans = {
-      val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
-      getStyleSpans(0, getText.length) forEach { styleSpan => spans += styleSpan }
-      spans.toList
-    }
-
-    def styleSpansAt(indexRange: IndexRange) = {
-      val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
-      getStyleSpans(indexRange) forEach { styleSpan => spans += styleSpan }
-      spans.toList
     }
   }
   lazy val textRulesPane: RulesPane = new RulesPane("Text rules",
@@ -434,5 +416,22 @@ object NodeEditor {
     def css = if (ruleset.isDefined) linkStyle else ""
 
     override def toString = s"hasRule: ${ruleset.isDefined}"
+  }
+
+  class NodeContentTextArea extends InlineStyleTextArea[LinkStyleInfo](new LinkStyleInfo(),
+                                                                       new Function[NodeEditor.LinkStyleInfo, String] {
+                                                                         override def apply(t: LinkStyleInfo): String = t.css
+                                                                       }) {
+    def styleSpans = {
+      val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
+      getStyleSpans(0, getText.length) forEach { styleSpan => spans += styleSpan }
+      spans.toList
+    }
+
+    def styleSpansAt(indexRange: IndexRange) = {
+      val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
+      getStyleSpans(indexRange) forEach { styleSpan => spans += styleSpan }
+      spans.toList
+    }
   }
 }
