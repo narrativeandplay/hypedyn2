@@ -3,6 +3,9 @@ package org.narrativeandplay.hypedyn.plugins
 import org.narrativeandplay.hypedyn.events.EventBus
 import org.narrativeandplay.hypedyn.story.Narrative
 
+/**
+ * An interface for a generic HypeDyn plugin
+ */
 trait Plugin {
   EventBus.StoryLoadedEvents foreach { evt => onStoryLoaded(evt.story) }
 
