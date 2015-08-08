@@ -6,12 +6,18 @@ import org.narrativeandplay.hypedyn.events.EventBus
 import org.narrativeandplay.hypedyn.plugins.Plugin
 import org.narrativeandplay.hypedyn.story.Nodal
 
+/**
+ * An interface for a plugin that allows for story visualisation
+ */
 trait NarrativeViewer {
   /**
    * Ensure that a NarrativeViewer is also a ScalaFX control, and a Plugin
    */
   self: Control with Plugin =>
 
+  /**
+   * The plugin is automatically hooked into the appropriate event streams
+   */
   EventBus.NodeCreatedEvents foreach { n => onNodeCreated(n.node) }
   EventBus.NodeUpdatedEvents foreach { n => onNodeUpdated(n.node, n.updatedNode) }
   EventBus.NodeDestroyedEvents foreach { n => onNodeDestroyed(n.node) }
