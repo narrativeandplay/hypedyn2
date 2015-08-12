@@ -4,8 +4,24 @@ import org.json4s._
 import org.json4s.native.JsonMethods._
 import org.narrativeandplay.hypedyn.serialisation._
 
+/**
+ * Object that transforms AST data into JSON strings
+ */
 object JsonSerialiser {
+  /**
+   * Transforms an AST element into a JSON string
+   *
+   * @param data The AST element to transform
+   * @return A JSON string
+   */
   def serialise(data: AstElement) = pretty(render(AstElementToJValue(data)))
+
+  /**
+   * Transforms a JSON string into an AST element
+   *
+   * @param data The JSON string to transform
+   * @return An AST element
+   */
   def deserialise(data: String): AstElement = jValueToAstElement(parse(data))
 
   private def AstElementToJValue(elem: AstElement): JValue = elem match {
