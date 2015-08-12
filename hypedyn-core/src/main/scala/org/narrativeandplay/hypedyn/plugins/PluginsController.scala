@@ -7,18 +7,27 @@ import scala.collection.mutable
 
 import org.clapper.classutil.ClassFinder
 
+/**
+ * Controller that handles plugin instantiation
+ */
 object PluginsController {
-  val PluginClassName = classOf[Plugin].getCanonicalName
+  private val PluginClassName = classOf[Plugin].getCanonicalName
 
   private final val PluginFolder = new File("plugins")
 
   private val _plugins = mutable.HashMap.empty[String, Plugin]
 
+  /**
+   * Returns the list of plugins as a Map
+   */
   def plugins = _plugins.toMap
 
+  /**
+   * Initialisation function to find and instantiate plugins
+   */
   private def init(): Unit = {
-    val pluginFolderFiles = Option(PluginFolder.listFiles())
-    val pluginJars = pluginFolderFiles getOrElse Array.empty[File] filter (_.getName.endsWith(".jar"))
+    val pluginFolderFiles = Option(PluginFolder.listFiles()) getOrElse Array.empty[File]
+    val pluginJars = pluginFolderFiles filter (_.getName.endsWith(".jar"))
     val classpath = ClassFinder.classpath ++ pluginJars
     val finder = ClassFinder(classpath)
     val classes = finder.getClasses()

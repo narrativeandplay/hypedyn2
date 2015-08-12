@@ -2,6 +2,9 @@ package org.narrativeandplay.hypedyn.story.rules
 
 import org.narrativeandplay.hypedyn.story.rules.ParameterValues._
 
+/**
+ * Object holding action definitions
+ */
 object ActionDefinitions {
   import Actionable.ActionType
   import ActionLocationType.{NodeContentAction, NodeAction, StoryAction}

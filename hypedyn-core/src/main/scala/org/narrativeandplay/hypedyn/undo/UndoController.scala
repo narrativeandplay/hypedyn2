@@ -2,6 +2,9 @@ package org.narrativeandplay.hypedyn.undo
 
 import org.fxmisc.undo.UndoManagerFactory
 
+/**
+ * Controller handling undo events
+ */
 object UndoController {
   private val undoManager = UndoManagerFactory.unlimitedHistoryUndoManager(
     UndoableStream.changes,

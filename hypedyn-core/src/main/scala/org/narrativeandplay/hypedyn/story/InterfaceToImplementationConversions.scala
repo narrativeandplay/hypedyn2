@@ -7,6 +7,10 @@ import org.narrativeandplay.hypedyn.story.internal.{Story, NodeContent, Node}
 import org.narrativeandplay.hypedyn.story.rules.{Conditional, Actionable, RuleLike}
 import org.narrativeandplay.hypedyn.story.rules.internal.{Condition, Action, Rule}
 
+/**
+ * Implicit conversions for converting interface types into concrete types used by
+ * the core. Used for simplifying working with interface types
+ */
 object InterfaceToImplementationConversions {
   implicit def ruleLike2Rule(ruleLike: RuleLike): Rule = Rule(ruleLike.id,
                                                               ruleLike.name,

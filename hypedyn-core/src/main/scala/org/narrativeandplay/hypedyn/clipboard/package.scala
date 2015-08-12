@@ -10,6 +10,10 @@ import org.narrativeandplay.hypedyn.story.internal.{NodeContent, Node}
 import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions._
 
 package object clipboard {
+
+  /**
+   * Typeclass instance for cutting/copying/pasting nodes
+   */
   implicit object NodeCopier extends Copyable[Nodal] {
     val NodeDataFormat = new DataFormat("application/x-hypedyn-node")
     val clipboard = new Clipboard(Clipboard.systemClipboard)

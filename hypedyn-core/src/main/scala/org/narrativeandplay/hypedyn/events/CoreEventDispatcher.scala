@@ -10,8 +10,15 @@ import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, ConditionDef
 import org.narrativeandplay.hypedyn.undo._
 import org.narrativeandplay.hypedyn.story.StoryController
 
+/**
+ * Main event dispatcher for the core
+ */
 object CoreEventDispatcher {
   val CoreEventSourceIdentity = "Core"
+
+  /**
+   * Keeps track of whether there is a story loaded via a file load
+   */
   private var loadedFile: Option[File] = None
 
   EventBus.NewNodeRequests foreach { _ =>

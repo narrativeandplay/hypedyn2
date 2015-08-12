@@ -10,6 +10,10 @@ import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.rules.internal.{Action, Condition, Rule}
 
 package object serialisers {
+
+  /**
+   * Typeclass instance for serialising Nodes
+   */
   implicit object NodeSerialiser extends Serialisable[Node] {
     /**
      * Returns the serialised representation of an object
@@ -39,10 +43,18 @@ package object serialisers {
     }
   }
 
+  /**
+   * Implicit class to allow the use of `node.serialise`
+   *
+   * @param node The node to extend
+   */
   implicit class SerialisableNode(node: Node) {
     def serialise = NodeSerialiser.serialise(node)
   }
 
+  /**
+   * Typeclass instance for serialising stories
+   */
   implicit object StorySerialiser extends Serialisable[Story] {
     /**
      * Returns the serialised representation of an object
@@ -77,10 +89,17 @@ package object serialisers {
     }
   }
 
+  /**
+   * Implicit class to allow `story.serialise`
+   * @param story
+   */
   implicit class SerialisableStory(story: Story) {
     def serialise = StorySerialiser.serialise(story)
   }
 
+  /**
+   * Typeclass instance for serialising node content
+   */
   implicit object NodeContentSerialiser extends Serialisable[NodeContent] {
     /**
      * Returns the serialised representation of an object
@@ -104,7 +123,10 @@ package object serialisers {
       NodeContent(text, rulesets)
     }
   }
-  
+
+  /**
+   * Typeclass instance for serialising rulesets
+   */
   implicit object RulesetSerialiser extends Serialisable[NodeContent.Ruleset] {
     /**
      * Returns the serialised representation of an object
@@ -136,6 +158,9 @@ package object serialisers {
     }
   }
 
+  /**
+   * Typeclass instance for serialising rules
+   */
   implicit object RuleSerialiser extends Serialisable[Rule] {
     /**
      * Returns the serialised representation of an object
@@ -175,6 +200,9 @@ package object serialisers {
     }
   }
 
+  /**
+   * Typeclass instance for serialsing conditions
+   */
   implicit object ConditionSerialiser extends Serialisable[Condition] {
     /**
      * Returns the serialised representation of an object
@@ -204,7 +232,10 @@ package object serialisers {
       })
     }
   }
-  
+
+  /**
+   * Typeclass instance for serialising actions
+   */
   implicit object ActionSerialiser extends Serialisable[Action] {
     /**
      * Returns the serialised representation of an object
@@ -233,7 +264,10 @@ package object serialisers {
       })
     }
   }
-  
+
+  /**
+   * Typeclass instance for serialising facts
+   */
   implicit object FactSerialiser extends Serialisable[Fact] {
     /**
      * Returns the serialised representation of an object
@@ -293,6 +327,9 @@ package object serialisers {
     }
   }
 
+  /**
+   * Typeclass instance for serialising story metadata
+   */
   implicit object StoryMetadataSerialiser extends Serialisable[Story.Metadata] {
     /**
      * Returns the serialised representation of an object
@@ -320,6 +357,9 @@ package object serialisers {
     }
   }
 
+  /**
+   * Typeclass instance for serialising the reader style information
+   */
   implicit object ReaderStyleSerialiser extends Serialisable[Narrative.ReaderStyle] {
     /**
      * Returns the serialised representation of an object

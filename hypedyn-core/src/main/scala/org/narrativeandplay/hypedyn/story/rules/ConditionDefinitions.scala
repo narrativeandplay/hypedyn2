@@ -2,6 +2,9 @@ package org.narrativeandplay.hypedyn.story.rules
 
 import org.narrativeandplay.hypedyn.story.rules.ParameterValues._
 
+/**
+ * Object holding condition definitions
+ */
 object ConditionDefinitions {
   import Conditional.ConditionType
 

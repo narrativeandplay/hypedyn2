@@ -3,6 +3,11 @@ package org.narrativeandplay.hypedyn.undo
 import org.narrativeandplay.hypedyn.events.UndoEventDispatcher
 import org.narrativeandplay.hypedyn.story.rules.Fact
 
+/**
+ * Change that represents a fact being created
+ *
+ * @param createdFact The created fact
+ */
 class FactCreatedChange(createdFact: Fact) extends Undoable {
   /**
    * Defines what to do when an undo action happens
