@@ -7,6 +7,9 @@ import scala.language.implicitConversions
 
 import com.github.benedictleejh.scala.math.vector.{Vector2, VectorN}
 
+/**
+ * Convenience implicit conversions to and from vectors
+ */
 object VectorImplicitConversions {
   implicit def Tuple2ToVector2[T](t: (T, T))(implicit n: Numeric[T]): Vector2[T] = new Vector2[T](t._1, t._2)
 
