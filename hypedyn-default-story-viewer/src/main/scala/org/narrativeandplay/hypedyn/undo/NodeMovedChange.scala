@@ -5,6 +5,14 @@ import com.github.benedictleejh.scala.math.vector.Vector2
 import org.narrativeandplay.hypedyn.story.NodeId
 import org.narrativeandplay.hypedyn.storyviewer.StoryViewer
 
+/**
+ * Change reprenting a node having been moved
+ *
+ * @param eventHandler The event dispatcher allowed to send events
+ * @param nodeId The ID of the node moved
+ * @param initialPos The initial position of the node
+ * @param finalPos The final position of the node
+ */
 class NodeMovedChange(val eventHandler: StoryViewer,
                       val nodeId: NodeId,
                       val initialPos: Vector2[Double],

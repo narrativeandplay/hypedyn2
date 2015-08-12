@@ -1,5 +1,12 @@
 package org.narrativeandplay.hypedyn.storyviewer.utils
 
+/**
+ * Class representing an unordered pair of elements
+ *
+ * @param _1 One of the elements in the pair
+ * @param _2 The other element in the pair
+ * @tparam T The type of the elements in the pair
+ */
 case class UnorderedPair[T](_1: T, _2: T) {
   override def equals(that: Any) = that match {
     case that: UnorderedPair[T] => that.canEqual(this) &&

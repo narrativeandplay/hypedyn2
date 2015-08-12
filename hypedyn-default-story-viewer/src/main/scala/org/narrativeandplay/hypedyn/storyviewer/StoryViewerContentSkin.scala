@@ -5,6 +5,11 @@ import javafx.scene.control.Skin
 
 import scalafx.scene.layout.Pane
 
+/**
+ * The MVC view for the content
+ *
+ * @param storyViewerContent The model for the view
+ */
 class StoryViewerContentSkin(storyViewerContent: StoryViewerContent) extends Skin[StoryViewerContent] {
   private val root = new Pane
 
