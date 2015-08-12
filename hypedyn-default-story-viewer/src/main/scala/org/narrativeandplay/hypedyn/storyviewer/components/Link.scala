@@ -17,14 +17,33 @@ import org.narrativeandplay.hypedyn.storyviewer.utils.FunctionImplicits._
 import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils._
 import org.narrativeandplay.hypedyn.storyviewer.utils.VectorImplicitConversions._
 
+/**
+ * Class representing a link
+ *
+ * @param from The node the link starts from
+ * @param to The node the link ends at
+ * @param initRule The rule representing the link
+ * @param parentLinkGroup The group of links the link belongs to
+ */
 class Link(val from: ViewerNode,
            val to: ViewerNode,
            initRule: RuleLike,
            private val parentLinkGroup: LinkGroup) {
   private var closestBezierParam = -1d
 
+  /**
+   * The rule representing the link, wrapped in a property to allow easy updating
+   */
   val rule = ObjectProperty(initRule)
+
+  /**
+   * A binding to the name of the rule
+   */
   val name = EasyBind map (rule, (_: RuleLike).name)
+
+  /**
+   * A property determining if the link is currently selected
+   */
   val selected = BooleanProperty(false)
 
   private val linkLabel = new Label {
@@ -66,20 +85,44 @@ class Link(val from: ViewerNode,
     minDistPoints
   }
 
+  /**
+   * Setter for updating the link's rule
+   *
+   * @param newRule The new data for the rule
+   */
   def rule_=(newRule: RuleLike) = rule() = newRule
 
+  /**
+   * Select this link
+   *
+   * @param x The x-position of the selection point
+   * @param y The y-position of the selection point
+   */
   def select(x: Double, y: Double): Unit = {
     selected() = true
     closestBezierParam = path closestPointParameterValue ((x, y))
   }
 
+  /**
+   * Unselect this link
+   */
   def deselect(): Unit = {
     selected() = false
     closestBezierParam = -1d
   }
 
+  /**
+   * Checks if the link contains the given point
+   *
+   * @param x The x-coordinate of the point
+   * @param y The y-coordinate of the point
+   * @return `true` if the link contains the given point, false otherwise
+   */
   def contains(x: Double, y: Double): Boolean = path.toFxPath contains new Point2D(x, y)
 
+  /**
+   * Returns the Bezier curve (the start, end, and control points) of this link
+   */
   def path = {
     val edgeGroupIndex = parentLinkGroup.indexOf(this)
 
@@ -123,6 +166,9 @@ class Link(val from: ViewerNode,
     BezierCurve(startPoint, ctrlPt1, ctrlPt2, endPoint)
   }
 
+  /**
+   * Returns the full graphical representation of the link
+   */
   def draw = {
     val line = path.toFxPath
 
@@ -185,6 +231,9 @@ object Link {
 
   val NameDisplay: NameDisplayType = NameDisplayType.OnLinkAlways
 
+  /**
+   * Enumeration for the ways to display the link name
+   */
   sealed trait NameDisplayType
   object NameDisplayType {
     case object AtMouseOnClick extends NameDisplayType

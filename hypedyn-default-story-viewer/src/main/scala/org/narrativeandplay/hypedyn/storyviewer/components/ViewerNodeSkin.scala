@@ -10,6 +10,10 @@ import scalafx.scene.layout.{StackPane, Pane}
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 
+/**
+ * View (as in an MVC view) for the visual representation of a node
+ * @param viewerNode
+ */
 class ViewerNodeSkin(viewerNode: ViewerNode) extends Skin[ViewerNode] {
   import ViewerNodeSkin._
 
