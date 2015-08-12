@@ -18,6 +18,11 @@ import org.narrativeandplay.hypedyn.story.{NodeId, Narrative, Nodal}
 import org.narrativeandplay.hypedyn.storyviewer.components.{ViewerNode, LinkGroup}
 import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
 
+/**
+ * Content pane for the story viewer
+ *
+ * @param pluginEventDispatcher The event dispatcher for the story viewer, that is allowed to send events
+ */
 class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends JfxControl {
   val nodes = ArrayBuffer.empty[ViewerNode]
   val linkGroups = ArrayBuffer.empty[LinkGroup]
@@ -30,14 +35,26 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     links find (_.contains(event.getX, event.getY)) foreach (_.select(event.getX, event.getY))
   })
 
+  /**
+   * Returns all the link representations for the story
+   */
   def links = (linkGroups flatMap (_.links)).toList
 
+  /**
+   * Remove all nodes and links
+   */
   def clear(): Unit = {
     children.clear()
     linkGroups.clear()
     nodes.clear()
   }
 
+  /**
+   * Add a node
+   *
+   * @param node The data of the node to add
+   * @return The added node
+   */
   def addNode(node: Nodal): ViewerNode = {
     val n = makeNode(node)
 
@@ -46,6 +63,11 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     n
   }
 
+  /**
+   * Update a node
+   * @param node The data of the node to update
+   * @param updatedNode The updated data of the node
+   */
   def updateNode(node: Nodal, updatedNode: Nodal): Unit = {
     val viewerNodeOption = nodes find (_.id == node.id)
 
@@ -63,6 +85,11 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     requestLayout()
   }
 
+  /**
+   * Remove a node
+   *
+   * @param node The node to remove
+   */
   def removeNode(node: Nodal): Unit = {
     val nodeToRemoveOption = nodes find (_.id == node.id)
 
@@ -73,11 +100,22 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     }
   }
 
+  /**
+   * Creates the visual representation of the loaded story
+   *
+   * @param story The story to load
+   */
   def loadStory(story: Narrative): Unit = {
     val ns = story.nodes map makeNode
     ns foreach makeLinks
   }
 
+  /**
+   * Creates a node in the viewer
+   *
+   * @param nodal The data of the node to create
+   * @return The created node in the viewer
+   */
   private def makeNode(nodal: Nodal): ViewerNode = {
     val node = new ViewerNode(nodal, pluginEventDispatcher)
     nodes += node
@@ -86,6 +124,11 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     node
   }
 
+  /**
+   * Creates the links for a given node
+   *
+   * @param viewerNode The node to create links for
+   */
   private def makeLinks(viewerNode: ViewerNode): Unit = {
     viewerNode.node().links foreach { link =>
       val toNode = link.actions find (_.actionType == ActionType("LinkTo")) flatMap (_.params get ParamName("node")) flatMap { idVal =>
