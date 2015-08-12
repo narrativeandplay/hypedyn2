@@ -15,6 +15,9 @@ import org.narrativeandplay.hypedyn.story.{Narrative, Nodal, NodeId}
 import org.narrativeandplay.hypedyn.storyviewer.components.ViewerNode
 import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoableStream}
 
+/**
+ * StoryViewer implementation class
+ */
 class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Saveable {
   prefWidth = 800
   prefHeight = 600
@@ -97,6 +100,9 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
    */
   override def onSave(): AstElement = AstMap("nodes" -> AstList(viewer.nodes.toList map serialise: _*))
 
+  /**
+   * Resizes the content control to ensure all nodes are shown
+   */
   def sizeToChildren(): Unit = {
     val allBounds = (viewer.nodes map (_.bounds)).toList
     val maxX = Try((allBounds map (_.maxX)).max) getOrElse 0d
@@ -106,6 +112,12 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
     if (maxY > viewportBounds().getHeight) { fitToHeight = false; viewer.prefHeight = maxY } else fitToHeight = true
   }
 
+  /**
+   * Moves a node
+   *
+   * @param nodeId The ID of the node to move
+   * @param position The position to move it to
+   */
   def moveNode(nodeId: NodeId, position: Vector2[Double]): Unit = {
     nodeLocations += nodeId -> position
 
