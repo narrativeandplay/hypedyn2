@@ -8,6 +8,9 @@ import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamValue, ParamName}
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.rules.internal.Rule
 
+/**
+ * Controller for handling story-related actions
+ */
 object StoryController {
   import Ordering.Implicits._
 
@@ -17,12 +20,30 @@ object StoryController {
   private var firstUnusedRuleId = RuleId(0)
   private var firstUnusedRulesetId = NodalContent.RulesetId(0)
 
+  /**
+   * Returns the story currently being edited
+   */
   def story = currentStory
 
+  /**
+   * Sets up a new story
+   *
+   * @param title The title of the new story
+   * @param author The author of the new story
+   * @param description The description of the new story
+   */
   def newStory(title: String, author: String, description: String): Unit = {
     currentStory = new Story(title, author, description)
   }
 
+  /**
+   * Edit the current story
+   *
+   * @param title The new title
+   * @param author The new author
+   * @param description The new description
+   * @param metadata The new metadata
+   */
   def editStory(title: String, author: String, description: String, metadata: Narrative.Metadata): Unit = {
     currentStory = currentStory rename title
     currentStory = currentStory changeAuthor author
@@ -31,6 +52,11 @@ object StoryController {
 
   }
 
+  /**
+   * Load a given story
+   *
+   * @param story The story to load
+   */
   def load(story: Story): Unit = {
     currentStory = story
     firstUnusedNodeId = story.nodes map (_.id) reduceOption (_ max _) map (_.inc) getOrElse NodeId(0)
@@ -39,9 +65,28 @@ object StoryController {
     firstUnusedRulesetId = story.nodes flatMap (_.content.rulesets) map (_.id) reduceOption (_ max _) map (_.inc) getOrElse NodalContent.RulesetId(0)
   }
 
+  /**
+   * Finds a node given a node ID
+   *
+   * @param nodeId The ID of the node to find
+   * @return An option containing the found node, or None if no node with the given ID exists
+   */
   def findNode(nodeId: NodeId) = currentStory.nodes find (_.id == nodeId)
+
+  /**
+   * Finds a fact given a fact ID
+   *
+   * @param factId The ID of the fact to find
+   * @return An option containing the found node or None if no fact with the given ID exists
+   */
   def findFact(factId: FactId) = currentStory.facts find (_.id == factId)
 
+  /**
+   * Create a node
+   *
+   * @param node The data for the node to create
+   * @return The created node
+   */
   def create(node: Nodal): Node = {
     val newNodeContent = NodeContent(node.content.text, node.content.rulesets map { rulesetLike =>
       val ruleset = rulesetLike.copy(id = if (rulesetLike.id.isValid) rulesetLike.id else firstUnusedRulesetId,
@@ -66,6 +111,14 @@ object StoryController {
     newNode
   }
 
+  /**
+   * Update a node
+   *
+   * @param node The node to update
+   * @param editedNode The updated node data
+   * @return An option containing the original node, the updated node, and an option containing the unchanged and
+   *         changed node if the node to update was made the start node, or None if the node to update did not exist
+   */
   def update(node: Nodal, editedNode: Nodal): Option[(Node, Node, Option[(Node, Node)])] = {
     val updatedOldStartNodeOption = if (editedNode.isStartNode) {
       currentStory.nodes find (_.isStartNode) flatMap { oldStartNode =>
@@ -78,6 +131,14 @@ object StoryController {
     updatedNode map { case (unupdated, updated) => (unupdated, updated, updatedOldStartNodeOption) }
   }
 
+  /**
+   * Updates a node
+   *
+   * @param node The node to update
+   * @param updatedNode The updated node data
+   * @return An option containing the unupdated and updated versions of the node, or None if the node to update
+   *         does not exist
+   */
   private def updateNode(node: Nodal, updatedNode: Nodal): Option[(Node, Node)] = {
     val editedNodeContent = NodeContent(updatedNode.content.text, updatedNode.content.rulesets map { rulesetLike =>
       val ruleset = rulesetLike.copy(id = if (rulesetLike.id.isValid) rulesetLike.id else firstUnusedRulesetId,
@@ -105,6 +166,13 @@ object StoryController {
     toUpdateOption map ((_, updated))
   }
 
+  /**
+   * Destroy a node
+   *
+   * @param node The node to destroy
+   * @return An option containing the destroyed node and a map of nodes changed as a result of the destroyed node,
+   *         or None if the node to destroy does not exist
+   */
   def destroy(node: Nodal): Option[(Node, Map[Node, Node])] = {
     val toDestroyOption = findNode(node.id)
 
@@ -153,6 +221,12 @@ object StoryController {
     destroyedNodeChangedNodesOption
   }
 
+  /**
+   * Create a new fact in the story
+   *
+   * @param fact The new fact
+   * @return The created fact
+   */
   def create(fact: Fact): Fact = {
     val newFact = instantiateFact(fact)
 
@@ -161,6 +235,14 @@ object StoryController {
     newFact
   }
 
+  /**
+   * Update a fact
+   *
+   * @param fact The fact to update
+   * @param editedFact The updated fact data
+   * @return An option containing the unupdated and updated versions of the fact, or None if the fact to update
+   *         does not exist
+   */
   def update(fact: Fact, editedFact: Fact): Option[(Fact, Fact)] = {
     val toUpdate = findFact(fact.id)
     val updated = instantiateFact(editedFact)
@@ -170,6 +252,12 @@ object StoryController {
     toUpdate map ((_, updated))
   }
 
+  /**
+   * Destroy a fact
+   *
+   * @param fact The fact to destroy
+   * @return An option containing the destroyed fact, or None if the fact to destroy does not exist
+   */
   def destroy(fact: Fact): Option[Fact] = {
     val toDestroy = findFact(fact.id)
 
@@ -178,6 +266,12 @@ object StoryController {
     toDestroy
   }
 
+  /**
+   * Instantiates a fact, i.e., provides a fact with a valid ID
+   *
+   * @param fact The fact to instantiate
+   * @return The instantiated fact
+   */
   private def instantiateFact(fact: Fact): Fact = {
     val factInstance = fact match {
       case IntegerFact(id, name, initVal) => IntegerFact(if (id.isValid) id else firstUnusedFactId,
