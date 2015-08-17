@@ -8,6 +8,9 @@ import org.narrativeandplay.hypedyn.story.UiNodeContent.UiRuleset
 import org.narrativeandplay.hypedyn.story.UiStory.UiStoryMetadata
 import org.narrativeandplay.hypedyn.story.rules.{RuleLike, Conditional, Actionable}
 
+/**
+ * Implicit conversions for interfaces to UI classes, to simplify conversions
+ */
 object InterfaceToUiImplementation {
   implicit def actionable2UiAction(actionable: Actionable): UiAction = new UiAction(actionable.actionType,
                                                                                     actionable.params)

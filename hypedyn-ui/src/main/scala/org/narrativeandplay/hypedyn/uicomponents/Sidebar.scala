@@ -5,6 +5,9 @@ import scalafx.geometry.Orientation
 import scalafx.scene.Group
 import scalafx.scene.control.{Label, Button, ToolBar}
 
+/**
+ * The side bar for the application
+ */
 object Sidebar extends ToolBar {
   orientation = Orientation.VERTICAL
 

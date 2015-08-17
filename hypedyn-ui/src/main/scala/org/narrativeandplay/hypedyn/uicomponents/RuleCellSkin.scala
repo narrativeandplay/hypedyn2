@@ -14,6 +14,11 @@ import scalafx.scene.Parent.sfxParent2jfx
 import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.{And, Or}
 import org.narrativeandplay.hypedyn.story.rules.BooleanOperator
 
+/**
+ * View (MVC view) for the RuleCell
+ *
+ * @param cell The RuleCell this skin belongs to
+ */
 class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
   val rootNode = new TreeView[String]() {
     root = treeRoot

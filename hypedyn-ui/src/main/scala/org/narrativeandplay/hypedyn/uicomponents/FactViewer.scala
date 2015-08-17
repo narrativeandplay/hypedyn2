@@ -11,6 +11,9 @@ import scalafx.scene.control.{MultipleSelectionModel, Tooltip}
 import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.utils.System
 
+/**
+ * List view for facts
+ */
 object FactViewer extends ListView[Fact] {
   val facts = new ObservableBuffer[Fact]()
 
@@ -35,9 +38,27 @@ object FactViewer extends ListView[Fact] {
     new FactCell
   }
 
-  def add(fact: Fact) = facts += fact
-  def remove(fact: Fact) = facts -= fact
-  def update(fact: Fact, newFact: Fact) = facts find (_ == fact) foreach { _ =>
+  /**
+   * Add a fact to this list view
+   *
+   * @param fact The fact to add
+   */
+  def add(fact: Fact): Unit = facts += fact
+
+  /**
+   * Remove a fact from this list view
+   *
+   * @param fact The fact to remove
+   */
+  def remove(fact: Fact): Unit = facts -= fact
+
+  /**
+   * Update a face in this list view
+   *
+   * @param fact The fact to update
+   * @param newFact The updated version of the fact
+   */
+  def update(fact: Fact, newFact: Fact): Unit = facts find (_ == fact) foreach { _ =>
     facts.update(facts indexOf fact, newFact)
   }
 
@@ -46,10 +67,6 @@ object FactViewer extends ListView[Fact] {
   }
 
   tooltip = deselectionInfo
-
-//  focusedProperty().addListener({ (_, _, selected) =>
-//    if (!selected) selectionModel.clearSelection()
-//  })
 
   // <editor-fold="Functions for replicating Scala-like access style">
 

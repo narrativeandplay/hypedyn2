@@ -17,13 +17,38 @@ import org.tbee.javafx.scene.layout.MigPane
 
 import org.narrativeandplay.hypedyn.story.rules._
 
+/**
+ * Dialog for editing facts
+ *
+ * @param dialogTitle The title of the dialog
+ * @param availableFactTypes The fact types available for creation
+ * @param factToEdit An option containing the fact to edit, or None if a new fact is to be created
+ * @param ownerWindow The parent window of the dialog, for inheriting icons
+ */
 class FactEditor private (dialogTitle: String,
                           availableFactTypes: List[String],
                           factToEdit: Option[Fact],
                           ownerWindow: Window) extends Dialog[Fact] {
+  /**
+   * Creates a new dialog for creating a fact
+   *
+   * @param dialogTitle The title of the dialog
+   * @param availableFactTypes The fact types available for creation
+   * @param ownerWindow The parent window of the dialog, for inheriting icons
+   * @return A new fact dialog
+   */
   def this(dialogTitle: String, availableFactTypes: List[String], ownerWindow: Window) =
     this(dialogTitle, availableFactTypes, None, ownerWindow)
 
+  /**
+   * Creates a new dialog for editing a fact
+   *
+   * @param dialogTitle The title of the dialog
+   * @param availableFactTypes The fact types available for creation
+   * @param factToEdit The fact to edit
+   * @param ownerWindow The parent window of the dialog, for inheriting icons
+   * @return A new fact dialog
+   */
   def this(dialogTitle: String, availableFactTypes: List[String], factToEdit: Fact, ownerWindow: Window) =
     this(dialogTitle, availableFactTypes, Some(factToEdit), ownerWindow)
 
@@ -153,6 +178,12 @@ class FactEditor private (dialogTitle: String,
     case _ => null
   }
 
+  /**
+   * Shows a blocking fact editor dialog
+   *
+   * @return An option containing the result of the dialog, or None if the dialog was not closed using
+   *         the OK button
+   */
   def showAndWait(): Option[Fact] = {
     initModality(Modality.APPLICATION_MODAL)
 

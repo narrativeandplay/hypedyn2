@@ -2,6 +2,9 @@ package org.narrativeandplay.hypedyn.utils
 
 import java.lang.{System => Sys}
 
+/**
+ * OS related utilities
+ */
 object System {
   private final val Windows = "windows"
   private final val Mac = "mac"

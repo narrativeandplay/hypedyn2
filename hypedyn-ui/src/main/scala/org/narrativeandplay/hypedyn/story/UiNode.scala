@@ -4,14 +4,37 @@ import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, ObjectProperty, StringProperty}
 import scalafx.collections.ObservableBuffer
 
+/**
+ * UI implementation for Nodal
+ * @param id The ID of the node
+ * @param initName The initial name of the node
+ * @param initContent The initial content of the node
+ * @param initIsStartNode The initial value of whether this node was the start node of the story
+ * @param initRules The initial list of rules
+ */
 class UiNode(val id: NodeId,
              initName: String,
              initContent: UiNodeContent,
              initIsStartNode: Boolean,
              initRules: List[UiRule]) extends Nodal {
+  /**
+   * Backing property for the name
+   */
   val nameProperty = StringProperty(initName)
+
+  /**
+   * Backing property for the content
+   */
   val contentProperty = ObjectProperty(initContent)
+
+  /**
+   * Backing property for the start node status
+   */
   val isStartNodeProperty = BooleanProperty(initIsStartNode)
+
+  /**
+   * Backing property for the list of rules
+   */
   val rulesProperty = ObjectProperty(ObservableBuffer(initRules: _*))
   
   /**

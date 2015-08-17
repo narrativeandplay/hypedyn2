@@ -8,6 +8,17 @@ import org.narrativeandplay.hypedyn.story.Narrative.{Metadata, ReaderStyle}
 import org.narrativeandplay.hypedyn.story.rules.Actionable.ActionType
 import org.narrativeandplay.hypedyn.story.rules.Fact
 
+/**
+ * UI implementation for Narrative
+ *
+ * @param initTitle The initial title of the story
+ * @param initDescription The initial description of the story
+ * @param initAuthor The initial author of the story
+ * @param initMetadata The initial metadata of the story
+ * @param initFacts The initial facts of the story
+ * @param initNodes The initial list of nodes of the story
+ * @param initRules The initial list of story-level rules
+ */
 class UiStory(initTitle: String,
               initDescription: String,
               initAuthor: String,
@@ -15,13 +26,39 @@ class UiStory(initTitle: String,
               initFacts: List[Fact],
               initNodes: List[UiNode],
               initRules: List[UiRule]) extends Narrative {
+  /**
+   * Backing property for the title
+   */
   val titleProperty = StringProperty(initTitle)
+
+  /**
+   * Backing property for the description
+   */
   val descriptionProperty = StringProperty(initDescription)
+
+  /**
+   * Backing property for the author
+   */
   val authorProperty = StringProperty(initAuthor)
+
+  /**
+   * Backing property for the metadata
+   */
   val metadataProperty = ObjectProperty(initMetadata)
 
+  /**
+   * Backing property for the list of facts
+   */
   val factsProperty = ObjectProperty(ObservableBuffer(initFacts))
+
+  /**
+   * Backing propety for the list of nodes
+   */
   val nodesProperty = ObjectProperty(ObservableBuffer(initNodes))
+
+  /**
+   * Backing property for the list of story-level rules
+   */
   val rulesProperty = ObjectProperty(ObservableBuffer(initRules))
 
   /**
@@ -65,21 +102,57 @@ class UiStory(initTitle: String,
 }
 
 object UiStory {
+
+  /**
+   * UI implementation for Narrative.Metadata
+   *
+   * @param initComments The initial comments of the story
+   * @param initReaderStyle The initial style of the reader
+   * @param initBackDisabled The initial value of whether the back button is disabled
+   * @param initRestartDisabled The initial value of whether the restart button is disabled
+   */
   class UiStoryMetadata(initComments: String,
                         initReaderStyle: ReaderStyle,
                         initBackDisabled: Boolean,
                         initRestartDisabled: Boolean) extends Narrative.Metadata {
+    /**
+     * Backing property for the comments
+     */
     val commentsProperty = StringProperty(initComments)
+
+    /**
+     * Backing property for the reader style
+     */
     val readerStyleProperty = ObjectProperty(initReaderStyle)
+
+    /**
+     * Backing property for whether the back button is disabled
+     */
     val backDisabledProperty = BooleanProperty(initBackDisabled)
+
+    /**
+     * Backing property for whether the restart button is disabled
+     */
     val restartDisabledProperty = BooleanProperty(initRestartDisabled)
 
+    /**
+     * Returns the story comments
+     */
     override def comments: String = commentsProperty()
 
+    /**
+     * Returns true if the restart button is to be disabled
+     */
     override def isRestartButtonDisabled: Boolean = restartDisabledProperty()
 
+    /**
+     * Returns true if the back button is to be disabled
+     */
     override def isBackButtonDisabled: Boolean = backDisabledProperty()
 
+    /**
+     * Returns the style of the reader
+     */
     override def readerStyle: ReaderStyle = readerStyleProperty()
 
     override def toString: String = s"${getClass.getSimpleName}(comments: $comments, readerStyle: $readerStyle, backDisabled?: $isBackButtonDisabled, restartDisabled: $isRestartButtonDisabled)"

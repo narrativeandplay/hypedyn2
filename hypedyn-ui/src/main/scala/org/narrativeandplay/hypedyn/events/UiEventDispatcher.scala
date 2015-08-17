@@ -7,6 +7,11 @@ import org.narrativeandplay.hypedyn.dialogs.NodeEditor
 import org.narrativeandplay.hypedyn.story.NodeId
 import org.narrativeandplay.hypedyn.uicomponents.FactViewer
 
+/**
+ * Dispatcher for UI events
+ *
+ * Any component that needs to send events should go through this dispatcher
+ */
 object UiEventDispatcher {
   val UiEventSourceIdentity = "UI"
   private var selectedNode: Option[NodeId] = None

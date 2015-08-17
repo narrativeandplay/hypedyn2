@@ -14,6 +14,15 @@ import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.Or
 import org.narrativeandplay.hypedyn.story.{UiStory, UiRule}
 import org.narrativeandplay.hypedyn.story.rules._
 
+/**
+ * A control to manipulate rules
+ *
+ * @param labelText The heading text of the pane
+ * @param conditionDefinitions The list of condition definitions
+ * @param actionDefinitions The list of action definitions
+ * @param initRules The initial list of rules for the control
+ * @param story The story the list of rules belongs to
+ */
 class RulesPane(labelText: String,
                 val conditionDefinitions: List[ConditionDefinition],
                 val actionDefinitions: List[ActionDefinition],

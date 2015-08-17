@@ -6,6 +6,9 @@ import scalafx.scene.control.{Button, ToolBar}
 
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 
+/**
+ * The toolbar for the application
+ */
 object Toolbar extends ToolBar {
   items.addAll(newNode, editNode, deleteNode, newFact, editFact, deleteFact)
 

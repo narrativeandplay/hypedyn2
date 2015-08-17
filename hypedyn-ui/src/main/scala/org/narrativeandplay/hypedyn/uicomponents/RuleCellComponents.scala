@@ -25,15 +25,49 @@ import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
 import org.narrativeandplay.hypedyn.story._
 import org.narrativeandplay.hypedyn.utils.ScalaJavaImplicits._
 
+
 object RuleCellComponents {
+
+  /**
+   * Common interface for parameter component UIs
+   */
   sealed trait RuleCellParameterComponent {
+    /**
+     * Returns the property containing the story for the component
+     */
     def story: ObjectProperty[UiStory]
+
+    /**
+     * Returns the name of the parameter this component represents
+     */
     def paramName: ParamName
+
+    /**
+     * Returns the parameter map this component manipulates
+     */
     def paramMap: ObservableMap[ParamName, ParamValue]
+
+    /**
+     * Returns an option containing the value of this parameter, or None if it's value has not been set
+     */
     def `val`: Option[ParamValue]
+
+    /**
+     * Sets the value of the parameter
+     *
+     * @param string The value to set it to
+     */
     def val_=(string: ParamValue): Unit
   }
-  
+
+  /**
+   * Cell for manipulating a condition
+   *
+   * @param condition The condition to manipulate
+   * @param conditionDefinitions The list of condition definitions
+   * @param parentStory The property containing story the parent belongs to
+   * @param parentRule The rule the parent belongs to
+   */
   class ConditionCell(val condition: UiCondition, 
                       val conditionDefinitions: List[ConditionDefinition],
                       val parentStory: ObjectProperty[UiStory],
@@ -93,6 +127,11 @@ object RuleCellComponents {
       }
     }
 
+    /**
+     * Generate the UI components for the selected condition
+     *
+     * @param comboBox The combo box for selecting the condition type
+     */
     private def generateParameterInputComponents(comboBox: ComboBox[ConditionDefinition]) =
       comboBox.selectionModel().getSelectedItem.parameters foreach { p =>
         val newComponent = createParameterInput(p, condition.paramsProperty(), parentStory)
@@ -104,6 +143,14 @@ object RuleCellComponents {
     
   }
 
+  /**
+   * Cell for manipulating an action
+   *
+   * @param action The action to manipulate
+   * @param actionDefinitions The list of action definitions
+   * @param parentStory The story the action belongs to
+   * @param parentRule The rule the action belongs to
+   */
   class ActionCell(val action: UiAction,
                    val actionDefinitions: List[ActionDefinition],
                    val parentStory: ObjectProperty[UiStory],
@@ -163,6 +210,11 @@ object RuleCellComponents {
       }
     }
 
+    /**
+     * Generate the UI components for the selected condition
+     *
+     * @param comboBox The combo box for selecting the action type
+     */
     private def generateParameterInputComponents(comboBox: ComboBox[ActionDefinition]) =
       comboBox.selectionModel().getSelectedItem.parameters foreach { p =>
         val newComponent = createParameterInput(p, action.paramsProperty(), parentStory)
@@ -173,6 +225,14 @@ object RuleCellComponents {
     graphic = new HBox(actionTypeCombo, actionParams, removeButton)
   }
 
+  /**
+   * Creates a UI component for a given rule parameter
+   *
+   * @param ruleParameter The rule parameter to generate UI components for
+   * @param parameterMap The parameter map which the component has access to
+   * @param parentStory The story the parameter map belongs to
+   * @return The created component
+   */
   private def createParameterInput(ruleParameter: RuleParameter,
                                    parameterMap: ObservableMap[ParamName, ParamValue],
                                    parentStory: ObjectProperty[UiStory]) = ruleParameter.possibleValues match {
@@ -188,6 +248,13 @@ object RuleCellComponents {
     case Product(params) => new ProductPane(parameterMap, ParamName(ruleParameter.name), parentStory, params)
   }
 
+  /**
+   * Combo box for selecting a node
+   *
+   * @param paramMap The paramter map this component manipulates
+   * @param paramName The name of the parameter this component manipulates
+   * @param story The property containing the story for the component
+   */
   class NodeComboBox(val paramMap: ObservableMap[ParamName, ParamValue],
                      val paramName: ParamName,
                      val story: ObjectProperty[UiStory]) extends ComboBox[UiNode] with RuleCellParameterComponent{
@@ -222,6 +289,13 @@ object RuleCellComponents {
     override def val_=(paramValue: ParamValue): Unit = story().nodes find (_.id.value == BigInt(paramValue.value)) foreach { n => value = n }
   }
 
+  /**
+   * Combo box for selecting a link
+   *
+   * @param paramMap The paramter map this component manipulates
+   * @param paramName The name of the parameter this component manipulates
+   * @param story The property containing the story for the component
+   */
   class LinkComboBox(val paramMap: ObservableMap[ParamName, ParamValue],
                      val paramName: ParamName,
                      val story: ObjectProperty[UiStory]) extends ComboBox[UiRule] with RuleCellParameterComponent {
@@ -258,6 +332,13 @@ object RuleCellComponents {
     override def val_=(paramValue: ParamValue): Unit = story().links find (_.id.value == BigInt(paramValue.value)) foreach { r => value = r }
   }
 
+  /**
+   * Combo box for selecting an integer fact
+   *
+   * @param paramMap The paramter map this component manipulates
+   * @param paramName The name of the parameter this component manipulates
+   * @param story The property containing the story for the component
+   */
   class IntegerFactsComboBox(val paramMap: ObservableMap[ParamName, ParamValue],
                              val paramName: ParamName,
                              val story: ObjectProperty[UiStory]) extends ComboBox[IntegerFact] with RuleCellParameterComponent {
@@ -296,6 +377,13 @@ object RuleCellComponents {
     override def val_=(paramValue: ParamValue): Unit = intFacts find (_.id.value == BigInt(paramValue.value)) foreach { f => value =  f }
   }
 
+  /**
+   * Combo box for selecting a boolean fact
+   *
+   * @param paramMap The paramter map this component manipulates
+   * @param paramName The name of the parameter this component manipulates
+   * @param story The property containing the story for the component
+   */
   class BooleanFactsComboBox(val paramMap: ObservableMap[ParamName, ParamValue],
                              val paramName: ParamName,
                              val story: ObjectProperty[UiStory]) extends ComboBox[BooleanFact] with RuleCellParameterComponent {
@@ -334,6 +422,13 @@ object RuleCellComponents {
     override def val_=(paramValue: ParamValue): Unit = boolFacts find (_.id.value == BigInt(paramValue.value)) foreach { f => value =  f }
   }
 
+  /**
+   * Combo box for selecting a string fact
+   *
+   * @param paramMap The paramter map this component manipulates
+   * @param paramName The name of the parameter this component manipulates
+   * @param story The property containing the story for the component
+   */
   class StringFactsComboBox(val paramMap: ObservableMap[ParamName, ParamValue],
                             val paramName: ParamName,
                             val story: ObjectProperty[UiStory]) extends ComboBox[StringFact] with RuleCellParameterComponent {
@@ -372,6 +467,13 @@ object RuleCellComponents {
     override def val_=(paramValue: ParamValue): Unit = stringFacts find (_.id.value == BigInt(paramValue.value)) foreach { f => value = f }
   }
 
+  /**
+   * Text area for a string input
+   *
+   * @param paramMap The paramter map this component manipulates
+   * @param paramName The name of the parameter this component manipulates
+   * @param story The property containing the story for the component
+   */
   class StringInput(val paramMap: ObservableMap[ParamName, ParamValue],
                     val paramName: ParamName,
                     val story: ObjectProperty[UiStory]) extends TextArea with RuleCellParameterComponent {
@@ -384,6 +486,13 @@ object RuleCellComponents {
     override def val_=(paramValue: ParamValue): Unit = text = paramValue.value
   }
 
+  /**
+   * Spinner for an integer input
+   *
+   * @param paramMap The paramter map this component manipulates
+   * @param paramName The name of the parameter this component manipulates
+   * @param story The property containing the story for the component
+   */
   class IntegerInput(val paramMap: ObservableMap[ParamName, ParamValue],
                      val paramName: ParamName,
                      val story: ObjectProperty[UiStory]) extends Spinner[BigInt] with RuleCellParameterComponent {
@@ -411,6 +520,14 @@ object RuleCellComponents {
     override def val_=(paramValue: ParamValue): Unit = valueFactory().setValue(BigInt(paramValue.value))
   }
 
+  /**
+   * Combo box for selecting a value from a list of strings
+   *
+   * @param paramMap The paramter map this component manipulates
+   * @param paramName The name of the parameter this component manipulates
+   * @param story The property containing the story for the component
+   * @param values The list of strings to select a value from
+   */
   class ValuesListComboBox(val paramMap: ObservableMap[ParamName, ParamValue],
                            val paramName: ParamName,
                            val story: ObjectProperty[UiStory],
@@ -426,6 +543,14 @@ object RuleCellComponents {
     override def val_=(paramValue: ParamValue): Unit = value = paramValue.value
   }
 
+  /**
+   * Combo box for selecting a rule parameter type from a list of rule parameter types
+   *
+   * @param paramMap The paramter map this component manipulates
+   * @param paramName The name of the parameter this component manipulates
+   * @param story The property containing the story for the component
+   * @param params The map of parameter types to select from; the keys are the display names
+   */
   class UnionComboBoxPane(val paramMap: ObservableMap[ParamName, ParamValue],
                           val paramName: ParamName,
                           val story: ObjectProperty[UiStory],
@@ -471,6 +596,14 @@ object RuleCellComponents {
     override def val_=(string: ParamValue): Unit = params find { case (_, param) => param.name == paramName.value } foreach { p => unionValue.value = p }
   }
 
+  /**
+   * Pane for containing a group of rule parameters
+   *
+   * @param paramMap The paramter map this component manipulates
+   * @param paramName The name of the parameter this component manipulates
+   * @param story The property containing the story for the component
+   * @param params The list of parameters in the group
+   */
   class ProductPane(val paramMap: ObservableMap[ParamName, ParamValue],
                     val paramName: ParamName,
                     val story: ObjectProperty[UiStory],
