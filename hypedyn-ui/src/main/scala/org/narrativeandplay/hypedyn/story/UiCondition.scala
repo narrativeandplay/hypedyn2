@@ -8,8 +8,21 @@ import org.narrativeandplay.hypedyn.story.rules.Conditional
 import org.narrativeandplay.hypedyn.story.rules.Conditional.ConditionType
 import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
 
+/**
+ * UI implementation for Conditional
+ *
+ * @param initConditionType The initial condition type
+ * @param initParams The initial paramters and their values
+ */
 class UiCondition(initConditionType: ConditionType, initParams: Map[ParamName, ParamValue]) extends Conditional {
+  /**
+   * Backing property for the condition type
+   */
   val conditionTypeProperty = ObjectProperty(initConditionType)
+
+  /**
+   * Backing property for the paramters and their values
+   */
   val paramsProperty = ObjectProperty(ObservableMap(initParams.toSeq: _*))
 
   /**
