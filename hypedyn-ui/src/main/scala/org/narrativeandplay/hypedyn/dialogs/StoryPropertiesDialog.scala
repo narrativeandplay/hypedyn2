@@ -20,6 +20,12 @@ import org.narrativeandplay.hypedyn.story.UiStory.UiStoryMetadata
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.utils.ScalaJavaImplicits._
 
+/**
+ * Dialog for editing story properties
+ *
+ * @param story The story for which to edit properties
+ * @param ownerWindow The parent window for the dialog, to inherit icons
+ */
 class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialog[(String, String, String, UiStoryMetadata)] {
   import Narrative.ReaderStyle._
 
@@ -144,6 +150,11 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
     case _ => null
   }
 
+  /**
+   * Shows a blocking story properties dialog
+   *
+   * @return An option containing the result of the dialog, or None if the dialog was not closed using the OK button
+   */
   def showAndWait(): Option[(String, String, String, UiStoryMetadata)] = {
     initModality(Modality.APPLICATION_MODAL)
 
@@ -154,6 +165,12 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
 }
 
 object StoryPropertiesDialog {
+
+  /**
+   * A control that integrates a text field with a file selector
+   *
+   * @param ownerWindow The parent window of the control, for the file dialog to inherit icons
+   */
   class FileSelectorWithTextField(ownerWindow: Window) extends HBox {
     private val fileDialog = new FileDialog(ownerWindow) {
       extensionFilters.clear()

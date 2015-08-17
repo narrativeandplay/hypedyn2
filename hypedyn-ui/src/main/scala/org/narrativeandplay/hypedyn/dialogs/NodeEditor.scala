@@ -29,18 +29,49 @@ import org.narrativeandplay.hypedyn.uicomponents.Sidebar.SidebarButton
 import org.narrativeandplay.hypedyn.utils.CollapsibleSplitPane
 import org.narrativeandplay.hypedyn.utils.ScalaJavaImplicits._
 
+/**
+ * Dialog for editing nodes
+ *
+ * @param dialogTitle The title of the dialog
+ * @param conditionDefinitions The list of condition definitions
+ * @param actionDefinitions The list of action defintions
+ * @param narrative The story that the node that is being edited belongs to
+ * @param nodeToEdit An option containing the node to edit, or None if a new node is to be created
+ * @param ownerWindow The parent window of the dialog, to inherit icons
+ */
 class NodeEditor private (dialogTitle: String,
                           conditionDefinitions: List[ConditionDefinition],
                           actionDefinitions: List[ActionDefinition],
                           narrative: Narrative,
                           nodeToEdit: Option[Nodal],
                           ownerWindow: Window) extends Dialog[Nodal] {
+  /**
+   * Creates a new node editor for creating a new node
+   *
+   * @param dialogTitle The title of the dialog
+   * @param conditionDefinitions The list of condition definitions
+   * @param actionDefinitions The list of action definitions
+   * @param story The story that the node that is being created belongs to
+   * @param ownerWindow The parent window of the dialog, to inherit icons
+   * @return A new node editor
+   */
   def this(dialogTitle: String,
            conditionDefinitions: List[ConditionDefinition],
            actionDefinitions: List[ActionDefinition],
            story: Narrative,
            ownerWindow: Window) = this(dialogTitle, conditionDefinitions, actionDefinitions, story, None, ownerWindow)
 
+  /**
+   * Creates a new node editor for editing a node
+   *
+   * @param dialogTitle The title of the dialog
+   * @param nodeToEdit The node to edit
+   * @param conditionDefinitions The list of condition definitions
+   * @param actionDefinitions The list of action definitions
+   * @param story The story that the node that is being edited belongs to
+   * @param ownerWindow The parent window of the dialog, to inherit icons
+   * @return A new node editor
+   */
   def this(dialogTitle: String,
            nodeToEdit: Nodal,
            conditionDefinitions: List[ConditionDefinition],
@@ -385,6 +416,9 @@ class NodeEditor private (dialogTitle: String,
     nodeNameField.requestFocus()
   }
 
+  /**
+   * Updates the indexes for where a text rule belongs in the text
+   */
   def updateNodeContentRulesetsIndexes(): Unit = {
     import NodalContent._
     val spans = nodeContentText.styleSpans.scanLeft((0, 0, None: Option[UiRuleset])) {
@@ -400,6 +434,11 @@ class NodeEditor private (dialogTitle: String,
     }
   }
 
+  /**
+   * Shows a blocking node editor dialog
+   *
+   * @return An option containg the edited face, or None if the dialog was not closed with the OK button
+   */
   def showAndWait(): Option[Nodal] = {
     initModality(Modality.APPLICATION_MODAL)
 
@@ -410,6 +449,13 @@ class NodeEditor private (dialogTitle: String,
 }
 
 object NodeEditor {
+
+  /**
+   * Style class for styling node text, as well as attaching user data (the ruleset for a span of text)
+   *
+   * @param ruleset An option containing the ruleset attached to this span of text, or None if no ruleset is
+   *                attached
+   */
   class LinkStyleInfo(val ruleset: Option[UiRuleset] = None) {
     private val linkStyle = "-fx-font-weight: bold; -fx-underline: true;"
 
@@ -418,16 +464,27 @@ object NodeEditor {
     override def toString = s"hasRule: ${ruleset.isDefined}"
   }
 
+  /**
+   * An extended rich text area to provide some convenience methods
+   */
   class NodeContentTextArea extends InlineStyleTextArea[LinkStyleInfo](new LinkStyleInfo(),
                                                                        new Function[NodeEditor.LinkStyleInfo, String] {
                                                                          override def apply(t: LinkStyleInfo): String = t.css
                                                                        }) {
+    /**
+     * Returns all the style spans in the text
+     */
     def styleSpans = {
       val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
       getStyleSpans(0, getText.length) forEach { styleSpan => spans += styleSpan }
       spans.toList
     }
 
+    /**
+     * Returns all the style spans within the given range of text
+     *
+     * @param indexRange The range of text for which to get the style spans
+     */
     def styleSpansAt(indexRange: IndexRange) = {
       val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
       getStyleSpans(indexRange) forEach { styleSpan => spans += styleSpan }
