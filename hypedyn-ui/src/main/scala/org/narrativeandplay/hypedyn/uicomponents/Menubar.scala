@@ -16,10 +16,18 @@ import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 import org.narrativeandplay.hypedyn.keycombinations.KeyCombinations
 import org.narrativeandplay.hypedyn.utils.System
 
+/**
+ * Menu bar for the application
+ */
 object Menubar extends MenuBar {
   useSystemMenuBar = true
   menus.addAll(fileMenu, editMenu, helpMenu)
 
+  /**
+   * Extension to the standard menu item class to disable it whenever the main window is not in focus
+   *
+   * @param name The display name of the menu item
+   */
   class MenuItem(name: String) extends scalafx.scene.control.MenuItem(name) {
     // Disable the menu items when the main window is not being selected,effectively preventing the shortcuts from
     // propagating to node editor windows. Due to annoying conversions and interplays between ScalaFX and JavaFX,

@@ -10,6 +10,15 @@ import org.narrativeandplay.hypedyn.story.rules.Conditional.ConditionType
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story._
 
+/**
+ * Cell in a rule list to manipulate rules
+ *
+ * @param rule The rule to manipulate
+ * @param conditionDefs The list of condition definitions
+ * @param actionDefs The list of action definitions
+ * @param story The story the rule belongs to
+ * @param ruleList The list of rules the rule belongs to
+ */
 class RuleCell(val rule: UiRule,
                val conditionDefs: List[ConditionDefinition],
                val actionDefs: List[ActionDefinition],
@@ -24,12 +33,22 @@ class RuleCell(val rule: UiRule,
   // and there is no way to force a redraw without clicking outside of the cell
   prefHeightProperty <== when (cellSkin.rootNode.expandedItemCount === 1) choose 50 otherwise 175
 
+  /**
+   * Add a condition to the rule
+   *
+   * @return The added condition
+   */
   def addCondition(): UiCondition = {
     val newCond = new UiCondition(ConditionType("NodeCondition"), Map.empty)
     rule.conditionsProperty() += newCond
     newCond
   }
 
+  /**
+   * Add an action to the rule
+   *
+   * @return The added action
+   */
   def addAction(): UiAction = {
     val newAction = new UiAction(actionDefs.head.actionType, Map.empty)
     rule.actionsProperty() += newAction
