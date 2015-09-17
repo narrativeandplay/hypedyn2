@@ -86,14 +86,11 @@ class FactEditor private (dialogTitle: String,
   private val factTypesField = new ComboBox[String]() {
     promptText = "Choose a fact type"
     items = ObservableBuffer(availableFactTypes)
-    factToEdit foreach { fact =>
-      fact match {
-        case _: StringFact => value = Fact.StringFact
-        case _: IntegerFact => value = Fact.IntegerFact
-        case _: BooleanFact => value = Fact.BooleanFact
-        case f => throw new IllegalArgumentException(s"Unknown or not enabled fact type: $f")
-      }
-
+    factToEdit foreach {
+      case _: StringFact => value = Fact.StringFact
+      case _: IntegerFact => value = Fact.IntegerFact
+      case _: BooleanFact => value = Fact.BooleanFact
+      case f => throw new IllegalArgumentException(s"Unknown or not enabled fact type: $f")
     }
   }
 
