@@ -4,6 +4,7 @@ import javafx.scene.Node
 import javafx.scene.control.{Skin => JfxSkin, ListCell => JfxListCell}
 
 import scalafx.Includes._
+import scalafx.application.Platform
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control._
@@ -22,6 +23,10 @@ import org.narrativeandplay.hypedyn.story.rules.BooleanOperator
 class RuleCellSkin(cell: RuleCell) extends JfxSkin[RuleCell] {
   val rootNode = new TreeView[String]() {
     root = treeRoot
+
+    selectionModel().selectedItem onChange {
+      Platform runLater { selectionModel().clearSelection() }
+    }
   }
 
   lazy val treeRoot = new TreeItem[String]("") {
