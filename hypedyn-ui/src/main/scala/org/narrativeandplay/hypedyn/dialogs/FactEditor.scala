@@ -59,7 +59,6 @@ class FactEditor private (dialogTitle: String,
 
   dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
   val okButton = dialogPane().lookupButton(ButtonType.OK)
-  okButton.disable = true
 
   private val converter = new StringConverter[BigInt] {
     override def fromString(string: String): BigInt = Try(BigInt(string)) getOrElse BigInt(0)
@@ -87,15 +86,11 @@ class FactEditor private (dialogTitle: String,
   private val factTypesField = new ComboBox[String]() {
     promptText = "Choose a fact type"
     items = ObservableBuffer(availableFactTypes)
-    factToEdit foreach { fact =>
-      fact match {
-        case _: StringFact => value = Fact.StringFact
-        case _: IntegerFact => value = Fact.IntegerFact
-        case _: BooleanFact => value = Fact.BooleanFact
-        case f => throw new IllegalArgumentException(s"Unknown or not enabled fact type: $f")
-      }
-
-      okButton.disable = false
+    factToEdit foreach {
+      case _: StringFact => value = Fact.StringFact
+      case _: IntegerFact => value = Fact.IntegerFact
+      case _: BooleanFact => value = Fact.BooleanFact
+      case f => throw new IllegalArgumentException(s"Unknown or not enabled fact type: $f")
     }
   }
 
@@ -125,7 +120,6 @@ class FactEditor private (dialogTitle: String,
       case _ => println("error")
     }
 
-    okButton.disable = false
     dialogPane().getScene.getWindow.sizeToScene()
   }
 
@@ -148,18 +142,7 @@ class FactEditor private (dialogTitle: String,
     }
   }
 
-  okButton.addEventFilter(ActionEvent.Action, new EventHandler[jfxe.ActionEvent] {
-    override def handle(event: jfxe.ActionEvent): Unit = {
-      if (factNameField.text().isEmpty) {
-        new Alert(Alert.AlertType.Error) {
-          initOwner(ownerWindow)
-          headerText = None
-          contentText = "Facts cannot have an empty name"
-        }.showAndWait()
-        event.consume()
-      }
-    }
-  })
+  okButton.disable <== factTypesField.selectionModel().selectedItem.isNull || factNameField.text.isEmpty
 
   resultConverter = {
     case ButtonType.OK =>
