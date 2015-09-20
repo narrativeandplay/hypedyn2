@@ -150,6 +150,8 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
         "bottom" -> (centre + heightVector))
   }
 
+  override def toString: String = s"ViewerNode id: $id, name: ${nodeName.getValue}"
+
   // <editor-fold desc="Utility Methods for a Scala-like access pattern">
 
   def width = getWidth
