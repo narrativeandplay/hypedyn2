@@ -417,7 +417,8 @@ class NodeEditor private (dialogTitle: String,
   }
 
   /**
-   * Updates the indexes for where a text rule belongs in the text
+   * Updates the indexes for where a text rule belongs in the text, and removes rulesets for which there is no
+   * corresponding text (i.e., when text containing a text rule has been deleted).
    */
   def updateNodeContentRulesetsIndexes(): Unit = {
     import NodalContent._
@@ -425,13 +426,17 @@ class NodeEditor private (dialogTitle: String,
       case ((_, end, rulesetOption), styleSpan) =>
         (end, end + styleSpan.getLength, styleSpan.getStyle.ruleset)
     }
-    (spans.tail foldLeft List(spans.head)) {
+    val existingRulesets = (spans.tail foldLeft List(spans.head)) {
       case (resList @ (headStart, _, headSpan) :: tail, (start, end, span)) =>
         if (headSpan == span) (headStart, end, span) :: tail else (start, end, span) :: resList
       case (Nil, input) => input :: Nil
     } collect { case (start, end, Some(ruleset)) =>
       ruleset.indexesProperty() = RulesetIndexes(TextIndex(start), TextIndex(end))
+      ruleset
     }
+
+    val rulesetsToRemove = node.contentProperty().rulesetsProperty().toList filterNot existingRulesets.toSet
+    rulesetsToRemove foreach { r => node.contentProperty().rulesetsProperty() -= r }
   }
 
   /**
