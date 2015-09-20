@@ -48,12 +48,26 @@ function loadStory() {
 								// create the rule
 								// createRule(parentID, parentType, if_not, and_or, fall_through, id)
 								// do we have all this info?
-								createRule(rulesetID, "if", conditionsOp, stopIfTrue, ruleID);
+								createRule(rulesetID, "link", "if", conditionsOp, stopIfTrue, ruleID);
 
 								// now create the conditions and actions (if any)
 
 								// create conditions - skip for now
 								var conditions = thisRule.conditions;
+								if(conditions!=null) {
+									for(var l=0; l < conditions.length; l++) {
+										var thisCondition = conditions[l];
+										var conditionType = thisCondition.conditionType;
+
+										// createCondition(func, func_args_arr, ruleID, not, id)
+										// createCondition(nodeVisited, [3], 21, false, 24);
+										if(conditionType=="NodeCondition"){
+											if (thisCondition.params.status=="visited") {
+												createCondition(nodeVisited, [thisCondition.params.node], ruleID, false, l);
+											}
+										}
+									}
+								}
 
 								// create actions
 								var actions = thisRule.actions;
