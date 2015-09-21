@@ -44,7 +44,8 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
    * Remove all nodes and links
    */
   def clear(): Unit = {
-    children.clear()
+    nodes foreach (children -= _)
+
     linkGroups.clear()
     nodes.clear()
   }
