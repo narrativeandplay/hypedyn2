@@ -1,14 +1,20 @@
 package org.narrativeandplay.hypedyn.uicomponents
 
-import javafx.scene.control.{Control => JfxControl}
+import javafx.scene.control.{ListCell => JfxListCell}
 
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
+import scalafx.geometry.Pos
+import scalafx.scene.control._
+import scalafx.scene.layout.{Priority, HBox}
+import scalafx.util.StringConverter
+import scalafx.scene.Parent.sfxParent2jfx
 
+import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.{Or, And}
 import org.narrativeandplay.hypedyn.story.rules.Conditional.ConditionType
-import org.narrativeandplay.hypedyn.story.rules._
-import org.narrativeandplay.hypedyn.story._
+import org.narrativeandplay.hypedyn.story.{UiAction, UiCondition, UiStory, UiRule}
+import org.narrativeandplay.hypedyn.story.rules.{BooleanOperator, ActionDefinition, ConditionDefinition}
 
 /**
  * Cell in a rule list to manipulate rules
@@ -23,15 +29,111 @@ class RuleCell(val rule: UiRule,
                val conditionDefs: List[ConditionDefinition],
                val actionDefs: List[ActionDefinition],
                val story: ObjectProperty[UiStory],
-               val ruleList: ObservableBuffer[UiRule]) extends JfxControl {
-  val cellSkin = new RuleCellSkin(this)
-  setSkin(cellSkin)
+               val ruleList: ObservableBuffer[UiRule]) extends TreeItem[String]("") {
+  private val self = this
 
-  // Shrink the display when the rule is collapsed
-  // However, because the height of a TreeView can't be set directly, we can only set the preferred height.
-  // The problem with this is that preferred height changes don't result in actual height changes without a redraw,
-  // and there is no way to force a redraw without clicking outside of the cell
-  prefHeightProperty <== when (cellSkin.rootNode.expandedItemCount === 1) choose 50 otherwise 175
+  graphic = ruleNameField
+
+  expanded = true
+
+  children += conditionsNode
+  children += new TreeItem[String]("", addCondButton)
+  children += actionsNode
+  children += new TreeItem[String]("", addActionButton)
+
+  lazy val ruleNameField = new HBox(10) {
+    alignment = Pos.CenterLeft
+
+    children += new TextField() {
+      text <==> rule.nameProperty
+
+      HBox.setHgrow(this, Priority.Always)
+    }
+    children += new Button("-") {
+      onAction = { _ =>
+        ruleList -= rule
+        self.parent().children -= self
+      }
+    }
+    children += new CheckBox("Stop if true") {
+      allowIndeterminate = false
+
+      selected <==> rule.stopIfTrueProperty
+    }
+  }
+  lazy val conditionsNode = new TreeItem[String]("") {
+    expanded = true
+
+    graphic = new HBox(new Label("If "), conditionCombineType, new Label(" of the following conditions are true:")) {
+      alignment = Pos.CenterLeft
+    }
+  }
+  lazy val actionsNode = new TreeItem[String]() {
+    value = "Then perform the following actions:"
+
+    expanded = true
+  }
+
+  lazy val addCondButton = new Button("Add condition") {
+    onAction = { _ =>
+      val newCond = addCondition()
+      conditionsNode.children += new RuleCellComponents.ConditionCell(newCond, conditionDefs, story, rule)
+    }
+  }
+  lazy val addActionButton = new Button("Add action") {
+    onAction = { _ =>
+      val newAction = addAction()
+      actionsNode.children += new RuleCellComponents.ActionCell(newAction, actionDefs, story, rule)
+    }
+  }
+
+  lazy val conditionCombineType = new ComboBox[BooleanOperator]() {
+    cellFactory = { _ =>
+      new JfxListCell[BooleanOperator] {
+        override def updateItem(item: BooleanOperator, empty: Boolean): Unit = {
+          super.updateItem(item, empty)
+
+          text = if (!empty && item != null) {
+            item match {
+              case And => "All"
+              case Or => "Any"
+            }
+          }
+          else ""
+        }
+
+        // <editor-fold="Functions for replicating Scala-like access style">
+
+        def text = getText
+        def text_=(s: String) = setText(s)
+
+        // </editor-fold>
+      }
+    }
+
+    items = ObservableBuffer(And, Or)
+    value <==> rule.conditionsOpProperty
+
+    converter = new StringConverter[BooleanOperator] {
+      override def fromString(string: String): BooleanOperator = string match {
+        case "Any" => Or
+        case "All" => And
+        case s => throw new IllegalArgumentException(s"Illegal BooleanOperator type: $s")
+      }
+
+      override def toString(t: BooleanOperator): String = t match {
+        case And => "All"
+        case Or => "Any"
+      }
+    }
+  }
+
+  rule.conditions foreach { condition =>
+    conditionsNode.children += new RuleCellComponents.ConditionCell(condition, conditionDefs, story, rule)
+  }
+  rule.actions foreach { action =>
+    actionsNode.children += new RuleCellComponents.ActionCell(action, actionDefs, story, rule)
+  }
 
   /**
    * Add a condition to the rule
