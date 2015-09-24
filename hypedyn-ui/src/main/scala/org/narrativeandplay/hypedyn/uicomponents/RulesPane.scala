@@ -1,18 +1,17 @@
 package org.narrativeandplay.hypedyn.uicomponents
 
-import javafx.scene.control.{ListCell => JFXListCell}
-
 import scalafx.Includes._
+import scalafx.application.Platform
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
-import scalafx.geometry.{Pos, Insets}
-import scalafx.scene.control._
+import scalafx.geometry.{Insets, Pos}
+import scalafx.scene.control.{Button, Label, TreeItem, TreeView}
 import scalafx.scene.layout.{Priority, HBox, VBox}
 import scalafx.scene.Parent.sfxParent2jfx
 
 import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.Or
 import org.narrativeandplay.hypedyn.story.{UiStory, UiRule}
-import org.narrativeandplay.hypedyn.story.rules._
+import org.narrativeandplay.hypedyn.story.rules.{RuleId, ActionDefinition, ConditionDefinition}
 
 /**
  * A control to manipulate rules
@@ -33,13 +32,14 @@ class RulesPane(labelText: String,
   val rules = ObjectProperty(initRules)
   private val self = this
 
-  private val ruleList = new ListView[UiRule]() {
-    items <== rules
+  private val rulesList = new TreeView[String](new TreeItem[String]("")) {
+    showRoot = false
 
-    cellFactory = { _ =>
-      new RulesPane.RulesPaneCell(self)
+    selectionModel().selectedItem onChange {
+      Platform runLater { selectionModel().clearSelection() }
     }
   }
+
   private val label = new Label(labelText)
   private val addRuleButton = new Button("Add rule") {
     // 73 is the minimum width of the button at runtime that shows the full button label; allowing a fully automatic
@@ -48,7 +48,9 @@ class RulesPane(labelText: String,
     minWidth = 73
 
     onAction = { _ =>
-      rules() += new UiRule(RuleId(-1), "New Rule", false, Or, Nil, Nil)
+      val newRule = new UiRule(RuleId(-1), "New Rule", false, Or, Nil, Nil)
+      rules() += newRule
+      rulesList.root().children += new RuleCell(newRule, conditionDefinitions, actionDefinitions, story, rules())
     }
   }
 
@@ -63,26 +65,18 @@ class RulesPane(labelText: String,
 
     label.prefWidth <== width - addRuleButton.width - padding().left - padding().right
   }
-  children += ruleList
+  children += rulesList
 
-  VBox.setVgrow(ruleList, Priority.Always)
-}
+  rules() foreach { rule =>
+    rulesList.root().children += new RuleCell(rule, conditionDefinitions, actionDefinitions, story, rules())
+  }
 
-object RulesPane {
-  private class RulesPaneCell(parentView: RulesPane) extends JFXListCell[UiRule] {
-    setPadding(Insets.Empty) // fill the whole cell
-    private val self = this
-
-    override def updateItem(item: UiRule, empty: Boolean): Unit = {
-      super.updateItem(item, empty)
-
-      if (empty || item == null) {
-        setGraphic(null)
-      }
-      else {
-        val cell = new RuleCell(item, parentView.conditionDefinitions, parentView.actionDefinitions, parentView.story, parentView.rules())
-        setGraphic(cell)
-      }
+  rules onChange { (_, _, currentRules) =>
+    rulesList.root().children.clear()
+    currentRules foreach { rule =>
+      rulesList.root().children += new RuleCell(rule, conditionDefinitions, actionDefinitions, story, rules())
     }
   }
+
+  VBox.setVgrow(rulesList, Priority.Always)
 }
