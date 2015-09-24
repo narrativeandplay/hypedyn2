@@ -1,6 +1,7 @@
 package org.narrativeandplay.hypedyn.uicomponents
 
 import scalafx.Includes._
+import scalafx.application.Platform
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.{Insets, Pos}
@@ -33,6 +34,10 @@ class RulesPane(labelText: String,
 
   private val rulesList = new TreeView[String](new TreeItem[String]("")) {
     showRoot = false
+
+    selectionModel().selectedItem onChange {
+      Platform runLater { selectionModel().clearSelection() }
+    }
   }
 
   private val label = new Label(labelText)
