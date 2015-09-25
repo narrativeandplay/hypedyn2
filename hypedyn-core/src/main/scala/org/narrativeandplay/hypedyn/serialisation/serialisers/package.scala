@@ -3,6 +3,7 @@ package org.narrativeandplay.hypedyn.serialisation
 import org.narrativeandplay.hypedyn.story.Narrative.ReaderStyle
 import org.narrativeandplay.hypedyn.story.internal.Story.Metadata
 import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.{And, Or}
+import org.narrativeandplay.hypedyn.story.rules.RuleLike.ParamValue
 import org.narrativeandplay.hypedyn.story.{Narrative, NodalContent, NodeId}
 import org.narrativeandplay.hypedyn.story.internal.NodeContent.Ruleset
 import org.narrativeandplay.hypedyn.story.internal.{NodeContent, Story, Node}
@@ -197,6 +198,56 @@ package object serialisers {
       val actions = data("actions").asInstanceOf[AstList].toList map ActionSerialiser.deserialise
 
       Rule(id, name, stopIfTrue, conditionsOp, conditions, actions)
+    }
+  }
+
+  private def paramValueToAstMap(paramValue: ParamValue): AstMap =  {
+    import ParamValue._
+    paramValue match {
+      case ParamValue.Node(n) => AstMap("type" -> AstString("node"),
+                                        "value" -> AstInteger(n.value))
+      case Link(l) => AstMap("type" -> AstString("link"),
+                             "value" -> AstInteger(l.value))
+      case IntegerFact(f) => AstMap("type" -> AstString("integerFact"),
+                                    "value" -> AstInteger(f.value))
+      case BooleanFact(f) => AstMap("type" -> AstString("booleanFact"),
+                                    "value" -> AstInteger(f.value))
+      case StringFact(f) => AstMap("type" -> AstString("stringFact"),
+                                   "value" -> AstInteger(f.value))
+      case StringInput(s) => AstMap("type" -> AstString("string"),
+                                    "value" -> AstString(s))
+      case IntegerInput(i) => AstMap("type" -> AstString("integer"),
+                                     "value" -> AstInteger(i))
+      case SelectedListValue(s) => AstMap("type" -> AstString("selectedListValue"),
+                                          "value" -> AstString(s))
+      case UnionValueSelected(p) => AstMap("type" -> AstString("union"),
+                                           "value" -> AstString(p))
+      case ProductValue(ns) => AstMap("type" -> AstString("product"),
+                                      "value" -> AstString(ns mkString ":"))
+    }
+  }
+
+  private def astMapToParamValue(astMap: AstMap): ParamValue = {
+    val m = astMap.toMap
+
+    // Sanity check
+    assert(m.size == 2)
+    assert(m contains "type")
+    assert(m contains "value")
+
+    import ParamValue._
+    m("type").asInstanceOf[AstString].s match {
+      case "node" => ParamValue.Node(NodeId(m("value").asInstanceOf[AstInteger].i))
+      case "link" => Link(RuleId(m("value").asInstanceOf[AstInteger].i))
+      case "integerFact" => IntegerFact(FactId(m("value").asInstanceOf[AstInteger].i))
+      case "booleanFact" => BooleanFact(FactId(m("value").asInstanceOf[AstInteger].i))
+      case "stringFact" => StringFact(FactId(m("value").asInstanceOf[AstInteger].i))
+      case "string" => StringInput(m("value").asInstanceOf[AstString].s)
+      case "integer" => IntegerInput(m("value").asInstanceOf[AstInteger].i)
+      case "selectedListValue" => SelectedListValue(m("value").asInstanceOf[AstString].s)
+      case "union" => UnionValueSelected(m("value").asInstanceOf[AstString].s)
+      case "product" => ProductValue((m("value").asInstanceOf[AstString].s split ":").toList)
+      case unknown => throw DeserialisationException(s"Invalid type for ParamValue: $unknown")
     }
   }
 
