@@ -179,28 +179,44 @@ object StoryController {
     toDestroyOption foreach { toDestroy => currentStory = currentStory removeNode toDestroy }
     val destroyedNodeChangedNodesOption = toDestroyOption map { toDestroy =>
       val nodesToEdit = currentStory.nodes filter { node =>
-        val nodeActionsReferenceToDestroy = node.rules flatMap (_.actions) flatMap (_.params get ParamName("node")) contains ParamValue(toDestroy.id.value.toString())
-        val nodeConditionsReferenceToDestroy = node.rules flatMap (_.conditions) flatMap (_.params get ParamName("node")) contains ParamValue(toDestroy.id.value.toString())
+        val nodeActionsReferenceToDestroy = (for {
+          actions <- node.rules map (_.actions)
+          parameterValues <- actions map (_.params.values)
+          nodeParameterValue <- parameterValues collect { case p: ParamValue.Node => p }
+        } yield nodeParameterValue.node) contains toDestroy.id
+        val nodeConditionsReferenceToDestroy = (for {
+          conditions <- node.rules map (_.conditions)
+          parameterValues <- conditions map (_.params.values)
+          nodeParameterValue <- parameterValues collect { case p: ParamValue.Node => p }
+        } yield nodeParameterValue.node) contains toDestroy.id
 
         val textRules = node.content.rulesets flatMap (_.rules)
-        val textRulesActionsReferenceToDestroy = textRules flatMap (_.actions) flatMap (_.params get ParamName("node")) contains ParamValue(toDestroy.id.value.toString())
-        val textRulesConditionsReferenceToDestroy = textRules flatMap (_.conditions) flatMap (_.params get ParamName("node")) contains ParamValue(toDestroy.id.value.toString())
+        val textRulesActionsReferenceToDestroy = (for {
+          actions <- textRules map (_.actions)
+          parameterValues <- actions map (_.params.values)
+          nodeParameterValue <- parameterValues collect { case p: ParamValue.Node => p }
+        } yield nodeParameterValue.node) contains toDestroy.id
+        val textRulesConditionsReferenceToDestroy = (for {
+          conditions <- textRules map (_.conditions)
+          parameterValues <- conditions map (_.params.values)
+          nodeParameterValue <- parameterValues collect { case p: ParamValue.Node => p }
+        } yield nodeParameterValue.node) contains toDestroy.id
 
         nodeActionsReferenceToDestroy || nodeConditionsReferenceToDestroy || textRulesActionsReferenceToDestroy || textRulesConditionsReferenceToDestroy
       }
 
       val editedNodePairs = nodesToEdit map { node =>
         val modifiedNodeRules = node.rules map { rule =>
-          val modifiedActions = rule.actions filterNot { action => action.params.values.toList contains ParamValue(toDestroy.id.value.toString()) }
-          val modifiedConditions = rule.conditions filterNot { action => action.params.values.toList contains ParamValue(toDestroy.id.value.toString()) }
+          val modifiedActions = rule.actions filterNot { action => action.params.values.toList contains ParamValue.Node(toDestroy.id) }
+          val modifiedConditions = rule.conditions filterNot { action => action.params.values.toList contains ParamValue.Node(toDestroy.id) }
 
           rule.copy(conditions = modifiedConditions, actions = modifiedActions)
         }
 
         val modifiedRulesets = node.content.rulesets map { ruleset =>
           val modifiedRules = ruleset.rules map { rule =>
-            val modifiedActions = rule.actions filterNot { action => action.params.values.toList contains ParamValue(toDestroy.id.value.toString()) }
-            val modifiedConditions = rule.conditions filterNot { action => action.params.values.toList contains ParamValue(toDestroy.id.value.toString()) }
+            val modifiedActions = rule.actions filterNot { action => action.params.values.toList contains ParamValue.Node(toDestroy.id) }
+            val modifiedConditions = rule.conditions filterNot { action => action.params.values.toList contains ParamValue.Node(toDestroy.id) }
 
             rule.copy(conditions = modifiedConditions, actions = modifiedActions)
           }
