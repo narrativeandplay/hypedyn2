@@ -12,9 +12,9 @@ import scalafx.event.Event
 import scalafx.scene.input.MouseEvent
 
 import org.narrativeandplay.hypedyn.storyviewer.utils.UnorderedPair
-import org.narrativeandplay.hypedyn.story.rules.RuleLike.ParamName
+import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamValue, ParamName}
 import org.narrativeandplay.hypedyn.story.rules.Actionable.ActionType
-import org.narrativeandplay.hypedyn.story.{NodeId, Narrative, Nodal}
+import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.storyviewer.components.{ViewerNode, LinkGroup}
 import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
 
@@ -132,8 +132,9 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
    */
   private def makeLinks(viewerNode: ViewerNode): Unit = {
     viewerNode.node().links foreach { link =>
-      val toNode = link.actions find (_.actionType == ActionType("LinkTo")) flatMap (_.params get ParamName("node")) flatMap { idVal =>
-        nodes find (_.id == NodeId(BigInt(idVal.value)))
+      val toNode = link.actions find (_.actionType == ActionType("LinkTo")) flatMap (_.params get ParamName("node")) flatMap { linkTo =>
+        val nodeId = linkTo.asInstanceOf[ParamValue.Node].node
+        nodes find (_.id == nodeId)
       }
 
       toNode foreach { to =>

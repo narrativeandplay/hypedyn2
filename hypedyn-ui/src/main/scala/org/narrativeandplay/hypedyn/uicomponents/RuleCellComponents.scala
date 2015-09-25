@@ -60,6 +60,10 @@ object RuleCellComponents {
     def val_=(string: ParamValue): Unit
   }
 
+  object RuleCellParameterComponent {
+    case class InvalidParamValueException(msg: String) extends Exception(msg)
+  }
+
   /**
    * Cell for manipulating a condition
    *
@@ -277,7 +281,7 @@ object RuleCellComponents {
     }
 
     onAction = { _ =>
-      paramMap += paramName -> ParamValue(value().id.value.toString())
+      paramMap += paramName -> ParamValue.Node(value().id)
     }
 
     items <== EasyBind select story selectObject new JFunction[UiStory, javafx.beans.value.ObservableValue[ObservableList[UiNode]]] {
@@ -286,7 +290,13 @@ object RuleCellComponents {
 
     override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(paramValue: ParamValue): Unit = story().nodes find (_.id.value == BigInt(paramValue.value)) foreach { n => value = n }
+    override def val_=(paramValue: ParamValue): Unit = {
+      val idToSet = paramValue match {
+        case ParamValue.Node(n) => n
+        case pv => throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.Node, got: $pv")
+      }
+      story().nodes find (_.id == idToSet) foreach { n => value = n }
+    }
   }
 
   /**
@@ -318,7 +328,7 @@ object RuleCellComponents {
     }
 
     onAction = { _ =>
-      paramMap += paramName -> ParamValue(value().id.value.toString())
+      paramMap += paramName -> ParamValue.Link(value().id)
     }
 
     items = story().links
@@ -329,7 +339,13 @@ object RuleCellComponents {
 
     override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(paramValue: ParamValue): Unit = story().links find (_.id.value == BigInt(paramValue.value)) foreach { r => value = r }
+    override def val_=(paramValue: ParamValue): Unit = {
+      val idToSet = paramValue match {
+        case ParamValue.Link(l) => l
+        case pv => throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.Link, got: $pv")
+      }
+      story().links find (_.id == idToSet) foreach { r => value = r }
+    }
   }
 
   /**
@@ -361,7 +377,7 @@ object RuleCellComponents {
     }
 
     onAction = { _ =>
-      paramMap += paramName -> ParamValue(selectionModel().getSelectedItem.id.value.toString())
+      paramMap += paramName -> ParamValue.IntegerFact(selectionModel().getSelectedItem.id)
     }
 
     items = intFacts
@@ -374,7 +390,13 @@ object RuleCellComponents {
 
     override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(paramValue: ParamValue): Unit = intFacts find (_.id.value == BigInt(paramValue.value)) foreach { f => value =  f }
+    override def val_=(paramValue: ParamValue): Unit = {
+      val idToSet = paramValue match {
+        case ParamValue.IntegerFact(f) => f
+        case pv => throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.IntegerFact, got: $pv")
+      }
+      intFacts find (_.id == idToSet) foreach { f => value = f }
+    }
   }
 
   /**
@@ -406,7 +428,7 @@ object RuleCellComponents {
     }
 
     onAction = { _ =>
-      paramMap += paramName -> ParamValue(selectionModel().getSelectedItem.id.toString)
+      paramMap += paramName -> ParamValue.BooleanFact(selectionModel().getSelectedItem.id)
     }
 
     items = boolFacts
@@ -419,7 +441,13 @@ object RuleCellComponents {
 
     override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(paramValue: ParamValue): Unit = boolFacts find (_.id.value == BigInt(paramValue.value)) foreach { f => value =  f }
+    override def val_=(paramValue: ParamValue): Unit = {
+      val idToSet = paramValue match {
+        case ParamValue.BooleanFact(f) => f
+        case pv => throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.BooleanFact, got: $pv")
+      }
+      boolFacts find (_.id == idToSet) foreach { f => value =  f }
+    }
   }
 
   /**
@@ -451,7 +479,7 @@ object RuleCellComponents {
     }
 
     onAction = { _ =>
-      paramMap += paramName -> ParamValue(selectionModel().getSelectedItem.id.toString)
+      paramMap += paramName -> ParamValue.StringFact(selectionModel().getSelectedItem.id)
     }
 
     items = stringFacts
@@ -464,7 +492,13 @@ object RuleCellComponents {
 
     override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(paramValue: ParamValue): Unit = stringFacts find (_.id.value == BigInt(paramValue.value)) foreach { f => value = f }
+    override def val_=(paramValue: ParamValue): Unit = {
+      val idToSet = paramValue match {
+        case ParamValue.StringFact(f) => f
+        case pv => throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.StringFact, got: $pv")
+      }
+      stringFacts find (_.id == idToSet) foreach { f => value = f }
+    }
   }
 
   /**
@@ -478,12 +512,18 @@ object RuleCellComponents {
                     val paramName: ParamName,
                     val story: ObjectProperty[UiStory]) extends TextArea with RuleCellParameterComponent {
     text onChange { (_, _ , newValue) =>
-      Option(newValue) foreach (paramMap += paramName -> ParamValue(_))
+      Option(newValue) foreach (paramMap += paramName -> ParamValue.StringInput(_))
     }
 
     override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(paramValue: ParamValue): Unit = text = paramValue.value
+    override def val_=(paramValue: ParamValue): Unit = {
+      val textToSet = paramValue match {
+        case ParamValue.StringInput(s) => s
+        case pv => throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.StringInput, got: $pv")
+      }
+      text = textToSet
+    }
   }
 
   /**
@@ -512,12 +552,18 @@ object RuleCellComponents {
     }
 
     value onChange { (_, _, newValue) =>
-      Option(newValue) foreach { v => paramMap += paramName -> ParamValue(v.toString()) }
+      Option(newValue) foreach { v => paramMap += paramName -> ParamValue.IntegerInput(v) }
     }
 
     override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(paramValue: ParamValue): Unit = valueFactory().setValue(BigInt(paramValue.value))
+    override def val_=(paramValue: ParamValue): Unit = {
+      val intToSet = paramValue match {
+        case ParamValue.IntegerInput(i) => i
+        case pv => throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.IntegerInput, got: $pv")
+      }
+      valueFactory().setValue(intToSet)
+    }
   }
 
   /**
@@ -535,12 +581,18 @@ object RuleCellComponents {
     items = ObservableBuffer(values)
 
     onAction = { _ =>
-      paramMap += paramName -> ParamValue(selectionModel().getSelectedItem)
+      paramMap += paramName -> ParamValue.SelectedListValue(selectionModel().getSelectedItem)
     }
 
     override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(paramValue: ParamValue): Unit = value = paramValue.value
+    override def val_=(paramValue: ParamValue): Unit = {
+      val valToSet = paramValue match {
+        case ParamValue.SelectedListValue(v) => v
+        case pv => throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.SelectedListValue, got: $pv")
+      }
+      value = valToSet
+    }
   }
 
   /**
@@ -555,6 +607,8 @@ object RuleCellComponents {
                           val paramName: ParamName,
                           val story: ObjectProperty[UiStory],
                           params: Map[String, RuleParameter]) extends HBox with RuleCellParameterComponent {
+    val unionParamsChildren = ObservableBuffer.empty[Region with RuleCellParameterComponent]
+
     val unionValue = new ComboBox[(String, RuleParameter)]() {
       cellFactory = { _ =>
         new JfxListCell[(String, RuleParameter)] {
@@ -581,9 +635,9 @@ object RuleCellComponents {
 
         pane.children.clear()
 
-        paramMap += paramName -> ParamValue(selected.name)
+        paramMap += paramName -> ParamValue.UnionValueSelected(selected.name)
 
-        pane.children += createParameterInput(selected, paramMap, story)
+        generateParameterInputComponents(this)
       }
     }
 
@@ -591,9 +645,29 @@ object RuleCellComponents {
 
     children.addAll(unionValue, pane)
 
+    private def generateParameterInputComponents(comboBox: ComboBox[(String, RuleParameter)]) = {
+      val newComponent = createParameterInput(comboBox.value()._2, paramMap, story)
+      pane.children += newComponent
+      unionParamsChildren += newComponent
+    }
+
     override def `val`: Option[ParamValue] = paramMap get paramName
 
-    override def val_=(string: ParamValue): Unit = params find { case (_, param) => param.name == paramName.value } foreach { p => unionValue.value = p }
+    override def val_=(paramValue: ParamValue): Unit = {
+      val selectedParameterName = paramValue match {
+        case ParamValue.UnionValueSelected(s) => s
+        case pv => throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.UnionValueSelected, got: $pv")
+      }
+      params find { case (_, param) => param.name == selectedParameterName } foreach { p => unionValue.value = p }
+
+      unionParamsChildren.clear()
+      pane.children.clear()
+
+      generateParameterInputComponents(unionValue)
+      unionParamsChildren foreach { component =>
+        paramMap get component.paramName foreach { v => component.`val` = v }
+      }
+    }
   }
 
   /**
@@ -608,9 +682,13 @@ object RuleCellComponents {
                     val paramName: ParamName,
                     val story: ObjectProperty[UiStory],
                     params: List[RuleParameter]) extends HBox with RuleCellParameterComponent {
-    paramMap += paramName -> ParamValue(params map (_.name) mkString ":")
+    paramMap += paramName -> ParamValue.ProductValue(params map (_.name))
 
-    params foreach (children += createParameterInput(_, paramMap, story))
+    params foreach { param =>
+      val newComponent = createParameterInput(param, paramMap, story)
+      children +=  newComponent
+      paramMap get newComponent.paramName foreach { v => newComponent.`val` = v }
+    }
 
     override def `val`: Option[ParamValue] = paramMap get paramName
 
