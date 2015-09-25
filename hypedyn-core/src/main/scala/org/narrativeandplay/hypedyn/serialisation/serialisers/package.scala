@@ -263,7 +263,7 @@ package object serialisers {
     override def serialise(condition: Condition): AstElement =
       AstMap("conditionType" -> AstString(condition.conditionType.value),
              "params" -> AstMap((condition.params map { case (k, v) =>
-               k.value -> AstString(v.value)
+               k.value -> paramValueToAstMap(v)
              }).toSeq: _*))
 
     /**
@@ -275,11 +275,11 @@ package object serialisers {
       val data = serialised.asInstanceOf[AstMap]
       val conditionType = data("conditionType").asInstanceOf[AstString].s
       val params = data("params").asInstanceOf[AstMap].toMap map { case (k, v) =>
-        k -> v.asInstanceOf[AstString].s
+        k -> astMapToParamValue(v.asInstanceOf[AstMap])
       }
 
       Condition(Conditional.ConditionType(conditionType), params map { case (k, v) =>
-        RuleLike.ParamName(k) -> RuleLike.ParamValue(v)
+        RuleLike.ParamName(k) -> v
       })
     }
   }
@@ -295,7 +295,7 @@ package object serialisers {
      */
     override def serialise(action: Action): AstElement = AstMap("actionType" -> AstString(action.actionType.value),
                                                                 "params" -> AstMap((action.params map { case (k, v) =>
-                                                                    k.value -> AstString(v.value)
+                                                                    k.value -> paramValueToAstMap(v)
                                                                 }).toSeq: _*))
 
     /**
@@ -307,11 +307,11 @@ package object serialisers {
       val data = serialised.asInstanceOf[AstMap]
       val actionType = data("actionType").asInstanceOf[AstString].s
       val params = data("params").asInstanceOf[AstMap].toMap map { case (k, v) =>
-          k -> v.asInstanceOf[AstString].s
+          k -> astMapToParamValue(v.asInstanceOf[AstMap])
       }
 
       Action(Actionable.ActionType(actionType), params map { case (k, v) =>
-        RuleLike.ParamName(k) -> RuleLike.ParamValue(v)
+        RuleLike.ParamName(k) -> v
       })
     }
   }
