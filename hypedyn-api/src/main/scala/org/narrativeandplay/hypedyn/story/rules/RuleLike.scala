@@ -1,5 +1,7 @@
 package org.narrativeandplay.hypedyn.story.rules
 
+import org.narrativeandplay.hypedyn.story.NodeId
+
 /**
  * An interface for a rule
  */
@@ -45,11 +47,25 @@ object RuleLike {
   case class ParamName(value: String) extends AnyVal
 
   /**
-   * A value type for the value of a parameter
-   *
-   * @param value The value of the parameter
+   * A union type representing the value of a given parameter
    */
-  case class ParamValue(value: String) extends AnyVal
+  sealed trait ParamValue
+  object ParamValue {
+    case class Node(node: NodeId) extends ParamValue
+    case class Link(link: RuleId) extends ParamValue
+
+    case class IntegerFact(fact: FactId) extends ParamValue
+    case class BooleanFact(fact: FactId) extends ParamValue
+    case class StringFact(fact: FactId) extends ParamValue
+
+    case class StringInput(string: String) extends ParamValue
+    case class IntegerInput(integer: BigInt) extends ParamValue
+
+    case class SelectedListValue(value: String) extends ParamValue
+
+    case class UnionValueSelected(selectedParameterName: String) extends ParamValue
+    case class ProductValue(parameterNames: List[String]) extends ParamValue
+  }
 }
 
 /**
