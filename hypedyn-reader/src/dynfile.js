@@ -14,10 +14,10 @@ function loadStory() {
 		for (var i=0; i < nodes.length; i++){
 			var thisNode = nodes[i];
 			if (thisNode!=null) {
-				var id=thisNode.id;
-				var name=thisNode.name;
-				var content=thisNode.content;
-				var rules=thisNode.rules; // node rules - do this later
+				var id=thisNode.id; 			// id of the node
+				var name=thisNode.name; 		// name of the node
+				var content=thisNode.content; 	// node content
+				var rules=thisNode.rules; 		// node rules - do this later
 
 				// create the node
 				createNode(name, content.text, false, id); // third param is isAnywhere??? check...
@@ -26,12 +26,12 @@ function loadStory() {
 				var links=content.rulesets;
 				if(links!=null) {
 					for(var j=0; j < links.length; j++) {
-						var thisRuleset=links[j];
-						var start = thisRuleset.start;
-						var end = thisRuleset.end;
-						var rulesetID = thisRuleset.id;
-						var rulesetName = thisRuleset.name;
-						var rules = thisRuleset.rules;
+						var thisRuleset=links[j];				// this link ("ruleset")
+						var start = thisRuleset.start;			// start offset of the link
+						var end = thisRuleset.end;				// end offset of the link
+						var rulesetID = thisRuleset.id;			// id of the link
+						var rulesetName = thisRuleset.name;		// name of this link
+						var rules = thisRuleset.rules;			// rules in this ruleset
 
 						// create the link
 						createLink(id, start, end, rulesetID);
@@ -39,11 +39,13 @@ function loadStory() {
 						// now create rules (if any)
 						if(rules!=null) {
 							for(var k=0; k < rules.length; k++) {
-								var thisRule=rules[k];
-								var ruleName=thisRule.name;
-								var stopIfTrue=thisRule.stopIfTrue;
-								var ruleID=thisRule.id;
-								var conditionsOp=thisRule.conditionsOp;
+								var thisRule=rules[k];					// this rule
+								var ruleName=thisRule.name;				// name of this rule
+								var stopIfTrue=thisRule.stopIfTrue;		// stop if true?
+								var ruleID=thisRule.id;					// id of this rule
+								var conditionsOp=thisRule.conditionsOp;	// operator (and/or)
+								var conditions = thisRule.conditions;	// list of conditions
+								var actions = thisRule.actions;			// list of actions
 
 								// create the rule
 								// createRule(parentID, parentType, if_not, and_or, fall_through, id)
@@ -52,25 +54,73 @@ function loadStory() {
 
 								// now create the conditions and actions (if any)
 
-								// create conditions - skip for now
-								var conditions = thisRule.conditions;
+								// create conditions
 								if(conditions!=null) {
 									for(var l=0; l < conditions.length; l++) {
-										var thisCondition = conditions[l];
-										var conditionType = thisCondition.conditionType;
+										var thisCondition = conditions[l];					// this condition
+										var conditionType = thisCondition.conditionType;	// type
 
 										// createCondition(func, func_args_arr, ruleID, not, id)
-										// createCondition(nodeVisited, [3], 21, false, 24);
-										if(conditionType=="NodeCondition"){
-											if (thisCondition.params.status=="visited") {
-												createCondition(nodeVisited, [thisCondition.params.node], ruleID, false, l);
-											}
+										switch (conditionType) {
+											case "NodeCondition":
+												switch(thisCondition.params.status) {
+													case "visited":
+														createCondition(nodeVisited, [thisCondition.params.node], ruleID, false, l);
+														break;
+													case "not visited":
+														createCondition(nodeVisited, [thisCondition.params.node], ruleID, true, l);
+														break;
+													case "is previous":
+														createCondition(nodeIsPrevious, [thisCondition.params.node], ruleID, false, l);
+														break;
+													case "is not previous":
+														createCondition(nodeIsPrevious, [thisCondition.params.node], ruleID, true, l);
+														break;
+													case "current":
+														break;
+												}
+												break;
+											case "LinkCondition":
+												switch(thisCondition.params.status) {
+													case "followed":
+														createCondition(linkFollowed, [thisCondition.params.node], ruleID, false, l);
+														break;
+													case "not followed":
+														createCondition(linkFollowed, [thisCondition.params.node], ruleID, true, l);
+														break;
+												}
+												break;
+											case "BooleanFactValue":
+												switch(thisCondition.params.state) {
+													case "true":
+														createCondition(checkBoolFact, [thisCondition.params.fact], ruleID, false, l);
+														break;
+													case "false":
+														createCondition(checkBoolFact, [thisCondition.params.fact], ruleID, true, l);
+														break;
+												}
+												break;
+											case "IntegerFactComparison":
+												switch(thisCondition.params.comparisonValue) {
+													case "input":
+														// createCondition(compareNumFact, [19, '=', 'Input', 0], 27, false, 28);
+														// value is missing here, bug #23
+														createCondition(checkBoolFact, [thisCondition.params.fact,
+															thisCondition.params.operator, 'Input', 0], ruleID, false, l);
+														break;
+													case "otherFact":
+														//createCondition(compareNumFact, [19, '=', 'Fact', 19], 29, false, 30);
+														createCondition(compareNumFact, [thisCondition.params.fact,
+															thisCondition.params.operator, 'Fact', thisCondition.params.otherFact],
+															ruleID, false, l);
+														break;
+												}
+												break;
 										}
 									}
 								}
 
 								// create actions
-								var actions = thisRule.actions;
 								if(actions!=null) {
 									for(var l=0; l < actions.length; l++) {
 										var thisAction = actions[l];
@@ -78,8 +128,24 @@ function loadStory() {
 
 										// createAction(eventType, parentRuleID, func, args, id)
 										// eventType can be "enteredNode" "clickedLink" "anywhereCheck"
-										if(actionType=="LinkTo") {
-											createAction("clickedLink", ruleID, gotoNode, [thisAction.params.node], l);
+										switch (actionType) {
+											case "LinkTo":
+												createAction("clickedLink", ruleID, gotoNode, [thisAction.params.node], l);
+												break;
+											case "ShowPopupNode":
+												break;
+											case "UpdateText":
+												break;
+											case "UpdateBooleanFact":
+												break;
+											case "UpdateStringFact":
+												break;
+											case "EnableAnywhereLinkToHere":
+												break;
+											case "ShowDisabledAnywhereLink":
+												break;
+											case "UpdateIntegerFacts":
+												break;
 										}
 									}
 								}
