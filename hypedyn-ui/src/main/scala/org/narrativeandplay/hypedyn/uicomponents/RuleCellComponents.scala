@@ -167,8 +167,10 @@ object RuleCellComponents {
     }
 
     parentRule.conditionsProperty() onChange { (buffer, changes) =>
-      moveUpButton.disable = buffer.head == condition
-      moveDownButton.disable = buffer.last == condition
+      if (buffer.nonEmpty) {
+        moveUpButton.disable = buffer.head == condition
+        moveDownButton.disable = buffer.last == condition
+      }
     }
 
     /**
@@ -290,8 +292,10 @@ object RuleCellComponents {
     }
 
     parentRule.actionsProperty() onChange { (buffer, changes) =>
-      moveUpButton.disable = buffer.head == action
-      moveDownButton.disable = buffer.last == action
+      if (buffer.nonEmpty) {
+        moveUpButton.disable = buffer.head == action
+        moveDownButton.disable = buffer.last == action
+      }
     }
 
     /**
