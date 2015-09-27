@@ -50,7 +50,7 @@ class RulesPane(labelText: String,
     onAction = { _ =>
       val newRule = new UiRule(RuleId(-1), "New Rule", false, Or, Nil, Nil)
       rules() += newRule
-      rulesList.root().children += new RuleCell(newRule, conditionDefinitions, actionDefinitions, story, rules())
+      rulesList.root().children += new RuleCell(newRule, conditionDefinitions, actionDefinitions, story, rules(), self)
     }
   }
 
@@ -67,14 +67,23 @@ class RulesPane(labelText: String,
   }
   children += rulesList
 
+  // Initialise cells
   rules() foreach { rule =>
-    rulesList.root().children += new RuleCell(rule, conditionDefinitions, actionDefinitions, story, rules())
+    rulesList.root().children += new RuleCell(rule, conditionDefinitions, actionDefinitions, story, rules(), this)
   }
 
+  // Redraw the whole pane when the whole buffer changes
   rules onChange { (_, _, currentRules) =>
     rulesList.root().children.clear()
     currentRules foreach { rule =>
-      rulesList.root().children += new RuleCell(rule, conditionDefinitions, actionDefinitions, story, rules())
+      rulesList.root().children += new RuleCell(rule, conditionDefinitions, actionDefinitions, story, rules(), this)
+    }
+  }
+
+  def rearrangeCells(): Unit = {
+    rulesList.root().children.clear()
+    rules() foreach { rule =>
+      rulesList.root().children += new RuleCell(rule, conditionDefinitions, actionDefinitions, story, rules(), this)
     }
   }
 

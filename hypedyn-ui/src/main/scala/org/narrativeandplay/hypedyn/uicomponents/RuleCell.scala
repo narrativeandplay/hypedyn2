@@ -15,6 +15,7 @@ import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.{Or, And}
 import org.narrativeandplay.hypedyn.story.rules.Conditional.ConditionType
 import org.narrativeandplay.hypedyn.story.{UiAction, UiCondition, UiStory, UiRule}
 import org.narrativeandplay.hypedyn.story.rules.{BooleanOperator, ActionDefinition, ConditionDefinition}
+import org.narrativeandplay.hypedyn.utils.ScalaJavaImplicits._
 
 /**
  * Cell in a rule list to manipulate rules
@@ -29,8 +30,45 @@ class RuleCell(val rule: UiRule,
                val conditionDefs: List[ConditionDefinition],
                val actionDefs: List[ActionDefinition],
                val story: ObjectProperty[UiStory],
-               val ruleList: ObservableBuffer[UiRule]) extends TreeItem[String]("") {
+               val ruleList: ObservableBuffer[UiRule],
+               val parentPane: RulesPane) extends TreeItem[String]("") {
   private val self = this
+  private val root = self.parent()
+  private val moveUpButton = new Button("↑") {
+    disable = ruleList(0) == rule
+
+    onAction = { _ =>
+      val currentIndex = ruleList indexOf rule
+      val newIndex = currentIndex - 1
+
+      val itemToMoveDown = ruleList(newIndex)
+
+      ruleList.set(newIndex, rule)
+      ruleList.set(currentIndex, itemToMoveDown)
+
+      parentPane.rearrangeCells()
+    }
+  }
+  private val moveDownButton = new Button("↓") {
+    disable = ruleList.last == rule
+
+    onAction = { _ =>
+      val currentIndex = ruleList indexOf rule
+      val newIndex = currentIndex + 1
+
+      val itemToMoveUp = ruleList(newIndex)
+
+      ruleList.set(newIndex, rule)
+      ruleList.set(currentIndex, itemToMoveUp)
+
+      parentPane.rearrangeCells()
+    }
+  }
+
+  ruleList onChange { (buffer, changes) =>
+    moveUpButton.disable = buffer(0) == rule
+    moveDownButton.disable = buffer.last == rule
+  }
 
   graphic = ruleNameField
 
@@ -44,6 +82,8 @@ class RuleCell(val rule: UiRule,
   lazy val ruleNameField = new HBox(10) {
     alignment = Pos.CenterLeft
 
+    children += moveUpButton
+    children += moveDownButton
     children += new TextField() {
       text <==> rule.nameProperty
 
