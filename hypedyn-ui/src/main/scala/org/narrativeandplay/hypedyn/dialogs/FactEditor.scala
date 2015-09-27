@@ -1,14 +1,11 @@
 package org.narrativeandplay.hypedyn.dialogs
 
-import javafx.{event => jfxe}
-import javafx.event.EventHandler
 import javafx.scene.{control => jfxsc}
 
 import scala.util.Try
 
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
-import scalafx.event.ActionEvent
 import scalafx.scene.control._
 import scalafx.stage.{Modality, Window}
 import scalafx.util.StringConverter
