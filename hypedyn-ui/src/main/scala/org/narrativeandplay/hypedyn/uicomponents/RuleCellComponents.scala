@@ -75,6 +75,7 @@ object RuleCellComponents {
   class ConditionCell(val condition: UiCondition, 
                       val conditionDefinitions: List[ConditionDefinition],
                       val parentStory: ObjectProperty[UiStory],
+                      val parentCell: RuleCell,
                       parentRule: UiRule) extends TreeItem[String]("") {
     private def parentTreeItem = parent()
     private val self = this
@@ -131,6 +132,45 @@ object RuleCellComponents {
       }
     }
 
+    lazy val moveUpButton = new Button("↑") {
+      disable = parentRule.conditions.head == condition
+
+      onAction = { _ =>
+        val currentIndex = parentRule.conditions indexOf condition
+        val newIndex = currentIndex - 1
+
+        val itemToMoveDown = parentRule.conditions(newIndex)
+
+        parentRule.conditionsProperty().set(newIndex, condition)
+        parentRule.conditionsProperty().set(currentIndex, itemToMoveDown)
+
+        parentCell.rearrangeConditions()
+      }
+    }
+    lazy val moveDownButton = new Button("↓") {
+      disable = parentRule.conditions.last == condition
+
+      onAction = { _ =>
+        val currentIndex = parentRule.conditions indexOf condition
+        val newIndex = currentIndex + 1
+
+        val itemToMoveUp = parentRule.conditions(newIndex)
+
+        parentRule.conditionsProperty().set(newIndex, condition)
+        parentRule.conditionsProperty().set(currentIndex, itemToMoveUp)
+
+        parentCell.rearrangeConditions()
+      }
+    }
+    lazy val rearrangeButtons = new HBox(10, moveUpButton, moveDownButton) {
+      padding = Insets(0, 10, 0, 0)
+    }
+
+    parentRule.conditionsProperty() onChange { (buffer, changes) =>
+      moveUpButton.disable = buffer.head == condition
+      moveDownButton.disable = buffer.last == condition
+    }
+
     /**
      * Generate the UI components for the selected condition
      *
@@ -143,7 +183,7 @@ object RuleCellComponents {
         condParamsChildren += newComponent
       }
 
-    graphic = new HBox(condTypeCombo, condParams, removeButton)
+    graphic = new HBox(rearrangeButtons, condTypeCombo, condParams, removeButton)
     
   }
 
