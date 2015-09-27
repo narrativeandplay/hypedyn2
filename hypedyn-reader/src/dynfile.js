@@ -65,16 +65,16 @@ function loadStory() {
 											case "NodeCondition":
 												switch(thisCondition.params.status) {
 													case "visited":
-														createCondition(nodeVisited, [thisCondition.params.node], ruleID, false, l);
+														createCondition(nodeVisited, [thisCondition.params.node.value], ruleID, false, l);
 														break;
 													case "not visited":
-														createCondition(nodeVisited, [thisCondition.params.node], ruleID, true, l);
+														createCondition(nodeVisited, [thisCondition.params.node.value], ruleID, true, l);
 														break;
 													case "is previous":
-														createCondition(nodeIsPrevious, [thisCondition.params.node], ruleID, false, l);
+														createCondition(nodeIsPrevious, [thisCondition.params.node.value], ruleID, false, l);
 														break;
 													case "is not previous":
-														createCondition(nodeIsPrevious, [thisCondition.params.node], ruleID, true, l);
+														createCondition(nodeIsPrevious, [thisCondition.params.node.value], ruleID, true, l);
 														break;
 													case "current":
 														break;
@@ -83,10 +83,10 @@ function loadStory() {
 											case "LinkCondition":
 												switch(thisCondition.params.status) {
 													case "followed":
-														createCondition(linkFollowed, [thisCondition.params.node], ruleID, false, l);
+														createCondition(linkFollowed, [thisCondition.params.link.value], ruleID, false, l);
 														break;
 													case "not followed":
-														createCondition(linkFollowed, [thisCondition.params.node], ruleID, true, l);
+														createCondition(linkFollowed, [thisCondition.params.link.value], ruleID, true, l);
 														break;
 												}
 												break;
@@ -130,7 +130,7 @@ function loadStory() {
 										// eventType can be "enteredNode" "clickedLink" "anywhereCheck"
 										switch (actionType) {
 											case "LinkTo":
-												createAction("clickedLink", ruleID, gotoNode, [thisAction.params.node], l);
+												createAction("clickedLink", ruleID, gotoNode, [thisAction.params.node.value], l);
 												break;
 											case "ShowPopupNode":
 												break;
