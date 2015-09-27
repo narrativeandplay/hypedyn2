@@ -89,8 +89,7 @@ class NodeEditor private (dialogTitle: String,
   initOwner(ownerWindow)
   initModality(Modality.NONE)
 
-  width = 640
-  height = 480
+  dialogPane().setPrefSize(1280, 800)
 
   dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
 

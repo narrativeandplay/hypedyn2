@@ -595,6 +595,9 @@ object RuleCellComponents {
       Option(newValue) foreach (paramMap += paramName -> ParamValue.StringInput(_))
     }
 
+    prefWidth = 150
+    prefHeight = 75
+
     override def `val`: Option[ParamValue] = paramMap get paramName
 
     override def val_=(paramValue: ParamValue): Unit = {
