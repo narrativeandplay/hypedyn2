@@ -46,7 +46,7 @@ class RuleCell(val rule: UiRule,
       ruleList.set(newIndex, rule)
       ruleList.set(currentIndex, itemToMoveDown)
 
-      parentPane.rearrangeCells()
+      parentPane.rearrangeCells((currentIndex, newIndex))
     }
   }
   private val moveDownButton = new Button("↓") {
@@ -61,7 +61,7 @@ class RuleCell(val rule: UiRule,
       ruleList.set(newIndex, rule)
       ruleList.set(currentIndex, itemToMoveUp)
 
-      parentPane.rearrangeCells()
+      parentPane.rearrangeCells((currentIndex, newIndex))
     }
   }
 

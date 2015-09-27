@@ -8,6 +8,7 @@ import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control.{Button, Label, TreeItem, TreeView}
 import scalafx.scene.layout.{Priority, HBox, VBox}
 import scalafx.scene.Parent.sfxParent2jfx
+import scalafx.scene.control.TreeItem.sfxTreeItemToJfx
 
 import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.Or
 import org.narrativeandplay.hypedyn.story.{UiStory, UiRule}
@@ -80,10 +81,25 @@ class RulesPane(labelText: String,
     }
   }
 
-  def rearrangeCells(): Unit = {
+  /**
+   * Redraw rule cells when rule positions are swapped
+   *
+   * @param swappedExpandedStates A pair contains the positions of which rules were swapped
+   */
+  def rearrangeCells(swappedExpandedStates: (Int, Int)): Unit = {
+    val expandedStates = rulesList.root().children map (_.isExpanded)
+    swappedExpandedStates match { case (first, second) =>
+      val firstExpandedState = expandedStates(first)
+      val secondExpandedState = expandedStates(second)
+      expandedStates.set(first, secondExpandedState)
+      expandedStates.set(second, firstExpandedState)
+    }
+
     rulesList.root().children.clear()
-    rules() foreach { rule =>
-      rulesList.root().children += new RuleCell(rule, conditionDefinitions, actionDefinitions, story, rules(), this)
+    rules() zip expandedStates foreach { case (rule, expand) =>
+      rulesList.root().children += new RuleCell(rule, conditionDefinitions, actionDefinitions, story, rules(), this) {
+        expanded = expand
+      }
     }
   }
 
