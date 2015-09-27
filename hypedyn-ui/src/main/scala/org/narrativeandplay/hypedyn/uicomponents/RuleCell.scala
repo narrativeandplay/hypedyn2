@@ -66,7 +66,7 @@ class RuleCell(val rule: UiRule,
   }
 
   ruleList onChange { (buffer, changes) =>
-    moveUpButton.disable = buffer(0) == rule
+    moveUpButton.disable = buffer.head == rule
     moveDownButton.disable = buffer.last == rule
   }
 
