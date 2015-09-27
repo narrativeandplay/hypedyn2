@@ -123,7 +123,7 @@ object RuleCellComponents {
 
     lazy val removeButton = new StackPane {
       padding = Insets(0, 0, 0, 10)
-      children += new Button("-") {
+      children += new Button("−") {
         onAction = { _ =>
           parentTreeItem.getChildren.remove(self)
           parentRule.conditionsProperty() -= condition
@@ -206,7 +206,7 @@ object RuleCellComponents {
 
     lazy val removeButton = new StackPane {
       padding = Insets(0, 0, 0, 10)
-      children += new Button("-") {
+      children += new Button("−") {
         onAction = { _ =>
           parentTreeItem.getChildren.remove(self)
           parentRule.actionsProperty() -= action

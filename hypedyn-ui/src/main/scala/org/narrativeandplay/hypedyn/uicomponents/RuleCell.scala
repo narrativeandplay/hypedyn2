@@ -89,7 +89,7 @@ class RuleCell(val rule: UiRule,
 
       HBox.setHgrow(this, Priority.Always)
     }
-    children += new Button("-") {
+    children += new Button("−") {
       onAction = { _ =>
         ruleList -= rule
         self.parent().children -= self
