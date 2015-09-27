@@ -3,7 +3,7 @@ function loadStory() {
 	jQuery.ajaxSetup({ scriptCharset: "utf-8" , contentType: "application/json; charset=utf-8"});
 
 	// get the JSON file and parse it
-	jQuery.getJSON( "dynfile.json", function( data ) {
+	jQuery.getJSON( "LRRH-new.dyn", function( data ) {
 		var story = data.story;
 		var author = story.author; // unused
 		var description = story.description; // unused
@@ -63,7 +63,7 @@ function loadStory() {
 										// createCondition(func, func_args_arr, ruleID, not, id)
 										switch (conditionType) {
 											case "NodeCondition":
-												switch(thisCondition.params.status) {
+												switch(thisCondition.params.status.value) {
 													case "visited":
 														createCondition(nodeVisited, [thisCondition.params.node.value], ruleID, false, l);
 														break;
@@ -81,7 +81,7 @@ function loadStory() {
 												}
 												break;
 											case "LinkCondition":
-												switch(thisCondition.params.status) {
+												switch(thisCondition.params.status.value) {
 													case "followed":
 														createCondition(linkFollowed, [thisCondition.params.link.value], ruleID, false, l);
 														break;
