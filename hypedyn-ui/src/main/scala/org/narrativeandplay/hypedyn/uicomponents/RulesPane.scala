@@ -8,6 +8,7 @@ import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control.{Button, Label, TreeItem, TreeView}
 import scalafx.scene.layout.{Priority, HBox, VBox}
 import scalafx.scene.Parent.sfxParent2jfx
+import scalafx.scene.control.TreeItem.sfxTreeItemToJfx
 
 import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.Or
 import org.narrativeandplay.hypedyn.story.{UiStory, UiRule}
@@ -50,7 +51,7 @@ class RulesPane(labelText: String,
     onAction = { _ =>
       val newRule = new UiRule(RuleId(-1), "New Rule", false, Or, Nil, Nil)
       rules() += newRule
-      rulesList.root().children += new RuleCell(newRule, conditionDefinitions, actionDefinitions, story, rules())
+      rulesList.root().children += new RuleCell(newRule, conditionDefinitions, actionDefinitions, story, rules(), self)
     }
   }
 
@@ -67,14 +68,38 @@ class RulesPane(labelText: String,
   }
   children += rulesList
 
+  // Initialise cells
   rules() foreach { rule =>
-    rulesList.root().children += new RuleCell(rule, conditionDefinitions, actionDefinitions, story, rules())
+    rulesList.root().children += new RuleCell(rule, conditionDefinitions, actionDefinitions, story, rules(), this)
   }
 
+  // Redraw the whole pane when the whole buffer changes
   rules onChange { (_, _, currentRules) =>
     rulesList.root().children.clear()
     currentRules foreach { rule =>
-      rulesList.root().children += new RuleCell(rule, conditionDefinitions, actionDefinitions, story, rules())
+      rulesList.root().children += new RuleCell(rule, conditionDefinitions, actionDefinitions, story, rules(), this)
+    }
+  }
+
+  /**
+   * Redraw rule cells when rule positions are swapped
+   *
+   * @param swappedExpandedStates A pair contains the positions of which rules were swapped
+   */
+  def rearrangeCells(swappedExpandedStates: (Int, Int)): Unit = {
+    val expandedStates = rulesList.root().children map (_.isExpanded)
+    swappedExpandedStates match { case (first, second) =>
+      val firstExpandedState = expandedStates(first)
+      val secondExpandedState = expandedStates(second)
+      expandedStates.set(first, secondExpandedState)
+      expandedStates.set(second, firstExpandedState)
+    }
+
+    rulesList.root().children.clear()
+    rules() zip expandedStates foreach { case (rule, expand) =>
+      rulesList.root().children += new RuleCell(rule, conditionDefinitions, actionDefinitions, story, rules(), this) {
+        expanded = expand
+      }
     }
   }
 
