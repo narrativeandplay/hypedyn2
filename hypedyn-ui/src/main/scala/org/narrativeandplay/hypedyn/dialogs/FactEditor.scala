@@ -74,6 +74,10 @@ class FactEditor private (dialogTitle: String,
 
       override def decrement(steps: Int): Unit = setValue(getValue - steps)
     }
+
+    editor().text onChange { (_, _, _) =>
+      valueFactory().value = valueFactory().converter().fromString(editor().text())
+    }
   }
   private val booleanFactInitValueField = new ComboBox[Boolean]() {
     items = ObservableBuffer(true, false)
