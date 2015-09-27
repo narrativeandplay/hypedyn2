@@ -72,7 +72,7 @@ class FactEditor private (dialogTitle: String,
 
       override def increment(steps: Int): Unit = setValue(getValue + steps)
 
-      override def decrement(steps: Int): Unit = setValue(BigInt(0).max(getValue - steps))
+      override def decrement(steps: Int): Unit = setValue(getValue - steps)
     }
   }
   private val booleanFactInitValueField = new ComboBox[Boolean]() {
