@@ -198,6 +198,7 @@ object RuleCellComponents {
   class ActionCell(val action: UiAction,
                    val actionDefinitions: List[ActionDefinition],
                    val parentStory: ObjectProperty[UiStory],
+                   val parentCell: RuleCell,
                    parentRule: UiRule) extends TreeItem[String]("") {
     private def parentTreeItem = parent()
     private val self = this
@@ -254,6 +255,45 @@ object RuleCellComponents {
       }
     }
 
+    lazy val moveUpButton = new Button("↑") {
+      disable = parentRule.actions.head == action
+
+      onAction = { _ =>
+        val currentIndex = parentRule.actions indexOf action
+        val newIndex = currentIndex - 1
+
+        val itemToMoveDown = parentRule.actions(newIndex)
+
+        parentRule.actionsProperty().set(newIndex, action)
+        parentRule.actionsProperty().set(currentIndex, itemToMoveDown)
+
+        parentCell.rearrangeActions()
+      }
+    }
+    lazy val moveDownButton = new Button("↓") {
+      disable = parentRule.actions.last == action
+
+      onAction = { _ =>
+        val currentIndex = parentRule.actions indexOf action
+        val newIndex = currentIndex + 1
+
+        val itemToMoveUp = parentRule.actions(newIndex)
+
+        parentRule.actionsProperty().set(newIndex, action)
+        parentRule.actionsProperty().set(currentIndex, itemToMoveUp)
+
+        parentCell.rearrangeActions()
+      }
+    }
+    lazy val rearrangeButtons = new HBox(10, moveUpButton, moveDownButton) {
+      padding = Insets(0, 10, 0, 0)
+    }
+
+    parentRule.actionsProperty() onChange { (buffer, changes) =>
+      moveUpButton.disable = buffer.head == action
+      moveDownButton.disable = buffer.last == action
+    }
+
     /**
      * Generate the UI components for the selected condition
      *
@@ -266,7 +306,7 @@ object RuleCellComponents {
         actionParamsChildren += newComponent
       }
 
-    graphic = new HBox(actionTypeCombo, actionParams, removeButton)
+    graphic = new HBox(rearrangeButtons, actionTypeCombo, actionParams, removeButton)
   }
 
   /**

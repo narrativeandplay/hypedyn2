@@ -123,7 +123,7 @@ class RuleCell(val rule: UiRule,
   lazy val addActionButton = new Button("Add action") {
     onAction = { _ =>
       val newAction = addAction()
-      actionsNode.children += new RuleCellComponents.ActionCell(newAction, actionDefs, story, rule)
+      actionsNode.children += new RuleCellComponents.ActionCell(newAction, actionDefs, story, self, rule)
     }
   }
 
@@ -172,7 +172,7 @@ class RuleCell(val rule: UiRule,
     conditionsNode.children += new RuleCellComponents.ConditionCell(condition, conditionDefs, story, this, rule)
   }
   rule.actions foreach { action =>
-    actionsNode.children += new RuleCellComponents.ActionCell(action, actionDefs, story, rule)
+    actionsNode.children += new RuleCellComponents.ActionCell(action, actionDefs, story, this, rule)
   }
 
   /**
@@ -201,6 +201,13 @@ class RuleCell(val rule: UiRule,
     conditionsNode.children.clear()
     rule.conditions foreach { condition =>
       conditionsNode.children += new RuleCellComponents.ConditionCell(condition, conditionDefs, story, this, rule)
+    }
+  }
+
+  def rearrangeActions(): Unit = {
+    actionsNode.children.clear()
+    rule.actions foreach { action =>
+      actionsNode.children += new RuleCellComponents.ActionCell(action, actionDefs, story, this, rule)
     }
   }
 }
