@@ -624,7 +624,6 @@ object RuleCellComponents {
                      val paramName: ParamName,
                      val story: ObjectProperty[UiStory]) extends Spinner[BigInt] with RuleCellParameterComponent {
     valueFactory = new JfxSpinnerValueFactory[BigInt] {
-      editable = true
       setValue(0)
 
       setConverter(new StringConverter[BigInt] {
@@ -640,6 +639,11 @@ object RuleCellComponents {
 
     value onChange { (_, _, newValue) =>
       Option(newValue) foreach { v => paramMap += paramName -> ParamValue.IntegerInput(v) }
+    }
+
+    editable = true
+    editor().text onChange { (_, _, _) =>
+      valueFactory().value = valueFactory().converter().fromString(editor().text())
     }
 
     override def `val`: Option[ParamValue] = paramMap get paramName
