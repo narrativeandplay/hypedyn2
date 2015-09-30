@@ -1,5 +1,7 @@
 package org.narrativeandplay.hypedyn.events
 
+import org.narrativeandplay.hypedyn.story.rules.FactId
+
 import scalafx.Includes._
 
 import org.narrativeandplay.hypedyn.Main
@@ -126,6 +128,9 @@ object UiEventDispatcher {
     Option(FactViewer.selectionModel.selectedItem()) foreach { f =>
       EventBus.send(EditFactRequest(f.id, UiEventSourceIdentity))
     }
+  }
+  def requestEditFact(factId: FactId): Unit = {
+    EventBus.send(EditFactRequest(factId, UiEventSourceIdentity))
   }
   def requestDeleteFact(): Unit = {
     Option(FactViewer.selectionModel.selectedItem()) foreach { f =>

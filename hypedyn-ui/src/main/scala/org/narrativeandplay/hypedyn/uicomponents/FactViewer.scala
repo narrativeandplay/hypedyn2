@@ -1,15 +1,23 @@
 package org.narrativeandplay.hypedyn.uicomponents
 
 import javafx.collections.ObservableList
+import javafx.{event => jfxe}
+import javafx.event.EventHandler
 import javafx.scene.control.{ListCell, ListView}
+import javafx.scene.{input => jfxsi}
 import javafx.util.Callback
+
+import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
+import scalafx.event.Event
 import scalafx.scene.control.{MultipleSelectionModel, Tooltip}
 
 import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.utils.System
+
+import scalafx.scene.input.MouseEvent
 
 /**
  * List view for facts
@@ -26,10 +34,23 @@ object FactViewer extends ListView[Fact] {
       text = Option(item) map (_.name) getOrElse ""
     }
 
+    onMouseClicked = { me =>
+      if (me.clickCount == 2) {
+        Option(itemProperty().get()) foreach { fact => UiEventDispatcher.requestEditFact(fact.id) }
+      }
+    }
+
     // <editor-fold="Functions for replicating Scala-like access style">
 
     def text = textProperty()
     def text_=(newText: String) = setText(newText)
+
+    def onMouseClicked = { me: MouseEvent => getOnMouseClicked.handle(me) }
+    def onMouseClicked_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: T => Unit)(implicit jfx2sfx: U => T) = {
+      setOnMouseClicked(new EventHandler[U] {
+        override def handle(event: U): Unit = lambda(event)
+      })
+    }
 
     //</editor-fold>
   }
