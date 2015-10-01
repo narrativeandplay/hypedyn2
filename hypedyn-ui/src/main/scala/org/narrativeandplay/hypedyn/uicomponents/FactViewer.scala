@@ -36,7 +36,7 @@ object FactViewer extends ListView[Fact] {
 
     onMouseClicked = { me =>
       if (me.clickCount == 2) {
-        Option(itemProperty().get()) foreach { fact => UiEventDispatcher.requestEditFact(fact.id) }
+        Option(itemProperty().get()) foreach { fact => UiEventDispatcher.requestEditFact(fact) }
       }
     }
 
