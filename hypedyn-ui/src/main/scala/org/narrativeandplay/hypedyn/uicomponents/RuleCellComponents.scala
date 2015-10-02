@@ -167,8 +167,10 @@ object RuleCellComponents {
     }
 
     parentRule.conditionsProperty() onChange { (buffer, changes) =>
-      moveUpButton.disable = buffer.head == condition
-      moveDownButton.disable = buffer.last == condition
+      if (buffer.nonEmpty) {
+        moveUpButton.disable = buffer.head == condition
+        moveDownButton.disable = buffer.last == condition
+      }
     }
 
     /**
@@ -290,8 +292,10 @@ object RuleCellComponents {
     }
 
     parentRule.actionsProperty() onChange { (buffer, changes) =>
-      moveUpButton.disable = buffer.head == action
-      moveDownButton.disable = buffer.last == action
+      if (buffer.nonEmpty) {
+        moveUpButton.disable = buffer.head == action
+        moveDownButton.disable = buffer.last == action
+      }
     }
 
     /**
@@ -595,6 +599,9 @@ object RuleCellComponents {
       Option(newValue) foreach (paramMap += paramName -> ParamValue.StringInput(_))
     }
 
+    prefWidth = 150
+    prefHeight = 75
+
     override def `val`: Option[ParamValue] = paramMap get paramName
 
     override def val_=(paramValue: ParamValue): Unit = {
@@ -617,7 +624,6 @@ object RuleCellComponents {
                      val paramName: ParamName,
                      val story: ObjectProperty[UiStory]) extends Spinner[BigInt] with RuleCellParameterComponent {
     valueFactory = new JfxSpinnerValueFactory[BigInt] {
-      editable = true
       setValue(0)
 
       setConverter(new StringConverter[BigInt] {
@@ -633,6 +639,11 @@ object RuleCellComponents {
 
     value onChange { (_, _, newValue) =>
       Option(newValue) foreach { v => paramMap += paramName -> ParamValue.IntegerInput(v) }
+    }
+
+    editable = true
+    editor().text onChange { (_, _, _) =>
+      valueFactory().value = valueFactory().converter().fromString(editor().text())
     }
 
     override def `val`: Option[ParamValue] = paramMap get paramName

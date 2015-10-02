@@ -1,17 +1,15 @@
 package org.narrativeandplay.hypedyn.dialogs
 
-import javafx.{event => jfxe}
-import javafx.event.EventHandler
 import javafx.scene.{control => jfxsc}
 
 import scala.util.Try
 
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
-import scalafx.event.ActionEvent
 import scalafx.scene.control._
 import scalafx.stage.{Modality, Window}
 import scalafx.util.StringConverter
+import scalafx.util.StringConverter.sfxStringConverter2jfx
 
 import org.tbee.javafx.scene.layout.MigPane
 
@@ -60,23 +58,25 @@ class FactEditor private (dialogTitle: String,
   dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
   val okButton = dialogPane().lookupButton(ButtonType.OK)
 
-  private val converter = new StringConverter[BigInt] {
-    override def fromString(string: String): BigInt = Try(BigInt(string)) getOrElse BigInt(0)
-
-    override def toString(t: BigInt): String = t.toString()
-  }
-
   private val factNameField = new TextField()
   private val stringFactInitValueField = new TextField()
   private val integerFactInitValueField = new Spinner[BigInt]() {
     editable = true
     valueFactory = new jfxsc.SpinnerValueFactory[BigInt]() {
       setValue(0)
-      setConverter(converter)
+      setConverter(new StringConverter[BigInt] {
+        override def fromString(string: String): BigInt = Try(BigInt(string)) getOrElse BigInt(0)
+
+        override def toString(t: BigInt): String = t.toString()
+      })
 
       override def increment(steps: Int): Unit = setValue(getValue + steps)
 
-      override def decrement(steps: Int): Unit = setValue(BigInt(0).max(getValue - steps))
+      override def decrement(steps: Int): Unit = setValue(getValue - steps)
+    }
+
+    editor().text onChange { (_, _, _) =>
+      valueFactory().value = valueFactory().converter().fromString(editor().text())
     }
   }
   private val booleanFactInitValueField = new ComboBox[Boolean]() {

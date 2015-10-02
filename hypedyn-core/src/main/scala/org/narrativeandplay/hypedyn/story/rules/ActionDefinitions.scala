@@ -15,7 +15,10 @@ object ActionDefinitions {
     ActionDefinition(ActionType("ShowPopupNode"), "Show node in popup", List(NodeContentAction),
                      List(RuleParameter("node", Nodes))),
     ActionDefinition(ActionType("UpdateText"), "Update text", List(NodeContentAction),
-                     List(RuleParameter("text", UserInputString))),
+                     List(RuleParameter("text", Union(Map(
+                      "Input" -> RuleParameter("textInput", UserInputString),
+                      "Fact" -> RuleParameter("stringFactValue", StringFacts)
+                     ))))),
     ActionDefinition(ActionType("UpdateBooleanFact"), "Update true/false fact", List(NodeContentAction, NodeAction, StoryAction),
                      List(RuleParameter("fact", BooleanFacts),
                           RuleParameter("value", ListOfValues("true", "false")))),
