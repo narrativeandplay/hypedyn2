@@ -139,7 +139,7 @@ object CoreEventDispatcher {
 
         loadedFile = Some(saveFileEvt.file)
 
-        EventBus.send(StorySaved(CoreEventSourceIdentity))
+        EventBus.send(StorySaved(saveFileEvt.file.getName, CoreEventSourceIdentity))
       }
   }
 
@@ -158,6 +158,7 @@ object CoreEventDispatcher {
 
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
     EventBus.send(DataLoaded(pluginData, CoreEventSourceIdentity))
+    EventBus.send(FileLoaded(evt.file.getName, CoreEventSourceIdentity))
   }
 
   EventBus.NewStoryRequests foreach { _ => EventBus.send(NewStoryResponse(CoreEventSourceIdentity)) }
@@ -172,6 +173,7 @@ object CoreEventDispatcher {
     UndoController.clearHistory()
 
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
+    EventBus.send(FileLoaded("Untitled", CoreEventSourceIdentity))
   }
   EventBus.UpdateStoryPropertiesEvents foreach { evt =>
     StoryController.editStory(evt.title, evt.author, evt.description, evt.metadata)
