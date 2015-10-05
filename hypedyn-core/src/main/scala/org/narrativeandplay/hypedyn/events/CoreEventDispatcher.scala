@@ -139,7 +139,7 @@ object CoreEventDispatcher {
 
         loadedFile = Some(saveFileEvt.file)
 
-        EventBus.send(StorySaved(CoreEventSourceIdentity))
+        EventBus.send(StorySaved(saveFileEvt.file.getName, CoreEventSourceIdentity))
       }
   }
 
