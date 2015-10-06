@@ -131,10 +131,11 @@ sealed case class FactCreated(fact: Fact, src: String) extends Completion
 sealed case class FactUpdated(fact: Fact, updatedFact: Fact, src: String) extends Completion
 sealed case class FactDestroyed(fact: Fact, src: String) extends Completion
 
-sealed case class StorySaved(src: String) extends Completion
+sealed case class StorySaved(filename: String, src: String) extends Completion
 sealed case class StoryLoaded(story: Narrative, src: String) extends Completion
 sealed case class StoryUpdated(story: Narrative, src: String) extends Completion
 sealed case class DataLoaded(data: Map[String, AstElement], src: String) extends Completion
+sealed case class FileLoaded(filename: String, src: String) extends Completion
 
 sealed case class UiNodeSelected(id: NodeId, src: String) extends Completion
 sealed case class UiNodeDeselected(id: NodeId, src: String) extends Completion

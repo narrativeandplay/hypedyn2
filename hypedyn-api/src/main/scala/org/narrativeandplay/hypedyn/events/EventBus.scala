@@ -124,6 +124,7 @@ object EventBus {
   val StoryUpdatedEvents = eventBus collect { case e: StoryUpdated => e }
   val StoryLoadedEvents = eventBus collect { case e: StoryLoaded => e }
   val DataLoadedEvents = eventBus collect { case e: DataLoaded => e }
+  val FileLoadedEvents = eventBus collect { case e: FileLoaded => e }
 
   val UiNodeSelectedEvents = eventBus collect { case e: UiNodeSelected => e }
   val UiNodeDeselectedEvents = eventBus collect { case e: UiNodeDeselected => e }

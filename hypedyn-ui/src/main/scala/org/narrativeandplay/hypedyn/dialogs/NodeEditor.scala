@@ -111,7 +111,7 @@ class NodeEditor private (dialogTitle: String,
     val rulesetColumn = new TableColumn[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset]("RulesetName") {
       cellValueFactory = { v => ObjectProperty(v.value) }
 
-      cellFactory = { _ =>
+      cellFactory = { _: javafx.scene.control.TableColumn[UiRuleset, UiRuleset] =>
         new JfxTableCell[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset] {
           override def startEdit(): Unit = {
             super.startEdit()
@@ -182,7 +182,7 @@ class NodeEditor private (dialogTitle: String,
       maxWidth = 30
       cellValueFactory = { v => ObjectProperty(v.value) }
 
-      cellFactory = { _ =>
+      cellFactory = { _: javafx.scene.control.TableColumn[UiRuleset,UiRuleset] =>
         new JfxTableCell[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset] {
           val removeButton = new Button("-")
 

@@ -1,8 +1,8 @@
-version = '0.12.0'
+version = '0.13.0'
 
 dependencies {
     compile 'io.reactivex:rxscala_2.11:0.25.0'
     compile 'org.fxmisc.undo:undofx:1.1.1'
 
-    compile 'org.scalafx:scalafx_2.11:8.0.40-R8'
+    compile 'org.scalafx:scalafx_2.11:8.0.60-R9'
 }

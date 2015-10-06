@@ -1,11 +1,16 @@
 package org.narrativeandplay.hypedyn
 
+import javafx.beans.value.ObservableValue
+
 import scalafx.Includes._
 import scalafx.application.{Platform, JFXApp}
 import scalafx.application.JFXApp.PrimaryStage
+import scalafx.beans.property.StringProperty
 import scalafx.scene.Scene
 import scalafx.scene.image.Image
 import scalafx.scene.layout.{VBox, BorderPane}
+
+import org.fxmisc.easybind.EasyBind
 
 import org.narrativeandplay.hypedyn.dialogs.{StoryPropertiesDialog, NodeEditor, FactEditor, FileDialog}
 import org.narrativeandplay.hypedyn.events._
@@ -14,6 +19,7 @@ import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition, Fact}
 import org.narrativeandplay.hypedyn.uicomponents._
 import org.narrativeandplay.hypedyn.undo.UndoController
+import org.narrativeandplay.hypedyn.utils.ScalaJavaImplicits._
 
 /**
  * Entry point for the application
@@ -28,6 +34,8 @@ object Main extends JFXApp {
   UndoEventDispatcher
 
   private val icon = new Image(getClass.getResourceAsStream("hypedyn-icon.jpg"))
+
+  private val loadedFilename = new StringProperty("Untitled")
 
   /**
    * Returns a new file dialog
@@ -93,8 +101,10 @@ object Main extends JFXApp {
    */
   def storyPropertiesEditor(story: Narrative) = new StoryPropertiesDialog(story, stage)
 
+  def editFilename(newFilename: String): Unit = loadedFilename() = newFilename
+
   stage = new PrimaryStage {
-    title = "HypeDyn"
+    title <== loadedFilename + " - HypeDyn"
     icons.add(icon)
 
     // CLose all windows when closing the main application window, i.e. make closing the main window equivalent to

@@ -1,9 +1,9 @@
 package org.narrativeandplay.hypedyn.events
 
-import org.narrativeandplay.hypedyn.story.rules.Fact
-
 import scalafx.Includes._
+import scalafx.beans.property.BooleanProperty
 
+import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
 import org.narrativeandplay.hypedyn.story.NodeId
@@ -34,7 +34,7 @@ object UiEventDispatcher {
   }
   EventBus.EditNodeResponses foreach { response =>
     openedNodeEditors get response.node.id match {
-      case Some(editor) => editor.dialogPane.value.getScene.getWindow.requestFocus()
+      case Some(editor) => editor.dialogPane().scene().window().requestFocus()
       case None =>
         val editor = Main.nodeEditor("Edit Node", response.conditionDefinitions, response.actionDefinitions, response.story, response.node)
 
@@ -90,9 +90,15 @@ object UiEventDispatcher {
     fileToLoad foreach { f => EventBus.send(LoadFromFile(f, UiEventSourceIdentity)) }
   }
 
+  EventBus.StorySavedEvents foreach { evt =>
+    Main.editFilename(evt.filename)
+  }
   EventBus.StoryLoadedEvents foreach { evt =>
     FactViewer.facts.clear()
     evt.story.facts foreach { f => FactViewer.facts += f }
+  }
+  EventBus.FileLoadedEvents foreach { evt =>
+    Main.editFilename(evt.filename)
   }
 
   EventBus.NewStoryResponses foreach { _ => EventBus.send(CreateStory(src = UiEventSourceIdentity)) }
