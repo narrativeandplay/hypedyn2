@@ -229,7 +229,7 @@ function loadStory() {
 	jQuery.ajaxSetup({ scriptCharset: "utf-8" , contentType: "application/json; charset=utf-8"});
 
 	// get the JSON file and parse it
-	jQuery.getJSON( "LRRH5-new.dyn", function( data ) {
+	jQuery.getJSON( "story.dyn", function( data ) {
 		var story = data.story;
 		var author = story.author; // unused
 		var description = story.description; // unused
