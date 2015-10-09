@@ -64,13 +64,13 @@ function createConditions(rulesetID, ruleID, conditions) {
 	}
 }
 
-function createActions(rulesetID, ruleID, actions) {
+function createActions(rulesetID, ruleID, actions, isNodeRules) {
 	for(var l=0; l < actions.length; l++) {
 		var thisAction = actions[l];
 		var actionType = thisAction.actionType;
 
 		// createAction(eventType, parentRuleID, func, args, id)
-		// eventType can be "enteredNode" "clickedLink" "anywhereCheck"
+		// eventType can be "enteredNode" "clickedLink" "anywhereCheck" "disabledAnywhereCheck"
 		switch (actionType) {
 			case "LinkTo":
 				createAction("clickedLink", ruleID, gotoNode, [thisAction.params.node.value], l);
@@ -92,11 +92,13 @@ function createActions(rulesetID, ruleID, actions) {
 				break;
 			case "UpdateBooleanFact":
 				//createAction("clickedLink", 4, setFact, [2, true], 5);
-				createAction("clickedLink", ruleID, setFact, [thisAction.params.fact.value, thisAction.params.value.value], l);
+				createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setFact, [thisAction.params.fact.value, thisAction.params.value.value == "true"], l);
 				break;
 			case "UpdateStringFact":
 				//createAction("clickedLink", 8, setFact, [6, "[the fact text...........]"], 9);
-				createAction("clickedLink", ruleID, setFact, [thisAction.params.fact.value, thisAction.params.value.value], l);
+				createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setFact, [thisAction.params.fact.value, thisAction.params.value.value], l);
+				break;
+			case "UpdateIntegerFacts":
 				break;
 			case "EnableAnywhereLinkToHere":
 				// hack to set anywhere flag in the node
@@ -112,13 +114,11 @@ function createActions(rulesetID, ruleID, actions) {
 				//createAction("disabledAnywhereCheck", 2, addInactiveAnywhereLink, [1], 3);
 				createAction("disabledAnywhereCheck", ruleID, addInactiveAnywhereLink, [rulesetID], l);
 				break;
-			case "UpdateIntegerFacts":
-				break;
 		}
 	}
 }
 
-function createRules(rulesetID, rulesetType, rules) {
+function createRules(rulesetID, rulesetType, rules, isNodeRules) {
 	for(var k=0; k < rules.length; k++) {
 		var thisRule=rules[k];					// this rule
 		var ruleName=thisRule.name;				// name of this rule
@@ -142,7 +142,33 @@ function createRules(rulesetID, rulesetType, rules) {
 
 		// create actions
 		if(actions!=null) {
-			createActions(rulesetID, ruleID, actions);
+			createActions(rulesetID, ruleID, actions, isNodeRules);
+		}
+	}
+}
+
+function createFacts(facts) {
+	for(var k=0; k < facts.length; k++) {
+		var thisFact = facts[k];
+		var factType = thisFact.type;
+		var factID = thisFact.id;
+		var factName = thisFact.name;
+		var factValue = thisFact.initialValue;
+
+		// create the fact
+		switch(factType) {
+			case "bool":
+				createFact(factName, "boolean", factID);
+				setFact(factID, factValue == "true");
+				break;
+			case "string":
+				createFact(factName, "string", factID);
+				setFact(factID, factValue);
+				break;
+			case "int":
+				createFact(factName, "number", factID);
+				setFact(factID, factValue);
+				break;
 		}
 	}
 }
@@ -152,7 +178,7 @@ function loadStory() {
 	jQuery.ajaxSetup({ scriptCharset: "utf-8" , contentType: "application/json; charset=utf-8"});
 
 	// get the JSON file and parse it
-	jQuery.getJSON( "LRRH2-new.dyn", function( data ) {
+	jQuery.getJSON( "updatefacts-new.dyn", function( data ) {
 		var story = data.story;
 		var author = story.author; // unused
 		var description = story.description; // unused
@@ -187,14 +213,14 @@ function loadStory() {
 
 						// now create rules (if any)
 						if(rules!=null) {
-							createRules(rulesetID, "link", rules);
+							createRules(rulesetID, "link", rules, false);
 						}
 					}
 				}
 
 				// now create the node rules (if any)
 				if(nodeRules!=null) {
-					createRules(id, "node", nodeRules);
+					createRules(id, "node", nodeRules, true);
 				}
 
 				// set start node if necessary
@@ -204,7 +230,10 @@ function loadStory() {
 			}
 		}
 
-		// add facts - skip for now
+		// add facts
+		if(facts!=null) {
+			createFacts(facts);
+		}
 
 		// write config flags
 		write_config_flag( 'back_button_flag', !story.metadata.backDisabled );
