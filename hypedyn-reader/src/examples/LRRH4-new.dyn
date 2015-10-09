@@ -10,6 +10,137 @@
       "restartDisabled":false
     },
     "nodes":[{
+      "id":10,
+      "name":"Go directly to Grandma's house",
+      "content":{
+        "text":"Red walks along the path, sticking carefully to the center to avoid the dark, menacing trees. Eventually, she reaches Grandma's house.\n\nWhen Red enters Grandma's house, she is surprised to see the young man sitting on the sofa. \nGrandma smiles when she sees Red.",
+        "rulesets":[{
+          "id":9,
+          "name":"talked",
+          "start":136,
+          "end":229,
+          "rules":[{
+            "id":26,
+            "name":"talked",
+            "stopIfTrue":false,
+            "conditionsOp":"or",
+            "conditions":[{
+              "conditionType":"NodeCondition",
+              "params":{
+                "node":{
+                  "type":"node",
+                  "value":15
+                },
+                "status":{
+                  "type":"selectedListValue",
+                  "value":"not visited"
+                }
+              }
+            }],
+            "actions":[{
+              "actionType":"UpdateText",
+              "params":{
+                "textInput":{
+                  "type":"string",
+                  "value":""
+                },
+                "text":{
+                  "type":"union",
+                  "value":"textInput"
+                }
+              }
+            }]
+          }]
+        },{
+          "id":10,
+          "name":"didn't talk",
+          "start":229,
+          "end":262,
+          "rules":[{
+            "id":27,
+            "name":"didn't talk",
+            "stopIfTrue":false,
+            "conditionsOp":"or",
+            "conditions":[{
+              "conditionType":"NodeCondition",
+              "params":{
+                "node":{
+                  "type":"node",
+                  "value":15
+                },
+                "status":{
+                  "type":"selectedListValue",
+                  "value":"visited"
+                }
+              }
+            }],
+            "actions":[{
+              "actionType":"UpdateText",
+              "params":{
+                "textInput":{
+                  "type":"string",
+                  "value":""
+                },
+                "text":{
+                  "type":"union",
+                  "value":"textInput"
+                }
+              }
+            }]
+          }]
+        }]
+      },
+      "isStart":false,
+      "rules":[{
+        "id":-1,
+        "name":"Add anywhere link",
+        "stopIfTrue":false,
+        "conditionsOp":"and",
+        "conditions":[{
+          "conditionType":"NodeCondition",
+          "params":{
+            "node":{
+              "type":"node",
+              "value":11
+            },
+            "status":{
+              "type":"selectedListValue",
+              "value":"not visited"
+            }
+          }
+        },{
+          "conditionType":"NodeCondition",
+          "params":{
+            "node":{
+              "type":"node",
+              "value":10
+            },
+            "status":{
+              "type":"selectedListValue",
+              "value":"not visited"
+            }
+          }
+        }],
+        "actions":[{
+          "actionType":"EnableAnywhereLinkToHere",
+          "params":{
+            
+          }
+        },{
+          "actionType":"UpdateBooleanFact",
+          "params":{
+            "fact":{
+              "type":"booleanFact",
+              "value":0
+            },
+            "value":{
+              "type":"selectedListValue",
+              "value":"false"
+            }
+          }
+        }]
+      }]
+    },{
       "id":12,
       "name":"Pass the basket to Grandma",
       "content":{
@@ -20,7 +151,7 @@
           "start":34,
           "end":41,
           "rules":[{
-            "id":23,
+            "id":24,
             "name":"display the flowers",
             "stopIfTrue":false,
             "conditionsOp":"or",
@@ -40,7 +171,14 @@
             "actions":[{
               "actionType":"UpdateText",
               "params":{
-                
+                "stringFactValue":{
+                  "type":"stringFact",
+                  "value":2
+                },
+                "text":{
+                  "type":"union",
+                  "value":"stringFactValue"
+                }
               }
             }]
           }]
@@ -580,123 +718,6 @@
         }]
       }]
     },{
-      "id":10,
-      "name":"Go directly to Grandma's house",
-      "content":{
-        "text":"Red walks along the path, sticking carefully to the center to avoid the dark, menacing trees. Eventually, she reaches Grandma's house.\n\nWhen Red enters Grandma's house, she is surprised to see the young man sitting on the sofa. \nGrandma smiles when she sees Red.",
-        "rulesets":[{
-          "id":9,
-          "name":"talked",
-          "start":136,
-          "end":229,
-          "rules":[{
-            "id":12,
-            "name":"talked",
-            "stopIfTrue":false,
-            "conditionsOp":"or",
-            "conditions":[{
-              "conditionType":"NodeCondition",
-              "params":{
-                "node":{
-                  "type":"node",
-                  "value":15
-                },
-                "status":{
-                  "type":"selectedListValue",
-                  "value":"not visited"
-                }
-              }
-            }],
-            "actions":[{
-              "actionType":"UpdateText",
-              "params":{
-                
-              }
-            }]
-          }]
-        },{
-          "id":10,
-          "name":"didn't talk",
-          "start":229,
-          "end":262,
-          "rules":[{
-            "id":13,
-            "name":"didn't talk",
-            "stopIfTrue":false,
-            "conditionsOp":"or",
-            "conditions":[{
-              "conditionType":"NodeCondition",
-              "params":{
-                "node":{
-                  "type":"node",
-                  "value":15
-                },
-                "status":{
-                  "type":"selectedListValue",
-                  "value":"visited"
-                }
-              }
-            }],
-            "actions":[{
-              "actionType":"UpdateText",
-              "params":{
-                
-              }
-            }]
-          }]
-        }]
-      },
-      "isStart":false,
-      "rules":[{
-        "id":-1,
-        "name":"Add anywhere link",
-        "stopIfTrue":false,
-        "conditionsOp":"and",
-        "conditions":[{
-          "conditionType":"NodeCondition",
-          "params":{
-            "node":{
-              "type":"node",
-              "value":11
-            },
-            "status":{
-              "type":"selectedListValue",
-              "value":"not visited"
-            }
-          }
-        },{
-          "conditionType":"NodeCondition",
-          "params":{
-            "node":{
-              "type":"node",
-              "value":10
-            },
-            "status":{
-              "type":"selectedListValue",
-              "value":"not visited"
-            }
-          }
-        }],
-        "actions":[{
-          "actionType":"EnableAnywhereLinkToHere",
-          "params":{
-            
-          }
-        },{
-          "actionType":"UpdateBooleanFact",
-          "params":{
-            "fact":{
-              "type":"booleanFact",
-              "value":0
-            },
-            "value":{
-              "type":"selectedListValue",
-              "value":"false"
-            }
-          }
-        }]
-      }]
-    },{
       "id":6,
       "name":"start",
       "content":{
@@ -727,33 +748,25 @@
   "plugins":{
     "Default Story Viewer":{
       "nodes":[{
-        "id":6,
-        "x":24.0,
-        "y":22.0
+        "id":12,
+        "x":239.0,
+        "y":232.0
       },{
         "id":7,
         "x":725.0,
         "y":632.0
       },{
-        "id":8,
-        "x":457.0,
-        "y":20.0
-      },{
-        "id":9,
-        "x":719.0,
-        "y":234.0
-      },{
-        "id":10,
-        "x":237.0,
-        "y":22.0
+        "id":15,
+        "x":723.0,
+        "y":436.0
       },{
         "id":11,
         "x":248.0,
         "y":445.0
       },{
-        "id":12,
-        "x":239.0,
-        "y":232.0
+        "id":9,
+        "x":719.0,
+        "y":234.0
       },{
         "id":13,
         "x":474.0,
@@ -763,9 +776,17 @@
         "x":471.0,
         "y":235.0
       },{
-        "id":15,
-        "x":723.0,
-        "y":436.0
+        "id":8,
+        "x":457.0,
+        "y":20.0
+      },{
+        "id":10,
+        "x":237.0,
+        "y":22.0
+      },{
+        "id":6,
+        "x":24.0,
+        "y":22.0
       }]
     }
   }

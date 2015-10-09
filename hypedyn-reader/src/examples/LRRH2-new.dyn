@@ -10,17 +10,111 @@
       "restartDisabled":false
     },
     "nodes":[{
+      "id":2,
+      "name":"forest",
+      "content":{
+        "text":"In the forest, Red came across a young man with a nasty smile.\n\n\"Where are you going, little girl?\" he asked. \n\n\"I'm off to see my sick granny,\" she said.\n\nWell, you can probably guess what happened next.",
+        "rulesets":[{
+          "id":4,
+          "name":"to the end",
+          "start":199,
+          "end":203,
+          "rules":[{
+            "id":5,
+            "name":"to end 1",
+            "stopIfTrue":true,
+            "conditionsOp":"and",
+            "conditions":[{
+              "conditionType":"LinkCondition",
+              "params":{
+                "link":{
+                  "type":"link",
+                  "value":2
+                },
+                "status":{
+                  "type":"selectedListValue",
+                  "value":"followed"
+                }
+              }
+            }],
+            "actions":[{
+              "actionType":"LinkTo",
+              "params":{
+                "node":{
+                  "type":"node",
+                  "value":3
+                }
+              }
+            }]
+          },{
+            "id":6,
+            "name":"to end 2",
+            "stopIfTrue":false,
+            "conditionsOp":"or",
+            "conditions":[],
+            "actions":[{
+              "actionType":"LinkTo",
+              "params":{
+                "node":{
+                  "type":"node",
+                  "value":4
+                }
+              }
+            }]
+          }]
+        },{
+          "id":9,
+          "name":"response",
+          "start":112,
+          "end":155,
+          "rules":[{
+            "id":15,
+            "name":"street-smart",
+            "stopIfTrue":false,
+            "conditionsOp":"and",
+            "conditions":[{
+              "conditionType":"LinkCondition",
+              "params":{
+                "link":{
+                  "type":"link",
+                  "value":3
+                },
+                "status":{
+                  "type":"selectedListValue",
+                  "value":"followed"
+                }
+              }
+            }],
+            "actions":[{
+              "actionType":"UpdateText",
+              "params":{
+                "textInput":{
+                  "type":"string",
+                  "value":"\"I'm not supposed to talk to strangers,\""
+                },
+                "text":{
+                  "type":"union",
+                  "value":"textInput"
+                }
+              }
+            }]
+          }]
+        }]
+      },
+      "isStart":false,
+      "rules":[]
+    },{
       "id":5,
       "name":"summary",
       "content":{
         "text":"The story has begun.\nRed's character has been decided. \nRed has met the wolf. \nThe end.",
         "rulesets":[{
-          "id":6,
+          "id":10,
           "name":"character",
           "start":21,
           "end":56,
           "rules":[{
-            "id":8,
+            "id":16,
             "name":"character",
             "stopIfTrue":false,
             "conditionsOp":"and",
@@ -52,20 +146,27 @@
             "actions":[{
               "actionType":"UpdateText",
               "params":{
-                
+                "textInput":{
+                  "type":"string",
+                  "value":""
+                },
+                "text":{
+                  "type":"union",
+                  "value":"textInput"
+                }
               }
             }]
           }]
         },{
-          "id":7,
+          "id":11,
           "name":"forest",
           "start":56,
           "end":79,
           "rules":[{
-            "id":9,
-            "name":"forest",
+            "id":18,
+            "name":"New Rule",
             "stopIfTrue":false,
-            "conditionsOp":"or",
+            "conditionsOp":"and",
             "conditions":[{
               "conditionType":"NodeCondition",
               "params":{
@@ -82,33 +183,28 @@
             "actions":[{
               "actionType":"UpdateText",
               "params":{
-                
+                "textInput":{
+                  "type":"string",
+                  "value":""
+                },
+                "text":{
+                  "type":"union",
+                  "value":"textInput"
+                }
               }
             }]
           }]
         },{
-          "id":8,
+          "id":12,
           "name":"end",
           "start":79,
           "end":87,
           "rules":[{
-            "id":10,
-            "name":"end",
+            "id":19,
+            "name":"New Rule",
             "stopIfTrue":false,
             "conditionsOp":"and",
             "conditions":[{
-              "conditionType":"NodeCondition",
-              "params":{
-                "node":{
-                  "type":"node",
-                  "value":4
-                },
-                "status":{
-                  "type":"selectedListValue",
-                  "value":"not visited"
-                }
-              }
-            },{
               "conditionType":"NodeCondition",
               "params":{
                 "node":{
@@ -120,11 +216,30 @@
                   "value":"not visited"
                 }
               }
+            },{
+              "conditionType":"NodeCondition",
+              "params":{
+                "node":{
+                  "type":"node",
+                  "value":4
+                },
+                "status":{
+                  "type":"selectedListValue",
+                  "value":"not visited"
+                }
+              }
             }],
             "actions":[{
               "actionType":"UpdateText",
               "params":{
-                
+                "textInput":{
+                  "type":"string",
+                  "value":""
+                },
+                "text":{
+                  "type":"union",
+                  "value":"textInput"
+                }
               }
             }]
           }]
@@ -242,96 +357,6 @@
         }]
       },
       "isStart":true,
-      "rules":[]
-    },{
-      "id":2,
-      "name":"forest",
-      "content":{
-        "text":"In the forest, Red came across a young man with a nasty smile.\n\n\"Where are you going, little girl?\" he asked. \n\n\"I'm off to see my sick granny,\" she said.\n\nWell, you can probably guess what happened next.",
-        "rulesets":[{
-          "id":4,
-          "name":"to the end",
-          "start":199,
-          "end":203,
-          "rules":[{
-            "id":5,
-            "name":"to end 1",
-            "stopIfTrue":true,
-            "conditionsOp":"and",
-            "conditions":[{
-              "conditionType":"LinkCondition",
-              "params":{
-                "link":{
-                  "type":"link",
-                  "value":2
-                },
-                "status":{
-                  "type":"selectedListValue",
-                  "value":"followed"
-                }
-              }
-            }],
-            "actions":[{
-              "actionType":"LinkTo",
-              "params":{
-                "node":{
-                  "type":"node",
-                  "value":3
-                }
-              }
-            }]
-          },{
-            "id":6,
-            "name":"to end 2",
-            "stopIfTrue":false,
-            "conditionsOp":"or",
-            "conditions":[],
-            "actions":[{
-              "actionType":"LinkTo",
-              "params":{
-                "node":{
-                  "type":"node",
-                  "value":4
-                }
-              }
-            }]
-          }]
-        },{
-          "id":5,
-          "name":"response",
-          "start":112,
-          "end":144,
-          "rules":[{
-            "id":7,
-            "name":"street-smart",
-            "stopIfTrue":false,
-            "conditionsOp":"or",
-            "conditions":[{
-              "conditionType":"LinkCondition",
-              "params":{
-                "link":{
-                  "type":"link",
-                  "value":3
-                },
-                "status":{
-                  "type":"selectedListValue",
-                  "value":"followed"
-                }
-              }
-            }],
-            "actions":[{
-              "actionType":"UpdateText",
-              "params":{
-                "text":{
-                  "type":"string",
-                  "value":"\"I'm not supposed to talk to strangers,\""
-                }
-              }
-            }]
-          }]
-        }]
-      },
-      "isStart":false,
       "rules":[]
     },{
       "id":1,
@@ -457,6 +482,14 @@
   "plugins":{
     "Default Story Viewer":{
       "nodes":[{
+        "id":5,
+        "x":525.0,
+        "y":467.0
+      },{
+        "id":2,
+        "x":99.0,
+        "y":231.0
+      },{
         "id":0,
         "x":100.0,
         "y":26.0
@@ -465,21 +498,13 @@
         "x":423.0,
         "y":24.0
       },{
-        "id":2,
-        "x":99.0,
-        "y":231.0
-      },{
-        "id":3,
-        "x":34.0,
-        "y":466.0
-      },{
         "id":4,
         "x":293.0,
         "y":469.0
       },{
-        "id":5,
-        "x":525.0,
-        "y":467.0
+        "id":3,
+        "x":34.0,
+        "y":466.0
       }]
     }
   }
