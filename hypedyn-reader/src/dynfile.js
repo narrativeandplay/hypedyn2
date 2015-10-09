@@ -3,7 +3,7 @@ function loadStory() {
 	jQuery.ajaxSetup({ scriptCharset: "utf-8" , contentType: "application/json; charset=utf-8"});
 
 	// get the JSON file and parse it
-	jQuery.getJSON( "LRRH-new.dyn", function( data ) {
+	jQuery.getJSON( "popup.dyn", function( data ) {
 		var story = data.story;
 		var author = story.author; // unused
 		var description = story.description; // unused
@@ -50,7 +50,7 @@ function loadStory() {
 								// create the rule
 								// createRule(parentID, parentType, if_not, and_or, fall_through, id)
 								// do we have all this info?
-								createRule(rulesetID, "link", "if", conditionsOp, stopIfTrue, ruleID);
+								createRule(rulesetID, "link", "if", conditionsOp, !stopIfTrue, ruleID);
 
 								// now create the conditions and actions (if any)
 
@@ -91,12 +91,12 @@ function loadStory() {
 												}
 												break;
 											case "BooleanFactValue":
-												switch(thisCondition.params.state) {
+												switch(thisCondition.params.state.value) {
 													case "true":
-														createCondition(checkBoolFact, [thisCondition.params.fact], ruleID, false, l);
+														createCondition(checkBoolFact, [thisCondition.params.fact.value], ruleID, false, l);
 														break;
 													case "false":
-														createCondition(checkBoolFact, [thisCondition.params.fact], ruleID, true, l);
+														createCondition(checkBoolFact, [thisCondition.params.fact.value], ruleID, true, l);
 														break;
 												}
 												break;
@@ -133,8 +133,19 @@ function loadStory() {
 												createAction("clickedLink", ruleID, gotoNode, [thisAction.params.node.value], l);
 												break;
 											case "ShowPopupNode":
+												createAction("clickedLink", ruleID, popup, [thisAction.params.node.value], l);
 												break;
 											case "UpdateText":
+												switch(thisAction.params.text.value) {
+													case "textInput":
+														//createAction("enteredNode", 63, replaceText, [62, "alternative text", "\"I'm not supposed to talk to strangers,\""], 98);
+														createAction("enteredNode", ruleID, replaceText, [rulesetID, "alternative text", thisAction.params.textInput.value], l);
+														break;
+													case "stringFactValue":
+														//createAction("enteredNode", 63, replaceText, [62, "text fact", 99], 101);
+														createAction("enteredNode", ruleID, replaceText, [rulesetID, "text fact", thisAction.params.stringFactValue.value], l);
+														break;
+												}
 												break;
 											case "UpdateBooleanFact":
 												break;
