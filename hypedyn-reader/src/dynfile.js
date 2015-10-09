@@ -99,8 +99,18 @@ function createActions(rulesetID, ruleID, actions) {
 				createAction("clickedLink", ruleID, setFact, [thisAction.params.fact.value, thisAction.params.value.value], l);
 				break;
 			case "EnableAnywhereLinkToHere":
+				// hack to set anywhere flag in the node
+				var node = nodelist[rulesetID];
+				if(node!=null) {
+					node.anywhere=true;
+				}
+
+				//createAction("anywhereCheck", 67, addAnywhereLink, [66], 68);
+				createAction("anywhereCheck", ruleID, addAnywhereLink, [rulesetID], l);
 				break;
 			case "ShowDisabledAnywhereLink":
+				//createAction("disabledAnywhereCheck", 2, addInactiveAnywhereLink, [1], 3);
+				createAction("disabledAnywhereCheck", ruleID, addInactiveAnywhereLink, [rulesetID], l);
 				break;
 			case "UpdateIntegerFacts":
 				break;
@@ -156,7 +166,7 @@ function loadStory() {
 				var id=thisNode.id; 			// id of the node
 				var name=thisNode.name; 		// name of the node
 				var content=thisNode.content; 	// node content
-				var rules=thisNode.rules; 		// node rules - do this later
+				var nodeRules=thisNode.rules; 		// node rules - do this later
 
 				// create the node
 				createNode(name, content.text, false, id); // third param is isAnywhere??? check...
@@ -183,6 +193,9 @@ function loadStory() {
 				}
 
 				// now create the node rules (if any)
+				if(nodeRules!=null) {
+					createRules(id, "node", nodeRules);
+				}
 
 				// set start node if necessary
 				if (thisNode.isStart) {
