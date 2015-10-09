@@ -45,18 +45,28 @@ function createConditions(rulesetID, ruleID, conditions) {
 				}
 				break;
 			case "IntegerFactComparison":
-				switch(thisCondition.params.comparisonValue) {
+				var operator = thisCondition.params.operator.value;
+				var not = false;
+
+				// operators may not match, so adjust if necessary
+				if (operator == "==") {
+					operator = "=";
+				}
+				if (operator == "!=") {
+					operator = "=";
+					not = true;
+				}
+
+				switch(thisCondition.params.comparisonValue.value) {
 					case "input":
-						// createCondition(compareNumFact, [19, '=', 'Input', 0], 27, false, 28);
-						// value is missing here, bug #23
-						createCondition(checkBoolFact, [thisCondition.params.fact,
-							thisCondition.params.operator, 'Input', 0], ruleID, false, l);
+						//createCondition(compareNumFact, [26, '=', 'Input', 1], 11, false, 51);
+						createCondition(compareNumFact, [thisCondition.params.fact.value, operator,
+							'Input', thisCondition.params.input.value], ruleID, not, l);
 						break;
 					case "otherFact":
-						//createCondition(compareNumFact, [19, '=', 'Fact', 19], 29, false, 30);
-						createCondition(compareNumFact, [thisCondition.params.fact,
-								thisCondition.params.operator, 'Fact', thisCondition.params.otherFact],
-							ruleID, false, l);
+						//createCondition(compareNumFact, [26, '=', 'Fact', 88], 11, false, 104);
+						createCondition(compareNumFact, [thisCondition.params.fact.value, operator,
+							'Fact', thisCondition.params.otherFact.value], ruleID, not, l);
 						break;
 				}
 				break;
@@ -178,7 +188,7 @@ function loadStory() {
 	jQuery.ajaxSetup({ scriptCharset: "utf-8" , contentType: "application/json; charset=utf-8"});
 
 	// get the JSON file and parse it
-	jQuery.getJSON( "updatefacts-new.dyn", function( data ) {
+	jQuery.getJSON( "numberfacts.dyn", function( data ) {
 		var story = data.story;
 		var author = story.author; // unused
 		var description = story.description; // unused
