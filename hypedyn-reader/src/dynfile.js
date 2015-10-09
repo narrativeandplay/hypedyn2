@@ -102,13 +102,54 @@ function createActions(rulesetID, ruleID, actions, isNodeRules) {
 				break;
 			case "UpdateBooleanFact":
 				//createAction("clickedLink", 4, setFact, [2, true], 5);
-				createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setFact, [thisAction.params.fact.value, thisAction.params.value.value == "true"], l);
+				createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setFact,
+					[thisAction.params.fact.value, thisAction.params.value.value == "true"], l);
 				break;
 			case "UpdateStringFact":
 				//createAction("clickedLink", 8, setFact, [6, "[the fact text...........]"], 9);
-				createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setFact, [thisAction.params.fact.value, thisAction.params.value.value], l);
+				createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setFact,
+					[thisAction.params.fact.value, thisAction.params.value.value], l);
 				break;
-			case "UpdateIntegerFacts":
+			case "UpdateIntegerFacts": // + - x / %
+				switch (thisAction.params.updateValue.value) {
+					case "inputValue":
+						//createAction("clickedLink", 5, setNumberFact, [3, "Input", [10]], 6);
+						createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setNumberFact,
+							[thisAction.params.fact.value, "Input", [thisAction.params.inputValue.value]], l);
+						break;
+					case "integerFactValue":
+						//createAction("clickedLink", 5, setNumberFact, [3, "Fact", [4]], 7);
+						createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setNumberFact,
+							[thisAction.params.fact.value, "Fact", [thisAction.params.integerFactValue.value]], l);
+						break;
+					case "computation":
+						var operandtype1=thisAction.params.operand1.value;
+						var operand1=thisAction.params[operandtype1].value;
+						var operandtype2=thisAction.params.operand2.value;
+						var operand2=thisAction.params[operandtype2].value;
+
+						//createAction("clickedLink", 5, setNumberFact, [3, "Math", ["+", 3, "Fact", 4, "Fact"]], 10);
+						createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setNumberFact,
+							[thisAction.params.fact.value, "Math",
+								[thisAction.params.operator.value,
+									operand1, operandtype1 == "userOperand1" ? "Input" : "Fact",
+									operand2, operandtype2 == "userOperand2" ? "Input" : "Fact"]],
+							l);
+						break;
+					case "randomValue":
+						var operandtype1=thisAction.params.start.value;
+						var operand1=thisAction.params[operandtype1].value;
+						var operandtype2=thisAction.params.end.value;
+						var operand2=thisAction.params[operandtype2].value;
+
+						//createAction("clickedLink", 5, setNumberFact, [3, "Random", [1, "Input", 4, "Fact"]], 11);
+						createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setNumberFact,
+							[thisAction.params.fact.value, "Random",
+								[operand1, operandtype1 == "startInput" ? "Input" : "Fact",
+									operand2, operandtype2 == "endInput" ? "Input" : "Fact"]],
+							l);
+						break;
+				}
 				break;
 			case "EnableAnywhereLinkToHere":
 				// hack to set anywhere flag in the node
@@ -188,7 +229,7 @@ function loadStory() {
 	jQuery.ajaxSetup({ scriptCharset: "utf-8" , contentType: "application/json; charset=utf-8"});
 
 	// get the JSON file and parse it
-	jQuery.getJSON( "numberfacts.dyn", function( data ) {
+	jQuery.getJSON( "LRRH5-new.dyn", function( data ) {
 		var story = data.story;
 		var author = story.author; // unused
 		var description = story.description; // unused
