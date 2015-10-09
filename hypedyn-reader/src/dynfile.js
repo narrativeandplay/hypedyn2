@@ -64,7 +64,7 @@ function createConditions(rulesetID, ruleID, conditions) {
 	}
 }
 
-function createActions(ruleID, actions) {
+function createActions(rulesetID, ruleID, actions) {
 	for(var l=0; l < actions.length; l++) {
 		var thisAction = actions[l];
 		var actionType = thisAction.actionType;
@@ -108,12 +108,41 @@ function createActions(ruleID, actions) {
 	}
 }
 
+function createRules(rulesetID, rulesetType, rules) {
+	for(var k=0; k < rules.length; k++) {
+		var thisRule=rules[k];					// this rule
+		var ruleName=thisRule.name;				// name of this rule
+		var stopIfTrue=thisRule.stopIfTrue;		// stop if true?
+		var ruleID=thisRule.id;					// id of this rule
+		var conditionsOp=thisRule.conditionsOp;	// operator (and/or)
+		var conditions = thisRule.conditions;	// list of conditions
+		var actions = thisRule.actions;			// list of actions
+
+		// create the rule
+		// createRule(parentID, parentType, if_not, and_or, fall_through, id)
+		// do we have all this info?
+		createRule(rulesetID, rulesetType, "if", conditionsOp, !stopIfTrue, ruleID);
+
+		// now create the conditions and actions (if any)
+
+		// create conditions
+		if(conditions!=null) {
+			createConditions(rulesetID, ruleID, conditions);
+		}
+
+		// create actions
+		if(actions!=null) {
+			createActions(rulesetID, ruleID, actions);
+		}
+	}
+}
+
 function loadStory() {
 	// try to avoid not-well-formed error (not working)
 	jQuery.ajaxSetup({ scriptCharset: "utf-8" , contentType: "application/json; charset=utf-8"});
 
 	// get the JSON file and parse it
-	jQuery.getJSON( "LRRH-new.dyn", function( data ) {
+	jQuery.getJSON( "LRRH2-new.dyn", function( data ) {
 		var story = data.story;
 		var author = story.author; // unused
 		var description = story.description; // unused
@@ -148,32 +177,7 @@ function loadStory() {
 
 						// now create rules (if any)
 						if(rules!=null) {
-							for(var k=0; k < rules.length; k++) {
-								var thisRule=rules[k];					// this rule
-								var ruleName=thisRule.name;				// name of this rule
-								var stopIfTrue=thisRule.stopIfTrue;		// stop if true?
-								var ruleID=thisRule.id;					// id of this rule
-								var conditionsOp=thisRule.conditionsOp;	// operator (and/or)
-								var conditions = thisRule.conditions;	// list of conditions
-								var actions = thisRule.actions;			// list of actions
-
-								// create the rule
-								// createRule(parentID, parentType, if_not, and_or, fall_through, id)
-								// do we have all this info?
-								createRule(rulesetID, "link", "if", conditionsOp, !stopIfTrue, ruleID);
-
-								// now create the conditions and actions (if any)
-
-								// create conditions
-								if(conditions!=null) {
-									createConditions(rulesetID, ruleID, conditions);
-								}
-
-								// create actions
-								if(actions!=null) {
-									createActions(ruleID, actions);
-								}
-							}
+							createRules(rulesetID, "link", rules);
 						}
 					}
 				}
