@@ -12,7 +12,7 @@ import scalafx.scene.layout.{VBox, BorderPane}
 
 import org.fxmisc.easybind.EasyBind
 
-import org.narrativeandplay.hypedyn.dialogs.{StoryPropertiesDialog, NodeEditor, FactEditor, FileDialog}
+import org.narrativeandplay.hypedyn.dialogs._
 import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
@@ -41,6 +41,11 @@ object Main extends JFXApp {
    * Returns a new file dialog
    */
   def fileDialog = new FileDialog(stage)
+
+  /**
+   * Returns a new directory selection dialog
+   */
+  def directoryDialog = new DirectoryDialog(stage)
 
   /**
    * Creates a new node editor for editing a node
