@@ -22,6 +22,13 @@ object UndoEventDispatcher {
   EventBus.send(RedoStatus(UndoController.redoAvailable(), UndoEventSourceIdentity))
   UndoController.markCurrentPosition()
 
+  UndoController.undoAvailable onChange { (_, _, available) =>
+    EventBus.send(UndoStatus(available, UndoEventSourceIdentity))
+  }
+  UndoController.redoAvailable onChange { (_, _, available) =>
+    EventBus.send(RedoStatus(available, UndoEventSourceIdentity))
+  }
+
   UndoController.atMarkedPosition onChange { (_, _, isAtMarkedPos) =>
     EventBus.send(FileStatus(!isAtMarkedPos, UndoEventSourceIdentity))
   }
