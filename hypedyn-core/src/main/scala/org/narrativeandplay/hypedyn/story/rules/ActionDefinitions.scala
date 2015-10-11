@@ -46,11 +46,11 @@ object ActionDefinitions {
                            )))
                          ))),
                          "Math" -> RuleParameter("computation", Product(List(
-                           RuleParameter("operator", ListOfValues("+", "-", "x", "/", "%")),
                            RuleParameter("operand1", Union(Map(
                              "Fact" -> RuleParameter("factOperand1", IntegerFacts),
                              "Input" -> RuleParameter("userOperand1", UserInputInteger)
                            ))),
+                           RuleParameter("operator", ListOfValues("+", "-", "x", "/", "%")),
                            RuleParameter("operand2", Union(Map(
                              "Fact" -> RuleParameter("factOperand2", IntegerFacts),
                              "Input" -> RuleParameter("userOperand2", UserInputInteger)
