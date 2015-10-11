@@ -139,3 +139,7 @@ sealed case class FileLoaded(filename: String, src: String) extends Completion
 
 sealed case class UiNodeSelected(id: NodeId, src: String) extends Completion
 sealed case class UiNodeDeselected(id: NodeId, src: String) extends Completion
+
+
+sealed trait Notification extends Event
+sealed case class FileStatus(isChanged: Boolean, src: String) extends Notification

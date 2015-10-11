@@ -128,4 +128,12 @@ object EventBus {
 
   val UiNodeSelectedEvents = eventBus collect { case e: UiNodeSelected => e }
   val UiNodeDeselectedEvents = eventBus collect { case e: UiNodeDeselected => e }
+
+
+  /**
+   * Event stream of all notifications
+   */
+  val Notifications = eventBus collect { case e: Notification => e }
+
+  val FileStatusEvents = eventBus collect { case e: FileStatus => e }
 }
