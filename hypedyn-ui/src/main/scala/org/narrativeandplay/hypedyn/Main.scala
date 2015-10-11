@@ -115,8 +115,10 @@ object Main extends JFXApp {
 
     // CLose all windows when closing the main application window, i.e. make closing the main window equivalent to
     // an exiting of the program
-    onCloseRequest = { _ =>
-      Platform.exit()
+    onCloseRequest = { evt =>
+      UiEventDispatcher.requestExit() foreach { exit =>
+        if (exit) Platform.exit() else evt.consume()
+      }
     }
 
     scene = new Scene {
