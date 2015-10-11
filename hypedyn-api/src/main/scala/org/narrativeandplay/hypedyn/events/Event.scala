@@ -143,3 +143,5 @@ sealed case class UiNodeDeselected(id: NodeId, src: String) extends Completion
 
 sealed trait Notification extends Event
 sealed case class FileStatus(isChanged: Boolean, src: String) extends Notification
+sealed case class UndoStatus(isAvailable: Boolean, src: String) extends Notification
+sealed case class RedoStatus(isAvailable: Boolean, src: String) extends Notification
