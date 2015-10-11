@@ -18,6 +18,7 @@ object UiEventDispatcher {
   val UiEventSourceIdentity = "UI"
   private var selectedNode: Option[NodeId] = None
   private var openedNodeEditors = Map.empty[NodeId, NodeEditor]
+  val isStoryEdited = BooleanProperty(false)
 
   EventBus.NewNodeResponses foreach { response =>
     val editor = Main.nodeEditor("New Node", response.conditionDefinitions, response.actionDefinitions, response.story)
@@ -116,6 +117,10 @@ object UiEventDispatcher {
   EventBus.FactCreatedEvents foreach { evt => FactViewer.add(evt.fact) }
   EventBus.FactUpdatedEvents foreach { evt => FactViewer.update(evt.fact, evt.updatedFact) }
   EventBus.FactDestroyedEvents foreach { evt => FactViewer.remove(evt.fact) }
+
+  EventBus.FileStatusEvents foreach { evt =>
+    isStoryEdited() = evt.isChanged
+  }
 
   def requestNewNode(): Unit = {
     EventBus.send(NewNodeRequest(UiEventSourceIdentity))

@@ -36,6 +36,7 @@ object Main extends JFXApp {
   private val icon = new Image(getClass.getResourceAsStream("hypedyn-icon.jpg"))
 
   private val loadedFilename = new StringProperty("Untitled")
+  private val editedMarker = EasyBind map (UiEventDispatcher.isStoryEdited.delegate.asInstanceOf[ObservableValue[Boolean]], if (_: Boolean) "*" else "")
 
   /**
    * Returns a new file dialog
@@ -109,7 +110,7 @@ object Main extends JFXApp {
   def editFilename(newFilename: String): Unit = loadedFilename() = newFilename
 
   stage = new PrimaryStage {
-    title <== loadedFilename + " - HypeDyn"
+    title <== loadedFilename + editedMarker + " - HypeDyn"
     icons.add(icon)
 
     // CLose all windows when closing the main application window, i.e. make closing the main window equivalent to
