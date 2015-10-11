@@ -2,6 +2,9 @@ package org.narrativeandplay.hypedyn.events
 
 import scalafx.Includes._
 import scalafx.beans.property.BooleanProperty
+import scalafx.scene.control.{ButtonType, Alert}
+
+import rx.lang.scala.Observable
 
 import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.Main
@@ -190,6 +193,38 @@ object UiEventDispatcher {
   }
   def requestRedo(): Unit = {
     EventBus.send(RedoRequest(UiEventSourceIdentity))
+  }
+
+  /**
+   * Checks to see if the current story has unsaved changes before exiting
+   *
+   * @return An Rx Observable of exactly one boolean value,
+   *         which is `true` is the program is to be exited, and `false` otherwise
+   */
+  def requestExit(): Observable[Boolean] = {
+    isStoryEdited() match {
+      case true =>
+        val Yes = new ButtonType("Yes")
+        val No = new ButtonType("No")
+        val confirmExit = new Alert(Alert.AlertType.Confirmation) {
+          initOwner(Main.stage)
+
+          title = "Unsaved Project"
+          headerText = None
+          contentText = "The current project has not been saved.\nDo you want to save it?"
+
+          buttonTypes = Seq(Yes, No, ButtonType.Cancel)
+        }
+
+        confirmExit.showAndWait() match {
+          case Some(Yes) =>
+            requestSave()
+            EventBus.StorySavedEvents flatMap { _ => Observable.just(true) }
+          case Some(No) => Observable.just(true)
+          case _ => Observable.just(false)
+        }
+      case false => Observable.just(true)
+    }
   }
 
 }
