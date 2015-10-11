@@ -17,7 +17,8 @@ object ActionDefinitions {
     ActionDefinition(ActionType("UpdateText"), "Update text", List(NodeContentAction),
                      List(RuleParameter("text", Union(Map(
                       "Input" -> RuleParameter("textInput", UserInputString),
-                      "Fact" -> RuleParameter("stringFactValue", StringFacts)
+                      "String Fact" -> RuleParameter("stringFactValue", StringFacts),
+                      "Number Fact" -> RuleParameter("NumberFactValue", IntegerFacts)
                      ))))),
     ActionDefinition(ActionType("UpdateBooleanFact"), "Update true/false fact", List(NodeContentAction, NodeAction, StoryAction),
                      List(RuleParameter("fact", BooleanFacts),
