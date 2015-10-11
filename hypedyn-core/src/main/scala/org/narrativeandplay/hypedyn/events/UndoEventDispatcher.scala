@@ -20,6 +20,10 @@ object UndoEventDispatcher {
 
   UndoController.markCurrentPosition()
 
+  UndoController.atMarkedPosition onChange { (_, _, isAtMarkedPos) =>
+    EventBus.send(FileStatus(!isAtMarkedPos, UndoEventSourceIdentity))
+  }
+
   /**
    * Sends an event to create a node
    *
