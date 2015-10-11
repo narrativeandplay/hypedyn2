@@ -18,6 +18,8 @@ object UndoEventDispatcher {
   EventBus.UndoResponses foreach { _ => UndoController.undo() }
   EventBus.RedoResponses foreach { _ => UndoController.redo() }
 
+  EventBus.send(UndoStatus(UndoController.undoAvailable(), UndoEventSourceIdentity))
+  EventBus.send(RedoStatus(UndoController.redoAvailable(), UndoEventSourceIdentity))
   UndoController.markCurrentPosition()
 
   UndoController.atMarkedPosition onChange { (_, _, isAtMarkedPos) =>
