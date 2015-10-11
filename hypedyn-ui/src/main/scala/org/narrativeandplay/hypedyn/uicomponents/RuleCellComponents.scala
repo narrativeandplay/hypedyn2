@@ -595,6 +595,11 @@ object RuleCellComponents {
   class StringInput(val paramMap: ObservableMap[ParamName, ParamValue],
                     val paramName: ParamName,
                     val story: ObjectProperty[UiStory]) extends TextArea with RuleCellParameterComponent {
+    `val` match {
+      case None => paramMap += paramName -> ParamValue.StringInput(text())
+      case _ =>
+    }
+
     text onChange { (_, _ , newValue) =>
       Option(newValue) foreach (paramMap += paramName -> ParamValue.StringInput(_))
     }
