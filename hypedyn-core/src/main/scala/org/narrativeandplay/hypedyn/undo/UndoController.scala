@@ -39,6 +39,16 @@ object UndoController {
   }
 
   /**
+   * Observable stream of whether undo is available
+   */
+  def undoAvailable: ObservableBooleanValue = undoManager.undoAvailableProperty()
+
+  /**
+   * Observable stream of whether redo is available
+   */
+  def redoAvailable: ObservableBooleanValue = undoManager.redoAvailableProperty()
+
+  /**
    * Marks the current position in the undo queue
    */
   def markCurrentPosition(): Unit = undoManager.mark()

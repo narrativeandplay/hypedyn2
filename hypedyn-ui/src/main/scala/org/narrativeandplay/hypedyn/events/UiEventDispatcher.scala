@@ -19,6 +19,8 @@ object UiEventDispatcher {
   private var selectedNode: Option[NodeId] = None
   private var openedNodeEditors = Map.empty[NodeId, NodeEditor]
   val isStoryEdited = BooleanProperty(false)
+  val undoAvailable = BooleanProperty(false)
+  val redoAvailable = BooleanProperty(false)
 
   EventBus.NewNodeResponses foreach { response =>
     val editor = Main.nodeEditor("New Node", response.conditionDefinitions, response.actionDefinitions, response.story)
@@ -120,6 +122,13 @@ object UiEventDispatcher {
 
   EventBus.FileStatusEvents foreach { evt =>
     isStoryEdited() = evt.isChanged
+  }
+
+  EventBus.UndoStatusEvents foreach { evt =>
+    undoAvailable() = evt.isAvailable
+  }
+  EventBus.RedoStatusEvents foreach { evt =>
+    redoAvailable() = evt.isAvailable
   }
 
   def requestNewNode(): Unit = {
