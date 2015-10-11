@@ -29,4 +29,9 @@ object UndoController {
   def clearHistory(): Unit = {
     undoManager.forgetHistory()
   }
+
+  /**
+   * Marks the current position in the undo queue
+   */
+  def markCurrentPosition(): Unit = undoManager.mark()
 }
