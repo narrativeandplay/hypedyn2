@@ -1,5 +1,7 @@
 package org.narrativeandplay.hypedyn.events
 
+import scalafx.Includes._
+
 import org.narrativeandplay.hypedyn.story.internal.Node
 import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.undo._
@@ -15,6 +17,12 @@ object UndoEventDispatcher {
    */
   EventBus.UndoResponses foreach { _ => UndoController.undo() }
   EventBus.RedoResponses foreach { _ => UndoController.redo() }
+
+  UndoController.markCurrentPosition()
+
+  UndoController.atMarkedPosition onChange { (_, _, isAtMarkedPos) =>
+    EventBus.send(FileStatus(!isAtMarkedPos, UndoEventSourceIdentity))
+  }
 
   /**
    * Sends an event to create a node

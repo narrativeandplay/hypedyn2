@@ -139,6 +139,8 @@ object CoreEventDispatcher {
 
         loadedFile = Some(saveFileEvt.file)
 
+        UndoController.markCurrentPosition()
+
         EventBus.send(StorySaved(saveFileEvt.file.getName, CoreEventSourceIdentity))
       }
   }
@@ -155,6 +157,7 @@ object CoreEventDispatcher {
     loadedFile = Some(evt.file)
 
     UndoController.clearHistory()
+    UndoController.markCurrentPosition()
 
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
     EventBus.send(DataLoaded(pluginData, CoreEventSourceIdentity))
@@ -171,6 +174,7 @@ object CoreEventDispatcher {
     loadedFile = None
 
     UndoController.clearHistory()
+    UndoController.markCurrentPosition()
 
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
     EventBus.send(FileLoaded("Untitled", CoreEventSourceIdentity))
