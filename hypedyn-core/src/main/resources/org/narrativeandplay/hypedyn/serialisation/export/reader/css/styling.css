@@ -81,7 +81,7 @@ body {
 }
 
 .pageflip {
-	background-image: url(page_back_btm_320_480.png);
+	background-image: url(../images/page_back_btm_320_480.png);
 }
 
 /* applied to the sections in 'pages' */
