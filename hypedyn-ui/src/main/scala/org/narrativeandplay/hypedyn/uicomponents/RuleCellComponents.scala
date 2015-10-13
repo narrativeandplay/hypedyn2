@@ -12,7 +12,7 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.collections.{ObservableBuffer, ObservableMap}
 import scalafx.geometry.Insets
 import scalafx.scene.control._
-import scalafx.scene.layout.{StackPane, Region, HBox}
+import scalafx.scene.layout.{Priority, StackPane, Region, HBox}
 import scalafx.util.StringConverter
 import scalafx.util.StringConverter.sfxStringConverter2jfx
 import scalafx.scene.Parent.sfxParent2jfx
@@ -120,7 +120,9 @@ object RuleCellComponents {
       }
     }
 
-    lazy val condParams = new HBox()
+    lazy val condParams = new HBox {
+      HBox.setHgrow(this, Priority.Always)
+    }
 
     lazy val removeButton = new StackPane {
       padding = Insets(0, 0, 0, 10)
@@ -245,7 +247,9 @@ object RuleCellComponents {
       }
     }
 
-    lazy val actionParams = new HBox()
+    lazy val actionParams = new HBox {
+      HBox.setHgrow(this, Priority.Always)
+    }
 
     lazy val removeButton = new StackPane {
       padding = Insets(0, 0, 0, 10)
@@ -607,6 +611,8 @@ object RuleCellComponents {
     prefWidth = 150
     prefHeight = 75
 
+    HBox.setHgrow(this, Priority.Always)
+
     override def `val`: Option[ParamValue] = paramMap get paramName
 
     override def val_=(paramValue: ParamValue): Unit = {
@@ -737,7 +743,11 @@ object RuleCellComponents {
       }
     }
 
-    lazy val pane = new HBox
+    lazy val pane = new HBox {
+      HBox.setHgrow(this, Priority.Always)
+    }
+
+    HBox.setHgrow(this, Priority.Always)
 
     children.addAll(unionValue, pane)
 
@@ -779,6 +789,8 @@ object RuleCellComponents {
                     val story: ObjectProperty[UiStory],
                     params: List[RuleParameter]) extends HBox with RuleCellParameterComponent {
     paramMap += paramName -> ParamValue.ProductValue(params map (_.name))
+
+    HBox.setHgrow(this, Priority.Always)
 
     params foreach { param =>
       val newComponent = createParameterInput(param, paramMap, story)
