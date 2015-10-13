@@ -2,6 +2,9 @@ package org.narrativeandplay.hypedyn.events
 
 import scalafx.Includes._
 import scalafx.beans.property.BooleanProperty
+import scalafx.scene.control.{ButtonType, Alert}
+
+import rx.lang.scala.Observable
 
 import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.Main
@@ -18,6 +21,9 @@ object UiEventDispatcher {
   val UiEventSourceIdentity = "UI"
   private var selectedNode: Option[NodeId] = None
   private var openedNodeEditors = Map.empty[NodeId, NodeEditor]
+  val isStoryEdited = BooleanProperty(false)
+  val undoAvailable = BooleanProperty(false)
+  val redoAvailable = BooleanProperty(false)
 
   EventBus.NewNodeResponses foreach { response =>
     val editor = Main.nodeEditor("New Node", response.conditionDefinitions, response.actionDefinitions, response.story)
@@ -117,6 +123,17 @@ object UiEventDispatcher {
   EventBus.FactUpdatedEvents foreach { evt => FactViewer.update(evt.fact, evt.updatedFact) }
   EventBus.FactDestroyedEvents foreach { evt => FactViewer.remove(evt.fact) }
 
+  EventBus.FileStatusEvents foreach { evt =>
+    isStoryEdited() = evt.isChanged
+  }
+
+  EventBus.UndoStatusEvents foreach { evt =>
+    undoAvailable() = evt.isAvailable
+  }
+  EventBus.RedoStatusEvents foreach { evt =>
+    redoAvailable() = evt.isAvailable
+  }
+
   def requestNewNode(): Unit = {
     EventBus.send(NewNodeRequest(UiEventSourceIdentity))
   }
@@ -176,6 +193,38 @@ object UiEventDispatcher {
   }
   def requestRedo(): Unit = {
     EventBus.send(RedoRequest(UiEventSourceIdentity))
+  }
+
+  /**
+   * Checks to see if the current story has unsaved changes before exiting
+   *
+   * @return An Rx Observable of exactly one boolean value,
+   *         which is `true` is the program is to be exited, and `false` otherwise
+   */
+  def requestExit(): Observable[Boolean] = {
+    isStoryEdited() match {
+      case true =>
+        val Yes = new ButtonType("Yes")
+        val No = new ButtonType("No")
+        val confirmExit = new Alert(Alert.AlertType.Confirmation) {
+          initOwner(Main.stage)
+
+          title = "Unsaved Project"
+          headerText = None
+          contentText = "The current project has not been saved.\nDo you want to save it?"
+
+          buttonTypes = Seq(Yes, No, ButtonType.Cancel)
+        }
+
+        confirmExit.showAndWait() match {
+          case Some(Yes) =>
+            requestSave()
+            EventBus.StorySavedEvents flatMap { _ => Observable.just(true) }
+          case Some(No) => Observable.just(true)
+          case _ => Observable.just(false)
+        }
+      case false => Observable.just(true)
+    }
   }
 
 }

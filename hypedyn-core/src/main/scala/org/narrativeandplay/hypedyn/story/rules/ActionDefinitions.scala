@@ -17,7 +17,8 @@ object ActionDefinitions {
     ActionDefinition(ActionType("UpdateText"), "Update text", List(NodeContentAction),
                      List(RuleParameter("text", Union(Map(
                       "Input" -> RuleParameter("textInput", UserInputString),
-                      "Fact" -> RuleParameter("stringFactValue", StringFacts)
+                      "String Fact" -> RuleParameter("stringFactValue", StringFacts),
+                      "Number Fact" -> RuleParameter("NumberFactValue", IntegerFacts)
                      ))))),
     ActionDefinition(ActionType("UpdateBooleanFact"), "Update true/false fact", List(NodeContentAction, NodeAction, StoryAction),
                      List(RuleParameter("fact", BooleanFacts),
@@ -46,11 +47,11 @@ object ActionDefinitions {
                            )))
                          ))),
                          "Math" -> RuleParameter("computation", Product(List(
-                           RuleParameter("operator", ListOfValues("+", "-", "x", "/", "%")),
                            RuleParameter("operand1", Union(Map(
                              "Fact" -> RuleParameter("factOperand1", IntegerFacts),
                              "Input" -> RuleParameter("userOperand1", UserInputInteger)
                            ))),
+                           RuleParameter("operator", ListOfValues("+", "-", "x", "/", "%")),
                            RuleParameter("operand2", Union(Map(
                              "Fact" -> RuleParameter("factOperand2", IntegerFacts),
                              "Input" -> RuleParameter("userOperand2", UserInputInteger)

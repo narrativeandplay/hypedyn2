@@ -95,6 +95,8 @@ object Menubar extends MenuBar {
   private lazy val undo = new MenuItem("Undo") {
     accelerator = KeyCombinations.Undo
 
+    disable <== !UiEventDispatcher.undoAvailable
+
     onAction = { actionEvent: ActionEvent =>
       UiEventDispatcher.requestUndo()
     }
@@ -102,6 +104,8 @@ object Menubar extends MenuBar {
 
   private lazy val redo = new MenuItem("Redo") {
     accelerator = if (System.isWindows) KeyCombinations.RedoWin else KeyCombinations.RedoUnix
+
+    disable <== !UiEventDispatcher.redoAvailable
 
     onAction = { actionEvent: ActionEvent =>
       UiEventDispatcher.requestRedo()
