@@ -611,6 +611,8 @@ object RuleCellComponents {
     prefWidth = 150
     prefHeight = 75
 
+    wrapText = true
+
     HBox.setHgrow(this, Priority.Always)
 
     override def `val`: Option[ParamValue] = paramMap get paramName
