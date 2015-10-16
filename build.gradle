@@ -13,6 +13,11 @@ javafx {
     mainClass 'org.narrativeandplay.hypedyn.Main'
 }
 
+ext {
+    majorScalaVersion = "2.11"
+    minorScalaVersion = "7"
+}
+
 allprojects {
     apply plugin: 'scala'
 
@@ -28,11 +33,11 @@ allprojects {
     sourceCompatibility = 1.8
 
     dependencies {
-        compile 'org.scala-lang:scala-library:2.11.7'
+        compile "org.scala-lang:scala-library:${rootProject.majorScalaVersion}.${rootProject.minorScalaVersion}"
 
         testCompile 'junit:junit:4.12'
-        testCompile 'org.scalatest:scalatest_2.11:2.2.4'
-        testRuntime 'org.scala-lang.modules:scala-xml_2.11:1.0.5'
+        testCompile "org.scalatest:scalatest_${rootProject.majorScalaVersion}:2.2.4"
+        testRuntime "org.scala-lang.modules:scala-xml_${rootProject.majorScalaVersion}:1.0.5"
     }
 
     tasks.withType(ScalaCompile) {
