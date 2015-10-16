@@ -22,7 +22,7 @@ object ExportController {
 
     try {
       val opts: EnumSet[FileVisitOption] = EnumSet.of(FileVisitOption.FOLLOW_LINKS)
-      val tc: Copy.TreeCopier = new Copy.TreeCopier(sourcePath, destPath, false, true)
+      val tc: Copy.TreeCopier = new Copy.TreeCopier(sourcePath, destPath, true)
       Files.walkFileTree(sourcePath, opts, Integer.MAX_VALUE, tc)
     } catch {
       case e: Exception => println("exception caught: " + e);
@@ -36,14 +36,3 @@ object ExportController {
   }
 
 }
-
-/*
-(define (get-content-file in-name in-mac-testing)
-  (let ((the-path (get-system-property "user.dir")))
-    ; Get a path to somewhere inside the .app folder
-    (if (and (is-mac-os?) (not in-mac-testing))
-        (let ((libpath  (get-system-property "java.library.path")))
-          (if (not (is-null? libpath))
-              (set! the-path libpath))))
-    (make-file (string-append the-path "/" in-name))))
-*/

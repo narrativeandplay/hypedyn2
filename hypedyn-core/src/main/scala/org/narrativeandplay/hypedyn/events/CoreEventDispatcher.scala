@@ -174,6 +174,10 @@ object CoreEventDispatcher {
     ExportController.export(exportDirectory);
 
     // save current story to export directory
+    val storyData = Serialiser serialise StoryController.story
+    val saveData = AstMap("story" -> storyData)
+
+    IoController.save(Serialiser toString saveData, new File(exportDirectory.getAbsolutePath()+"/export/story.dyn"))
 
     // send completion (we're done!)
     EventBus.send(ExportedToFile(CoreEventSourceIdentity))
