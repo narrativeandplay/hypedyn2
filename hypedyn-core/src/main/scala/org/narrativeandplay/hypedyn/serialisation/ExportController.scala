@@ -8,7 +8,8 @@ import java.util.EnumSet
  * Created by alex on 16/10/15.
  */
 object ExportController {
-  val testingDir = "" //"/src/main/resources"
+  val testingDir = ""
+  //val testingDir = "/src/main/resources" // uncomment when running from IDE - should automate this?
 
   /**
    * Export the story
@@ -18,10 +19,11 @@ object ExportController {
    */
   def export(exportParentDir: File, exportDirName: String): Unit = {
     // create the export directory
-    val libPath=java.lang.System.getProperty("user.dir") //("java.library.path");
+    val libPath=java.lang.System.getProperty("user.dir")
     val sourcePath=Paths.get(libPath+"/hypedyn-core"+testingDir+"/org/narrativeandplay/hypedyn/serialisation/export/reader")
     val destPath=Paths.get(exportParentDir.getAbsolutePath()+"/"+exportDirName)
 
+    // copy the reader into the export directory
     try {
       val opts: EnumSet[FileVisitOption] = EnumSet.of(FileVisitOption.FOLLOW_LINKS)
       val tc: Copy.TreeCopier = new Copy.TreeCopier(sourcePath, destPath, true)
@@ -29,12 +31,6 @@ object ExportController {
     } catch {
       case e: Exception => println("exception caught: " + e);
     }
-
-    // copy the reader into the directory
-
-    //val fileWriter = new PrintWriter(file)
-
-    //fileWriter.close()
   }
 
 }
