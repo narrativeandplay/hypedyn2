@@ -47,6 +47,9 @@ object EventBus {
   val SaveAsRequests = eventBus collect { case e: SaveAsRequest => e }
   val LoadRequests = eventBus collect { case e: LoadRequest => e }
 
+  val ExportRequests = eventBus collect { case e: ExportRequest => e }
+  val RunStoryRequests = eventBus collect { case e: RunStoryRequest => e }
+
   val CutNodeRequests = eventBus collect { case e: CutNodeRequest => e }
   val CopyNodeRequests = eventBus collect { case e: CopyNodeRequest => e }
   val PasteNodeRequests = eventBus collect { case e: PasteNodeRequest => e }
@@ -74,6 +77,9 @@ object EventBus {
   val SaveResponses = eventBus collect { case e: SaveResponse => e }
   val SaveAsResponses = eventBus collect { case e: SaveAsResponse => e }
   val LoadResponses = eventBus collect { case e: LoadResponse => e }
+
+  val ExportResponses = eventBus collect { case e: ExportResponse => e }
+  val RunStoryResponses = eventBus collect { case e: RunStoryResponse => e }
 
   val CutNodeResponses = eventBus collect { case e: CutNodeResponse => e }
   val CopyNodeResponses = eventBus collect { case e: CopyNodeResponse => e }
@@ -103,6 +109,8 @@ object EventBus {
   val SaveToFileEvents = eventBus collect { case e: SaveToFile => e }
   val LoadFromFileEvents = eventBus collect { case e: LoadFromFile => e }
 
+  val ExportToFileEvents = eventBus collect { case e: ExportToFile => e }
+
   val CreateStoryEvents = eventBus collect { case e: CreateStory => e }
   val UpdateStoryPropertiesEvents = eventBus collect { case e: UpdateStoryProperties => e }
 
@@ -125,6 +133,8 @@ object EventBus {
   val StoryLoadedEvents = eventBus collect { case e: StoryLoaded => e }
   val DataLoadedEvents = eventBus collect { case e: DataLoaded => e }
   val FileLoadedEvents = eventBus collect { case e: FileLoaded => e }
+
+  val ExportedToFileEvents = eventBus collect { case e: ExportedToFile => e }
 
   val UiNodeSelectedEvents = eventBus collect { case e: UiNodeSelected => e }
   val UiNodeDeselectedEvents = eventBus collect { case e: UiNodeDeselected => e }

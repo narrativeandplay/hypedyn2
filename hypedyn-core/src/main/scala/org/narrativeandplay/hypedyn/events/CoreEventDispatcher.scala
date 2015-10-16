@@ -3,7 +3,7 @@ package org.narrativeandplay.hypedyn.events
 import java.io.File
 
 import org.narrativeandplay.hypedyn.plugins.PluginsController
-import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement}
+import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement, ExportController}
 import org.narrativeandplay.hypedyn.serialisation.serialisers._
 import org.narrativeandplay.hypedyn.story.internal.Story
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, ConditionDefinitions, Fact}
@@ -125,6 +125,9 @@ object CoreEventDispatcher {
   EventBus.SaveAsRequests foreach { _ => EventBus.send(SaveAsResponse(CoreEventSourceIdentity)) }
   EventBus.LoadRequests foreach { _ => EventBus.send(LoadResponse(CoreEventSourceIdentity)) }
 
+  EventBus.ExportRequests foreach { _ => EventBus.send(ExportResponse(loadedFile, CoreEventSourceIdentity)) }
+  EventBus.RunStoryRequests foreach { _ => EventBus.send(RunStoryResponse(CoreEventSourceIdentity)) }
+
   EventBus.SaveDataEvents tumbling PluginsController.plugins.size zip EventBus.SaveToFileEvents foreach {
     case (pluginData, saveFileEvt) =>
       pluginData.foldLeft(Map.empty[String, AstElement])({ case (m, SaveData(pluginName, data, _)) =>
@@ -162,6 +165,18 @@ object CoreEventDispatcher {
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
     EventBus.send(DataLoaded(pluginData, CoreEventSourceIdentity))
     EventBus.send(FileLoaded(evt.file.getName, CoreEventSourceIdentity))
+  }
+
+  EventBus.ExportToFileEvents foreach { evt =>
+    val exportDirectory = evt.file;
+
+    // create directory and copy over the reader
+    ExportController.export(exportDirectory);
+
+    // save current story to export directory
+
+    // send completion (we're done!)
+    EventBus.send(ExportedToFile(CoreEventSourceIdentity))
   }
 
   EventBus.NewStoryRequests foreach { _ => EventBus.send(NewStoryResponse(CoreEventSourceIdentity)) }

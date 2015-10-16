@@ -96,6 +96,25 @@ object UiEventDispatcher {
     fileToLoad foreach { f => EventBus.send(LoadFromFile(f, UiEventSourceIdentity)) }
   }
 
+  EventBus.ExportResponses foreach { evt =>
+    // get location to export to (a directory)
+    val fileToSaveTo = Main.directoryDialog.showDialog()
+
+    fileToSaveTo foreach { f => EventBus.send(ExportToFile(f, UiEventSourceIdentity)) }
+  }
+  // actually run the story
+  EventBus.RunStoryResponses foreach { _ =>
+    // create temp directory
+
+    // copy javascript to temp directory
+
+    // save current story to temp directory
+
+    //val fileToSaveTo = Main.fileDialog.showSaveFileDialog()
+
+    //fileToSaveTo foreach { f => EventBus.send(SaveToFile(f, UiEventSourceIdentity)) }
+  }
+
   EventBus.StorySavedEvents foreach { evt =>
     Main.editFilename(evt.filename)
   }
@@ -105,6 +124,10 @@ object UiEventDispatcher {
   }
   EventBus.FileLoadedEvents foreach { evt =>
     Main.editFilename(evt.filename)
+  }
+
+  EventBus.ExportedToFileEvents foreach { evt =>
+    // done export, nothing to see here
   }
 
   EventBus.NewStoryResponses foreach { _ => EventBus.send(CreateStory(src = UiEventSourceIdentity)) }
@@ -176,6 +199,13 @@ object UiEventDispatcher {
   }
   def requestLoad(): Unit = {
     EventBus.send(LoadRequest(UiEventSourceIdentity))
+  }
+
+  def requestExport(): Unit = {
+    EventBus.send(ExportRequest(UiEventSourceIdentity))
+  }
+  def requestRunStory(): Unit = {
+    EventBus.send(RunStoryRequest(UiEventSourceIdentity))
   }
 
   def requestCut(): Unit = {

@@ -36,6 +36,7 @@ sealed trait Event {
  * Generally the UI or plugins send Requests
  */
 sealed trait Request extends Event
+
 sealed case class NewNodeRequest(src: String) extends Request
 sealed case class EditNodeRequest(id: NodeId, src: String) extends Request
 sealed case class DeleteNodeRequest(id: NodeId, src: String) extends Request
@@ -47,6 +48,9 @@ sealed case class DeleteFactRequest(id: FactId, src: String) extends Request
 sealed case class SaveRequest(src: String) extends Request
 sealed case class SaveAsRequest(src: String) extends Request
 sealed case class LoadRequest(src: String) extends Request
+
+sealed case class ExportRequest(src: String) extends Request
+sealed case class RunStoryRequest(src: String) extends Request
 
 sealed case class CutNodeRequest(id: NodeId, src: String) extends Request
 sealed case class CopyNodeRequest(id: NodeId, src: String) extends Request
@@ -65,6 +69,7 @@ sealed case class RedoRequest(src: String) extends Request
  * Generally sent by the core
  */
 sealed trait Response extends Event
+
 sealed case class NewNodeResponse(story: Narrative, conditionDefinitions: List[ConditionDefinition], actionDefinitions: List[ActionDefinition], src: String) extends Response
 sealed case class EditNodeResponse(node: Nodal, story: Narrative, conditionDefinitions: List[ConditionDefinition], actionDefinitions: List[ActionDefinition], src: String) extends Response
 sealed case class DeleteNodeResponse(node: Nodal, story: Narrative, conditionDefinitions: List[ConditionDefinition], actionDefinitions: List[ActionDefinition], src: String) extends Response
@@ -76,6 +81,9 @@ sealed case class DeleteFactResponse(fact: Fact, src: String) extends Response
 sealed case class SaveResponse(loadedFile: Option[File], src: String) extends Response
 sealed case class SaveAsResponse(src: String) extends Response
 sealed case class LoadResponse(src: String) extends Response
+
+sealed case class ExportResponse(loadedFile: Option[File], src: String) extends Response
+sealed case class RunStoryResponse(src: String) extends Response
 
 sealed case class CutNodeResponse(node: Nodal, src: String) extends Response
 sealed case class CopyNodeResponse(node: Nodal, src: String) extends Response
@@ -105,6 +113,8 @@ sealed case class DestroyFact(fact: Fact, src: String) extends Action
 sealed case class SaveData(pluginName: String, data: AstElement, src: String) extends Action
 sealed case class SaveToFile(file: File, src: String) extends Action
 sealed case class LoadFromFile(file: File, src: String) extends Action
+
+sealed case class ExportToFile(file: File, src: String) extends Action
 
 sealed case class CreateStory(title: String = "Untitled",
                               author: String = "",
@@ -136,6 +146,8 @@ sealed case class StoryLoaded(story: Narrative, src: String) extends Completion
 sealed case class StoryUpdated(story: Narrative, src: String) extends Completion
 sealed case class DataLoaded(data: Map[String, AstElement], src: String) extends Completion
 sealed case class FileLoaded(filename: String, src: String) extends Completion
+
+sealed case class ExportedToFile(src: String) extends Completion
 
 sealed case class UiNodeSelected(id: NodeId, src: String) extends Completion
 sealed case class UiNodeDeselected(id: NodeId, src: String) extends Completion
