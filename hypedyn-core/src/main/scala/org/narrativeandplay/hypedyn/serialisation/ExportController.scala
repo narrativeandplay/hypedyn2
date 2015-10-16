@@ -8,9 +8,6 @@ import java.util.EnumSet
  * Created by alex on 16/10/15.
  */
 object ExportController {
-  val testingDir = ""
-  //val testingDir = "/src/main/resources" // uncomment when running from IDE - should automate this?
-
   /**
    * Export the story
    *
@@ -20,7 +17,7 @@ object ExportController {
   def export(exportParentDir: File, exportDirName: String): Unit = {
     // create the export directory
     val libPath=java.lang.System.getProperty("user.dir")
-    val sourcePath=Paths.get(libPath+"/hypedyn-core"+testingDir+"/org/narrativeandplay/hypedyn/serialisation/export/reader")
+    val sourcePath=Paths.get(getClass().getResource("export/reader").getPath())
     val destPath=Paths.get(exportParentDir.getAbsolutePath()+"/"+exportDirName)
 
     // copy the reader into the export directory
