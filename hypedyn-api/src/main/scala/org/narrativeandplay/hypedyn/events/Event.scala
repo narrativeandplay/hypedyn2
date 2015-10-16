@@ -115,6 +115,7 @@ sealed case class SaveToFile(file: File, src: String) extends Action
 sealed case class LoadFromFile(file: File, src: String) extends Action
 
 sealed case class ExportToFile(file: File, src: String) extends Action
+sealed case class RunStory(src: String) extends Action
 
 sealed case class CreateStory(title: String = "Untitled",
                               author: String = "",
@@ -148,6 +149,7 @@ sealed case class DataLoaded(data: Map[String, AstElement], src: String) extends
 sealed case class FileLoaded(filename: String, src: String) extends Completion
 
 sealed case class ExportedToFile(src: String) extends Completion
+sealed case class RanStory(src: String) extends Completion
 
 sealed case class UiNodeSelected(id: NodeId, src: String) extends Completion
 sealed case class UiNodeDeselected(id: NodeId, src: String) extends Completion

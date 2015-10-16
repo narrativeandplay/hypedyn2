@@ -104,15 +104,7 @@ object UiEventDispatcher {
   }
   // actually run the story
   EventBus.RunStoryResponses foreach { _ =>
-    // create temp directory
-
-    // copy javascript to temp directory
-
-    // save current story to temp directory
-
-    //val fileToSaveTo = Main.fileDialog.showSaveFileDialog()
-
-    //fileToSaveTo foreach { f => EventBus.send(SaveToFile(f, UiEventSourceIdentity)) }
+    EventBus.send(RunStory(UiEventSourceIdentity))
   }
 
   EventBus.StorySavedEvents foreach { evt =>
@@ -129,6 +121,10 @@ object UiEventDispatcher {
   EventBus.ExportedToFileEvents foreach { evt =>
     // done export, nothing to see here
   }
+  EventBus.RanStoryEvents foreach { evt =>
+    // done running, nothing to see here
+  }
+
 
   EventBus.NewStoryResponses foreach { _ => EventBus.send(CreateStory(src = UiEventSourceIdentity)) }
   EventBus.EditStoryPropertiesResponses foreach { evt =>

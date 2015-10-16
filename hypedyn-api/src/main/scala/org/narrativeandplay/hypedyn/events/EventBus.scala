@@ -110,6 +110,7 @@ object EventBus {
   val LoadFromFileEvents = eventBus collect { case e: LoadFromFile => e }
 
   val ExportToFileEvents = eventBus collect { case e: ExportToFile => e }
+  val RunStoryEvents = eventBus collect { case e: RunStory => e }
 
   val CreateStoryEvents = eventBus collect { case e: CreateStory => e }
   val UpdateStoryPropertiesEvents = eventBus collect { case e: UpdateStoryProperties => e }
@@ -135,6 +136,7 @@ object EventBus {
   val FileLoadedEvents = eventBus collect { case e: FileLoaded => e }
 
   val ExportedToFileEvents = eventBus collect { case e: ExportedToFile => e }
+  val RanStoryEvents = eventBus collect { case e: RanStory => e }
 
   val UiNodeSelectedEvents = eventBus collect { case e: UiNodeSelected => e }
   val UiNodeDeselectedEvents = eventBus collect { case e: UiNodeDeselected => e }

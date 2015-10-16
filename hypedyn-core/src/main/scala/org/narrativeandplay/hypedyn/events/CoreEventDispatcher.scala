@@ -1,6 +1,7 @@
 package org.narrativeandplay.hypedyn.events
 
 import java.io.File
+import java.net.URI
 
 import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement, ExportController}
@@ -20,6 +21,11 @@ object CoreEventDispatcher {
    * Keeps track of whether there is a story loaded via a file load
    */
   private var loadedFile: Option[File] = None
+
+  /*
+   * keeps track of file suffix for temp file when running
+   */
+  private var fileSuffix = 0
 
   EventBus.NewNodeRequests foreach { _ =>
     EventBus.send(NewNodeResponse(StoryController.story, ConditionDefinitions(), ActionDefinitions(), CoreEventSourceIdentity))
@@ -169,18 +175,48 @@ object CoreEventDispatcher {
 
   EventBus.ExportToFileEvents foreach { evt =>
     val exportDirectory = evt.file;
+    val destDirName = "export"
 
     // create directory and copy over the reader
-    ExportController.export(exportDirectory);
+    ExportController.export(exportDirectory, destDirName);
 
     // save current story to export directory
     val storyData = Serialiser serialise StoryController.story
     val saveData = AstMap("story" -> storyData)
-
-    IoController.save(Serialiser toString saveData, new File(exportDirectory.getAbsolutePath()+"/export/story.dyn"))
+    IoController.save(Serialiser toString saveData, new File(exportDirectory.getAbsolutePath()+"/"+destDirName+"/story.dyn"))
 
     // send completion (we're done!)
     EventBus.send(ExportedToFile(CoreEventSourceIdentity))
+  }
+
+  EventBus.RunStoryEvents foreach { evt =>
+    // get system temp directory
+    val tempDirectory = java.lang.System.getProperty("java.io.tmpdir")
+    val tempDirectoryFile = new File(tempDirectory)
+
+    // increment file suffix
+    fileSuffix = fileSuffix + 1
+    val destDirName = "temp"+fileSuffix
+
+    // create directory and copy over the reader
+    ExportController.export(tempDirectoryFile,destDirName);
+
+    // save current story to temp directory
+    val storyData = Serialiser serialise StoryController.story
+    val saveData = AstMap("story" -> storyData)
+    IoController.save(Serialiser toString saveData, new File(tempDirectory+destDirName+"/story.dyn"))
+
+    // and launch browser
+    if(java.awt.Desktop.isDesktopSupported()){
+      try{
+        java.awt.Desktop.getDesktop().browse(new URI("file://"+tempDirectory+destDirName+"/index.html"))
+      } catch {
+        case e: Exception => println("exception caught: " + e);
+      }
+    }
+
+    // send completion (we're done!)
+    EventBus.send(RanStory(CoreEventSourceIdentity))
   }
 
   EventBus.NewStoryRequests foreach { _ => EventBus.send(NewStoryResponse(CoreEventSourceIdentity)) }
