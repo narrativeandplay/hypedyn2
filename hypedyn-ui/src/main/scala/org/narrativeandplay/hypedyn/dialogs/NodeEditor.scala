@@ -3,14 +3,14 @@ package org.narrativeandplay.hypedyn.dialogs
 import java.util.function.Function
 import javafx.event.EventHandler
 import javafx.scene.control.{TableCell => JfxTableCell, IndexRange => JfxIndexRange}
-import javafx.scene.input.{KeyCode => JfxKeyCode, KeyEvent => JfxKeyEvent}
+import javafx.scene.input.{KeyCode => JfxKeyCode, KeyEvent => JfxKeyEvent, MouseEvent => JfxMouseEvent}
 
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.{Pos, Insets, Orientation}
 import scalafx.scene.control._
-import scalafx.scene.input.{KeyCode, KeyEvent}
+import scalafx.scene.input.{MouseEvent, KeyEvent}
 import scalafx.scene.layout._
 import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
@@ -233,6 +233,24 @@ class NodeEditor private (dialogTitle: String,
 
     columns += rulesetColumn
     columns += removeButtonColumn
+
+    nodeContentText.selection onChange { (_, _, selectedRange) =>
+      val foldedStyleSpans = nodeContentText.styleSpansAt(selectedRange).foldLeft(Nil: List[StyleSpan[LinkStyleInfo]]) {
+        case (resList @ headSpan :: tail, currSpan) =>
+          if (headSpan == currSpan) resList else currSpan :: resList
+        case (Nil, currSpan) => currSpan :: Nil
+      }
+
+      if (foldedStyleSpans.size == 1) {
+        val selectedSpan = foldedStyleSpans.head
+
+        selectedSpan.getStyle.ruleset match {
+          case Some(r) => selectionModel().select(r)
+          case None => selectionModel().clearSelection()
+        }
+      }
+      else selectionModel().clearSelection()
+    }
 
     items <== node.contentProperty().rulesetsProperty
     editable = true
@@ -488,6 +506,17 @@ object NodeEditor {
       }
     })
 
+    setOnMouseClicked({ mouseEvent: JfxMouseEvent =>
+      val hasNoSelectedText = getSelectedText == ""
+      val selectedPosHasRule = getStyleAtPosition(getCaretPosition).ruleset.isDefined
+
+      if (hasNoSelectedText && selectedPosHasRule) {
+        val ruleRange = getStyleRangeAtPosition(getCaretPosition)
+
+        selectRange(ruleRange.start, ruleRange.end)
+      }
+    })
+
     /**
      * Returns all the style spans in the text
      */
@@ -510,5 +539,7 @@ object NodeEditor {
 
     def useInitialStyleForInsertion = useInitialStyleForInsertionProperty()
     def useInitialStyleForInsertion_=(value: Boolean) = setUseInitialStyleForInsertion(value)
+
+    def selection = selectionProperty()
   }
 }
