@@ -148,7 +148,7 @@ object UiEventDispatcher {
     EventBus.send(NewFactRequest(UiEventSourceIdentity))
   }
   def requestEditFact(): Unit = {
-    Option(FactViewer.selectionModel.selectedItem()) foreach { f =>
+    Option(FactViewer.selectionModel().selectedItem()) foreach { f =>
       EventBus.send(EditFactRequest(f.id, UiEventSourceIdentity))
     }
   }
@@ -156,7 +156,7 @@ object UiEventDispatcher {
     EventBus.send(EditFactRequest(fact.id, UiEventSourceIdentity))
   }
   def requestDeleteFact(): Unit = {
-    Option(FactViewer.selectionModel.selectedItem()) foreach { f =>
+    Option(FactViewer.selectionModel().selectedItem()) foreach { f =>
       EventBus.send(DeleteFactRequest(f.id, UiEventSourceIdentity))
     }
   }
