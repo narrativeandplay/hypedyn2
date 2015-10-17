@@ -3,14 +3,14 @@ package org.narrativeandplay.hypedyn.dialogs
 import java.util.function.Function
 import javafx.event.EventHandler
 import javafx.scene.control.{TableCell => JfxTableCell, IndexRange => JfxIndexRange}
-import javafx.scene.input.{KeyCode => JfxKeyCode, KeyEvent => JfxKeyEvent}
+import javafx.scene.input.{KeyCode => JfxKeyCode, KeyEvent => JfxKeyEvent, MouseEvent => JfxMouseEvent}
 
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.{Pos, Insets, Orientation}
 import scalafx.scene.control._
-import scalafx.scene.input.{KeyCode, KeyEvent}
+import scalafx.scene.input.{MouseEvent, KeyEvent}
 import scalafx.scene.layout._
 import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
@@ -485,6 +485,17 @@ object NodeEditor {
         useInitialStyleForInsertion = true
         appendText(" ")
         useInitialStyleForInsertion = false
+      }
+    })
+
+    setOnMouseClicked({ mouseEvent: JfxMouseEvent =>
+      val hasNoSelectedText = getSelectedText == ""
+      val selectedPosHasRule = getStyleAtPosition(getCaretPosition).ruleset.isDefined
+
+      if (hasNoSelectedText && selectedPosHasRule) {
+        val ruleRange = getStyleRangeAtPosition(getCaretPosition)
+
+        selectRange(ruleRange.start, ruleRange.end)
       }
     })
 
