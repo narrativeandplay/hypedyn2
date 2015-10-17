@@ -508,10 +508,10 @@ object NodeEditor {
 
     setOnMouseClicked({ mouseEvent: JfxMouseEvent =>
       val hasNoSelectedText = getSelectedText == ""
-      val selectedPosHasRule = getStyleAtPosition(getCaretPosition).ruleset.isDefined
+      val selectedPosHasRule = styleAt(caretPosition()).ruleset.isDefined
 
       if (hasNoSelectedText && selectedPosHasRule) {
-        val ruleRange = getStyleRangeAtPosition(getCaretPosition)
+        val ruleRange = styleRangeAt(caretPosition())
 
         selectRange(ruleRange.start, ruleRange.end)
       }
@@ -537,9 +537,15 @@ object NodeEditor {
       spans.toList
     }
 
+    def styleAt(position: Int) = getStyleAtPosition(position)
+
+    def styleRangeAt(position: Int) = getStyleRangeAtPosition(position)
+
     def useInitialStyleForInsertion = useInitialStyleForInsertionProperty()
     def useInitialStyleForInsertion_=(value: Boolean) = setUseInitialStyleForInsertion(value)
 
     def selection = selectionProperty()
+
+    def caretPosition = caretPositionProperty()
   }
 }
