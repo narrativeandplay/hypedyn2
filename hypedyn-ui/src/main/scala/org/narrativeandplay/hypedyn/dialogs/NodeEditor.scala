@@ -426,7 +426,7 @@ class NodeEditor private (dialogTitle: String,
       case ((_, end, rulesetOption), styleSpan) =>
         (end, end + styleSpan.getLength, styleSpan.getStyle.ruleset)
     }
-    val existingRulesets = (spans.tail foldLeft List(spans.head)) {
+    val rulesetsExistingInText = (spans.tail foldLeft List(spans.head)) {
       case (resList @ (headStart, _, headSpan) :: tail, (start, end, span)) =>
         if (headSpan == span) (headStart, end, span) :: tail else (start, end, span) :: resList
       case (Nil, input) => input :: Nil
@@ -435,8 +435,11 @@ class NodeEditor private (dialogTitle: String,
       ruleset
     }
 
-    val rulesetsToRemove = node.contentProperty().rulesetsProperty().toList filterNot existingRulesets.toSet
+    val rulesetsToRemove = node.contentProperty().rulesetsProperty().toList filterNot rulesetsExistingInText.toSet
     rulesetsToRemove foreach { r => node.contentProperty().rulesetsProperty() -= r }
+
+    val rulesetsToAdd = rulesetsExistingInText filterNot node.contentProperty().rulesetsProperty().toSet
+    rulesetsToAdd foreach { r => node.contentProperty().rulesetsProperty() += r }
   }
 
   /**
