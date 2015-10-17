@@ -293,6 +293,7 @@ class NodeEditor private (dialogTitle: String,
           nodeContentText.setStyle(start,
                                    end,
                                    new LinkStyleInfo(Some(newRuleset)))
+          textRulesTable.selectionModel().select(newRuleset)
         }
       }
     }
