@@ -234,6 +234,24 @@ class NodeEditor private (dialogTitle: String,
     columns += rulesetColumn
     columns += removeButtonColumn
 
+    nodeContentText.selection onChange { (_, _, selectedRange) =>
+      val foldedStyleSpans = nodeContentText.styleSpansAt(selectedRange).foldLeft(Nil: List[StyleSpan[LinkStyleInfo]]) {
+        case (resList @ headSpan :: tail, currSpan) =>
+          if (headSpan == currSpan) resList else currSpan :: resList
+        case (Nil, currSpan) => currSpan :: Nil
+      }
+
+      if (foldedStyleSpans.size == 1) {
+        val selectedSpan = foldedStyleSpans.head
+
+        selectedSpan.getStyle.ruleset match {
+          case Some(r) => selectionModel().select(r)
+          case None => selectionModel().clearSelection()
+        }
+      }
+      else selectionModel().clearSelection()
+    }
+
     items <== node.contentProperty().rulesetsProperty
     editable = true
     placeholder = new Label("")
@@ -521,5 +539,7 @@ object NodeEditor {
 
     def useInitialStyleForInsertion = useInitialStyleForInsertionProperty()
     def useInitialStyleForInsertion_=(value: Boolean) = setUseInitialStyleForInsertion(value)
+
+    def selection = selectionProperty()
   }
 }
