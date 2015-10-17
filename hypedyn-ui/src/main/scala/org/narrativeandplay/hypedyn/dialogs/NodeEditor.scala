@@ -185,7 +185,7 @@ class NodeEditor private (dialogTitle: String,
 
       cellFactory = { _: javafx.scene.control.TableColumn[UiRuleset,UiRuleset] =>
         new JfxTableCell[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset] {
-          val removeButton = new Button("-")
+          val removeButton = new Button("−")
 
           override def updateItem(item: UiNodeContent.UiRuleset, empty: Boolean): Unit = {
             super.updateItem(item, empty)
