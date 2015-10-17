@@ -1,9 +1,14 @@
 package org.narrativeandplay.hypedyn.uicomponents
 
+import java.lang
+import javafx.beans.value.ObservableValue
+import javafx.stage.Window
 import javafx.{event => jfxe}
 import javafx.event.EventHandler
 import javafx.scene.control.{ListCell => JfxListCell}
-import javafx.scene.{input => jfxsi}
+import javafx.scene.{input => jfxsi, Scene}
+
+import org.fxmisc.easybind.EasyBind
 
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 
@@ -85,5 +90,9 @@ object FactViewer extends ListView[Fact] {
     text = s"${if (System.isMac) "Cmd" else "Ctrl"}-Click deselects a selected fact"
   }
 
-  tooltip = deselectionInfo
+  EasyBind select scene select { s: Scene => s.window.delegate.asInstanceOf[ObservableValue[Window]] } selectObject { w: Window =>
+    w.focused.delegate.asInstanceOf[ObservableValue[lang.Boolean]]
+  } onChange { (_, _, isFocused) =>
+    if (isFocused) tooltip = deselectionInfo else tooltip = null
+  }
 }
