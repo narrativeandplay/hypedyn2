@@ -10,6 +10,7 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.{Pos, Insets, Orientation}
 import scalafx.scene.control._
+import scalafx.scene.input.{KeyCode, KeyEvent}
 import scalafx.scene.layout._
 import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
@@ -475,6 +476,14 @@ object NodeEditor {
                                                                        new Function[NodeEditor.LinkStyleInfo, String] {
                                                                          override def apply(t: LinkStyleInfo): String = t.css
                                                                        }) {
+    addEventFilter(KeyEvent.KeyTyped, { keyEvent: JfxKeyEvent =>
+      if (keyEvent.controlDown && keyEvent.character == " ") {
+        useInitialStyleForInsertion = true
+        appendText(" ")
+        useInitialStyleForInsertion = false
+      }
+    })
+
     /**
      * Returns all the style spans in the text
      */
@@ -494,5 +503,8 @@ object NodeEditor {
       getStyleSpans(indexRange) forEach { styleSpan => spans += styleSpan }
       spans.toList
     }
+
+    def useInitialStyleForInsertion = useInitialStyleForInsertionProperty()
+    def useInitialStyleForInsertion_=(value: Boolean) = setUseInitialStyleForInsertion(value)
   }
 }
