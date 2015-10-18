@@ -31,6 +31,7 @@
 
 package org.narrativeandplay.hypedyn.serialisation;
 
+import java.net.URI;
 import java.nio.file.*;
 import static java.nio.file.StandardCopyOption.*;
 import java.nio.file.attribute.*;
@@ -66,11 +67,36 @@ public class Copy {
         private final Path source;
         private final Path target;
         private final boolean preserve;
+        private FileSystem fs;
 
-        TreeCopier(Path source, Path target, boolean preserve) {
-            this.source = source;
+        TreeCopier(URI source, Path target, boolean preserve) {
+            final Map<String, String> env = new HashMap<>();
+            final String[] array = source.toString().split("!");
+            try {
+                fs = FileSystems.newFileSystem(URI.create(array[0]), env);
+            } catch (IOException x) {
+                System.err.format("IOExcaption: %s", x);
+            }
+
+            // what if fs is null?
+            this.source = fs.getPath(array[1]);
             this.target = target;
             this.preserve = preserve;
+        }
+
+        public Path getSourcePath() {
+            return source;
+        }
+
+        public void closeFilesystem() {
+            if(fs != null && fs.isOpen()) {
+                try {
+                    fs.close();
+                    fs=null;
+                } catch (IOException x) {
+                    System.err.format("IOExcaption: %s", x);
+                }
+            }
         }
 
         @Override
@@ -80,7 +106,7 @@ public class Copy {
             CopyOption[] options = (preserve) ?
                     new CopyOption[] { COPY_ATTRIBUTES } : new CopyOption[0];
 
-            Path newdir = target.resolve(source.relativize(dir));
+            Path newdir = target.resolve(source.relativize(dir).toString()); // important to convert to string
             try {
                 Files.copy(dir, newdir, options);
             } catch (FileAlreadyExistsException x) {
@@ -94,8 +120,8 @@ public class Copy {
 
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-            copyFile(file, target.resolve(source.relativize(file)),
-                    preserve);
+            copyFile(file, target.resolve(source.relativize(file).toString()),
+                    preserve);  // important to convert to string
             return CONTINUE;
         }
 
@@ -103,7 +129,7 @@ public class Copy {
         public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
             // fix up modification time of directory when done
             if (exc == null && preserve) {
-                Path newdir = target.resolve(source.relativize(dir));
+                Path newdir = target.resolve(source.relativize(dir).toString());  // important to convert to string
                 try {
                     FileTime time = Files.getLastModifiedTime(dir);
                     Files.setLastModifiedTime(newdir, time);
