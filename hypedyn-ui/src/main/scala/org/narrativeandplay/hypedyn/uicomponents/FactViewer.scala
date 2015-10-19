@@ -1,18 +1,21 @@
 package org.narrativeandplay.hypedyn.uicomponents
 
-import javafx.collections.ObservableList
+import java.lang
+import javafx.beans.value.ObservableValue
+import javafx.stage.Window
 import javafx.{event => jfxe}
 import javafx.event.EventHandler
-import javafx.scene.control.{ListCell, ListView}
-import javafx.scene.{input => jfxsi}
-import javafx.util.Callback
+import javafx.scene.control.{ListCell => JfxListCell}
+import javafx.scene.{input => jfxsi, Scene}
+
+import org.fxmisc.easybind.EasyBind
 
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
 import scalafx.event.Event
-import scalafx.scene.control.{MultipleSelectionModel, Tooltip}
+import scalafx.scene.control.{ListView, Tooltip}
 
 import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.utils.System
@@ -27,7 +30,7 @@ object FactViewer extends ListView[Fact] {
 
   items = facts
 
-  class FactCell extends ListCell[Fact] {
+  class FactCell extends JfxListCell[Fact] {
     override def updateItem(item: Fact, empty: Boolean): Unit = {
       super.updateItem(item, empty)
 
@@ -87,26 +90,9 @@ object FactViewer extends ListView[Fact] {
     text = s"${if (System.isMac) "Cmd" else "Ctrl"}-Click deselects a selected fact"
   }
 
-  tooltip = deselectionInfo
-
-  // <editor-fold="Functions for replicating Scala-like access style">
-
-  def cellFactory = cellFactoryProperty
-  def cellFactory_=(v: (ListView[Fact] => ListCell[Fact])) {
-    setCellFactory(new Callback[ListView[Fact], ListCell[Fact]] {
-      override def call(lv: ListView[Fact]) = {
-        v(lv)
-      }
-    })
+  EasyBind select scene select { s: Scene => s.window.delegate.asInstanceOf[ObservableValue[Window]] } selectObject { w: Window =>
+    w.focused.delegate.asInstanceOf[ObservableValue[lang.Boolean]]
+  } onChange { (_, _, isFocused) =>
+    if (isFocused) tooltip = deselectionInfo else tooltip = null
   }
-
-  def items = itemsProperty()
-  def items_=(i: ObservableList[Fact]) = setItems(i)
-
-  def selectionModel: MultipleSelectionModel[Fact] = getSelectionModel
-
-  def tooltip: Tooltip = getTooltip
-  def tooltip_=(tooltip: Tooltip) = setTooltip(tooltip)
-
-  //</editor-fold>
 }

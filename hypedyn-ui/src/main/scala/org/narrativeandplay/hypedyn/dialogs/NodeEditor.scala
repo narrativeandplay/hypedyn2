@@ -3,13 +3,14 @@ package org.narrativeandplay.hypedyn.dialogs
 import java.util.function.Function
 import javafx.event.EventHandler
 import javafx.scene.control.{TableCell => JfxTableCell, IndexRange => JfxIndexRange}
-import javafx.scene.input.{KeyCode => JfxKeyCode, KeyEvent => JfxKeyEvent}
+import javafx.scene.input.{KeyCode => JfxKeyCode, KeyEvent => JfxKeyEvent, MouseEvent => JfxMouseEvent}
 
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.{Pos, Insets, Orientation}
 import scalafx.scene.control._
+import scalafx.scene.input.{MouseEvent, KeyEvent}
 import scalafx.scene.layout._
 import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
@@ -184,7 +185,7 @@ class NodeEditor private (dialogTitle: String,
 
       cellFactory = { _: javafx.scene.control.TableColumn[UiRuleset,UiRuleset] =>
         new JfxTableCell[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset] {
-          val removeButton = new Button("-")
+          val removeButton = new Button("−")
 
           override def updateItem(item: UiNodeContent.UiRuleset, empty: Boolean): Unit = {
             super.updateItem(item, empty)
@@ -232,6 +233,24 @@ class NodeEditor private (dialogTitle: String,
 
     columns += rulesetColumn
     columns += removeButtonColumn
+
+    nodeContentText.selection onChange { (_, _, selectedRange) =>
+      val foldedStyleSpans = nodeContentText.styleSpansAt(selectedRange).foldLeft(Nil: List[StyleSpan[LinkStyleInfo]]) {
+        case (resList @ headSpan :: tail, currSpan) =>
+          if (headSpan == currSpan) resList else currSpan :: resList
+        case (Nil, currSpan) => currSpan :: Nil
+      }
+
+      if (foldedStyleSpans.size == 1) {
+        val selectedSpan = foldedStyleSpans.head
+
+        selectedSpan.getStyle.ruleset match {
+          case Some(r) => selectionModel().select(r)
+          case None => selectionModel().clearSelection()
+        }
+      }
+      else selectionModel().clearSelection()
+    }
 
     items <== node.contentProperty().rulesetsProperty
     editable = true
@@ -292,6 +311,7 @@ class NodeEditor private (dialogTitle: String,
           nodeContentText.setStyle(start,
                                    end,
                                    new LinkStyleInfo(Some(newRuleset)))
+          textRulesTable.selectionModel().select(newRuleset)
         }
       }
     }
@@ -425,7 +445,7 @@ class NodeEditor private (dialogTitle: String,
       case ((_, end, rulesetOption), styleSpan) =>
         (end, end + styleSpan.getLength, styleSpan.getStyle.ruleset)
     }
-    val existingRulesets = (spans.tail foldLeft List(spans.head)) {
+    val rulesetsExistingInText = (spans.tail foldLeft List(spans.head)) {
       case (resList @ (headStart, _, headSpan) :: tail, (start, end, span)) =>
         if (headSpan == span) (headStart, end, span) :: tail else (start, end, span) :: resList
       case (Nil, input) => input :: Nil
@@ -434,8 +454,11 @@ class NodeEditor private (dialogTitle: String,
       ruleset
     }
 
-    val rulesetsToRemove = node.contentProperty().rulesetsProperty().toList filterNot existingRulesets.toSet
+    val rulesetsToRemove = node.contentProperty().rulesetsProperty().toList filterNot rulesetsExistingInText.toSet
     rulesetsToRemove foreach { r => node.contentProperty().rulesetsProperty() -= r }
+
+    val rulesetsToAdd = rulesetsExistingInText filterNot node.contentProperty().rulesetsProperty().toSet
+    rulesetsToAdd foreach { r => node.contentProperty().rulesetsProperty() += r }
   }
 
   /**
@@ -475,6 +498,25 @@ object NodeEditor {
                                                                        new Function[NodeEditor.LinkStyleInfo, String] {
                                                                          override def apply(t: LinkStyleInfo): String = t.css
                                                                        }) {
+    addEventFilter(KeyEvent.KeyTyped, { keyEvent: JfxKeyEvent =>
+      if (keyEvent.controlDown && keyEvent.character == " ") {
+        useInitialStyleForInsertion = true
+        appendText(" ")
+        useInitialStyleForInsertion = false
+      }
+    })
+
+    setOnMouseClicked({ mouseEvent: JfxMouseEvent =>
+      val hasNoSelectedText = getSelectedText == ""
+      val selectedPosHasRule = styleAt(caretPosition()).ruleset.isDefined
+
+      if (hasNoSelectedText && selectedPosHasRule) {
+        val ruleRange = styleRangeAt(caretPosition())
+
+        selectRange(ruleRange.start, ruleRange.end)
+      }
+    })
+
     /**
      * Returns all the style spans in the text
      */
@@ -494,5 +536,16 @@ object NodeEditor {
       getStyleSpans(indexRange) forEach { styleSpan => spans += styleSpan }
       spans.toList
     }
+
+    def styleAt(position: Int) = getStyleAtPosition(position)
+
+    def styleRangeAt(position: Int) = getStyleRangeAtPosition(position)
+
+    def useInitialStyleForInsertion = useInitialStyleForInsertionProperty()
+    def useInitialStyleForInsertion_=(value: Boolean) = setUseInitialStyleForInsertion(value)
+
+    def selection = selectionProperty()
+
+    def caretPosition = caretPositionProperty()
   }
 }
