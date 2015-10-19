@@ -2,6 +2,7 @@ package org.narrativeandplay.hypedyn.events
 
 import java.io.File
 import java.net.URI
+import java.nio.file.Files
 
 import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement, ExportController}
@@ -21,11 +22,6 @@ object CoreEventDispatcher {
    * Keeps track of whether there is a story loaded via a file load
    */
   private var loadedFile: Option[File] = None
-
-  /*
-   * keeps track of file suffix for temp file when running
-   */
-  private var fileSuffix = 0
 
   EventBus.NewNodeRequests foreach { _ =>
     EventBus.send(NewNodeResponse(StoryController.story, ConditionDefinitions(), ActionDefinitions(), CoreEventSourceIdentity))
@@ -190,28 +186,25 @@ object CoreEventDispatcher {
   }
 
   EventBus.RunStoryEvents foreach { evt =>
-    // get system temp directory
-    val tempDirectory = java.lang.System.getProperty("java.io.tmpdir")
-    val tempDirectoryFile = new File(tempDirectory)
-
-    // increment file suffix
-    fileSuffix = fileSuffix + 1
-    val destDirName = "temp"+fileSuffix
+    // create temp directory
+    val tempDirectory = Files.createTempDirectory(null)
+    tempDirectory.toFile.deleteOnExit
+    val destDirName = "hypedyn"
 
     // create directory and copy over the reader
-    ExportController.export(tempDirectoryFile,destDirName);
+    ExportController.export(tempDirectory.toFile, destDirName)
 
     // save current story to temp directory
     val storyData = Serialiser serialise StoryController.story
     val saveData = AstMap("story" -> storyData)
-    IoController.save(Serialiser toString saveData, new File(tempDirectory+destDirName+"/story.dyn"))
+    IoController.save(Serialiser toString saveData, tempDirectory.resolve(destDirName+"/story.dyn").toFile)
 
     // and launch browser
     if(java.awt.Desktop.isDesktopSupported()){
       try{
-        java.awt.Desktop.getDesktop().browse(new URI("file://"+tempDirectory+destDirName+"/index.html"))
+        java.awt.Desktop.getDesktop().browse(tempDirectory.resolve(destDirName+"/index.html").toUri)
       } catch {
-        case e: Exception => println("exception caught: " + e);
+        case e: Exception => println("CoreEventDispatcher RunStoryEvents exception caught: " + e);
       }
     }
 
