@@ -98,6 +98,10 @@ function createActions(rulesetID, ruleID, actions, isNodeRules) {
 						//createAction("enteredNode", 63, replaceText, [62, "text fact", 99], 101);
 						createAction("enteredNode", ruleID, replaceText, [rulesetID, "text fact", thisAction.params.stringFactValue.value], l);
 						break;
+					case "NumberFactValue":
+						//createAction("enteredNode", 4, replaceText, [3, "number fact", 2], 5);
+						createAction("enteredNode", ruleID, replaceText, [rulesetID, "number fact", thisAction.params.NumberFactValue.value], l);
+						break;
 				}
 				break;
 			case "UpdateBooleanFact":
