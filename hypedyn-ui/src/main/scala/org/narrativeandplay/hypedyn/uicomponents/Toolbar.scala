@@ -10,7 +10,13 @@ import org.narrativeandplay.hypedyn.events.UiEventDispatcher
  * The toolbar for the application
  */
 object Toolbar extends ToolBar {
-  items.addAll(newNode, editNode, deleteNode, newFact, editFact, deleteFact)
+  items.addAll(runStory, newNode, editNode, deleteNode, newFact, editFact, deleteFact)
+
+  private lazy val runStory = new Button("Run") {
+    onAction = { actionEvent: ActionEvent =>
+      UiEventDispatcher.requestRunStory()
+    }
+  }
 
   private lazy val newNode = new Button("New Node") {
     onAction = { actionEvent: ActionEvent =>

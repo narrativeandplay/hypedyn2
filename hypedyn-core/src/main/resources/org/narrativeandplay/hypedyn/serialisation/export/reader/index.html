@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="height=device-height, width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" type="text/css" href="css/styling.css" />
+</head>
+
+<body>
+	<script type="text/javascript">
+		// Stub hack to prevent errors in IE
+		// from http://stackoverflow.com/questions/8095348/website-with-js-doesnt-work-in-ie9-until-the-developer-tools-is-activated
+		console = window.console || { log: function() {} };
+	</script>
+	
+	<div id="buttons-panel">
+		<button id="back_button" type="button" style="position: static; left: 0px; top: 5px; font: 16px/20px Helvetica, sans-serif;" onClick="backPrevNode()">
+			<font size=3>Back</font>
+		</button>
+		<button id="restart_button" type="button" style="position: static; left: 0px; top: 5px; font: 16px/20px Helvetica, sans-serif;" onClick="restartStory()">
+			<font size=3>Restart</font>
+		</button>
+	</div>
+	
+	<div id="pages"></div>
+	<div id="test_bed" style="left:500px"></div>
+	
+	<div id="outer-popup">
+		<div id="popup"></div>
+	</div>
+	
+	<canvas id="pageflip-canvas"></canvas>
+	<canvas id="lightsoff-canvas"></canvas>
+	<canvas id="page-indicate-canvas"></canvas>
+	
+	<div id="touch_debug"></div>
+	<div id="fact_debug"></div>
+	
+	<script src="js/jquery-2.1.4.js" ></script>
+	<script src="js/main.js"></script>
+	<script src="js/misc.js"></script>
+	<script src="js/config.js"></script>
+	<script src="js/layout.js"></script>
+	<script src="js/facts.js"></script>
+	<script src="js/rules.js"></script>
+	<script src="js/dynfile.js"></script>
+	<script src="js/hdmouse.js"></script>
+	<script src="js/datastructure.js"></script>
+	<script src="js/page-formatting.js"></script>
+	<script src="js/flip-animation.js"></script>
+	<script src="js/choice-button.js"></script>
+	<script type="application/javascript" src="js/iscroll.js?v4"></script>
+
+</body>
+
+</html>

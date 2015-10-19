@@ -41,7 +41,7 @@ object Menubar extends MenuBar {
    * File Menu
    */
   private lazy val fileMenu = new Menu("File") {
-    items.addAll(newStory, openStory, saveStory, saveAs, new SeparatorMenuItem(), editStoryProperties, new SeparatorMenuItem(), exit)
+    items.addAll(newStory, openStory, saveStory, saveAs, export, new SeparatorMenuItem(), editStoryProperties, new SeparatorMenuItem(), exit)
   }
 
   private lazy val newStory = new MenuItem("New") {
@@ -73,6 +73,14 @@ object Menubar extends MenuBar {
 
     onAction = { ae: ActionEvent =>
       UiEventDispatcher.requestSaveAs()
+    }
+  }
+
+  private lazy val export = new MenuItem("Export...") {
+    //accelerator = KeyCombinations.Export
+
+    onAction = { ae: ActionEvent =>
+      UiEventDispatcher.requestExport()
     }
   }
 
