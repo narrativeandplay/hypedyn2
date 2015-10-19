@@ -41,10 +41,21 @@ import java.util.*;
 
 /**
  * Sample code that copies files in a similar manner to the cp(1) program.
- * Revised to remove command line elements
+ * Revised to remove command line elements and copy from a jar file
  */
 
 public class Copy {
+    static void copyFromJar(URI source, Path target) {
+        EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
+        TreeCopier tc = new TreeCopier(source, target, true);
+        try {
+            Files.walkFileTree(tc.getSourcePath(), opts, Integer.MAX_VALUE, tc);
+            tc.closeFilesystem();
+        } catch (IOException x) {
+            System.err.format("Unable to copy %s to %s: %s%n", source, target, x);
+        }
+    }
+
     /**
      * Copy source file to target location. The {@code preserve}
      * parameter determines if file attributes should be copied/preserved.
