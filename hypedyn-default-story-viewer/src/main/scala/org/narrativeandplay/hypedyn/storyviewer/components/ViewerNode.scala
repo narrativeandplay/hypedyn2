@@ -15,9 +15,9 @@ import scalafx.scene.input.MouseEvent
 import com.github.benedictleejh.scala.math.vector.Vector2
 import org.fxmisc.easybind.EasyBind
 
+import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 import org.narrativeandplay.hypedyn.story.Nodal
 import org.narrativeandplay.hypedyn.storyviewer.StoryViewer
-import org.narrativeandplay.hypedyn.storyviewer.utils.FunctionImplicits._
 import org.narrativeandplay.hypedyn.storyviewer.utils.VectorImplicitConversions._
 import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
 

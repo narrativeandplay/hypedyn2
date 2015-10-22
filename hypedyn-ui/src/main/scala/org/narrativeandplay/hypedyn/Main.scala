@@ -19,7 +19,7 @@ import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition, Fact}
 import org.narrativeandplay.hypedyn.uicomponents._
 import org.narrativeandplay.hypedyn.undo.UndoController
-import org.narrativeandplay.hypedyn.utils.ScalaJavaImplicits._
+import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 
 /**
  * Entry point for the application

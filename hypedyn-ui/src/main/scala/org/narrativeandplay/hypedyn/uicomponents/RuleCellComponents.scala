@@ -23,7 +23,7 @@ import org.narrativeandplay.hypedyn.story.rules.ParameterValues._
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
 import org.narrativeandplay.hypedyn.story._
-import org.narrativeandplay.hypedyn.utils.ScalaJavaImplicits._
+import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 
 
 object RuleCellComponents {

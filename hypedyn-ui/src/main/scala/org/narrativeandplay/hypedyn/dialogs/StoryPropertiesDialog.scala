@@ -18,7 +18,7 @@ import org.narrativeandplay.hypedyn.dialogs.StoryPropertiesDialog.FileSelectorWi
 import org.narrativeandplay.hypedyn.story.Narrative
 import org.narrativeandplay.hypedyn.story.UiStory.UiStoryMetadata
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
-import org.narrativeandplay.hypedyn.utils.ScalaJavaImplicits._
+import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 
 /**
  * Dialog for editing story properties

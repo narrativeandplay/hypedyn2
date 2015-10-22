@@ -28,7 +28,7 @@ import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.uicomponents.RulesPane
 import org.narrativeandplay.hypedyn.uicomponents.Sidebar.SidebarButton
 import org.narrativeandplay.hypedyn.utils.CollapsibleSplitPane
-import org.narrativeandplay.hypedyn.utils.ScalaJavaImplicits._
+import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 
 /**
  * Dialog for editing nodes
