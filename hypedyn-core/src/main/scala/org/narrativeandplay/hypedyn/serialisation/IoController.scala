@@ -14,7 +14,7 @@ object IoController {
    * @param data The data to write to file
    * @param file The file to write to
    */
-  def save(data: String, file: File): Unit = {
+  def write(data: String, file: File): Unit = {
     val fileWriter = new PrintWriter(file)
 
     fileWriter.write(data)
@@ -27,7 +27,7 @@ object IoController {
    * @param file The file to read
    * @return The data in the file as a string
    */
-  def load(file: File): String = {
+  def read(file: File): String = {
     val fileSource = Source.fromFile(file)
     val data = fileSource.mkString
 

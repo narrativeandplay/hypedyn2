@@ -140,7 +140,7 @@ object CoreEventDispatcher {
         val storyData = Serialiser serialise StoryController.story
         val saveData = AstMap("story" -> storyData, "plugins" -> pluginSaveDataAstMap)
 
-        IoController.save(Serialiser toString saveData, saveFileEvt.file)
+        IoController.write(Serialiser toString saveData, saveFileEvt.file)
 
         loadedFile = Some(saveFileEvt.file)
 
@@ -179,7 +179,7 @@ object CoreEventDispatcher {
     // save current story to export directory
     val storyData = Serialiser serialise StoryController.story
     val saveData = AstMap("story" -> storyData)
-    IoController.save(Serialiser toString saveData, new File(exportDirectory.getAbsolutePath()+"/"+destDirName+"/story.dyn"))
+    IoController.write(Serialiser toString saveData, new File(exportDirectory.getAbsolutePath()+"/"+destDirName+"/story.dyn"))
 
     // send completion (we're done!)
     EventBus.send(ExportedToFile(CoreEventSourceIdentity))
@@ -197,7 +197,7 @@ object CoreEventDispatcher {
     // save current story to temp directory
     val storyData = Serialiser serialise StoryController.story
     val saveData = AstMap("story" -> storyData)
-    IoController.save(Serialiser toString saveData, tempDirectory.resolve(destDirName+"/story.dyn").toFile)
+    IoController.write(Serialiser toString saveData, tempDirectory.resolve(destDirName+"/story.dyn").toFile)
 
     // and launch browser
     if(java.awt.Desktop.isDesktopSupported()){
