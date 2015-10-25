@@ -103,8 +103,10 @@ object UiEventDispatcher {
     fileToSaveTo foreach { f => EventBus.send(ExportToFile(f, UiEventSourceIdentity)) }
   }
   // actually run the story
-  EventBus.RunResponses foreach { _ =>
-    EventBus.send(RunStory(UiEventSourceIdentity))
+  EventBus.RunResponses foreach { evt =>
+    Main.runInBrowser(evt.fileToRun)
+
+    EventBus.send(StoryRan(UiEventSourceIdentity))
   }
 
   EventBus.StorySavedEvents foreach { evt =>

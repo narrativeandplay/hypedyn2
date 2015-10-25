@@ -83,7 +83,7 @@ sealed case class SaveAsResponse(src: String) extends Response
 sealed case class LoadResponse(src: String) extends Response
 
 sealed case class ExportResponse(src: String) extends Response
-sealed case class RunResponse(src: String) extends Response
+sealed case class RunResponse(fileToRun: File, src: String) extends Response
 
 sealed case class CutNodeResponse(node: Nodal, src: String) extends Response
 sealed case class CopyNodeResponse(node: Nodal, src: String) extends Response
