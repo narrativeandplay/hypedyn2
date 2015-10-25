@@ -5,7 +5,7 @@ import java.net.URI
 import java.nio.file.Files
 
 import org.narrativeandplay.hypedyn.plugins.PluginsController
-import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement, ExportController}
+import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement}
 import org.narrativeandplay.hypedyn.serialisation.serialisers._
 import org.narrativeandplay.hypedyn.story.internal.Story
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, ConditionDefinitions, Fact}
