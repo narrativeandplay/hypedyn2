@@ -103,8 +103,10 @@ object UiEventDispatcher {
     fileToSaveTo foreach { f => EventBus.send(ExportToFile(f, UiEventSourceIdentity)) }
   }
   // actually run the story
-  EventBus.RunStoryResponses foreach { _ =>
-    EventBus.send(RunStory(UiEventSourceIdentity))
+  EventBus.RunResponses foreach { evt =>
+    Main.runInBrowser(evt.fileToRun)
+
+    EventBus.send(StoryRan(UiEventSourceIdentity))
   }
 
   EventBus.StorySavedEvents foreach { evt =>
@@ -117,14 +119,6 @@ object UiEventDispatcher {
   EventBus.FileLoadedEvents foreach { evt =>
     Main.editFilename(evt.filename)
   }
-
-  EventBus.ExportedToFileEvents foreach { evt =>
-    // done export, nothing to see here
-  }
-  EventBus.RanStoryEvents foreach { evt =>
-    // done running, nothing to see here
-  }
-
 
   EventBus.NewStoryResponses foreach { _ => EventBus.send(CreateStory(src = UiEventSourceIdentity)) }
   EventBus.EditStoryPropertiesResponses foreach { evt =>
@@ -201,7 +195,7 @@ object UiEventDispatcher {
     EventBus.send(ExportRequest(UiEventSourceIdentity))
   }
   def requestRunStory(): Unit = {
-    EventBus.send(RunStoryRequest(UiEventSourceIdentity))
+    EventBus.send(RunRequest(UiEventSourceIdentity))
   }
 
   def requestCut(): Unit = {

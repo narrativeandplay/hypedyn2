@@ -1,5 +1,6 @@
 package org.narrativeandplay.hypedyn
 
+import java.io.File
 import javafx.beans.value.ObservableValue
 
 import scalafx.Includes._
@@ -20,6 +21,7 @@ import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefi
 import org.narrativeandplay.hypedyn.uicomponents._
 import org.narrativeandplay.hypedyn.undo.UndoController
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
+import org.narrativeandplay.hypedyn.utils.{System => Sys}
 
 /**
  * Entry point for the application
@@ -108,6 +110,21 @@ object Main extends JFXApp {
   def storyPropertiesEditor(story: Narrative) = new StoryPropertiesDialog(story, stage)
 
   def editFilename(newFilename: String): Unit = loadedFilename() = newFilename
+
+  def runInBrowser(file: File): Unit = {
+    val runtime = Runtime.getRuntime
+    val filePath = file.getAbsolutePath
+
+    if (Sys.isWindows) {
+      runtime.exec(s"rundll32 url.dll,FileProtocolHandler $filePath")
+    }
+    else if (Sys.isMac) {
+      runtime.exec(s"open $filePath")
+    }
+    else {
+      runtime.exec(s"xdg-open $filePath")
+    }
+  }
 
   stage = new PrimaryStage {
     title <== loadedFilename + editedMarker + " - HypeDyn"

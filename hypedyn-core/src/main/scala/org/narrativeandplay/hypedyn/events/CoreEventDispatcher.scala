@@ -5,7 +5,7 @@ import java.net.URI
 import java.nio.file.Files
 
 import org.narrativeandplay.hypedyn.plugins.PluginsController
-import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement, ExportController}
+import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement}
 import org.narrativeandplay.hypedyn.serialisation.serialisers._
 import org.narrativeandplay.hypedyn.story.internal.Story
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, ConditionDefinitions, Fact}
@@ -127,8 +127,19 @@ object CoreEventDispatcher {
   EventBus.SaveAsRequests foreach { _ => EventBus.send(SaveAsResponse(CoreEventSourceIdentity)) }
   EventBus.LoadRequests foreach { _ => EventBus.send(LoadResponse(CoreEventSourceIdentity)) }
 
-  EventBus.ExportRequests foreach { _ => EventBus.send(ExportResponse(loadedFile, CoreEventSourceIdentity)) }
-  EventBus.RunStoryRequests foreach { _ => EventBus.send(RunStoryResponse(CoreEventSourceIdentity)) }
+  EventBus.ExportRequests foreach { _ => EventBus.send(ExportResponse(CoreEventSourceIdentity)) }
+  EventBus.RunRequests foreach { _ =>
+    val tmpDir = Files.createTempDirectory("hypedyn").toFile
+    tmpDir.deleteOnExit()
+
+    IoController.copyResourceToFilesystem("export/reader/", tmpDir)
+
+    val storyData = Serialiser serialise StoryController.story
+    val saveData = AstMap("story" -> storyData)
+    IoController.write(Serialiser toString saveData, new File(tmpDir, "story.dyn"))
+
+    EventBus.send(RunResponse(new File(tmpDir, "index.html"), CoreEventSourceIdentity))
+  }
 
   EventBus.SaveDataEvents tumbling PluginsController.plugins.size zip EventBus.SaveToFileEvents foreach {
     case (pluginData, saveFileEvt) =>
@@ -140,7 +151,7 @@ object CoreEventDispatcher {
         val storyData = Serialiser serialise StoryController.story
         val saveData = AstMap("story" -> storyData, "plugins" -> pluginSaveDataAstMap)
 
-        IoController.save(Serialiser toString saveData, saveFileEvt.file)
+        IoController.write(Serialiser toString saveData, saveFileEvt.file)
 
         loadedFile = Some(saveFileEvt.file)
 
@@ -151,7 +162,7 @@ object CoreEventDispatcher {
   }
 
   EventBus.LoadFromFileEvents foreach { evt =>
-    val dataToLoad = IoController load evt.file
+    val dataToLoad = IoController read evt.file
     val dataAst = (Serialiser fromString dataToLoad).asInstanceOf[AstMap]
 
     val pluginData = dataAst("plugins").asInstanceOf[AstMap].toMap
@@ -170,46 +181,17 @@ object CoreEventDispatcher {
   }
 
   EventBus.ExportToFileEvents foreach { evt =>
-    val exportDirectory = evt.file;
-    val destDirName = "export"
+    val exportDirectory = new File(evt.file, "export")
 
-    // create directory and copy over the reader
-    ExportController.export(exportDirectory, destDirName);
+    IoController.copyResourceToFilesystem("export/reader/", exportDirectory)
 
     // save current story to export directory
     val storyData = Serialiser serialise StoryController.story
     val saveData = AstMap("story" -> storyData)
-    IoController.save(Serialiser toString saveData, new File(exportDirectory.getAbsolutePath()+"/"+destDirName+"/story.dyn"))
+    IoController.write(Serialiser toString saveData, new File(exportDirectory, "story.dyn"))
 
     // send completion (we're done!)
-    EventBus.send(ExportedToFile(CoreEventSourceIdentity))
-  }
-
-  EventBus.RunStoryEvents foreach { evt =>
-    // create temp directory
-    val tempDirectory = Files.createTempDirectory(null)
-    tempDirectory.toFile.deleteOnExit
-    val destDirName = "hypedyn"
-
-    // create directory and copy over the reader
-    ExportController.export(tempDirectory.toFile, destDirName)
-
-    // save current story to temp directory
-    val storyData = Serialiser serialise StoryController.story
-    val saveData = AstMap("story" -> storyData)
-    IoController.save(Serialiser toString saveData, tempDirectory.resolve(destDirName+"/story.dyn").toFile)
-
-    // and launch browser
-    if(java.awt.Desktop.isDesktopSupported()){
-      try{
-        java.awt.Desktop.getDesktop().browse(tempDirectory.resolve(destDirName+"/index.html").toUri)
-      } catch {
-        case e: Exception => println("CoreEventDispatcher RunStoryEvents exception caught: " + e);
-      }
-    }
-
-    // send completion (we're done!)
-    EventBus.send(RanStory(CoreEventSourceIdentity))
+    EventBus.send(StoryExported(CoreEventSourceIdentity))
   }
 
   EventBus.NewStoryRequests foreach { _ => EventBus.send(NewStoryResponse(CoreEventSourceIdentity)) }
