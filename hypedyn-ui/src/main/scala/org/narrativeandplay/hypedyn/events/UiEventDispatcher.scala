@@ -118,14 +118,6 @@ object UiEventDispatcher {
     Main.editFilename(evt.filename)
   }
 
-  EventBus.ExportedToFileEvents foreach { evt =>
-    // done export, nothing to see here
-  }
-  EventBus.RanStoryEvents foreach { evt =>
-    // done running, nothing to see here
-  }
-
-
   EventBus.NewStoryResponses foreach { _ => EventBus.send(CreateStory(src = UiEventSourceIdentity)) }
   EventBus.EditStoryPropertiesResponses foreach { evt =>
     val editedProperties = Main.storyPropertiesEditor(evt.story).showAndWait()
