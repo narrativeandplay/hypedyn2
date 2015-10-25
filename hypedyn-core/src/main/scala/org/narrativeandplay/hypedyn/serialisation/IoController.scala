@@ -40,7 +40,8 @@ object IoController {
   }
 
   /**
-   * Copies the contents of a resource folder from inside the classpath to the filesystem
+   * Copies the contents of a resource folder from inside the classpath to the filesystem. The name of the folder must
+   * end in a '/'
    *
    * Adapted from http://stackoverflow.com/a/2993908
    *
