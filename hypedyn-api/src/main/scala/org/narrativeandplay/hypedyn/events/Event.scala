@@ -50,7 +50,7 @@ sealed case class SaveAsRequest(src: String) extends Request
 sealed case class LoadRequest(src: String) extends Request
 
 sealed case class ExportRequest(src: String) extends Request
-sealed case class RunStoryRequest(src: String) extends Request
+sealed case class RunRequest(src: String) extends Request
 
 sealed case class CutNodeRequest(id: NodeId, src: String) extends Request
 sealed case class CopyNodeRequest(id: NodeId, src: String) extends Request
@@ -82,8 +82,8 @@ sealed case class SaveResponse(loadedFile: Option[File], src: String) extends Re
 sealed case class SaveAsResponse(src: String) extends Response
 sealed case class LoadResponse(src: String) extends Response
 
-sealed case class ExportResponse(loadedFile: Option[File], src: String) extends Response
-sealed case class RunStoryResponse(src: String) extends Response
+sealed case class ExportResponse(src: String) extends Response
+sealed case class RunResponse(src: String) extends Response
 
 sealed case class CutNodeResponse(node: Nodal, src: String) extends Response
 sealed case class CopyNodeResponse(node: Nodal, src: String) extends Response
@@ -148,8 +148,8 @@ sealed case class StoryUpdated(story: Narrative, src: String) extends Completion
 sealed case class DataLoaded(data: Map[String, AstElement], src: String) extends Completion
 sealed case class FileLoaded(filename: String, src: String) extends Completion
 
-sealed case class ExportedToFile(src: String) extends Completion
-sealed case class RanStory(src: String) extends Completion
+sealed case class StoryExported(src: String) extends Completion
+sealed case class StoryRan(src: String) extends Completion
 
 sealed case class UiNodeSelected(id: NodeId, src: String) extends Completion
 sealed case class UiNodeDeselected(id: NodeId, src: String) extends Completion

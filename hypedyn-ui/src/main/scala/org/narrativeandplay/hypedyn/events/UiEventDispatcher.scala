@@ -103,7 +103,7 @@ object UiEventDispatcher {
     fileToSaveTo foreach { f => EventBus.send(ExportToFile(f, UiEventSourceIdentity)) }
   }
   // actually run the story
-  EventBus.RunStoryResponses foreach { _ =>
+  EventBus.RunResponses foreach { _ =>
     EventBus.send(RunStory(UiEventSourceIdentity))
   }
 
@@ -201,7 +201,7 @@ object UiEventDispatcher {
     EventBus.send(ExportRequest(UiEventSourceIdentity))
   }
   def requestRunStory(): Unit = {
-    EventBus.send(RunStoryRequest(UiEventSourceIdentity))
+    EventBus.send(RunRequest(UiEventSourceIdentity))
   }
 
   def requestCut(): Unit = {

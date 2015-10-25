@@ -127,8 +127,8 @@ object CoreEventDispatcher {
   EventBus.SaveAsRequests foreach { _ => EventBus.send(SaveAsResponse(CoreEventSourceIdentity)) }
   EventBus.LoadRequests foreach { _ => EventBus.send(LoadResponse(CoreEventSourceIdentity)) }
 
-  EventBus.ExportRequests foreach { _ => EventBus.send(ExportResponse(loadedFile, CoreEventSourceIdentity)) }
-  EventBus.RunStoryRequests foreach { _ => EventBus.send(RunStoryResponse(CoreEventSourceIdentity)) }
+  EventBus.ExportRequests foreach { _ => EventBus.send(ExportResponse(CoreEventSourceIdentity)) }
+  EventBus.RunRequests foreach { _ => EventBus.send(RunResponse(CoreEventSourceIdentity)) }
 
   EventBus.SaveDataEvents tumbling PluginsController.plugins.size zip EventBus.SaveToFileEvents foreach {
     case (pluginData, saveFileEvt) =>
@@ -182,7 +182,7 @@ object CoreEventDispatcher {
     IoController.write(Serialiser toString saveData, new File(exportDirectory.getAbsolutePath()+"/"+destDirName+"/story.dyn"))
 
     // send completion (we're done!)
-    EventBus.send(ExportedToFile(CoreEventSourceIdentity))
+    EventBus.send(StoryExported(CoreEventSourceIdentity))
   }
 
   EventBus.RunStoryEvents foreach { evt =>
