@@ -6,6 +6,8 @@ dependencies {
     // For serialisation to JSON (save/load/export)
     compile "org.json4s:json4s-native_${rootProject.majorScalaVersion}:3.2.11"
 
+    compile "commons-io:commons-io:2.4"
+
     compile project(':hypedyn-api')
 }
 
