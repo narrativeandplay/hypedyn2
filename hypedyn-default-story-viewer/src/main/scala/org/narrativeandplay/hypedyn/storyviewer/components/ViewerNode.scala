@@ -6,8 +6,8 @@ import javafx.event.EventHandler
 import javafx.scene.control.{Control => JfxControl, Skin}
 import javafx.scene.{input => jfxsi}
 
-import scalafx.Includes.{jfxBounds2sfx, jfxMouseEvent2sfx}
-import scalafx.beans.property.{BooleanProperty, ObjectProperty}
+import scalafx.Includes.{jfxBounds2sfx, jfxMouseEvent2sfx, jfxReadOnlyDoubleProperty2sfx}
+import scalafx.beans.property.{ReadOnlyDoubleProperty, BooleanProperty, ObjectProperty}
 import scalafx.event.Event
 import scalafx.geometry.Bounds
 import scalafx.scene.input.MouseEvent
@@ -59,8 +59,13 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
    */
   val isAnywhere = BooleanExpression.booleanExpression(EasyBind map (_node, { n: Nodal => Boolean box n.isAnywhere }))
 
-  width = ViewerNode.Width
-  height = ViewerNode.Height
+  width = pluginEventDispatcher.zoomLevel() * ViewerNode.Width
+  height = pluginEventDispatcher.zoomLevel() * ViewerNode.Height
+
+  pluginEventDispatcher.zoomLevel onChange { (_, _, z) =>
+    width = z.doubleValue() * ViewerNode.Width
+    height = z.doubleValue() * ViewerNode.Height
+  }
 
   skin = new ViewerNodeSkin(this)
 
