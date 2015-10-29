@@ -15,11 +15,13 @@ import scalafx.scene.input.MouseEvent
 import com.github.benedictleejh.scala.math.vector.Vector2
 import org.fxmisc.easybind.EasyBind
 
+import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 import org.narrativeandplay.hypedyn.story.Nodal
 import org.narrativeandplay.hypedyn.storyviewer.StoryViewer
 import org.narrativeandplay.hypedyn.storyviewer.utils.VectorImplicitConversions._
 import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
+import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils._
 
 /**
  * Visual representation of a node. More accurately, the model (MVC model) for the visual representation of a node
@@ -62,9 +64,18 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
   width = pluginEventDispatcher.zoomLevel() * ViewerNode.Width
   height = pluginEventDispatcher.zoomLevel() * ViewerNode.Height
 
-  pluginEventDispatcher.zoomLevel onChange { (_, _, z) =>
-    width = z.doubleValue() * ViewerNode.Width
-    height = z.doubleValue() * ViewerNode.Height
+  storyViewer.zoomLevel onChange { (_, z1, z2) =>
+    val oldZoom = DoubleUtils clamp (storyViewer.minZoom, storyViewer.maxZoom, z1.doubleValue())
+    val newZoom = DoubleUtils clamp (storyViewer.minZoom, storyViewer.maxZoom, z2.doubleValue())
+
+    width = newZoom * ViewerNode.Width
+    height = newZoom * ViewerNode.Height
+
+    if (newZoom - oldZoom !~= 1.0) {
+      val scaledFactor = newZoom / oldZoom
+
+      relocate(scaledFactor * topLeft.x, scaledFactor * topLeft.y)
+    }
   }
 
   skin = new ViewerNodeSkin(this)
