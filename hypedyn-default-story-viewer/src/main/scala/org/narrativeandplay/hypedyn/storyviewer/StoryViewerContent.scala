@@ -36,7 +36,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   })
 
   addEventFilter(ScrollEvent.SCROLL, { event: jfxsi.ScrollEvent =>
-    if (event.isControlDown) {
+    if (event.shortcutDown) {
       event.getDeltaY match {
         case x if x > 0 => pluginEventDispatcher.zoomLevel() += 0.1
         case y if y < 0 => pluginEventDispatcher.zoomLevel() -= 0.1
