@@ -80,7 +80,7 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
 
   skin = new ViewerNodeSkin(this)
 
-  relocate(topLeft.x, topLeft.y)
+  relocate(storyViewer.zoomLevel() * topLeft.x, storyViewer.zoomLevel() * topLeft.y)
 
   onMouseClicked = { me =>
     me.clickCount match {
