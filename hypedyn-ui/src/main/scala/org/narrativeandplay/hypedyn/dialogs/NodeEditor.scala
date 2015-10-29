@@ -459,6 +459,26 @@ class NodeEditor private (dialogTitle: String,
 
     val rulesetsToAdd = rulesetsExistingInText filterNot node.contentProperty().rulesetsProperty().toSet
     rulesetsToAdd foreach { r => node.contentProperty().rulesetsProperty() += r }
+
+    /**
+     * Special case for dealing with issue #8
+     *
+     * If the entire text of the text area is styled in a non-initial style, and you remove all the text,
+     * any new text will be styled using the non-initial style. The style is sticky, somehow, and there
+     * exists a style span of the non-initial style from position 0 to position 0.
+     *
+     * This is the only allowed special case in handing rule addition/removal from the text. If any other
+     * weird thing pops up, find a general solution, or file an issue against RichTextFX.
+     */
+    node.contentProperty().rulesetsProperty() find { r =>
+      r.indexes.startIndex == TextIndex(0) && r.indexes.endIndex == TextIndex(0)
+    } foreach { r =>
+      node.contentProperty().rulesetsProperty() -= r
+      nodeContentText.useInitialStyleForInsertion = true
+      nodeContentText.insertText(0, " ")
+      nodeContentText.useInitialStyleForInsertion = false
+      nodeContentText.replaceText("")
+    }
   }
 
   /**
