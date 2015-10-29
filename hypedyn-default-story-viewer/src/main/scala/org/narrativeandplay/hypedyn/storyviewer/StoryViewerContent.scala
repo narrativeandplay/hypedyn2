@@ -9,7 +9,7 @@ import scala.collection.mutable.ArrayBuffer
 
 import scalafx.Includes._
 import scalafx.event.Event
-import scalafx.scene.input.MouseEvent
+import scalafx.scene.input.{ScrollEvent, MouseEvent}
 
 import org.narrativeandplay.hypedyn.storyviewer.utils.UnorderedPair
 import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamValue, ParamName}
@@ -33,6 +33,15 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     nodes foreach (_.deselect())
     links foreach (_.deselect())
     links find (_.contains(event.getX, event.getY)) foreach (_.select(event.getX, event.getY))
+  })
+
+  addEventFilter(ScrollEvent.SCROLL, { event: jfxsi.ScrollEvent =>
+    if (event.isControlDown) {
+      event.getDeltaY match {
+        case x if x > 0 => pluginEventDispatcher.zoomLevel() += 0.1
+        case y if y < 0 => pluginEventDispatcher.zoomLevel() -= 0.1
+      }
+    }
   })
 
   /**

@@ -63,4 +63,6 @@ object DoubleUtils {
     def >~= (d2: Double) = (d ~= d2) || (d >~ d2)
   }
 
+  def clamp(minD: Double, maxD: Double, d: Double) = minD max d min maxD
+
 }

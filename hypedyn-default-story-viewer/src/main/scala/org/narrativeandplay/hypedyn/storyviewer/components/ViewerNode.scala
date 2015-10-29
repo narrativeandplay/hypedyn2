@@ -6,8 +6,8 @@ import javafx.event.EventHandler
 import javafx.scene.control.{Control => JfxControl, Skin}
 import javafx.scene.{input => jfxsi}
 
-import scalafx.Includes.{jfxBounds2sfx, jfxMouseEvent2sfx}
-import scalafx.beans.property.{BooleanProperty, ObjectProperty}
+import scalafx.Includes.{jfxBounds2sfx, jfxMouseEvent2sfx, jfxReadOnlyDoubleProperty2sfx}
+import scalafx.beans.property.{ReadOnlyDoubleProperty, BooleanProperty, ObjectProperty}
 import scalafx.event.Event
 import scalafx.geometry.Bounds
 import scalafx.scene.input.MouseEvent
@@ -15,11 +15,13 @@ import scalafx.scene.input.MouseEvent
 import com.github.benedictleejh.scala.math.vector.Vector2
 import org.fxmisc.easybind.EasyBind
 
+import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 import org.narrativeandplay.hypedyn.story.Nodal
 import org.narrativeandplay.hypedyn.storyviewer.StoryViewer
 import org.narrativeandplay.hypedyn.storyviewer.utils.VectorImplicitConversions._
 import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
+import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils._
 
 /**
  * Visual representation of a node. More accurately, the model (MVC model) for the visual representation of a node
@@ -59,8 +61,22 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
    */
   val isAnywhere = BooleanExpression.booleanExpression(EasyBind map (_node, { n: Nodal => Boolean box n.isAnywhere }))
 
-  width = ViewerNode.Width
-  height = ViewerNode.Height
+  width = pluginEventDispatcher.zoomLevel() * ViewerNode.Width
+  height = pluginEventDispatcher.zoomLevel() * ViewerNode.Height
+
+  storyViewer.zoomLevel onChange { (_, z1, z2) =>
+    val oldZoom = DoubleUtils clamp (storyViewer.minZoom, storyViewer.maxZoom, z1.doubleValue())
+    val newZoom = DoubleUtils clamp (storyViewer.minZoom, storyViewer.maxZoom, z2.doubleValue())
+
+    width = newZoom * ViewerNode.Width
+    height = newZoom * ViewerNode.Height
+
+    if (newZoom - oldZoom !~= 1.0) {
+      val scaledFactor = newZoom / oldZoom
+
+      relocate(scaledFactor * topLeft.x, scaledFactor * topLeft.y)
+    }
+  }
 
   skin = new ViewerNodeSkin(this)
 
@@ -108,7 +124,7 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
   /**
    * Returns the center point of the visual representation
    */
-  def centre = topLeft + Vector2(ViewerNode.Width / 2, ViewerNode.Height / 2)
+  def centre = topLeft + Vector2(width / 2, height / 2)
 
   /**
    * Move this node to the specified point. Coordinates given refer to the upper-left corner of the node

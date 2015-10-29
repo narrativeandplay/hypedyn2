@@ -19,20 +19,20 @@ class ViewerNodeSkin(viewerNode: ViewerNode) extends Skin[ViewerNode] {
 
   // The -1 is for the rectangle to look nicer
   private val headingBarRect = new Rectangle {
-    width = viewerNode.width - 1
+    width <== viewerNode.widthProperty() - 1
     height = HeadingHeight
     fill <== when (viewerNode.isAnywhere) choose Color.Silver otherwise Color.LightGrey
     stroke = Color.Black
   }
   private val contentRect = new Rectangle {
-    width = viewerNode.width
-    height = viewerNode.height
+    width <== viewerNode.widthProperty()
+    height <== viewerNode.heightProperty()
     fill = Color.White
     stroke = Color.Black
   }
   private val selectRect = new Rectangle {
-    width = viewerNode.width + 2 * SelectionOutlineWidth
-    height = viewerNode.height + 2 * SelectionOutlineWidth
+    width <== viewerNode.widthProperty() + 2 * SelectionOutlineWidth
+    height <== viewerNode.heightProperty() + 2 * SelectionOutlineWidth
     fill = Color.Red
     translateX = -SelectionOutlineWidth
     translateY = -SelectionOutlineWidth
@@ -44,7 +44,7 @@ class ViewerNodeSkin(viewerNode: ViewerNode) extends Skin[ViewerNode] {
     wrapText = true
     alignment = Pos.Center
 
-    maxWidth = viewerNode.width
+    maxWidth <== viewerNode.widthProperty()
     maxHeight = ViewerNodeSkin.HeadingHeight
 
     text <== viewerNode.nodeName
@@ -57,8 +57,8 @@ class ViewerNodeSkin(viewerNode: ViewerNode) extends Skin[ViewerNode] {
     alignment = Pos.TopLeft
     //textOverrun = OverrunStyle.WordEllipsis
 
-    maxWidth = viewerNode.width - 2 * TextPadding
-    maxHeight = viewerNode.height - 2 * TextPadding - HeadingHeight
+    maxWidth <== viewerNode.widthProperty() - 2 * TextPadding
+    maxHeight <== viewerNode.heightProperty() - 2 * TextPadding - HeadingHeight
 
     text <== viewerNode.contentText
   }

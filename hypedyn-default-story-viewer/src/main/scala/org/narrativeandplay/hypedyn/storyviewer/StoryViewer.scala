@@ -3,6 +3,7 @@ package org.narrativeandplay.hypedyn.storyviewer
 import scala.collection.mutable
 import scala.util.Try
 
+import scalafx.beans.property.DoubleProperty
 import scalafx.scene.control.{Control, ScrollPane}
 
 import com.github.benedictleejh.scala.math.vector.Vector2
@@ -13,6 +14,7 @@ import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
 import org.narrativeandplay.hypedyn.serialisation._
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal, NodeId}
 import org.narrativeandplay.hypedyn.storyviewer.components.ViewerNode
+import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils
 import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoableStream}
 
 /**
@@ -25,7 +27,15 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   fitToHeight = true
   fitToWidth = true
 
+  val minZoom = 0.5
+  val maxZoom = 1.0
+
   val nodeLocations = mutable.Map.empty[NodeId, Vector2[Double]]
+  val zoomLevel = DoubleProperty(1.0)
+  zoomLevel onChange { (_, _, value) =>
+    zoomLevel() = DoubleUtils clamp (minZoom, maxZoom, value.doubleValue())
+    sizeToChildren()
+  }
 
   val StoryViewerEventSourceIdentity = s"Plugin - $name"
   val viewer = new StoryViewerContent(this)
@@ -84,7 +94,8 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
    * @param data The saved data
    */
   override def onLoad(data: AstElement): Unit = {
-    val nodes = data.asInstanceOf[AstMap]("nodes").asInstanceOf[AstList].elems
+    val properData = data.asInstanceOf[AstMap]
+    val nodes = properData("nodes").asInstanceOf[AstList].elems
     nodes foreach { n =>
       val nodeData = n.asInstanceOf[AstMap]
       val (id, x, y) = deserialise(nodeData)
@@ -92,13 +103,16 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
       moveNode(id, Vector2(x, y))
     }
 
+    zoomLevel() = properData get "zoomLevel" map (_.asInstanceOf[AstFloat].f) getOrElse 1.0
+
     sizeToChildren()
   }
 
   /**
    * Returns the data that this Saveable would like saved
    */
-  override def onSave(): AstElement = AstMap("nodes" -> AstList(viewer.nodes.toList map serialise: _*))
+  override def onSave(): AstElement = AstMap("zoomLevel" -> AstFloat(zoomLevel()),
+                                             "nodes" -> AstList(viewer.nodes.toList map serialise: _*))
 
   /**
    * Resizes the content control to ensure all nodes are shown
