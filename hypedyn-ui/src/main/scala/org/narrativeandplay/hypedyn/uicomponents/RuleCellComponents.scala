@@ -745,11 +745,7 @@ object RuleCellComponents {
       }
     }
 
-    lazy val pane = new HBox {
-      HBox.setHgrow(this, Priority.Always)
-    }
-
-    HBox.setHgrow(this, Priority.Always)
+    lazy val pane = new HBox
 
     children.addAll(unionValue, pane)
 
@@ -791,8 +787,6 @@ object RuleCellComponents {
                     val story: ObjectProperty[UiStory],
                     params: List[RuleParameter]) extends HBox with RuleCellParameterComponent {
     paramMap += paramName -> ParamValue.ProductValue(params map (_.name))
-
-    HBox.setHgrow(this, Priority.Always)
 
     params foreach { param =>
       val newComponent = createParameterInput(param, paramMap, story)
