@@ -28,7 +28,7 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   fitToWidth = true
 
   val minZoom = 0.5
-  val maxZoom = 1.0
+  val maxZoom = 2.0
 
   val nodeLocations = mutable.Map.empty[NodeId, Vector2[Double]]
   val zoomLevel = DoubleProperty(1.0)
