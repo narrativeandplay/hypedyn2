@@ -113,7 +113,7 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
   /**
    * Returns the center point of the visual representation
    */
-  def centre = topLeft + Vector2(ViewerNode.Width / 2, ViewerNode.Height / 2)
+  def centre = topLeft + Vector2(width / 2, height / 2)
 
   /**
    * Move this node to the specified point. Coordinates given refer to the upper-left corner of the node
