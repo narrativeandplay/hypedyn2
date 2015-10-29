@@ -14,6 +14,7 @@ import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
 import org.narrativeandplay.hypedyn.serialisation._
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal, NodeId}
 import org.narrativeandplay.hypedyn.storyviewer.components.ViewerNode
+import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils
 import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoableStream}
 
 /**
@@ -32,8 +33,8 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   val nodeLocations = mutable.Map.empty[NodeId, Vector2[Double]]
   val zoomLevel = DoubleProperty(1.0)
   zoomLevel onChange { (_, _, value) =>
-    // clamps the zoom level to between the min and max zoom levels
-    zoomLevel() = minZoom max value.doubleValue() min maxZoom
+    zoomLevel() = DoubleUtils clamp (minZoom, maxZoom, value.doubleValue())
+    sizeToChildren()
   }
 
   val StoryViewerEventSourceIdentity = s"Plugin - $name"
