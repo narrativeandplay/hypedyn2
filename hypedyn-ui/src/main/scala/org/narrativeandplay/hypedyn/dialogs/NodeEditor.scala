@@ -499,10 +499,13 @@ object NodeEditor {
                                                                          override def apply(t: LinkStyleInfo): String = t.css
                                                                        }) {
     addEventFilter(KeyEvent.KeyTyped, { keyEvent: JfxKeyEvent =>
-      if (keyEvent.controlDown && keyEvent.character == " ") {
+      if (keyEvent.shiftDown && keyEvent.character == " ") {
         useInitialStyleForInsertion = true
-        appendText(" ")
+        insertText(caretPosition(), " ")
         useInitialStyleForInsertion = false
+
+        // Shift-space also inserts a space on its own, so we consume the event to prevent double space insertion
+        keyEvent.consume()
       }
     })
 
