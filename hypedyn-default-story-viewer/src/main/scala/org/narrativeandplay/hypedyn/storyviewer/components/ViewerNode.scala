@@ -65,8 +65,8 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
   height = pluginEventDispatcher.zoomLevel() * ViewerNode.Height
 
   storyViewer.zoomLevel onChange { (_, z1, z2) =>
-    val oldZoom = DoubleUtils clamp (storyViewer.minZoom, storyViewer.maxZoom, z1.doubleValue())
-    val newZoom = DoubleUtils clamp (storyViewer.minZoom, storyViewer.maxZoom, z2.doubleValue())
+    val oldZoom = z1.doubleValue()
+    val newZoom = z2.doubleValue()
 
     width = newZoom * ViewerNode.Width
     height = newZoom * ViewerNode.Height

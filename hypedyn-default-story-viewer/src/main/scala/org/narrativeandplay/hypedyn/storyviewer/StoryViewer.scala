@@ -32,10 +32,6 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
 
   val nodeLocations = mutable.Map.empty[NodeId, Vector2[Double]]
   val zoomLevel = DoubleProperty(1.0)
-  zoomLevel onChange { (_, _, value) =>
-    zoomLevel() = DoubleUtils clamp (minZoom, maxZoom, value.doubleValue())
-    sizeToChildren()
-  }
 
   val StoryViewerEventSourceIdentity = s"Plugin - $name"
   val viewer = new StoryViewerContent(this)

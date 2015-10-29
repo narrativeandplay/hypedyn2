@@ -11,7 +11,7 @@ import scalafx.Includes._
 import scalafx.event.Event
 import scalafx.scene.input.{ScrollEvent, MouseEvent}
 
-import org.narrativeandplay.hypedyn.storyviewer.utils.UnorderedPair
+import org.narrativeandplay.hypedyn.storyviewer.utils.{DoubleUtils, UnorderedPair}
 import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamValue, ParamName}
 import org.narrativeandplay.hypedyn.story.rules.Actionable.ActionType
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
@@ -35,11 +35,14 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     links find (_.contains(event.getX, event.getY)) foreach (_.select(event.getX, event.getY))
   })
 
+  private def zoomValueClamp(v: Double) = DoubleUtils.clamp(pluginEventDispatcher.minZoom, pluginEventDispatcher.maxZoom, v)
   addEventFilter(ScrollEvent.SCROLL, { event: jfxsi.ScrollEvent =>
     if (event.shortcutDown) {
       event.getDeltaY match {
-        case x if x > 0 => pluginEventDispatcher.zoomLevel() += 0.1
-        case y if y < 0 => pluginEventDispatcher.zoomLevel() -= 0.1
+        case x if x > 0 =>
+          pluginEventDispatcher.zoomLevel() = zoomValueClamp(pluginEventDispatcher.zoomLevel() + 0.1)
+        case y if y < 0 =>
+          pluginEventDispatcher.zoomLevel() = zoomValueClamp(pluginEventDispatcher.zoomLevel() - 0.1)
       }
     }
   })
