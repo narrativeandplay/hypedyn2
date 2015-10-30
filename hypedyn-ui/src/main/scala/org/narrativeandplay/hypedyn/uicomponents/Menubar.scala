@@ -48,7 +48,9 @@ object Menubar extends MenuBar {
     accelerator = KeyCombinations.New
 
     onAction = { ae: ActionEvent =>
-      UiEventDispatcher.requestNewStory()
+      UiEventDispatcher.requestExit() foreach { createNewStory =>
+        if (createNewStory) UiEventDispatcher.requestNewStory()
+      }
     }
   }
 
@@ -56,7 +58,9 @@ object Menubar extends MenuBar {
     accelerator = KeyCombinations.Open
 
     onAction = { ae: ActionEvent =>
-      UiEventDispatcher.requestLoad()
+      UiEventDispatcher.requestExit() foreach { loadStory =>
+        if (loadStory) UiEventDispatcher.requestLoad()
+      }
     }
   }
 
