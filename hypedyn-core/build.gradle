@@ -8,6 +8,8 @@ dependencies {
 
     compile "commons-io:commons-io:2.4"
 
+    compile "org.fxmisc.easybind:easybind:1.0.3"
+
     compile project(':hypedyn-api')
 }
 
