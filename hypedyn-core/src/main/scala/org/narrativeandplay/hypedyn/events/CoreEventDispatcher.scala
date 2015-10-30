@@ -59,6 +59,7 @@ object CoreEventDispatcher {
     }
 
     EventBus.send(NodeCreated(created, CoreEventSourceIdentity))
+    EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
   }
   EventBus.UpdateNodeEvents foreach { evt =>
     val updatedUnupdatedPair = StoryController.update(evt.node, evt.updatedNode)
@@ -69,6 +70,7 @@ object CoreEventDispatcher {
       }
 
       EventBus.send(NodeUpdated(unupdated, updated, CoreEventSourceIdentity))
+      EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
     }
   }
   EventBus.DestroyNodeEvents foreach { evt =>
@@ -80,6 +82,7 @@ object CoreEventDispatcher {
       }
 
       EventBus.send(NodeDestroyed(destroyedNode, CoreEventSourceIdentity))
+      EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
     }
   }
 
@@ -91,6 +94,7 @@ object CoreEventDispatcher {
     }
 
     EventBus.send(FactCreated(created, CoreEventSourceIdentity))
+    EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
   }
   EventBus.UpdateFactEvents foreach { evt =>
     val updatedUnupdatedPair = StoryController.update(evt.fact, evt.updatedFact)
@@ -101,6 +105,7 @@ object CoreEventDispatcher {
       }
 
       EventBus.send(FactUpdated(unupdated, updated, CoreEventSourceIdentity))
+      EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
     }
   }
   EventBus.DestroyFactEvents foreach { evt =>
@@ -112,6 +117,7 @@ object CoreEventDispatcher {
       }
 
       EventBus.send(FactDestroyed(f, CoreEventSourceIdentity))
+      EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
     }
   }
 

@@ -1,5 +1,7 @@
 package org.narrativeandplay.hypedyn.events
 
+import scala.collection.mutable.ArrayBuffer
+
 import scalafx.Includes._
 import scalafx.beans.property.BooleanProperty
 import scalafx.scene.control.{ButtonType, Alert}
@@ -11,6 +13,7 @@ import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
 import org.narrativeandplay.hypedyn.story.NodeId
 import org.narrativeandplay.hypedyn.uicomponents.FactViewer
+import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 
 /**
  * Dispatcher for UI events
@@ -20,7 +23,7 @@ import org.narrativeandplay.hypedyn.uicomponents.FactViewer
 object UiEventDispatcher {
   val UiEventSourceIdentity = "UI"
   private var selectedNode: Option[NodeId] = None
-  private var openedNodeEditors = Map.empty[NodeId, NodeEditor]
+  private val openedNodeEditors = ArrayBuffer.empty[NodeEditor]
   val isStoryEdited = BooleanProperty(false)
   val undoAvailable = BooleanProperty(false)
   val redoAvailable = BooleanProperty(false)
@@ -36,10 +39,15 @@ object UiEventDispatcher {
       Option(newNode) foreach { n => EventBus.send(CreateNode(n, UiEventSourceIdentity)) }
     }
 
+    editor.onCloseRequest = { _ =>
+      openedNodeEditors -= editor
+    }
+
+    openedNodeEditors += editor
     editor.show()
   }
   EventBus.EditNodeResponses foreach { response =>
-    openedNodeEditors get response.node.id match {
+    openedNodeEditors find (_.node.id == response.node.id) match {
       case Some(editor) => editor.dialogPane().scene().window().requestFocus()
       case None =>
         val editor = Main.nodeEditor("Edit Node", response.conditionDefinitions, response.actionDefinitions, response.story, response.node)
@@ -55,10 +63,10 @@ object UiEventDispatcher {
         }
 
         editor.onCloseRequest = { _ =>
-          openedNodeEditors -= response.node.id
+          openedNodeEditors -= editor
         }
 
-        openedNodeEditors += response.node.id -> editor
+        openedNodeEditors += editor
         editor.show()
     }
   }
@@ -115,6 +123,9 @@ object UiEventDispatcher {
   EventBus.StoryLoadedEvents foreach { evt =>
     FactViewer.facts.clear()
     evt.story.facts foreach { f => FactViewer.facts += f }
+  }
+  EventBus.StoryUpdatedEvents foreach { evt =>
+    openedNodeEditors foreach (_.story() = evt.story)
   }
   EventBus.FileLoadedEvents foreach { evt =>
     Main.editFilename(evt.filename)
