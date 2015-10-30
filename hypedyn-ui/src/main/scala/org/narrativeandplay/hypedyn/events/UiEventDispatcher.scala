@@ -13,6 +13,7 @@ import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
 import org.narrativeandplay.hypedyn.story.NodeId
 import org.narrativeandplay.hypedyn.uicomponents.FactViewer
+import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 
 /**
  * Dispatcher for UI events
@@ -122,6 +123,9 @@ object UiEventDispatcher {
   EventBus.StoryLoadedEvents foreach { evt =>
     FactViewer.facts.clear()
     evt.story.facts foreach { f => FactViewer.facts += f }
+  }
+  EventBus.StoryUpdatedEvents foreach { evt =>
+    openedNodeEditors foreach (_.story() = evt.story)
   }
   EventBus.FileLoadedEvents foreach { evt =>
     Main.editFilename(evt.filename)
