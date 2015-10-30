@@ -38,6 +38,11 @@ object UiEventDispatcher {
       Option(newNode) foreach { n => EventBus.send(CreateNode(n, UiEventSourceIdentity)) }
     }
 
+    editor.onCloseRequest = { _ =>
+      openedNodeEditors -= editor
+    }
+
+    openedNodeEditors += editor
     editor.show()
   }
   EventBus.EditNodeResponses foreach { response =>
