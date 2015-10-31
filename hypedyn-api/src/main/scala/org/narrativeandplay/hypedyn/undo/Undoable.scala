@@ -7,9 +7,9 @@ import java.util.Optional
  */
 trait Undoable {
   /**
-   * Defines what to do when an undo action happens
+   * Defines the change to produce when an undo action happens
    */
-  def undo(): Unit
+  def undo(): Undoable
 
   /**
    * Defines how to reverse an undo action

@@ -9,11 +9,11 @@ import org.narrativeandplay.hypedyn.story.rules.Fact
  * @param notUpdatedFact The not updated version of the fact
  * @param updatedFact The updated version of the fact
  */
-class FactUpdatedChange(notUpdatedFact: Fact, updatedFact: Fact) extends Undoable {
+sealed case class FactUpdatedChange(notUpdatedFact: Fact, updatedFact: Fact) extends Undoable {
   /**
    * Defines what to do when an undo action happens
    */
-  override def undo(): Unit = UndoEventDispatcher.updateFact(updatedFact, notUpdatedFact)
+  override def undo(): FactUpdatedChange = FactUpdatedChange(updatedFact, notUpdatedFact)
 
   /**
    * Defines how to reverse an undo action
