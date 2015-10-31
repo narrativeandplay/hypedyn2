@@ -1,7 +1,8 @@
 package org.narrativeandplay.hypedyn.undo
 
 import java.lang
-import java.util.function.{Function => JFunction}
+import java.util.Optional
+import java.util.function.{Function => JFunction, BiFunction, Consumer}
 import javafx.beans.value.ObservableValue
 
 import scalafx.beans.property.ObjectProperty
@@ -14,9 +15,15 @@ import org.fxmisc.undo.{UndoManager, UndoManagerFactory}
 object UndoController {
   private val undoManager = ObjectProperty(UndoManagerFactory.unlimitedHistoryUndoManager(
     UndoableStream.changes,
-    { c: Undoable => c.redo() },
-    { c: Undoable => c.undo() },
-    { (c1: Undoable, c2: Undoable) => c1 mergeWith c2 }
+    new JFunction[Undoable, Undoable] {
+      override def apply(t: Undoable): Undoable = t.undo()
+    },
+    new Consumer[Undoable] {
+      override def accept(t: Undoable): Unit = t.redo()
+    },
+    new BiFunction[Undoable, Undoable, Optional[Undoable]] {
+      override def apply(t: Undoable, u: Undoable): Optional[Undoable] = t mergeWith u
+    }
   ))
 
   /**
@@ -56,9 +63,15 @@ object UndoController {
    */
   def clearHistory(): Unit = undoManager() = UndoManagerFactory.unlimitedHistoryUndoManager(
     UndoableStream.changes,
-    { c: Undoable => c.redo() },
-    { c: Undoable => c.undo() },
-    { (c1: Undoable, c2: Undoable) => c1 mergeWith c2 }
+    new JFunction[Undoable, Undoable] {
+      override def apply(t: Undoable): Undoable = t.undo()
+    },
+    new Consumer[Undoable] {
+      override def accept(t: Undoable): Unit = t.redo()
+    },
+    new BiFunction[Undoable, Undoable, Optional[Undoable]] {
+      override def apply(t: Undoable, u: Undoable): Optional[Undoable] = t mergeWith u
+    }
   )
 
   /**
