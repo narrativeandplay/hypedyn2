@@ -529,6 +529,20 @@ object NodeEditor {
       }
     })
 
+    addEventHandler(MouseEvent.MouseClicked, { me: JfxMouseEvent =>
+      if (me.clickCount == 2) {
+        val range = getSelection
+        val selectedText = getSelectedText
+
+        if (selectedText.startsWith(" ")) {
+          selectRange(range.getStart + 1, range.getEnd)
+        }
+        else if (selectedText.endsWith(" ")) {
+          selectRange(range.getStart, range.getEnd - 1)
+        }
+      }
+    })
+
     setOnMouseClicked({ mouseEvent: JfxMouseEvent =>
       val hasNoSelectedText = getSelectedText == ""
       val selectedPosHasRule = styleAt(caretPosition()).ruleset.isDefined
