@@ -12,14 +12,11 @@ import org.narrativeandplay.hypedyn.story.internal.Node
  *                         node was changed when the node was set as the start node or if this node was already the
  *                         start node
  */
-class NodeUpdatedChange(notUpdatedNode: Node, updatedNode: Node, changedStartNode: Option[(Node, Node)]) extends Undoable {
+sealed case class NodeUpdatedChange(notUpdatedNode: Node, updatedNode: Node, changedStartNode: Option[(Node, Node)]) extends Undoable {
   /**
-   * Defines what to do when an undo action happens
+   * Defines the change to produce when an undo action happens
    */
-  override def undo(): Unit = {
-    UndoEventDispatcher.updateNode(updatedNode, notUpdatedNode)
-    changedStartNode foreach { case (unchanged, changed) => UndoEventDispatcher.updateNode(changed, unchanged) }
-  }
+  override def undo(): NodeUpdatedChange = NodeUpdatedChange(updatedNode, notUpdatedNode, changedStartNode map (_.swap))
 
   /**
    * Defines how to reverse an undo action

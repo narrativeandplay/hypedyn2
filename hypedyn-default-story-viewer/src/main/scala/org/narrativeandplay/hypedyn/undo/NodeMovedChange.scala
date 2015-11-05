@@ -13,11 +13,11 @@ import org.narrativeandplay.hypedyn.storyviewer.StoryViewer
  * @param initialPos The initial position of the node
  * @param finalPos The final position of the node
  */
-class NodeMovedChange(val eventHandler: StoryViewer,
-                      val nodeId: NodeId,
-                      val initialPos: Vector2[Double],
-                      val finalPos: Vector2[Double]) extends Undoable {
-  override def undo(): Unit = eventHandler.moveNode(nodeId, initialPos)
+case class NodeMovedChange(eventHandler: StoryViewer,
+                           nodeId: NodeId,
+                           initialPos: Vector2[Double],
+                           finalPos: Vector2[Double]) extends Undoable {
+  override def undo(): NodeMovedChange = NodeMovedChange(eventHandler, nodeId, finalPos, initialPos)
 
   override def redo(): Unit = eventHandler.moveNode(nodeId, finalPos)
 

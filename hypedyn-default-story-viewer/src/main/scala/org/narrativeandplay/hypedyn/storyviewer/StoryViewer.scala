@@ -14,7 +14,6 @@ import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
 import org.narrativeandplay.hypedyn.serialisation._
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal, NodeId}
 import org.narrativeandplay.hypedyn.storyviewer.components.ViewerNode
-import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils
 import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoableStream}
 
 /**
