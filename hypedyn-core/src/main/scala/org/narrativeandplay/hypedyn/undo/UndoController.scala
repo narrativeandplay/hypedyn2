@@ -1,14 +1,11 @@
 package org.narrativeandplay.hypedyn.undo
 
 import java.lang
-import java.util.Optional
-import java.util.function.{Function => JFunction, BiFunction, Consumer}
-import javafx.beans.value.ObservableValue
 
 import scalafx.beans.property.ObjectProperty
 
 import org.fxmisc.easybind.EasyBind
-import org.fxmisc.undo.{UndoManager, UndoManagerFactory}
+import org.fxmisc.undo.UndoManagerFactory
 
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 
