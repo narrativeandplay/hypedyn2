@@ -13,7 +13,7 @@ import org.fxmisc.undo.{UndoManager, UndoManagerFactory}
  * Controller handling undo events
  */
 object UndoController {
-  private val undoManager = ObjectProperty(UndoManagerFactory.unlimitedHistoryUndoManager(
+  private val undoManager = ObjectProperty(UndoManagerFactory.unlimitedHistoryUndoManager[Undoable](
     UndoableStream.changes,
     new JFunction[Undoable, Undoable] {
       override def apply(t: Undoable): Undoable = t.undo()
@@ -61,7 +61,7 @@ object UndoController {
   /**
    * Clears the undo history
    */
-  def clearHistory(): Unit = undoManager() = UndoManagerFactory.unlimitedHistoryUndoManager(
+  def clearHistory(): Unit = undoManager() = UndoManagerFactory.unlimitedHistoryUndoManager[Undoable](
     UndoableStream.changes,
     new JFunction[Undoable, Undoable] {
       override def apply(t: Undoable): Undoable = t.undo()
