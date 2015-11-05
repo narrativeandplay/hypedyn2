@@ -11,6 +11,10 @@ import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 
 /**
  * Controller handling undo events
+ *
+ * The calls to methods that take functions in this object are essentially Java method calls to generic methods. Due to
+ * limitations in the Scala compiler, the type parameters of these method calls must be provided for Scala to correctly
+ * type the results.
  */
 object UndoController {
   private val undoManager = ObjectProperty(makeUndoManager)
@@ -50,6 +54,7 @@ object UndoController {
    */
   def markCurrentPosition(): Unit = undoManager().mark()
 
+  // SAM conversion somehow doesn't work here, hence the need for the function conversion imports
   private def makeUndoManager = UndoManagerFactory.unlimitedHistoryUndoManager[Undoable](
     UndoableStream.changes,
     { u: Undoable => u.undo() },
