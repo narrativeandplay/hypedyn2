@@ -22,23 +22,16 @@ object UndoController {
    * Observable stream of whether the current position within the undo manager's
    * history is the same as the last marked position.
    */
-  val atMarkedPosition = EasyBind monadic undoManager flatMap new JFunction[UndoManager, ObservableValue[lang.Boolean]] {
-    override def apply(t: UndoManager): ObservableValue[lang.Boolean] = t.atMarkedPositionProperty()
-  }
+  val atMarkedPosition = EasyBind monadic undoManager flatMap[lang.Boolean] (_.atMarkedPositionProperty())
 
   /**
    * Observable stream of whether undo is available
    */
-  val undoAvailable = EasyBind monadic undoManager flatMap new JFunction[UndoManager, ObservableValue[lang.Boolean]] {
-    override def apply(t: UndoManager): ObservableValue[lang.Boolean] = t.undoAvailableProperty()
-  }
-
+  val undoAvailable = EasyBind monadic undoManager flatMap[lang.Boolean] (_.undoAvailableProperty())
   /**
    * Observable stream of whether redo is available
    */
-  val redoAvailable = EasyBind monadic undoManager flatMap new JFunction[UndoManager, ObservableValue[lang.Boolean]] {
-    override def apply(t: UndoManager): ObservableValue[lang.Boolean] = t.redoAvailableProperty()
-  }
+  val redoAvailable = EasyBind monadic undoManager flatMap[lang.Boolean] (_.redoAvailableProperty())
 
   /**
    * Undo a change
