@@ -9,22 +9,14 @@ import scalafx.beans.property.ObjectProperty
 
 import org.fxmisc.easybind.EasyBind
 import org.fxmisc.undo.{UndoManager, UndoManagerFactory}
+
+import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
+
 /**
  * Controller handling undo events
  */
 object UndoController {
-  private val undoManager = ObjectProperty(UndoManagerFactory.unlimitedHistoryUndoManager[Undoable](
-    UndoableStream.changes,
-    new JFunction[Undoable, Undoable] {
-      override def apply(t: Undoable): Undoable = t.undo()
-    },
-    new Consumer[Undoable] {
-      override def accept(t: Undoable): Unit = t.redo()
-    },
-    new BiFunction[Undoable, Undoable, Optional[Undoable]] {
-      override def apply(t: Undoable, u: Undoable): Optional[Undoable] = t mergeWith u
-    }
-  ))
+  private val undoManager = ObjectProperty(makeUndoManager)
 
   /**
    * Observable stream of whether the current position within the undo manager's
@@ -61,21 +53,17 @@ object UndoController {
   /**
    * Clears the undo history
    */
-  def clearHistory(): Unit = undoManager() = UndoManagerFactory.unlimitedHistoryUndoManager[Undoable](
-    UndoableStream.changes,
-    new JFunction[Undoable, Undoable] {
-      override def apply(t: Undoable): Undoable = t.undo()
-    },
-    new Consumer[Undoable] {
-      override def accept(t: Undoable): Unit = t.redo()
-    },
-    new BiFunction[Undoable, Undoable, Optional[Undoable]] {
-      override def apply(t: Undoable, u: Undoable): Optional[Undoable] = t mergeWith u
-    }
-  )
+  def clearHistory(): Unit = undoManager() = makeUndoManager
 
   /**
    * Marks the current position in the undo queue
    */
   def markCurrentPosition(): Unit = undoManager().mark()
+
+  private def makeUndoManager = UndoManagerFactory.unlimitedHistoryUndoManager[Undoable](
+    UndoableStream.changes,
+    { u: Undoable => u.undo() },
+    { undoable: Undoable => undoable.redo() },
+    { (u1: Undoable, u2: Undoable) => u1 mergeWith u2}
+  )
 }
