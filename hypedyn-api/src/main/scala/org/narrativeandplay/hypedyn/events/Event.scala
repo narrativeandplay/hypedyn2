@@ -115,7 +115,7 @@ sealed case class SaveToFile(file: File, src: String) extends Action
 sealed case class LoadFromFile(file: File, src: String) extends Action
 
 sealed case class ExportToFile(file: File, src: String) extends Action
-sealed case class RunStory(src: String) extends Action
+sealed case class RunStory(fileToRun: File, src: String) extends Action
 
 sealed case class CreateStory(title: String = "Untitled",
                               author: String = "",
