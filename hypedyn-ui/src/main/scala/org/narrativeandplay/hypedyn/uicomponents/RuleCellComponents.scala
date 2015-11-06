@@ -372,9 +372,7 @@ object RuleCellComponents {
       paramMap += paramName -> ParamValue.Node(value().id)
     }
 
-    items <== EasyBind select story selectObject new JFunction[UiStory, javafx.beans.value.ObservableValue[ObservableList[UiNode]]] {
-      override def apply(t: UiStory): property.ObjectProperty[ObservableList[UiNode]] = t.nodesProperty
-    }
+    items <== EasyBind monadic story flatMap[ObservableList[UiNode]] (_.nodesProperty)
 
     override def `val`: Option[ParamValue] = paramMap get paramName
 
@@ -419,11 +417,7 @@ object RuleCellComponents {
       paramMap += paramName -> ParamValue.Link(value().id)
     }
 
-    items = story().links
-
-    story onChange { (_, _, `new`) =>
-      Option(`new`) foreach { s => items = s.links }
-    }
+    items <== EasyBind monadic story map[ObservableList[UiRule]] (_.links)
 
     override def `val`: Option[ParamValue] = paramMap get paramName
 
@@ -468,10 +462,8 @@ object RuleCellComponents {
       paramMap += paramName -> ParamValue.IntegerFact(selectionModel().getSelectedItem.id)
     }
 
-    items = intFacts
-
-    story onChange { (_, _, `new`) =>
-      Option(`new`) foreach { _ => items = intFacts }
+    items <== EasyBind monadic story flatMap[ObservableList[Fact]] (_.factsProperty) map[ObservableList[IntegerFact]] { facts =>
+      facts collect { case f: IntegerFact => f }
     }
 
     def intFacts = story().factsProperty() collect { case f: IntegerFact => f }
@@ -519,10 +511,8 @@ object RuleCellComponents {
       paramMap += paramName -> ParamValue.BooleanFact(selectionModel().getSelectedItem.id)
     }
 
-    items = boolFacts
-
-    story onChange { (_, _ , `new`) =>
-      items = boolFacts
+    items <== EasyBind monadic story flatMap[ObservableList[Fact]] (_.factsProperty) map[ObservableList[BooleanFact]] { facts =>
+      facts collect { case f: BooleanFact => f }
     }
 
     def boolFacts = story().factsProperty() collect { case f: BooleanFact => f }
@@ -570,10 +560,8 @@ object RuleCellComponents {
       paramMap += paramName -> ParamValue.StringFact(selectionModel().getSelectedItem.id)
     }
 
-    items = stringFacts
-
-    story onChange { (_, _, `new`) =>
-      items = stringFacts
+    items <== EasyBind monadic story flatMap[ObservableList[Fact]] (_.factsProperty) map[ObservableList[StringFact]] { facts =>
+      facts collect { case f: StringFact => f }
     }
 
     def stringFacts = story().factsProperty() collect { case f: StringFact => f }
