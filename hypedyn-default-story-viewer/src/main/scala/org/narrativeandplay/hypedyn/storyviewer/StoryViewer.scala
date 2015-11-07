@@ -1,10 +1,14 @@
 package org.narrativeandplay.hypedyn.storyviewer
 
+import javafx.scene.{input => jfxsi}
+
 import scala.collection.mutable
 import scala.util.Try
 
+import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.scene.control.{Control, ScrollPane}
+import scalafx.scene.input.{KeyCode, KeyEvent}
 
 import com.github.benedictleejh.scala.math.vector.Vector2
 
@@ -14,6 +18,7 @@ import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
 import org.narrativeandplay.hypedyn.serialisation._
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal, NodeId}
 import org.narrativeandplay.hypedyn.storyviewer.components.ViewerNode
+import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils
 import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoableStream}
 
 /**
@@ -37,6 +42,18 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   val viewer = new StoryViewerContent(this)
 
   content = new Control(viewer) {}
+
+  private[storyviewer] def zoomValueClamp(v: Double) = DoubleUtils.clamp(minZoom, maxZoom, v)
+  addEventFilter(KeyEvent.KeyPressed, { event: jfxsi.KeyEvent =>
+    if (event.shortcutDown) {
+      event.code match {
+        case KeyCode.ADD => zoomLevel() = zoomValueClamp(zoomLevel() + 0.1)
+        case KeyCode.MINUS | KeyCode.SUBTRACT => zoomLevel() = zoomValueClamp(zoomLevel() - 0.1)
+        case KeyCode.NUMPAD0 | KeyCode.DIGIT0 => zoomLevel() = 1.0
+        case _ =>
+      }
+    }
+  })
 
   /**
    * Returns the name of the plugin
