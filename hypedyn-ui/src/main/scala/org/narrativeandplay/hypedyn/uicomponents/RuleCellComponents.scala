@@ -369,7 +369,7 @@ object RuleCellComponents {
     }
 
     onAction = { _ =>
-      paramMap += paramName -> ParamValue.Node(value().id)
+      Option(value()) foreach { v => paramMap += paramName -> ParamValue.Node(v.id) }
     }
 
     items <== EasyBind monadic story flatMap[ObservableList[UiNode]] (_.nodesProperty)
@@ -423,7 +423,7 @@ object RuleCellComponents {
     }
 
     onAction = { _ =>
-      paramMap += paramName -> ParamValue.Link(value().id)
+      Option(value()) foreach { v => paramMap += paramName -> ParamValue.Link(v.id) }
     }
 
     items <== EasyBind monadic story map[ObservableList[UiRule]] (_.links)
@@ -477,7 +477,7 @@ object RuleCellComponents {
     }
 
     onAction = { _ =>
-      paramMap += paramName -> ParamValue.IntegerFact(selectionModel().getSelectedItem.id)
+      Option(selectionModel().selectedItem()) foreach { f => paramMap += paramName -> ParamValue.IntegerFact(f.id) }
     }
 
     items <== EasyBind monadic story flatMap[ObservableList[Fact]] (_.factsProperty) map[ObservableList[IntegerFact]] { facts =>
@@ -535,7 +535,7 @@ object RuleCellComponents {
     }
 
     onAction = { _ =>
-      paramMap += paramName -> ParamValue.BooleanFact(selectionModel().getSelectedItem.id)
+      Option(selectionModel().selectedItem()) foreach { f => paramMap += paramName -> ParamValue.BooleanFact(f.id) }
     }
 
     items <== EasyBind monadic story flatMap[ObservableList[Fact]] (_.factsProperty) map[ObservableList[BooleanFact]] { facts =>
@@ -593,7 +593,7 @@ object RuleCellComponents {
     }
 
     onAction = { _ =>
-      paramMap += paramName -> ParamValue.StringFact(selectionModel().getSelectedItem.id)
+      Option(selectionModel().selectedItem()) foreach { f => paramMap += paramName -> ParamValue.StringFact(f.id) }
     }
 
     items <== EasyBind monadic story flatMap[ObservableList[Fact]] (_.factsProperty) map[ObservableList[StringFact]] { facts =>
