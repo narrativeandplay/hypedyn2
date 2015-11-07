@@ -374,6 +374,15 @@ object RuleCellComponents {
 
     items <== EasyBind monadic story flatMap[ObservableList[UiNode]] (_.nodesProperty)
 
+    items onChange {
+      `val` foreach {
+        case ParamValue.Node(id) =>
+          story().nodes find (_.id == id) foreach { n => value = n }
+        case pv =>
+          throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.Node, got: $pv")
+      }
+    }
+
     override def `val`: Option[ParamValue] = paramMap get paramName
 
     override def val_=(paramValue: ParamValue): Unit = {
@@ -418,6 +427,15 @@ object RuleCellComponents {
     }
 
     items <== EasyBind monadic story map[ObservableList[UiRule]] (_.links)
+
+    items onChange {
+      `val` foreach {
+        case ParamValue.Link(id) =>
+          story().links find (_.id == id) foreach { r => value = r }
+        case pv =>
+          throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.Link, got: $pv")
+      }
+    }
 
     override def `val`: Option[ParamValue] = paramMap get paramName
 
@@ -464,6 +482,15 @@ object RuleCellComponents {
 
     items <== EasyBind monadic story flatMap[ObservableList[Fact]] (_.factsProperty) map[ObservableList[IntegerFact]] { facts =>
       facts collect { case f: IntegerFact => f }
+    }
+
+    items onChange {
+      `val` foreach {
+        case ParamValue.IntegerFact(id) =>
+          intFacts find (_.id == id) foreach { f => value = f }
+        case pv =>
+          throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.IntegerFact, got: $pv")
+      }
     }
 
     def intFacts = story().factsProperty() collect { case f: IntegerFact => f }
@@ -515,6 +542,15 @@ object RuleCellComponents {
       facts collect { case f: BooleanFact => f }
     }
 
+    items onChange {
+      `val` foreach {
+        case ParamValue.BooleanFact(id) =>
+          boolFacts find (_.id == id) foreach { f => value = f }
+        case pv =>
+          throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.BooleanFact, got: $pv")
+      }
+    }
+
     def boolFacts = story().factsProperty() collect { case f: BooleanFact => f }
 
     override def `val`: Option[ParamValue] = paramMap get paramName
@@ -562,6 +598,15 @@ object RuleCellComponents {
 
     items <== EasyBind monadic story flatMap[ObservableList[Fact]] (_.factsProperty) map[ObservableList[StringFact]] { facts =>
       facts collect { case f: StringFact => f }
+    }
+
+    items onChange {
+      `val` foreach {
+        case ParamValue.StringFact(id) =>
+          stringFacts find (_.id == id) foreach { f => value = f }
+        case pv =>
+          throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.StringFact, got: $pv")
+      }
     }
 
     def stringFacts = story().factsProperty() collect { case f: StringFact => f }
