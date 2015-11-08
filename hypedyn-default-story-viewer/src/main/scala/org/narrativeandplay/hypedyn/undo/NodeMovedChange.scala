@@ -19,7 +19,10 @@ case class NodeMovedChange(eventHandler: StoryViewer,
                            finalPos: Vector2[Double]) extends Undoable {
   override def undo(): NodeMovedChange = NodeMovedChange(eventHandler, nodeId, finalPos, initialPos)
 
-  override def redo(): Unit = eventHandler.moveNode(nodeId, finalPos)
+  override def redo(): Unit = {
+    eventHandler.moveNode(nodeId, finalPos)
+    eventHandler.notifyNodeMove(nodeId, initialPos, finalPos)
+  }
 
   override def merge(other: Undoable): Option[Undoable] = other match {
     case c: NodeMovedChange =>
