@@ -47,7 +47,7 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   addEventFilter(KeyEvent.KeyPressed, { event: jfxsi.KeyEvent =>
     if (event.shortcutDown) {
       event.code match {
-        case KeyCode.ADD => zoomLevel() = zoomValueClamp(zoomLevel() + 0.1)
+        case KeyCode.ADD | KeyCode.EQUALS => zoomLevel() = zoomValueClamp(zoomLevel() + 0.1)
         case KeyCode.MINUS | KeyCode.SUBTRACT => zoomLevel() = zoomValueClamp(zoomLevel() - 0.1)
         case KeyCode.NUMPAD0 | KeyCode.DIGIT0 => zoomLevel() = 1.0
         case _ =>
