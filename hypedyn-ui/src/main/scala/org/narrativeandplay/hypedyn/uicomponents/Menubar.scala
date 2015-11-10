@@ -30,8 +30,9 @@ object Menubar extends MenuBar {
    */
   class MenuItem(name: String) extends scalafx.scene.control.MenuItem(name) {
     // Disable the menu items when the main window is not being selected,effectively preventing the shortcuts from
-    // propagating to node editor windows. Due to annoying conversions and interplays between ScalaFX and JavaFX,
-    // all casting has to be done on the JavaFX delegates of the ScalaFX properties
+    // propagating to node editor windows. The function `flatMap` is a Java method call to a generic method. Due to
+    // limitations in the Scala compiler, the type parameters of these method calls must be provided for Scala to
+    // correctly type the results.
     disable <== EasyBind monadic scene flatMap[Window] (_.window) flatMap[lang.Boolean] (!_.focused)
   }
 

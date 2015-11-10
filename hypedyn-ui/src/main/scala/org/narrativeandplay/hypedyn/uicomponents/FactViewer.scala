@@ -90,6 +90,8 @@ object FactViewer extends ListView[Fact] {
     text = s"${if (System.isMac) "Cmd" else "Ctrl"}-Click deselects a selected fact"
   }
 
+  // The functions `select` and `selectObject` are Java method calls to a generic methods. Due to limitations in the
+  // Scala compiler, the type parameters of these method calls must be provided for Scala to correctly type the results.
   EasyBind select scene select[Window] (_.window) selectObject[lang.Boolean] (_.focused) onChange { (_, _, isFocused) =>
     Option(isFocused) foreach { focused =>
       if (focused) tooltip = deselectionInfo else tooltip = null
