@@ -32,9 +32,7 @@ object Menubar extends MenuBar {
     // Disable the menu items when the main window is not being selected,effectively preventing the shortcuts from
     // propagating to node editor windows. Due to annoying conversions and interplays between ScalaFX and JavaFX,
     // all casting has to be done on the JavaFX delegates of the ScalaFX properties
-    disable <== EasyBind select scene select { s: Scene => s.window.delegate.asInstanceOf[ObservableValue[Window]] } selectObject { w: Window =>
-      (!w.focused).delegate.asInstanceOf[ObservableValue[lang.Boolean]]
-    }
+    disable <== EasyBind monadic scene flatMap[Window] (_.window) flatMap[lang.Boolean] (!_.focused)
   }
 
   /**
