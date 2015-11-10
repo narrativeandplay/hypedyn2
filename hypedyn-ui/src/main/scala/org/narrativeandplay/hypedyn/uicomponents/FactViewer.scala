@@ -90,9 +90,9 @@ object FactViewer extends ListView[Fact] {
     text = s"${if (System.isMac) "Cmd" else "Ctrl"}-Click deselects a selected fact"
   }
 
-  EasyBind select scene select { s: Scene => s.window.delegate.asInstanceOf[ObservableValue[Window]] } selectObject { w: Window =>
-    w.focused.delegate.asInstanceOf[ObservableValue[lang.Boolean]]
-  } onChange { (_, _, isFocused) =>
-    if (isFocused) tooltip = deselectionInfo else tooltip = null
+  EasyBind select scene select[Window] (_.window) selectObject[lang.Boolean] (_.focused) onChange { (_, _, isFocused) =>
+    Option(isFocused) foreach { focused =>
+      if (focused) tooltip = deselectionInfo else tooltip = null
+    }
   }
 }
