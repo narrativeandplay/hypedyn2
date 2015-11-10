@@ -521,7 +521,10 @@ object NodeEditor {
     addEventFilter(KeyEvent.KeyTyped, { keyEvent: JfxKeyEvent =>
       if (keyEvent.shiftDown && keyEvent.character == " ") {
         useInitialStyleForInsertion = true
-        insertText(caretPosition(), " ")
+
+        if (styleAt(caretPosition()).ruleset.isDefined && styleAt(caretPosition() + 1).ruleset.isEmpty)
+          insertText(caretPosition(), " ")
+
         useInitialStyleForInsertion = false
 
         // Shift-space also inserts a space on its own, so we consume the event to prevent double space insertion
