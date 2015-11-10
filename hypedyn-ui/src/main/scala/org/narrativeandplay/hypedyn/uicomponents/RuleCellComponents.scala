@@ -778,7 +778,11 @@ object RuleCellComponents {
       }
     }
 
-    lazy val pane = new HBox
+    lazy val pane = new HBox {
+      HBox.setHgrow(this, Priority.Always)
+    }
+
+    HBox.setHgrow(this, Priority.Always)
 
     children.addAll(unionValue, pane)
 
