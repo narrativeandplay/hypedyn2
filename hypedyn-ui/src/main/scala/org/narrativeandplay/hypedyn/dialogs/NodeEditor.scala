@@ -548,10 +548,13 @@ object NodeEditor {
 
     setOnMouseClicked({ mouseEvent: JfxMouseEvent =>
       val hasNoSelectedText = getSelectedText == ""
-      val selectedPosHasRule = styleAt(caretPosition()).ruleset.isDefined
+      val styleAtCaret = styleAt(caretPosition())
+      val selectedPosHasRule = styleAtCaret.ruleset.isDefined
 
       if (hasNoSelectedText && selectedPosHasRule) {
-        val ruleRange = styleRangeAt(caretPosition())
+        val rulesetIndexes = styleAtCaret.ruleset.get.indexes
+        val ruleRange = new IndexRange(rulesetIndexes.startIndex.index.toInt,
+                                       rulesetIndexes.endIndex.index.toInt)
 
         selectRange(ruleRange.start, ruleRange.end)
       }
