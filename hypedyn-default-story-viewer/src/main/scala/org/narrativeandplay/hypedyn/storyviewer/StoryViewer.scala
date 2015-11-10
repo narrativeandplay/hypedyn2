@@ -44,8 +44,10 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   content = new Control(viewer) {}
 
   private[storyviewer] def zoomValueClamp(v: Double) = DoubleUtils.clamp(minZoom, maxZoom, v)
+  private var lastKeypressTime = System.currentTimeMillis()
   addEventFilter(KeyEvent.KeyPressed, { event: jfxsi.KeyEvent =>
-    if (event.shortcutDown) {
+    val timeDiff = System.currentTimeMillis() - lastKeypressTime
+    if (event.shortcutDown && timeDiff > 1) {
       event.code match {
         case KeyCode.ADD | KeyCode.EQUALS => zoomLevel() = zoomValueClamp(zoomLevel() + 0.1)
         case KeyCode.MINUS | KeyCode.SUBTRACT => zoomLevel() = zoomValueClamp(zoomLevel() - 0.1)
@@ -53,6 +55,7 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
         case _ =>
       }
     }
+    lastKeypressTime = System.currentTimeMillis()
   })
 
   /**
