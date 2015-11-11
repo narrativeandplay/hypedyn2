@@ -83,6 +83,7 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
   relocate(storyViewer.zoomLevel() * topLeft.x, storyViewer.zoomLevel() * topLeft.y)
 
   onMouseClicked = { me =>
+    toFront()
     me.clickCount match {
       case 1 =>
         if (selected()) deselect() else select()
