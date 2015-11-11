@@ -3,7 +3,7 @@ package org.narrativeandplay.hypedyn.events
 import scala.collection.mutable.ArrayBuffer
 
 import scalafx.Includes._
-import scalafx.beans.property.BooleanProperty
+import scalafx.beans.property.{ObjectProperty, BooleanProperty}
 import scalafx.scene.control.{ButtonType, Alert}
 
 import rx.lang.scala.Observable
@@ -22,7 +22,7 @@ import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
  */
 object UiEventDispatcher {
   val UiEventSourceIdentity = "UI"
-  private var selectedNode: Option[NodeId] = None
+  val selectedNode = ObjectProperty[Option[NodeId]](None)
   private val openedNodeEditors = ArrayBuffer.empty[NodeEditor]
   val isStoryEdited = BooleanProperty(false)
   val undoAvailable = BooleanProperty(false)
@@ -141,8 +141,8 @@ object UiEventDispatcher {
     }
   }
 
-  EventBus.UiNodeSelectedEvents foreach { evt => selectedNode = Some(evt.id) }
-  EventBus.UiNodeDeselectedEvents foreach { _ => selectedNode = None }
+  EventBus.UiNodeSelectedEvents foreach { evt => selectedNode() = Some(evt.id) }
+  EventBus.UiNodeDeselectedEvents foreach { _ => selectedNode() = None }
 
   EventBus.FactCreatedEvents foreach { evt => FactViewer.add(evt.fact) }
   EventBus.FactUpdatedEvents foreach { evt => FactViewer.update(evt.fact, evt.updatedFact) }
@@ -163,10 +163,10 @@ object UiEventDispatcher {
     EventBus.send(NewNodeRequest(UiEventSourceIdentity))
   }
   def requestEditNode(): Unit = {
-    selectedNode foreach { id => EventBus.send(EditNodeRequest(id, UiEventSourceIdentity)) }
+    selectedNode() foreach { id => EventBus.send(EditNodeRequest(id, UiEventSourceIdentity)) }
   }
   def requestDeleteNode(): Unit = {
-    selectedNode foreach { id => EventBus.send(DeleteNodeRequest(id, UiEventSourceIdentity)) }
+    selectedNode() foreach { id => EventBus.send(DeleteNodeRequest(id, UiEventSourceIdentity)) }
   }
 
   def requestNewFact(): Unit = {
@@ -211,10 +211,10 @@ object UiEventDispatcher {
   }
 
   def requestCut(): Unit = {
-    selectedNode foreach { id => EventBus.send(CutNodeRequest(id, UiEventSourceIdentity)) }
+    selectedNode() foreach { id => EventBus.send(CutNodeRequest(id, UiEventSourceIdentity)) }
   }
   def requestCopy(): Unit = {
-    selectedNode foreach { id => EventBus.send(CopyNodeRequest(id, UiEventSourceIdentity)) }
+    selectedNode() foreach { id => EventBus.send(CopyNodeRequest(id, UiEventSourceIdentity)) }
   }
   def requestPaste(): Unit = {
     EventBus.send(PasteNodeRequest(UiEventSourceIdentity))
