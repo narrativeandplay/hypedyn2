@@ -44,6 +44,9 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   content = new Control(viewer) {}
 
   private[storyviewer] def zoomValueClamp(v: Double) = DoubleUtils.clamp(minZoom, maxZoom, v)
+  // Because OS X does something stupid by firing multiple events for a single Equals key press, we add a timestamp
+  // to track when the last time the zoom was triggered, and allow it to zoom only if it was at least 2 ms after
+  // the last zoom time.
   private var lastKeypressTime = System.currentTimeMillis()
   addEventFilter(KeyEvent.KeyPressed, { event: jfxsi.KeyEvent =>
     val timeDiff = System.currentTimeMillis() - lastKeypressTime
