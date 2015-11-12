@@ -78,9 +78,9 @@ scala
 ___blank line___
 scalafx
 ___blank line___
-org.narrativeandplay.hypedyn
-___blank line___
 all other imports
+___blank line___
+org.narrativeandplay.hypedyn
 ```
 
 You should also regularly run IntelliJ's Optimize Imports (Code > Optimize Imports) against
