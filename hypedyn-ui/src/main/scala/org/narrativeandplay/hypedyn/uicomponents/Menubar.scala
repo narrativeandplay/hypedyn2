@@ -1,16 +1,10 @@
 package org.narrativeandplay.hypedyn.uicomponents
 
-import java.lang
-import javafx.beans.value.ObservableValue
-import javafx.scene.Scene
-import javafx.stage.Window
-
 import scalafx.Includes._
 import scalafx.application.Platform
+import scalafx.beans.property.ReadOnlyBooleanProperty
 import scalafx.event.ActionEvent
-import scalafx.scene.control.{Menu, MenuBar, MenuItem, SeparatorMenuItem}
-
-import org.fxmisc.easybind.EasyBind
+import scalafx.scene.control.{Menu, MenuBar, SeparatorMenuItem}
 
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 import org.narrativeandplay.hypedyn.keycombinations.KeyCombinations
@@ -19,7 +13,7 @@ import org.narrativeandplay.hypedyn.utils.System
 /**
  * Menu bar for the application
  */
-object Menubar extends MenuBar {
+class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   useSystemMenuBar = true
   menus.addAll(fileMenu, editMenu, helpMenu)
 
@@ -33,7 +27,7 @@ object Menubar extends MenuBar {
     // propagating to node editor windows. The function `flatMap` is a Java method call to a generic method. Due to
     // limitations in the Scala compiler, the type parameters of these method calls must be provided for Scala to
     // correctly type the results.
-    disable <== EasyBind monadic scene flatMap[Window] (_.window) flatMap[lang.Boolean] (!_.focused)
+    disable <== !mainStageFocused
   }
 
   /**
@@ -106,7 +100,7 @@ object Menubar extends MenuBar {
   private lazy val undo = new MenuItem("Undo") {
     accelerator = KeyCombinations.Undo
 
-    disable <== !UiEventDispatcher.undoAvailable
+    disable <== !UiEventDispatcher.undoAvailable || !mainStageFocused
 
     onAction = { actionEvent: ActionEvent =>
       UiEventDispatcher.requestUndo()
@@ -116,7 +110,7 @@ object Menubar extends MenuBar {
   private lazy val redo = new MenuItem("Redo") {
     accelerator = if (System.isWindows) KeyCombinations.RedoWin else KeyCombinations.RedoUnix
 
-    disable <== !UiEventDispatcher.redoAvailable
+    disable <== !UiEventDispatcher.redoAvailable || !mainStageFocused
 
     onAction = { actionEvent: ActionEvent =>
       UiEventDispatcher.requestRedo()

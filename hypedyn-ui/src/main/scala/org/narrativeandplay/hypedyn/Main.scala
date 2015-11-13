@@ -130,6 +130,8 @@ object Main extends JFXApp {
     title <== loadedFilename + editedMarker + " - HypeDyn"
     icons.add(icon)
 
+    val mainStageFocused = focused
+
     // CLose all windows when closing the main application window, i.e. make closing the main window equivalent to
     // an exiting of the program
     onCloseRequest = { evt =>
@@ -141,7 +143,7 @@ object Main extends JFXApp {
     scene = new Scene {
       root = new BorderPane() {
         top = new VBox() {
-          children.addAll(Menubar, Toolbar)
+          children.addAll(new Menubar(mainStageFocused), Toolbar)
         }
 
         left = Sidebar
