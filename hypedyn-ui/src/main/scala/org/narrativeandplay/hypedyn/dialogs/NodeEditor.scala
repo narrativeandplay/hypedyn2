@@ -4,6 +4,7 @@ import java.util.function.Function
 import javafx.event.EventHandler
 import javafx.scene.control.{TableCell => JfxTableCell, IndexRange => JfxIndexRange}
 import javafx.scene.input.{KeyCode => JfxKeyCode, KeyEvent => JfxKeyEvent, MouseEvent => JfxMouseEvent}
+import javafx.stage.Stage
 
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
@@ -94,6 +95,12 @@ class NodeEditor private (dialogTitle: String,
   dialogPane().setPrefSize(1280, 800)
 
   dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
+
+  dialogPane().scene().window().focused onChange { (_, _, f) =>
+    Option(f) foreach { isFocused =>
+      if (isFocused) dialogPane().scene().window().asInstanceOf[Stage].toFront()
+    }
+  }
 
   val story: ObjectProperty[UiStory] = ObjectProperty(narrative)
   val node: UiNode = nodeToEdit getOrElse new UiNode(NodeId(-1), "New Node", new UiNodeContent("", Nil), false, Nil)
