@@ -159,7 +159,7 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
    */
   def edgePoints = {
     val widthVector = Vector2(width / 2, 0d)
-    val heightVector = Vector2(height / 2, 0d)
+    val heightVector = Vector2(0d, height / 2)
 
     Map("left" -> (centre - widthVector),
         "right" -> (centre + widthVector),
