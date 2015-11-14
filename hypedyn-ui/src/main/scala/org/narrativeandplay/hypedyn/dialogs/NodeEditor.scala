@@ -14,6 +14,7 @@ import scalafx.scene.input.{MouseEvent, KeyEvent}
 import scalafx.scene.layout._
 import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
+import scalafx.scene.control.Tab.sfxTab2jfx
 
 import org.fxmisc.easybind.EasyBind
 import org.fxmisc.richtext.{StyleSpan, InlineStyleTextArea}
@@ -333,13 +334,18 @@ class NodeEditor private (dialogTitle: String,
 
     dividerPositions = 0.3
   }
-  val textAndNodeRulesPane = new CollapsibleSplitPane {
-    orientation = Orientation.HORIZONTAL
-    add(textRulesPane)
 
-    add(nodeRulesPane)
+  val textAndNodeRulesPane = new TabPane {
+    tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
 
-    dividerPositions = 0.5
+    tabs += new Tab {
+      text = "Fragment rules"
+      content = textRulesPane
+    }
+    tabs += new Tab {
+      text = "Node rules"
+      content = nodeRulesPane
+    }
   }
 
   val mainContentPane = new CollapsibleSplitPane {
@@ -372,36 +378,18 @@ class NodeEditor private (dialogTitle: String,
     bottom = new ToolBar {
       style = "-fx-background-color: transparent;"
 
-      // Blank and invisible button to push the next 2 buttons into a nice position
+      // Blank and invisible button to push the next button into a nice position
       items += new Button("") {
         minWidth = 35
         visible = false
       }
-      items += new Button("Text Rules") {
+      items += new Button {
+        text = "Show/hide rules"
+
         onAction = { _ =>
-          (textAndNodeRulesPane isShown textRulesPane, mainContentPane isShown textAndNodeRulesPane) match {
-            case (true, true) =>
-              if (textAndNodeRulesPane isShown nodeRulesPane) textAndNodeRulesPane.hide(textRulesPane) else mainContentPane.hide(textAndNodeRulesPane)
-            case (false, true) => textAndNodeRulesPane.show(textRulesPane)
-            case (true, false) => mainContentPane.show(textAndNodeRulesPane)
-            case (false, false) =>
-              textAndNodeRulesPane.hide(nodeRulesPane)
-              textAndNodeRulesPane.show(textRulesPane)
-              mainContentPane.show(textAndNodeRulesPane)
-          }
-        }
-      }
-      items += new Button("Node Rules") {
-        onAction = { _ =>
-          (textAndNodeRulesPane isShown nodeRulesPane, mainContentPane isShown textAndNodeRulesPane) match {
-            case (true, true) =>
-              if (textAndNodeRulesPane isShown textRulesPane) textAndNodeRulesPane.hide(nodeRulesPane) else mainContentPane.hide(textAndNodeRulesPane)
-            case (false, true) => textAndNodeRulesPane.show(nodeRulesPane)
-            case (true, false) => mainContentPane.show(textAndNodeRulesPane)
-            case (false, false) =>
-              textAndNodeRulesPane.hide(textRulesPane)
-              textAndNodeRulesPane.show(nodeRulesPane)
-              mainContentPane.show(textAndNodeRulesPane)
+          mainContentPane isShown textAndNodeRulesPane match {
+            case true => mainContentPane.hide(textAndNodeRulesPane)
+            case false => mainContentPane.show(textAndNodeRulesPane)
           }
         }
       }
