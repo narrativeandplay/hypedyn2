@@ -79,11 +79,11 @@ class RulesPane(labelText: String,
   /**
    * Redraw rule cells when rule positions are swapped
    *
-   * @param swappedExpandedStates A pair contains the positions of which rules were swapped
+   * @param swappedRulePositions A pair contains the positions of which rules were swapped
    */
-  def rearrangeCells(swappedExpandedStates: (Int, Int)): Unit = {
+  def rearrangeCells(swappedRulePositions: (Int, Int)): Unit = {
     val expandedStates = rulesList.root().children map (_.isExpanded)
-    swappedExpandedStates match { case (first, second) =>
+    swappedRulePositions match { case (first, second) =>
       val firstExpandedState = expandedStates(first)
       val secondExpandedState = expandedStates(second)
       expandedStates.set(first, secondExpandedState)
