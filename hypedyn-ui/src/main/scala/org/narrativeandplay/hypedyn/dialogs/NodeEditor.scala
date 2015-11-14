@@ -274,7 +274,7 @@ class NodeEditor private (dialogTitle: String,
       }
     }
   }
-  lazy val textRulesPane: RulesPane = new RulesPane("Text rules",
+  lazy val textRulesPane: RulesPane = new RulesPane("Fragment rules",
                                                     conditionDefinitions,
                                                     actionDefinitions filter (_.actionLocationTypes contains NodeContentAction),
                                                     ObservableBuffer.empty,
@@ -291,10 +291,10 @@ class NodeEditor private (dialogTitle: String,
     children += new HBox {
       padding = Insets(5)
       alignment = Pos.CenterLeft
-      children += new Label("Text Rules")
+      children += new Label("Fragments")
       children += new HBox { HBox.setHgrow(this, Priority.Always) } // Add expandable empty space to push the add button
                                                                     // to the end
-      children += new Button("Add text rule") {
+      children += new Button("Add fragment") {
         disable <== EasyBind combine (nodeContentText.selectedTextProperty, nodeContentText.selectionProperty, { (s: String, i: JfxIndexRange) =>
           val spansInSelection = nodeContentText styleSpansAt i map (_.getStyle.ruleset)
           val selectionAlreadyContainsRuleset = !(spansInSelection forall (_.isEmpty))
@@ -306,7 +306,7 @@ class NodeEditor private (dialogTitle: String,
           val start = nodeContentText.getSelection.getStart
           val end = nodeContentText.getSelection.getEnd
           val newRuleset = new UiRuleset(firstUnusedRulesetId,
-                                         "new rule",
+                                         "new fragment",
                                          RulesetIndexes(TextIndex(start), TextIndex(end)),
                                          Nil)
           firstUnusedRulesetId = firstUnusedRulesetId.dec
@@ -402,7 +402,7 @@ class NodeEditor private (dialogTitle: String,
       style = "-fx-background-color: transparent;"
       orientation = Orientation.VERTICAL
 
-      items += new SidebarButton("Text Rules") {
+      items += new SidebarButton("Fragments") {
         onAction = { _ =>
           contentTextAndRulesetsListPane isShown rulesetsListVBox match {
             case true => contentTextAndRulesetsListPane.hide(rulesetsListVBox)
