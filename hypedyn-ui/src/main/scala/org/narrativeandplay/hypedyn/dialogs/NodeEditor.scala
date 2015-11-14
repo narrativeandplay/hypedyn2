@@ -292,6 +292,8 @@ class NodeEditor private (dialogTitle: String,
       padding = Insets(5)
       alignment = Pos.CenterLeft
       children += new Label("Text Rules")
+      children += new HBox { HBox.setHgrow(this, Priority.Always) } // Add expandable empty space to push the add button
+                                                                    // to the end
       children += new Button("Add text rule") {
         disable <== EasyBind combine (nodeContentText.selectedTextProperty, nodeContentText.selectionProperty, { (s: String, i: JfxIndexRange) =>
           val spansInSelection = nodeContentText styleSpansAt i map (_.getStyle.ruleset)
