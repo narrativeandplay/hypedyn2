@@ -28,7 +28,7 @@ import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.uicomponents.RulesPane
 import org.narrativeandplay.hypedyn.uicomponents.Sidebar.SidebarButton
-import org.narrativeandplay.hypedyn.utils.CollapsibleSplitPane
+import org.narrativeandplay.hypedyn.utils.{ExpandableEmptySpace, CollapsibleSplitPane}
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 
 /**
@@ -292,8 +292,7 @@ class NodeEditor private (dialogTitle: String,
       padding = Insets(5)
       alignment = Pos.CenterLeft
       children += new Label("Fragments")
-      children += new HBox { HBox.setHgrow(this, Priority.Always) } // Add expandable empty space to push the add button
-                                                                    // to the end
+      children += new ExpandableEmptySpace
       children += new Button("Add fragment") {
         disable <== EasyBind combine (nodeContentText.selectedTextProperty, nodeContentText.selectionProperty, { (s: String, i: JfxIndexRange) =>
           val spansInSelection = nodeContentText styleSpansAt i map (_.getStyle.ruleset)

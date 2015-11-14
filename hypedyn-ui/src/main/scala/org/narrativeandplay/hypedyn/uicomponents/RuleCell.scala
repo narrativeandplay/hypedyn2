@@ -15,6 +15,7 @@ import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.{Or, And}
 import org.narrativeandplay.hypedyn.story.rules.Conditional.ConditionType
 import org.narrativeandplay.hypedyn.story.{UiAction, UiCondition, UiStory, UiRule}
 import org.narrativeandplay.hypedyn.story.rules.{BooleanOperator, ActionDefinition, ConditionDefinition}
+import org.narrativeandplay.hypedyn.utils.ExpandableEmptySpace
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 
 /**
@@ -106,8 +107,7 @@ class RuleCell(val rule: UiRule,
       children += new Label("If ")
       children += conditionCombineType
       children += new Label(" of the following conditions are true:")
-      children += new HBox { HBox.setHgrow(this, Priority.Always) } // Add expandable empty space to push the add button
-                                                                    // to the end
+      children += new ExpandableEmptySpace
       children += addCondButton
 
       alignment = Pos.CenterLeft
@@ -118,8 +118,7 @@ class RuleCell(val rule: UiRule,
 
     graphic = new HBox {
       children += new Label("Then perform the following actions:")
-      children += new HBox { HBox.setHgrow(this, Priority.Always) } // Add expandable empty space to push the add button
-                                                                    // to the end
+      children += new ExpandableEmptySpace
       children += addActionButton
 
       alignment = Pos.CenterLeft

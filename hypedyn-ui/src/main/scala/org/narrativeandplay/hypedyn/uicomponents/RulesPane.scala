@@ -13,6 +13,7 @@ import scalafx.scene.control.TreeItem.sfxTreeItemToJfx
 import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.Or
 import org.narrativeandplay.hypedyn.story.{UiStory, UiRule}
 import org.narrativeandplay.hypedyn.story.rules.{RuleId, ActionDefinition, ConditionDefinition}
+import org.narrativeandplay.hypedyn.utils.ExpandableEmptySpace
 
 /**
  * A control to manipulate rules
@@ -57,8 +58,7 @@ class RulesPane(labelText: String,
     padding = Insets(5, 5, 0, 5)
 
     children += label
-    children += new HBox { HBox.setHgrow(this, Priority.Always) } // Add expandable empty space to push the add button
-                                                                  // to the end
+    children += new ExpandableEmptySpace
     children += addRuleButton
   }
   children += rulesList
