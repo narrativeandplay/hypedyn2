@@ -354,7 +354,7 @@ class NodeEditor private (dialogTitle: String,
   }
 
   val contentPane = new BorderPane() {
-    center = new VBox() {
+    top = new VBox() {
       children += new Label("Name:")
       children += new HBox(10) {
         padding = Insets(5, 0, 5, 0)
@@ -365,8 +365,9 @@ class NodeEditor private (dialogTitle: String,
 
         HBox.setHgrow(nodeNameField, Priority.Always)
       }
-      children += mainContentPane
     }
+
+    center = mainContentPane
 
     bottom = new ToolBar {
       style = "-fx-background-color: transparent;"
