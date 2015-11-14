@@ -54,7 +54,7 @@ class RulesPane(labelText: String,
 
   children += new HBox {
     alignment = Pos.CenterLeft
-    padding = Insets(0, 5, 0, 5)
+    padding = Insets(5, 5, 0, 5)
 
     children += label
     children += new HBox { HBox.setHgrow(this, Priority.Always) } // Add expandable empty space to push the add button
