@@ -63,26 +63,18 @@ class Link(val from: ViewerNode,
   }
 
   private def endPoints = {
-    var minDistPoints = (Vector2(0d, 0d), Vector2(0d, 0d), Double.MaxValue)
     val fromPoints = from.edgePoints
     val toPoints = to.edgePoints
 
-    val endPointPairs = fromPoints.flatMap { case (fromPosition, fromCoords) =>
-      toPoints.map { case (toPosition, toCoords) =>
-        (fromCoords, toCoords) -> (toCoords - fromCoords).length
+    val endPointPairs = fromPoints flatMap { case (fromPosition, fromCoords) =>
+      toPoints map { case (toPosition, toCoords) =>
+        (fromPosition, fromCoords, toPosition, toCoords, (toCoords - fromCoords).length)
       }
     }
 
-    endPointPairs.foreach { case ((fromPt, toPt), dist) =>
-      minDistPoints match {
-        case (startPt, endPt, minDist) =>
-          if (dist <~ minDist) {
-            minDistPoints = (fromPt, toPt, dist)
-          }
-      }
+    endPointPairs minBy (_._5) match { case minPtPair @ (_, fromCoords, _, toCoords, length) =>
+      (fromCoords, toCoords, length)
     }
-
-    minDistPoints
   }
 
   /**
