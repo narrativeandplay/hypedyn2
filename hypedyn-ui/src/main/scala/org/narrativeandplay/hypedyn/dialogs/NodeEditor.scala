@@ -335,6 +335,7 @@ class NodeEditor private (dialogTitle: String,
     dividerPositions = 0.3
   }
 
+  dialogPane().scene().stylesheets += getClass.getResource("/org/narrativeandplay/hypedyn/tab-pane-fix.css").toExternalForm
   val textAndNodeRulesPane = new TabPane {
     tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
 

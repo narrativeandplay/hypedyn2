@@ -39,6 +39,8 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
   dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
   val okButton = dialogPane().lookupButton(ButtonType.OK)
 
+  dialogPane().scene().stylesheets += getClass.getResource("/org/narrativeandplay/hypedyn/tab-pane-fix.css").toExternalForm
+
   val contentPane = new TabPane {
     tabs += storyPropertiesTab
     tabs += readerPropertiesTab
