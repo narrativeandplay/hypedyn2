@@ -141,6 +141,10 @@ object UiEventDispatcher {
     }
   }
 
+  EventBus.NodeDestroyedEvents foreach { evt =>
+    openedNodeEditors find (_.node.id == evt.node.id) foreach (_.close())
+  }
+
   EventBus.UiNodeSelectedEvents foreach { evt => selectedNode() = Some(evt.id) }
   EventBus.UiNodeDeselectedEvents foreach { _ => selectedNode() = None }
 
