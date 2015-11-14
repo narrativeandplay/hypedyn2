@@ -43,11 +43,6 @@ class RulesPane(labelText: String,
 
   private val label = new Label(labelText)
   private val addRuleButton = new Button("Add rule") {
-    // 73 is the minimum width of the button at runtime that shows the full button label; allowing a fully automatic
-    // computation causes the computed width to be less than this value at times, so we force to button to be minimally
-    // this long to ensure that the full label always gets displayed
-    minWidth = 73
-
     onAction = { _ =>
       val newRule = new UiRule(RuleId(-1), "New Rule", false, Or, Nil, Nil)
       rules() += newRule
@@ -59,12 +54,12 @@ class RulesPane(labelText: String,
 
   children += new HBox {
     alignment = Pos.CenterLeft
-    padding = Insets(0, 5, 0, 5)
+    padding = Insets(5, 5, 0, 5)
 
     children += label
+    children += new HBox { HBox.setHgrow(this, Priority.Always) } // Add expandable empty space to push the add button
+                                                                  // to the end
     children += addRuleButton
-
-    label.prefWidth <== width - addRuleButton.width - padding().left - padding().right
   }
   children += rulesList
 
@@ -84,11 +79,11 @@ class RulesPane(labelText: String,
   /**
    * Redraw rule cells when rule positions are swapped
    *
-   * @param swappedExpandedStates A pair contains the positions of which rules were swapped
+   * @param swappedRulePositions A pair contains the positions of which rules were swapped
    */
-  def rearrangeCells(swappedExpandedStates: (Int, Int)): Unit = {
+  def rearrangeCells(swappedRulePositions: (Int, Int)): Unit = {
     val expandedStates = rulesList.root().children map (_.isExpanded)
-    swappedExpandedStates match { case (first, second) =>
+    swappedRulePositions match { case (first, second) =>
       val firstExpandedState = expandedStates(first)
       val secondExpandedState = expandedStates(second)
       expandedStates.set(first, secondExpandedState)

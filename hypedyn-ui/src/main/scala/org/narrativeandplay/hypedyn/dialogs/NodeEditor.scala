@@ -14,6 +14,7 @@ import scalafx.scene.input.{MouseEvent, KeyEvent}
 import scalafx.scene.layout._
 import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
+import scalafx.scene.control.Tab.sfxTab2jfx
 
 import org.fxmisc.easybind.EasyBind
 import org.fxmisc.richtext.{StyleSpan, InlineStyleTextArea}
@@ -273,7 +274,7 @@ class NodeEditor private (dialogTitle: String,
       }
     }
   }
-  lazy val textRulesPane: RulesPane = new RulesPane("Text rules",
+  lazy val textRulesPane: RulesPane = new RulesPane("Fragment rules",
                                                     conditionDefinitions,
                                                     actionDefinitions filter (_.actionLocationTypes contains NodeContentAction),
                                                     ObservableBuffer.empty,
@@ -290,8 +291,10 @@ class NodeEditor private (dialogTitle: String,
     children += new HBox {
       padding = Insets(5)
       alignment = Pos.CenterLeft
-      children += new Label("Text Rules")
-      children += new Button("Add text rule") {
+      children += new Label("Fragments")
+      children += new HBox { HBox.setHgrow(this, Priority.Always) } // Add expandable empty space to push the add button
+                                                                    // to the end
+      children += new Button("Add fragment") {
         disable <== EasyBind combine (nodeContentText.selectedTextProperty, nodeContentText.selectionProperty, { (s: String, i: JfxIndexRange) =>
           val spansInSelection = nodeContentText styleSpansAt i map (_.getStyle.ruleset)
           val selectionAlreadyContainsRuleset = !(spansInSelection forall (_.isEmpty))
@@ -303,7 +306,7 @@ class NodeEditor private (dialogTitle: String,
           val start = nodeContentText.getSelection.getStart
           val end = nodeContentText.getSelection.getEnd
           val newRuleset = new UiRuleset(firstUnusedRulesetId,
-                                         "new rule",
+                                         "new fragment",
                                          RulesetIndexes(TextIndex(start), TextIndex(end)),
                                          Nil)
           firstUnusedRulesetId = firstUnusedRulesetId.dec
@@ -333,13 +336,19 @@ class NodeEditor private (dialogTitle: String,
 
     dividerPositions = 0.3
   }
-  val textAndNodeRulesPane = new CollapsibleSplitPane {
-    orientation = Orientation.HORIZONTAL
-    add(textRulesPane)
 
-    add(nodeRulesPane)
+  dialogPane().scene().stylesheets += getClass.getResource("/org/narrativeandplay/hypedyn/tab-pane-fix.css").toExternalForm
+  val textAndNodeRulesPane = new TabPane {
+    tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
 
-    dividerPositions = 0.5
+    tabs += new Tab {
+      text = "Fragment rules"
+      content = textRulesPane
+    }
+    tabs += new Tab {
+      text = "Node rules"
+      content = nodeRulesPane
+    }
   }
 
   val mainContentPane = new CollapsibleSplitPane {
@@ -354,7 +363,7 @@ class NodeEditor private (dialogTitle: String,
   }
 
   val contentPane = new BorderPane() {
-    center = new VBox() {
+    top = new VBox() {
       children += new Label("Name:")
       children += new HBox(10) {
         padding = Insets(5, 0, 5, 0)
@@ -365,42 +374,25 @@ class NodeEditor private (dialogTitle: String,
 
         HBox.setHgrow(nodeNameField, Priority.Always)
       }
-      children += mainContentPane
     }
+
+    center = mainContentPane
 
     bottom = new ToolBar {
       style = "-fx-background-color: transparent;"
 
-      // Blank and invisible button to push the next 2 buttons into a nice position
+      // Blank and invisible button to push the next button into a nice position
       items += new Button("") {
         minWidth = 35
         visible = false
       }
-      items += new Button("Text Rules") {
+      items += new Button {
+        text = "Show/hide rules"
+
         onAction = { _ =>
-          (textAndNodeRulesPane isShown textRulesPane, mainContentPane isShown textAndNodeRulesPane) match {
-            case (true, true) =>
-              if (textAndNodeRulesPane isShown nodeRulesPane) textAndNodeRulesPane.hide(textRulesPane) else mainContentPane.hide(textAndNodeRulesPane)
-            case (false, true) => textAndNodeRulesPane.show(textRulesPane)
-            case (true, false) => mainContentPane.show(textAndNodeRulesPane)
-            case (false, false) =>
-              textAndNodeRulesPane.hide(nodeRulesPane)
-              textAndNodeRulesPane.show(textRulesPane)
-              mainContentPane.show(textAndNodeRulesPane)
-          }
-        }
-      }
-      items += new Button("Node Rules") {
-        onAction = { _ =>
-          (textAndNodeRulesPane isShown nodeRulesPane, mainContentPane isShown textAndNodeRulesPane) match {
-            case (true, true) =>
-              if (textAndNodeRulesPane isShown textRulesPane) textAndNodeRulesPane.hide(nodeRulesPane) else mainContentPane.hide(textAndNodeRulesPane)
-            case (false, true) => textAndNodeRulesPane.show(nodeRulesPane)
-            case (true, false) => mainContentPane.show(textAndNodeRulesPane)
-            case (false, false) =>
-              textAndNodeRulesPane.hide(textRulesPane)
-              textAndNodeRulesPane.show(nodeRulesPane)
-              mainContentPane.show(textAndNodeRulesPane)
+          mainContentPane isShown textAndNodeRulesPane match {
+            case true => mainContentPane.hide(textAndNodeRulesPane)
+            case false => mainContentPane.show(textAndNodeRulesPane)
           }
         }
       }
@@ -410,7 +402,7 @@ class NodeEditor private (dialogTitle: String,
       style = "-fx-background-color: transparent;"
       orientation = Orientation.VERTICAL
 
-      items += new SidebarButton("Text Rules") {
+      items += new SidebarButton("Fragments") {
         onAction = { _ =>
           contentTextAndRulesetsListPane isShown rulesetsListVBox match {
             case true => contentTextAndRulesetsListPane.hide(rulesetsListVBox)
