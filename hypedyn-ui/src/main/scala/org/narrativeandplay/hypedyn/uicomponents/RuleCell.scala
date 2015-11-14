@@ -75,9 +75,7 @@ class RuleCell(val rule: UiRule,
   expanded = true
 
   children += conditionsNode
-  children += new TreeItem[String]("", addCondButton)
   children += actionsNode
-  children += new TreeItem[String]("", addActionButton)
 
   lazy val ruleNameField = new HBox(10) {
     alignment = Pos.CenterLeft
@@ -104,23 +102,37 @@ class RuleCell(val rule: UiRule,
   lazy val conditionsNode = new TreeItem[String]("") {
     expanded = true
 
-    graphic = new HBox(new Label("If "), conditionCombineType, new Label(" of the following conditions are true:")) {
+    graphic = new HBox {
+      children += new Label("If ")
+      children += conditionCombineType
+      children += new Label(" of the following conditions are true:")
+      children += new HBox { HBox.setHgrow(this, Priority.Always) } // Add expandable empty space to push the add button
+                                                                    // to the end
+      children += addCondButton
+
       alignment = Pos.CenterLeft
     }
   }
-  lazy val actionsNode = new TreeItem[String]() {
-    value = "Then perform the following actions:"
-
+  lazy val actionsNode = new TreeItem[String]("") {
     expanded = true
+
+    graphic = new HBox {
+      children += new Label("Then perform the following actions:")
+      children += new HBox { HBox.setHgrow(this, Priority.Always) } // Add expandable empty space to push the add button
+                                                                    // to the end
+      children += addActionButton
+
+      alignment = Pos.CenterLeft
+    }
   }
 
-  lazy val addCondButton = new Button("Add condition") {
+  lazy val addCondButton: Button = new Button("Add condition") {
     onAction = { _ =>
       val newCond = addCondition()
       conditionsNode.children += new RuleCellComponents.ConditionCell(newCond, conditionDefs, story, self, rule)
     }
   }
-  lazy val addActionButton = new Button("Add action") {
+  lazy val addActionButton: Button = new Button("Add action") {
     onAction = { _ =>
       val newAction = addAction()
       actionsNode.children += new RuleCellComponents.ActionCell(newAction, actionDefs, story, self, rule)
