@@ -9,6 +9,7 @@ import scala.collection.mutable.ArrayBuffer
 
 import scalafx.Includes._
 import scalafx.event.Event
+import scalafx.geometry.Point2D
 import scalafx.scene.input.{ScrollEvent, MouseEvent}
 
 import org.narrativeandplay.hypedyn.storyviewer.utils.UnorderedPair
@@ -30,9 +31,11 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   skin = new StoryViewerContentSkin(this)
 
   addEventFilter(MouseEvent.MousePressed, { event: jfxsi.MouseEvent =>
+    val pt = new Point2D(event.getX, event.getY)
+
     nodes foreach (_.deselect())
     links foreach (_.deselect())
-    links find (_.contains(event.getX, event.getY)) foreach (_.select(event.getX, event.getY))
+    links find (_ contains pt) foreach (_.select(pt))
   })
 
   private def zoomValueClamp(d: Double) = pluginEventDispatcher.zoomValueClamp(d)
