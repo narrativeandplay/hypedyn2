@@ -35,6 +35,8 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
 
     nodes foreach (_.deselect())
     links foreach (_.deselect())
+    requestLayout()
+    
     links find (_ contains pt) foreach (_.select(pt))
   })
 
