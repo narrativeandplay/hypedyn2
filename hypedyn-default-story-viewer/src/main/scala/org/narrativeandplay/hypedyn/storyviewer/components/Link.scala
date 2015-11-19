@@ -96,6 +96,13 @@ class Link(val from: ViewerNode,
   }
 
   /**
+   * Select this link
+   *
+   * @param pt The selection point
+   */
+  def select(pt: Point2D): Unit = select(pt.x, pt.y)
+
+  /**
    * Unselect this link
    */
   def deselect(): Unit = {
@@ -110,7 +117,21 @@ class Link(val from: ViewerNode,
    * @param y The y-coordinate of the point
    * @return `true` if the link contains the given point, false otherwise
    */
-  def contains(x: Double, y: Double): Boolean = path.toFxPath contains new Point2D(x, y)
+  def contains(x: Double, y: Double): Boolean = mousingPath contains (x, y)
+
+  /**
+   * Checks if the link contains the given point
+   *
+   * @param pt The point to check
+   * @return `true` if the link contains the given point, false otherwise
+   */
+  def contains(pt: Point2D): Boolean = mousingPath contains pt
+
+  private def mousingPath = {
+    val h = path.toFxPath
+    h.strokeWidth = 5
+    h
+  }
 
   /**
    * Returns the Bezier curve (the start, end, and control points) of this link
