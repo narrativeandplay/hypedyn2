@@ -29,7 +29,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
 
   skin = new StoryViewerContentSkin(this)
 
-  addEventFilter(MouseEvent.MouseClicked, { event: jfxsi.MouseEvent =>
+  addEventFilter(MouseEvent.MousePressed, { event: jfxsi.MouseEvent =>
     nodes foreach (_.deselect())
     links foreach (_.deselect())
     links find (_.contains(event.getX, event.getY)) foreach (_.select(event.getX, event.getY))

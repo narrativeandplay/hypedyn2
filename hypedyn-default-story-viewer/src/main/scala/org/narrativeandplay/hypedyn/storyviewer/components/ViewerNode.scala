@@ -85,9 +85,6 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
   onMouseClicked = { me =>
     toFront()
     me.clickCount match {
-      case 1 =>
-        if (selected()) deselect() else select()
-        requestLayout()
       case 2 => pluginEventDispatcher.requestNodeEdit(id)
       case _ =>
     }
@@ -96,6 +93,9 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
   onMousePressed = { me =>
     anchor = (me.sceneX, me.sceneY)
     topLeft = (layoutX, layoutY)
+
+    if (selected()) deselect() else select()
+    requestLayout()
   }
   onMouseDragged = { me =>
     val translation = Vector2(me.sceneX, me.sceneY) - anchor
