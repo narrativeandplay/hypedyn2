@@ -33,11 +33,11 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   addEventFilter(MouseEvent.MousePressed, { event: jfxsi.MouseEvent =>
     val pt = new Point2D(event.getX, event.getY)
 
-    nodes foreach (_.deselect())
-    links foreach (_.deselect())
+    nodes foreach { n => if (!(n.bounds contains pt)) n.deselect() }
+    links foreach { l => if (!(l contains pt)) l.deselect() }
     requestLayout()
-    
-    links find (_ contains pt) foreach (_.select(pt))
+
+    links find (_ contains pt) foreach { l => if (l.selected()) l.deselect() else l.select(pt) }
   })
 
   private def zoomValueClamp(d: Double) = pluginEventDispatcher.zoomValueClamp(d)
