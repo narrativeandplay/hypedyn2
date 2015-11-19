@@ -41,16 +41,18 @@ allprojects {
     }
 
     tasks.withType(ScalaCompile) {
-        scalaCompileOptions.useAnt = false
-        scalaCompileOptions.useCompileDaemon = true
-        scalaCompileOptions.additionalParameters = [
-                "-Xexperimental", // for Single Abstract Method conversion support without needing implicits
-                "-Xlint:-nullary-unit,_",
-                "-feature",
-                "-Xfatal-warnings",
-                "-deprecation",
-                "-unchecked",
-                "-Yinline-warnings"
-        ]
+        scalaCompileOptions.with {
+            useAnt = false
+            useCompileDaemon = true
+            additionalParameters = [
+                    "-Xexperimental", // for Single Abstract Method conversion support without needing implicits
+                    "-Xlint:-nullary-unit,_",
+                    "-feature",
+                    "-Xfatal-warnings",
+                    "-deprecation",
+                    "-unchecked",
+                    "-Yinline-warnings"
+            ]
+        }
     }
 }
