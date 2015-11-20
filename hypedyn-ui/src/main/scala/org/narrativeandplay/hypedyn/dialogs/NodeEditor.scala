@@ -521,7 +521,7 @@ object NodeEditor {
         useInitialStyleForInsertion = true
 
         if (styleAt(caretPosition()).ruleset.isDefined &&
-            (styleAt(caretPosition() + 1).ruleset.isEmpty
+            (styleAt(caretPosition() + 1).ruleset != styleAt(caretPosition()).ruleset
               || caretPosition() == 0 // Because the style 'sticks' to the first position if the text after it is styled
               || caretPosition() == text().length)) // Because the style at the next position after the end isn't well
                                                     // defined
