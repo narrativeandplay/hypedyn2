@@ -582,8 +582,6 @@ object NodeEditor {
 
     def styleAt(position: Int) = getStyleAtPosition(position)
 
-    def styleRangeAt(position: Int) = getStyleRangeAtPosition(position)
-
     def useInitialStyleForInsertion = useInitialStyleForInsertionProperty()
     def useInitialStyleForInsertion_=(value: Boolean) = setUseInitialStyleForInsertion(value)
 
