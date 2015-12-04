@@ -103,15 +103,20 @@ class NodeEditor private (dialogTitle: String,
   }
 
   val story: ObjectProperty[UiStory] = ObjectProperty(narrative)
-  val node: UiNode = nodeToEdit getOrElse new UiNode(NodeId(-1), "New Node", new UiNodeContent("", Nil), false, Nil)
+  val node: ObjectProperty[UiNode] = ObjectProperty(nodeToEdit getOrElse NodeEditor.newNode)
 
   val nodeNameField = new TextField() {
-    text <==> node.nameProperty
+    text <==> node().nameProperty
+
+    node onChange { (_, oldNode, newNode) =>
+      text.unbind(oldNode.nameProperty)
+      text <==> newNode.nameProperty
+    }
   }
   val startNodeCheckbox = new CheckBox("Start node") {
     allowIndeterminate = false
 
-    selected <==> node.isStartNodeProperty
+    selected <==> node().isStartNodeProperty
     disable <== selected
   }
   val textRulesTable = new TableView[UiNodeContent.UiRuleset] {
@@ -316,7 +321,7 @@ class NodeEditor private (dialogTitle: String,
                                          RulesetIndexes(TextIndex(start), TextIndex(end)),
                                          Nil)
           firstUnusedRulesetId = firstUnusedRulesetId.dec
-          node.contentProperty().rulesetsProperty() += newRuleset
+          node().contentProperty().rulesetsProperty() += newRuleset
           nodeContentText.setStyle(start,
                                    end,
                                    new LinkStyleInfo(Some(newRuleset)))
@@ -423,9 +428,9 @@ class NodeEditor private (dialogTitle: String,
 
   resultConverter = {
     case ButtonType.OK =>
-      node.contentProperty().textProperty() = nodeContentText.getText
+      node().contentProperty().textProperty() = nodeContentText.getText
       updateNodeContentRulesetsIndexes()
-      node
+      node()
     case _ => null
   }
 
@@ -452,11 +457,11 @@ class NodeEditor private (dialogTitle: String,
       ruleset
     }
 
-    val rulesetsToRemove = node.contentProperty().rulesetsProperty().toList filterNot rulesetsExistingInText.toSet
-    rulesetsToRemove foreach { r => node.contentProperty().rulesetsProperty() -= r }
+    val rulesetsToRemove = node().contentProperty().rulesetsProperty().toList filterNot rulesetsExistingInText.toSet
+    rulesetsToRemove foreach { r => node().contentProperty().rulesetsProperty() -= r }
 
-    val rulesetsToAdd = rulesetsExistingInText filterNot node.contentProperty().rulesetsProperty().toSet
-    rulesetsToAdd foreach { r => node.contentProperty().rulesetsProperty() += r }
+    val rulesetsToAdd = rulesetsExistingInText filterNot node().contentProperty().rulesetsProperty().toSet
+    rulesetsToAdd foreach { r => node().contentProperty().rulesetsProperty() += r }
 
     /**
      * Special case for dealing with issue #8
@@ -468,10 +473,10 @@ class NodeEditor private (dialogTitle: String,
      * This is the only allowed special case in handing rule addition/removal from the text. If any other
      * weird thing pops up, find a general solution, or file an issue against RichTextFX.
      */
-    node.contentProperty().rulesetsProperty() find { r =>
+    node().contentProperty().rulesetsProperty() find { r =>
       r.indexes.startIndex == TextIndex(0) && r.indexes.endIndex == TextIndex(0)
     } foreach { r =>
-      node.contentProperty().rulesetsProperty() -= r
+      node().contentProperty().rulesetsProperty() -= r
       nodeContentText.useInitialStyleForInsertion = true
       nodeContentText.insertText(0, " ")
       nodeContentText.useInitialStyleForInsertion = false
