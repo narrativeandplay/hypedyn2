@@ -508,14 +508,12 @@ object NodeEditor {
 
     override def toString = s"hasRule: ${ruleset.isDefined}"
   }
+  private[this] def linkStyleInfo2Css = { t: LinkStyleInfo => t.css}
 
   /**
    * An extended rich text area to provide some convenience methods
    */
-  class NodeContentTextArea extends InlineStyleTextArea[LinkStyleInfo](new LinkStyleInfo(),
-                                                                       new Function[NodeEditor.LinkStyleInfo, String] {
-                                                                         override def apply(t: LinkStyleInfo): String = t.css
-                                                                       }) {
+  class NodeContentTextArea extends InlineStyleTextArea[LinkStyleInfo](new LinkStyleInfo(), linkStyleInfo2Css) {
     addEventFilter(KeyEvent.KeyTyped, { keyEvent: JfxKeyEvent =>
       if (keyEvent.shiftDown && keyEvent.character == " ") {
         useInitialStyleForInsertion = true
