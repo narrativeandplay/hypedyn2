@@ -538,33 +538,33 @@ object NodeEditor {
       }
     })
 
-    addEventHandler(MouseEvent.MouseClicked, { me: JfxMouseEvent =>
-      if (me.clickCount == 2) {
-        val range = getSelection
-        val selectedText = getSelectedText
+    onMouseClicked = { me =>
+      me.clickCount match {
+        case 1 =>
+          val hasNoSelectedText = getSelectedText == ""
+          val styleAtCaret = styleAt(caretPosition())
+          val selectedPosHasRule = styleAtCaret.ruleset.isDefined
 
-        if (selectedText.startsWith(" ")) {
-          selectRange(range.getStart + 1, range.getEnd)
-        }
-        else if (selectedText.endsWith(" ")) {
-          selectRange(range.getStart, range.getEnd - 1)
-        }
+          if (hasNoSelectedText && selectedPosHasRule) {
+            val rulesetIndexes = styleAtCaret.ruleset.get.indexes
+            val ruleRange = new IndexRange(rulesetIndexes.startIndex.index.toInt,
+                                           rulesetIndexes.endIndex.index.toInt)
+
+            selectRange(ruleRange.start, ruleRange.end)
+          }
+        case 2 =>
+          val range = getSelection
+          val selectedText = getSelectedText
+
+          if (selectedText.startsWith(" ")) {
+            selectRange(range.getStart + 1, range.getEnd)
+          }
+          else if (selectedText.endsWith(" ")) {
+            selectRange(range.getStart, range.getEnd - 1)
+          }
+        case _ =>
       }
-    })
-
-    setOnMouseClicked({ mouseEvent: JfxMouseEvent =>
-      val hasNoSelectedText = getSelectedText == ""
-      val styleAtCaret = styleAt(caretPosition())
-      val selectedPosHasRule = styleAtCaret.ruleset.isDefined
-
-      if (hasNoSelectedText && selectedPosHasRule) {
-        val rulesetIndexes = styleAtCaret.ruleset.get.indexes
-        val ruleRange = new IndexRange(rulesetIndexes.startIndex.index.toInt,
-                                       rulesetIndexes.endIndex.index.toInt)
-
-        selectRange(ruleRange.start, ruleRange.end)
-      }
-    })
+    }
 
     /**
      * Returns all the style spans in the text
