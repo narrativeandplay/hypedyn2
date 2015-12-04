@@ -590,5 +590,12 @@ object NodeEditor {
     def caretPosition = caretPositionProperty()
 
     def text = textProperty()
+
+    def onMouseClicked = { me: MouseEvent => getOnMouseClicked.handle(me) }
+    def onMouseClicked_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: T => Unit)(implicit jfx2sfx: U => T) = {
+      setOnMouseClicked(new EventHandler[U] {
+        override def handle(event: U): Unit = lambda(event)
+      })
+    }
   }
 }
