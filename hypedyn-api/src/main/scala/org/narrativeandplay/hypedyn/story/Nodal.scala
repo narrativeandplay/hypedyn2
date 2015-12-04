@@ -54,6 +54,16 @@ case class NodeId(value: BigInt) extends AnyVal with Ordered[NodeId] {
   def inc = increment
 
   /**
+   * Returns a FactId which has it's value decremented by one from the original
+   */
+  def decrement = new NodeId(value - 1)
+
+  /**
+   * An alias for `decrement`
+   */
+  def dec = decrement
+
+  /**
    * Returns true if the FactId is valid, false otherwise
    *
    * A valid node id is one whose value is greater than or equal to 0
