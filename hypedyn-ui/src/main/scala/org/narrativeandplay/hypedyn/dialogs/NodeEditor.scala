@@ -494,6 +494,12 @@ class NodeEditor private (dialogTitle: String,
 }
 
 object NodeEditor {
+  private[this] var firstUnusedNodeId = NodeId(-1)
+  private def newNode = {
+    val newNode = new UiNode(firstUnusedNodeId, "New Node", new UiNodeContent("", Nil), false, Nil)
+    firstUnusedNodeId = firstUnusedNodeId.dec
+    newNode
+  }
 
   /**
    * Style class for styling node text, as well as attaching user data (the ruleset for a span of text)
