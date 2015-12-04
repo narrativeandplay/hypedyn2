@@ -56,7 +56,7 @@ object CoreEventDispatcher {
 
     UndoableStream.send(new NodeCreatedChange(created, Map.empty))
 
-    EventBus.send(NodeCreated(created, CoreEventSourceIdentity))
+    EventBus.send(NodeCreated(evt.node, created, CoreEventSourceIdentity))
     EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
   }
   EventBus.UpdateNodeEvents foreach { evt =>

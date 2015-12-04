@@ -134,7 +134,7 @@ sealed case class UpdateStoryProperties(title: String,
  * Generally sent by the core
  */
 sealed trait Completion extends Event
-sealed case class NodeCreated(node: Nodal, src: String) extends Completion
+sealed case class NodeCreated(originalNodeData: Nodal, node: Nodal, src: String) extends Completion
 sealed case class NodeUpdated(node: Nodal, updatedNode: Nodal, src: String) extends Completion
 sealed case class NodeDestroyed(node: Nodal, src: String) extends Completion
 
