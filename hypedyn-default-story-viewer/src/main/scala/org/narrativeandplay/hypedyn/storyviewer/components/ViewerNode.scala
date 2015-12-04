@@ -161,10 +161,11 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
     val widthVector = Vector2(width / 2, 0d)
     val heightVector = Vector2(0d, height / 2)
 
-    Map("left" -> (centre - widthVector),
-        "right" -> (centre + widthVector),
-        "top" -> (centre - heightVector),
-        "bottom" -> (centre + heightVector))
+    import ViewerNode.Edge._
+    Map(Left -> (centre - widthVector),
+        Right -> (centre + widthVector),
+        Top -> (centre - heightVector),
+        Bottom -> (centre + heightVector))
   }
 
   override def toString: String = s"ViewerNode id: $id, name: ${nodeName.getValue}"
@@ -213,4 +214,12 @@ object ViewerNode {
   private val Width = 190d
   private val Height = 170d
   private val DefaultLocation = Vector2(100d, 100d)
+
+  sealed trait Edge
+  object Edge {
+    case object Left extends Edge
+    case object Right extends Edge
+    case object Top extends Edge
+    case object Bottom extends Edge
+  }
 }

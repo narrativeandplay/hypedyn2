@@ -72,8 +72,8 @@ class Link(val from: ViewerNode,
       }
     }
 
-    endPointPairs minBy (_._5) match { case minPtPair @ (_, fromCoords, _, toCoords, length) =>
-      (fromCoords, toCoords, length)
+    endPointPairs minBy (_._5) match { case minPtPair @ (_, fromCoords, _, toCoords, _) =>
+      (fromCoords, toCoords)
     }
   }
 
@@ -139,7 +139,7 @@ class Link(val from: ViewerNode,
   def path = {
     val edgeGroupIndex = parentLinkGroup.indexOf(this)
 
-    val (startPoint, endPoint, _) = endPoints
+    val (startPoint, endPoint) = endPoints
 
     val x = parentLinkGroup.size
     val y = (endPoint - startPoint).length / 100
@@ -150,7 +150,7 @@ class Link(val from: ViewerNode,
     val m = edgeGroupIndex + (if (from eq mainEdge.from) 0 else 1)
 
     var v = endPoint - startPoint
-    var v2 = 0.6 *: Vector2(v.y, -v.x) //rotate v 90 deg anti-clockwise
+    var v2 = 0.6 *: (v rotate 90)
     var o = Vector2(0d, 0d)
 
     v *= 0.2
