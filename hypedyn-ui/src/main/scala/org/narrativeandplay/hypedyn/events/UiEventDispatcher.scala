@@ -22,7 +22,7 @@ import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
  */
 object UiEventDispatcher {
   val UiEventSourceIdentity = "UI"
-  val selectedNode = ObjectProperty[Option[NodeId]](None)
+  val selectedNode = ObjectProperty(Option.empty[NodeId])
   private val openedNodeEditors = ArrayBuffer.empty[NodeEditor]
   val isStoryEdited = BooleanProperty(false)
   val undoAvailable = BooleanProperty(false)

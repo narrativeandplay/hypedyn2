@@ -243,7 +243,7 @@ class NodeEditor private (dialogTitle: String,
     columns += removeButtonColumn
 
     nodeContentText.selection onChange { (_, _, selectedRange) =>
-      val foldedStyleSpans = nodeContentText.styleSpansAt(selectedRange).foldLeft(Nil: List[StyleSpan[LinkStyleInfo]]) {
+      val foldedStyleSpans = nodeContentText.styleSpansAt(selectedRange).foldLeft(List.empty[StyleSpan[LinkStyleInfo]]) {
         case (resList @ headSpan :: tail, currSpan) =>
           if (headSpan == currSpan) resList else currSpan :: resList
         case (Nil, currSpan) => currSpan :: Nil
@@ -439,7 +439,7 @@ class NodeEditor private (dialogTitle: String,
    */
   def updateNodeContentRulesetsIndexes(): Unit = {
     import NodalContent._
-    val spans = nodeContentText.styleSpans.scanLeft((0, 0, None: Option[UiRuleset])) {
+    val spans = nodeContentText.styleSpans.scanLeft((0, 0, Option.empty[UiRuleset])) {
       case ((_, end, rulesetOption), styleSpan) =>
         (end, end + styleSpan.getLength, styleSpan.getStyle.ruleset)
     }

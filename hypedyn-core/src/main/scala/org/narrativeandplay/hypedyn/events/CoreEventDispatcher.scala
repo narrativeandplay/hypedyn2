@@ -21,7 +21,7 @@ object CoreEventDispatcher {
   /**
    * Keeps track of whether there is a story loaded via a file load
    */
-  private var loadedFile: Option[File] = None
+  private var loadedFile = Option.empty[File]
 
   EventBus.NewNodeRequests foreach { _ =>
     EventBus.send(NewNodeResponse(StoryController.story, ConditionDefinitions(), ActionDefinitions(), CoreEventSourceIdentity))
