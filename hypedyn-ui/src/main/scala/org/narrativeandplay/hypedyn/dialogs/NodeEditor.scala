@@ -1,14 +1,16 @@
 package org.narrativeandplay.hypedyn.dialogs
 
-import java.util.function.Function
-import javafx.event.EventHandler
-import javafx.scene.control.{TableCell => JfxTableCell, IndexRange => JfxIndexRange}
-import javafx.scene.input.{KeyCode => JfxKeyCode, KeyEvent => JfxKeyEvent, MouseEvent => JfxMouseEvent}
-import javafx.stage.Stage
+import javafx.collections.ObservableList
+import javafx.{event => jfxe}
+import javafx.event.{ActionEvent => JfxActionEvent, EventHandler}
+import javafx.scene.control.{IndexRange => JfxIndexRange}
+import javafx.scene.{input => jfxsi}
+import javafx.scene.input.{KeyEvent => JfxKeyEvent}
 
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
+import scalafx.event.{Event, ActionEvent}
 import scalafx.geometry.{Pos, Insets, Orientation}
 import scalafx.scene.control._
 import scalafx.scene.input.{MouseEvent, KeyEvent}
@@ -21,6 +23,7 @@ import org.fxmisc.easybind.EasyBind
 import org.fxmisc.richtext.{StyleSpan, InlineStyleTextArea}
 
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor.{NodeContentTextArea, LinkStyleInfo}
+import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 import org.narrativeandplay.hypedyn.story.NodalContent.{RulesetId, TextIndex, RulesetIndexes}
 import org.narrativeandplay.hypedyn.story.UiNodeContent.UiRuleset
 import org.narrativeandplay.hypedyn.story._
@@ -94,123 +97,94 @@ class NodeEditor private (dialogTitle: String,
 
   dialogPane().setPrefSize(1280, 800)
 
-  dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
-
-  dialogPane().scene().window().focused onChange { (_, _, f) =>
-    Option(f) foreach { isFocused =>
-      if (isFocused) dialogPane().scene().window().asInstanceOf[Stage].toFront()
-    }
-  }
+  dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Apply, ButtonType.Cancel)
+  private[this] val okButton: Button = dialogPane().lookupButton(ButtonType.OK).asInstanceOf[javafx.scene.control.Button]
+  private[this] val applyButton: Button = dialogPane().lookupButton(ButtonType.Apply).asInstanceOf[javafx.scene.control.Button]
 
   val story: ObjectProperty[UiStory] = ObjectProperty(narrative)
-  val node: UiNode = nodeToEdit getOrElse new UiNode(NodeId(-1), "New Node", new UiNodeContent("", Nil), false, Nil)
+  val node: ObjectProperty[UiNode] = ObjectProperty(nodeToEdit getOrElse NodeEditor.newNode)
+  private[this] val monadicNode = EasyBind monadic node
+
+  private var updateFunc = UiEventDispatcher.updateNode(node()) _
+  node onChange { (_, _, newNode) =>
+    updateFunc = UiEventDispatcher.updateNode(node())
+  }
+
+  okButton.addEventFilter(ActionEvent.Any, { ae: JfxActionEvent =>
+    node().contentProperty().textProperty() = nodeContentText.getText
+    updateNodeContentRulesetsIndexes()
+
+    if (node().id.isValid) {
+      updateFunc(node())
+    }
+    else {
+      UiEventDispatcher.createNode(node())
+    }
+
+    result = node()
+    ae.consume()
+  })
+  applyButton.addEventFilter(ActionEvent.Any, { ae: JfxActionEvent =>
+    node().contentProperty().textProperty() = nodeContentText.getText
+    updateNodeContentRulesetsIndexes()
+
+    if (node().id.isValid) {
+      updateFunc(node())
+    }
+    else {
+      UiEventDispatcher.createNode(node())
+    }
+    ae.consume()
+  })
 
   val nodeNameField = new TextField() {
-    text <==> node.nameProperty
+    text <==> node().nameProperty
+
+    node onChange { (_, oldNode, newNode) =>
+      text.unbind(oldNode.nameProperty)
+      text <==> newNode.nameProperty
+    }
   }
   val startNodeCheckbox = new CheckBox("Start node") {
     allowIndeterminate = false
 
-    selected <==> node.isStartNodeProperty
+    selected <==> node().isStartNodeProperty
     disable <== selected
-  }
-  val textRulesTable = new TableView[UiNodeContent.UiRuleset] {
-    val tableWidth = width
 
-    val rulesetColumn = new TableColumn[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset]("RulesetName") {
-      cellValueFactory = { v => ObjectProperty(v.value) }
-
-      cellFactory = { _: javafx.scene.control.TableColumn[UiRuleset, UiRuleset] =>
-        new JfxTableCell[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset] {
-          override def startEdit(): Unit = {
-            super.startEdit()
-
-            val nameField = new TextField {
-              text = itemProperty().get().name
-
-              onKeyReleased = new EventHandler[JfxKeyEvent] {
-                override def handle(event: JfxKeyEvent): Unit = event.getCode match {
-                  case JfxKeyCode.ENTER =>
-                    if (!text().trim.isEmpty) {
-                      itemProperty().get.nameProperty() = text()
-                      commitEdit(itemProperty().get())
-                    }
-                    else {
-                      cancelEdit()
-                    }
-                  case JfxKeyCode.ESCAPE => cancelEdit()
-                  case _ =>
-                }
-              }
-
-              focused onChange { (_, _, isFocused) =>
-                if (!isFocused) {
-                  itemProperty().get.nameProperty() = text()
-                  commitEdit(itemProperty().get())
-                }
-              }
-            }
-
-            setText("")
-            setGraphic(nameField)
-          }
-
-          override def commitEdit(newValue: UiRuleset): Unit = {
-            super.commitEdit(newValue)
-
-            setText(newValue.name)
-            setGraphic(null)
-          }
-
-          override def cancelEdit(): Unit = {
-            super.cancelEdit()
-
-            setGraphic(null)
-          }
-
-          override def updateItem(item: UiRuleset, empty: Boolean): Unit = {
-            super.updateItem(item, empty)
-
-            if (!empty && item != null) {
-              setText(item.name)
-            }
-            else {
-              setText("")
-            }
-          }
-        }
-      }
-
-      // Sets the width of this table column to fill the rest of the width
-      // of the table view. The width of the remove button column is 30, and 32 adds a couple of pixels
-      // so that the scroll bar at the bottom of the view doesn't show up
-      prefWidth <== tableWidth - 32
+    node onChange { (_, oldNode, newNode) =>
+      selected.unbind(oldNode.isStartNodeProperty)
+      selected <==> newNode.isStartNodeProperty
     }
-    val removeButtonColumn = new TableColumn[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset]("Delete") {
-      minWidth = 30
-      maxWidth = 30
-      cellValueFactory = { v => ObjectProperty(v.value) }
+  }
 
-      cellFactory = { _: javafx.scene.control.TableColumn[UiRuleset,UiRuleset] =>
-        new JfxTableCell[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset] {
-          val removeButton = new Button("−")
+  val rulesetsList = new ListView[UiRuleset] {
+    cellFactory = { _ =>
+      new ListCell[UiRuleset] {
+        item onChange { (_, _, nullableNewRuleset) =>
+          Option(nullableNewRuleset) match {
+            case Some(ruleset) =>
+              val nameField = new TextField {
+                text <==> ruleset.nameProperty
 
-          override def updateItem(item: UiNodeContent.UiRuleset, empty: Boolean): Unit = {
-            super.updateItem(item, empty)
+                focused onChange { (_, _, nullableIsFocused) =>
+                  Option(nullableIsFocused) foreach { isFocused =>
+                    selectionModel().select(ruleset)
+                  }
+                }
 
-            if (!empty && item != null) {
-              removeButton.onAction = { _ =>
-                node.contentProperty().rulesetsProperty() -= item
-                nodeContentText.setStyle(item.indexes.startIndex.index.toInt,
-                                         item.indexes.endIndex.index.toInt,
-                                         new LinkStyleInfo())
+                HBox.setHgrow(this, Priority.Always)
+              }
+              val removeButton = new Button("−") {
+                onAction = { _ =>
+                  node().contentProperty().rulesetsProperty() -= ruleset
+                  nodeContentText.setStyle(ruleset.indexes.startIndex.index.toInt,
+                                           ruleset.indexes.endIndex.index.toInt,
+                                           new LinkStyleInfo())
+                }
               }
 
-              setGraphic(removeButton)
-            }
-            else {
-              setGraphic(null)
-            }
+              graphic = new HBox(10, nameField, removeButton)
+            case None => graphic = null
           }
         }
       }
@@ -219,6 +193,7 @@ class NodeEditor private (dialogTitle: String,
     selectionModel().selectedItemProperty onChange { (_, _, `new`) =>
       Option(`new`) match {
         case Some(ruleset) =>
+          updateNodeContentRulesetsIndexes()
           nodeContentText.selectRange(ruleset.indexes.startIndex.index.toInt, ruleset.indexes.endIndex.index.toInt)
           textRulesPane.rules() = ruleset.rulesProperty
         case None =>
@@ -228,22 +203,8 @@ class NodeEditor private (dialogTitle: String,
 
     nodeContentText.focused onChange { (_, _, focus) => if (focus) selectionModel().clearSelection() }
 
-    // Hides the header of the table
-    width onChange { (_, _, _) =>
-      val header = lookup("TableHeaderRow").delegate.asInstanceOf[javafx.scene.layout.Pane]
-      if (header.visible()) {
-        header.setMaxHeight(0)
-        header.setMinHeight(0)
-        header.setPrefHeight(0)
-        header.setVisible(false)
-      }
-    }
-
-    columns += rulesetColumn
-    columns += removeButtonColumn
-
     nodeContentText.selection onChange { (_, _, selectedRange) =>
-      val foldedStyleSpans = nodeContentText.styleSpansAt(selectedRange).foldLeft(Nil: List[StyleSpan[LinkStyleInfo]]) {
+      val foldedStyleSpans = nodeContentText.styleSpansAt(selectedRange).foldLeft(List.empty[StyleSpan[LinkStyleInfo]]) {
         case (resList @ headSpan :: tail, currSpan) =>
           if (headSpan == currSpan) resList else currSpan :: resList
         case (Nil, currSpan) => currSpan :: Nil
@@ -260,14 +221,13 @@ class NodeEditor private (dialogTitle: String,
       else selectionModel().clearSelection()
     }
 
-    items <== node.contentProperty().rulesetsProperty
-    editable = true
-    placeholder = new Label("")
+    items <== monadicNode flatMap[UiNodeContent] (_.contentProperty) flatMap[ObservableList[UiRuleset]] (_.rulesetsProperty)
   }
+
   lazy val nodeContentText = new NodeContentTextArea {
     setWrapText(true)
-    replaceText(node.content.text)
-    node.content.rulesetsProperty() foreach { ruleset =>
+    replaceText(node().content.text)
+    node().content.rulesetsProperty() foreach { ruleset =>
       setStyle(ruleset.indexes.startIndex.index.toInt,
                ruleset.indexes.endIndex.index.toInt,
                new LinkStyleInfo(Some(ruleset)))
@@ -275,24 +235,33 @@ class NodeEditor private (dialogTitle: String,
 
     getUndoManager.forgetHistory() // Ensure that the initialisation of the text done above is not undoable
 
-    beingUpdatedProperty onChange { (_, _, beingUpdated) =>
-      if (!beingUpdated) {
-        updateNodeContentRulesetsIndexes()
+    node onChange { (_, _, newNode) =>
+      replaceText(newNode.content.text)
+      setStyle(0, text().length, new LinkStyleInfo()) // Clear text styling before applying text styling from rulesets
+      newNode.content.rulesetsProperty() foreach { ruleset =>
+        setStyle(ruleset.indexes.startIndex.index.toInt,
+                 ruleset.indexes.endIndex.index.toInt,
+                 new LinkStyleInfo(Some(ruleset)))
       }
+
+      getUndoManager.forgetHistory() // Ensure that the initialisation of the text done above is not undoable
     }
   }
+
   lazy val textRulesPane: RulesPane = new RulesPane("Fragment rules",
                                                     conditionDefinitions,
                                                     actionDefinitions filter (_.actionLocationTypes contains NodeContentAction),
                                                     ObservableBuffer.empty,
                                                     story) {
-    disableAddRule <== textRulesTable.selectionModel().selectedItem.isNull
+    disableAddRule <== rulesetsList.selectionModel().selectedItem.isNull
   }
   val nodeRulesPane = new RulesPane("Node rules",
                                     conditionDefinitions,
                                     actionDefinitions filter (_.actionLocationTypes contains NodeAction),
-                                    node.rulesProperty(),
-                                    story)
+                                    node().rulesProperty(),
+                                    story) {
+    rules <== monadicNode flatMap[ObservableList[UiRule]] (_.rulesProperty)
+  }
 
   val rulesetsListVBox = new VBox {
     children += new HBox {
@@ -316,17 +285,17 @@ class NodeEditor private (dialogTitle: String,
                                          RulesetIndexes(TextIndex(start), TextIndex(end)),
                                          Nil)
           firstUnusedRulesetId = firstUnusedRulesetId.dec
-          node.contentProperty().rulesetsProperty() += newRuleset
+          node().contentProperty().rulesetsProperty() += newRuleset
           nodeContentText.setStyle(start,
                                    end,
                                    new LinkStyleInfo(Some(newRuleset)))
-          textRulesTable.selectionModel().select(newRuleset)
+          rulesetsList.selectionModel().select(newRuleset)
         }
       }
     }
-    children += textRulesTable
+    children += rulesetsList
 
-    VBox.setVgrow(textRulesTable, Priority.Always)
+    VBox.setVgrow(rulesetsList, Priority.Always)
   }
   val contentTextAndRulesetsListPane = new CollapsibleSplitPane {
     orientation = Orientation.HORIZONTAL
@@ -423,9 +392,9 @@ class NodeEditor private (dialogTitle: String,
 
   resultConverter = {
     case ButtonType.OK =>
-      node.contentProperty().textProperty() = nodeContentText.getText
+      node().contentProperty().textProperty() = nodeContentText.getText
       updateNodeContentRulesetsIndexes()
-      node
+      node()
     case _ => null
   }
 
@@ -439,7 +408,7 @@ class NodeEditor private (dialogTitle: String,
    */
   def updateNodeContentRulesetsIndexes(): Unit = {
     import NodalContent._
-    val spans = nodeContentText.styleSpans.scanLeft((0, 0, None: Option[UiRuleset])) {
+    val spans = nodeContentText.styleSpans.scanLeft((0, 0, Option.empty[UiRuleset])) {
       case ((_, end, rulesetOption), styleSpan) =>
         (end, end + styleSpan.getLength, styleSpan.getStyle.ruleset)
     }
@@ -452,11 +421,11 @@ class NodeEditor private (dialogTitle: String,
       ruleset
     }
 
-    val rulesetsToRemove = node.contentProperty().rulesetsProperty().toList filterNot rulesetsExistingInText.toSet
-    rulesetsToRemove foreach { r => node.contentProperty().rulesetsProperty() -= r }
+    val rulesetsToRemove = node().contentProperty().rulesetsProperty().toList filterNot rulesetsExistingInText.toSet
+    rulesetsToRemove foreach { r => node().contentProperty().rulesetsProperty() -= r }
 
-    val rulesetsToAdd = rulesetsExistingInText filterNot node.contentProperty().rulesetsProperty().toSet
-    rulesetsToAdd foreach { r => node.contentProperty().rulesetsProperty() += r }
+    val rulesetsToAdd = rulesetsExistingInText filterNot node().contentProperty().rulesetsProperty().toSet
+    rulesetsToAdd foreach { r => node().contentProperty().rulesetsProperty() += r }
 
     /**
      * Special case for dealing with issue #8
@@ -468,10 +437,10 @@ class NodeEditor private (dialogTitle: String,
      * This is the only allowed special case in handing rule addition/removal from the text. If any other
      * weird thing pops up, find a general solution, or file an issue against RichTextFX.
      */
-    node.contentProperty().rulesetsProperty() find { r =>
+    node().contentProperty().rulesetsProperty() find { r =>
       r.indexes.startIndex == TextIndex(0) && r.indexes.endIndex == TextIndex(0)
     } foreach { r =>
-      node.contentProperty().rulesetsProperty() -= r
+      node().contentProperty().rulesetsProperty() -= r
       nodeContentText.useInitialStyleForInsertion = true
       nodeContentText.insertText(0, " ")
       nodeContentText.useInitialStyleForInsertion = false
@@ -494,6 +463,12 @@ class NodeEditor private (dialogTitle: String,
 }
 
 object NodeEditor {
+  private[this] var firstUnusedNodeId = NodeId(-1)
+  private def newNode = {
+    val newNode = new UiNode(firstUnusedNodeId, "New Node", new UiNodeContent("", Nil), false, Nil)
+    firstUnusedNodeId = firstUnusedNodeId.dec
+    newNode
+  }
 
   /**
    * Style class for styling node text, as well as attaching user data (the ruleset for a span of text)
@@ -508,14 +483,12 @@ object NodeEditor {
 
     override def toString = s"hasRule: ${ruleset.isDefined}"
   }
+  private[this] def linkStyleInfo2Css = { t: LinkStyleInfo => t.css}
 
   /**
    * An extended rich text area to provide some convenience methods
    */
-  class NodeContentTextArea extends InlineStyleTextArea[LinkStyleInfo](new LinkStyleInfo(),
-                                                                       new Function[NodeEditor.LinkStyleInfo, String] {
-                                                                         override def apply(t: LinkStyleInfo): String = t.css
-                                                                       }) {
+  class NodeContentTextArea extends InlineStyleTextArea[LinkStyleInfo](new LinkStyleInfo(), linkStyleInfo2Css) {
     addEventFilter(KeyEvent.KeyTyped, { keyEvent: JfxKeyEvent =>
       if (keyEvent.shiftDown && keyEvent.character == " ") {
         useInitialStyleForInsertion = true
@@ -534,33 +507,33 @@ object NodeEditor {
       }
     })
 
-    addEventHandler(MouseEvent.MouseClicked, { me: JfxMouseEvent =>
-      if (me.clickCount == 2) {
-        val range = getSelection
-        val selectedText = getSelectedText
+    onMouseClicked = { me =>
+      me.clickCount match {
+        case 1 =>
+          val hasNoSelectedText = getSelectedText == ""
+          val styleAtCaret = styleAt(caretPosition())
+          val selectedPosHasRule = styleAtCaret.ruleset.isDefined
 
-        if (selectedText.startsWith(" ")) {
-          selectRange(range.getStart + 1, range.getEnd)
-        }
-        else if (selectedText.endsWith(" ")) {
-          selectRange(range.getStart, range.getEnd - 1)
-        }
+          if (hasNoSelectedText && selectedPosHasRule) {
+            val rulesetIndexes = styleAtCaret.ruleset.get.indexes
+            val ruleRange = new IndexRange(rulesetIndexes.startIndex.index.toInt,
+                                           rulesetIndexes.endIndex.index.toInt)
+
+            selectRange(ruleRange.start, ruleRange.end)
+          }
+        case 2 =>
+          val range = getSelection
+          val selectedText = getSelectedText
+
+          if (selectedText.startsWith(" ")) {
+            selectRange(range.getStart + 1, range.getEnd)
+          }
+          else if (selectedText.endsWith(" ")) {
+            selectRange(range.getStart, range.getEnd - 1)
+          }
+        case _ =>
       }
-    })
-
-    setOnMouseClicked({ mouseEvent: JfxMouseEvent =>
-      val hasNoSelectedText = getSelectedText == ""
-      val styleAtCaret = styleAt(caretPosition())
-      val selectedPosHasRule = styleAtCaret.ruleset.isDefined
-
-      if (hasNoSelectedText && selectedPosHasRule) {
-        val rulesetIndexes = styleAtCaret.ruleset.get.indexes
-        val ruleRange = new IndexRange(rulesetIndexes.startIndex.index.toInt,
-                                       rulesetIndexes.endIndex.index.toInt)
-
-        selectRange(ruleRange.start, ruleRange.end)
-      }
-    })
+    }
 
     /**
      * Returns all the style spans in the text
@@ -584,8 +557,6 @@ object NodeEditor {
 
     def styleAt(position: Int) = getStyleAtPosition(position)
 
-    def styleRangeAt(position: Int) = getStyleRangeAtPosition(position)
-
     def useInitialStyleForInsertion = useInitialStyleForInsertionProperty()
     def useInitialStyleForInsertion_=(value: Boolean) = setUseInitialStyleForInsertion(value)
 
@@ -594,5 +565,12 @@ object NodeEditor {
     def caretPosition = caretPositionProperty()
 
     def text = textProperty()
+
+    def onMouseClicked = { me: MouseEvent => getOnMouseClicked.handle(me) }
+    def onMouseClicked_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: T => Unit)(implicit jfx2sfx: U => T) = {
+      setOnMouseClicked(new EventHandler[U] {
+        override def handle(event: U): Unit = lambda(event)
+      })
+    }
   }
 }

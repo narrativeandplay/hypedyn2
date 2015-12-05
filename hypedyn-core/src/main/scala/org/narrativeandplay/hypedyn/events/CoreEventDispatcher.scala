@@ -21,7 +21,7 @@ object CoreEventDispatcher {
   /**
    * Keeps track of whether there is a story loaded via a file load
    */
-  private var loadedFile: Option[File] = None
+  private var loadedFile = Option.empty[File]
 
   EventBus.NewNodeRequests foreach { _ =>
     EventBus.send(NewNodeResponse(StoryController.story, ConditionDefinitions(), ActionDefinitions(), CoreEventSourceIdentity))
@@ -56,7 +56,7 @@ object CoreEventDispatcher {
 
     UndoableStream.send(new NodeCreatedChange(created, Map.empty))
 
-    EventBus.send(NodeCreated(created, CoreEventSourceIdentity))
+    EventBus.send(NodeCreated(evt.node, created, CoreEventSourceIdentity))
     EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
   }
   EventBus.UpdateNodeEvents foreach { evt =>

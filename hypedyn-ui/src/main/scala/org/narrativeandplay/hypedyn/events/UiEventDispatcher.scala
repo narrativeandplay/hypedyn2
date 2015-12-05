@@ -11,7 +11,7 @@ import rx.lang.scala.Observable
 import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
-import org.narrativeandplay.hypedyn.story.NodeId
+import org.narrativeandplay.hypedyn.story.{Nodal, NodeId}
 import org.narrativeandplay.hypedyn.uicomponents.FactViewer
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 
@@ -22,7 +22,7 @@ import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
  */
 object UiEventDispatcher {
   val UiEventSourceIdentity = "UI"
-  val selectedNode = ObjectProperty[Option[NodeId]](None)
+  val selectedNode = ObjectProperty(Option.empty[NodeId])
   private val openedNodeEditors = ArrayBuffer.empty[NodeEditor]
   val isStoryEdited = BooleanProperty(false)
   val undoAvailable = BooleanProperty(false)
@@ -30,14 +30,6 @@ object UiEventDispatcher {
 
   EventBus.NewNodeResponses foreach { response =>
     val editor = Main.nodeEditor("New Node", response.conditionDefinitions, response.actionDefinitions, response.story)
-
-    editor.result onChange { (_, _, newNode) =>
-      // The onChange listener takes 3 values: the observable whose value changes, the old value of the observable,
-      // and the new value of the observable. Due to ScalaFX not properly wrapping JavaFX, and there being no guarantee
-      // from JavaFX that the new value will not be null, the new value is first wrapped into an Option for null-safety,
-      // then processed.
-      Option(newNode) foreach { n => EventBus.send(CreateNode(n, UiEventSourceIdentity)) }
-    }
 
     editor.onCloseRequest = { _ =>
       openedNodeEditors -= editor
@@ -47,20 +39,10 @@ object UiEventDispatcher {
     editor.show()
   }
   EventBus.EditNodeResponses foreach { response =>
-    openedNodeEditors find (_.node.id == response.node.id) match {
+    openedNodeEditors find (_.node().id == response.node.id) match {
       case Some(editor) => editor.dialogPane().scene().window().requestFocus()
       case None =>
         val editor = Main.nodeEditor("Edit Node", response.conditionDefinitions, response.actionDefinitions, response.story, response.node)
-
-        editor.result onChange { (_, _, editedNode) =>
-          // The onChange listener takes 3 values: the observable whose value changes, the old value of the observable,
-          // and the new value of the observable. Due to ScalaFX not properly wrapping JavaFX, and there being no guarantee
-          // from JavaFX that the new value will not be null, the new value is first wrapped into an Option for null-safety,
-          // then processed.
-          Option(editedNode) foreach { n =>
-            EventBus.send(UpdateNode(response.node, n, UiEventSourceIdentity))
-          }
-        }
 
         editor.onCloseRequest = { _ =>
           openedNodeEditors -= editor
@@ -141,8 +123,14 @@ object UiEventDispatcher {
     }
   }
 
+  EventBus.NodeCreatedEvents foreach { evt =>
+    openedNodeEditors find (_.node().id == evt.originalNodeData.id) foreach (_.node() = evt.node)
+  }
+  EventBus.NodeUpdatedEvents foreach { evt =>
+    openedNodeEditors find (_.node().id == evt.node.id) foreach (_.node() = evt.updatedNode)
+  }
   EventBus.NodeDestroyedEvents foreach { evt =>
-    openedNodeEditors find (_.node.id == evt.node.id) foreach (_.close())
+    openedNodeEditors find (_.node().id == evt.node.id) foreach (_.close())
   }
 
   EventBus.UiNodeSelectedEvents foreach { evt => selectedNode() = Some(evt.id) }
@@ -229,6 +217,13 @@ object UiEventDispatcher {
   }
   def requestRedo(): Unit = {
     EventBus.send(RedoRequest(UiEventSourceIdentity))
+  }
+
+  def createNode(newNode: Nodal): Unit = {
+    EventBus.send(CreateNode(newNode, UiEventSourceIdentity))
+  }
+  def updateNode(originalNode: Nodal)(editedNode: Nodal): Unit = {
+    EventBus.send(UpdateNode(originalNode, editedNode, UiEventSourceIdentity))
   }
 
   /**
