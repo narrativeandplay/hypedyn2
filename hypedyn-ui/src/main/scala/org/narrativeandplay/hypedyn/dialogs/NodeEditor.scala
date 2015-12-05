@@ -111,9 +111,12 @@ class NodeEditor private (dialogTitle: String,
 
     selected <==> node().isStartNodeProperty
     disable <== selected
-  }
 
+    node onChange { (_, oldNode, newNode) =>
+      selected.unbind(oldNode.isStartNodeProperty)
+      selected <==> newNode.isStartNodeProperty
     }
+  }
 
   val rulesetsList = new ListView[UiRuleset] {
     cellFactory = { _ =>
@@ -184,8 +187,8 @@ class NodeEditor private (dialogTitle: String,
 
   lazy val nodeContentText = new NodeContentTextArea {
     setWrapText(true)
-    replaceText(node.content.text)
-    node.content.rulesetsProperty() foreach { ruleset =>
+    replaceText(node().content.text)
+    node().content.rulesetsProperty() foreach { ruleset =>
       setStyle(ruleset.indexes.startIndex.index.toInt,
                ruleset.indexes.endIndex.index.toInt,
                new LinkStyleInfo(Some(ruleset)))
@@ -196,9 +199,18 @@ class NodeEditor private (dialogTitle: String,
     beingUpdatedProperty onChange { (_, _, beingUpdated) =>
       if (!beingUpdated) {
         updateNodeContentRulesetsIndexes()
+    node onChange { (_, _, newNode) =>
+      replaceText(newNode.content.text)
+      newNode.content.rulesetsProperty() foreach { ruleset =>
+        setStyle(ruleset.indexes.startIndex.index.toInt,
+                 ruleset.indexes.endIndex.index.toInt,
+                 new LinkStyleInfo(Some(ruleset)))
       }
+
+      getUndoManager.forgetHistory() // Ensure that the initialisation of the text done above is not undoable
     }
   }
+
   lazy val textRulesPane: RulesPane = new RulesPane("Fragment rules",
                                                     conditionDefinitions,
                                                     actionDefinitions filter (_.actionLocationTypes contains NodeContentAction),
@@ -209,8 +221,10 @@ class NodeEditor private (dialogTitle: String,
   val nodeRulesPane = new RulesPane("Node rules",
                                     conditionDefinitions,
                                     actionDefinitions filter (_.actionLocationTypes contains NodeAction),
-                                    node.rulesProperty(),
-                                    story)
+                                    node().rulesProperty(),
+                                    story) {
+    rules <== monadicNode flatMap[ObservableList[UiRule]] (_.rulesProperty)
+  }
 
   val rulesetsListVBox = new VBox {
     children += new HBox {
