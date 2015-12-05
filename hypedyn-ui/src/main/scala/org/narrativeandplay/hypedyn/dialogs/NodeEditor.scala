@@ -112,103 +112,37 @@ class NodeEditor private (dialogTitle: String,
     selected <==> node().isStartNodeProperty
     disable <== selected
   }
-  val textRulesTable = new TableView[UiNodeContent.UiRuleset] {
-    val tableWidth = width
 
-    val rulesetColumn = new TableColumn[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset]("RulesetName") {
-      cellValueFactory = { v => ObjectProperty(v.value) }
-
-      cellFactory = { _: javafx.scene.control.TableColumn[UiRuleset, UiRuleset] =>
-        new JfxTableCell[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset] {
-          override def startEdit(): Unit = {
-            super.startEdit()
-
-            val nameField = new TextField {
-              text = itemProperty().get().name
-
-              onKeyReleased = new EventHandler[JfxKeyEvent] {
-                override def handle(event: JfxKeyEvent): Unit = event.getCode match {
-                  case JfxKeyCode.ENTER =>
-                    if (!text().trim.isEmpty) {
-                      itemProperty().get.nameProperty() = text()
-                      commitEdit(itemProperty().get())
-                    }
-                    else {
-                      cancelEdit()
-                    }
-                  case JfxKeyCode.ESCAPE => cancelEdit()
-                  case _ =>
-                }
-              }
-
-              focused onChange { (_, _, isFocused) =>
-                if (!isFocused) {
-                  itemProperty().get.nameProperty() = text()
-                  commitEdit(itemProperty().get())
-                }
-              }
-            }
-
-            setText("")
-            setGraphic(nameField)
-          }
-
-          override def commitEdit(newValue: UiRuleset): Unit = {
-            super.commitEdit(newValue)
-
-            setText(newValue.name)
-            setGraphic(null)
-          }
-
-          override def cancelEdit(): Unit = {
-            super.cancelEdit()
-
-            setGraphic(null)
-          }
-
-          override def updateItem(item: UiRuleset, empty: Boolean): Unit = {
-            super.updateItem(item, empty)
-
-            if (!empty && item != null) {
-              setText(item.name)
-            }
-            else {
-              setText("")
-            }
-          }
-        }
-      }
-
-      // Sets the width of this table column to fill the rest of the width
-      // of the table view. The width of the remove button column is 30, and 32 adds a couple of pixels
-      // so that the scroll bar at the bottom of the view doesn't show up
-      prefWidth <== tableWidth - 32
     }
-    val removeButtonColumn = new TableColumn[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset]("Delete") {
-      minWidth = 30
-      maxWidth = 30
-      cellValueFactory = { v => ObjectProperty(v.value) }
 
-      cellFactory = { _: javafx.scene.control.TableColumn[UiRuleset,UiRuleset] =>
-        new JfxTableCell[UiNodeContent.UiRuleset, UiNodeContent.UiRuleset] {
-          val removeButton = new Button("−")
+  val rulesetsList = new ListView[UiRuleset] {
+    cellFactory = { _ =>
+      new ListCell[UiRuleset] {
+        item onChange { (_, _, nullableNewRuleset) =>
+          Option(nullableNewRuleset) match {
+            case Some(ruleset) =>
+              val nameField = new TextField {
+                text <==> ruleset.nameProperty
 
-          override def updateItem(item: UiNodeContent.UiRuleset, empty: Boolean): Unit = {
-            super.updateItem(item, empty)
+                focused onChange { (_, _, nullableIsFocused) =>
+                  Option(nullableIsFocused) foreach { isFocused =>
+                    selectionModel().select(ruleset)
+                  }
+                }
 
-            if (!empty && item != null) {
-              removeButton.onAction = { _ =>
-                node.contentProperty().rulesetsProperty() -= item
-                nodeContentText.setStyle(item.indexes.startIndex.index.toInt,
-                                         item.indexes.endIndex.index.toInt,
-                                         new LinkStyleInfo())
+                HBox.setHgrow(this, Priority.Always)
+              }
+              val removeButton = new Button("−") {
+                onAction = { _ =>
+                  node().contentProperty().rulesetsProperty() -= ruleset
+                  nodeContentText.setStyle(ruleset.indexes.startIndex.index.toInt,
+                                           ruleset.indexes.endIndex.index.toInt,
+                                           new LinkStyleInfo())
+                }
               }
 
-              setGraphic(removeButton)
-            }
-            else {
-              setGraphic(null)
-            }
+              graphic = new HBox(10, nameField, removeButton)
+            case None => graphic = null
           }
         }
       }
@@ -217,6 +151,7 @@ class NodeEditor private (dialogTitle: String,
     selectionModel().selectedItemProperty onChange { (_, _, `new`) =>
       Option(`new`) match {
         case Some(ruleset) =>
+          updateNodeContentRulesetsIndexes()
           nodeContentText.selectRange(ruleset.indexes.startIndex.index.toInt, ruleset.indexes.endIndex.index.toInt)
           textRulesPane.rules() = ruleset.rulesProperty
         case None =>
@@ -225,20 +160,6 @@ class NodeEditor private (dialogTitle: String,
     }
 
     nodeContentText.focused onChange { (_, _, focus) => if (focus) selectionModel().clearSelection() }
-
-    // Hides the header of the table
-    width onChange { (_, _, _) =>
-      val header = lookup("TableHeaderRow").delegate.asInstanceOf[javafx.scene.layout.Pane]
-      if (header.visible()) {
-        header.setMaxHeight(0)
-        header.setMinHeight(0)
-        header.setPrefHeight(0)
-        header.setVisible(false)
-      }
-    }
-
-    columns += rulesetColumn
-    columns += removeButtonColumn
 
     nodeContentText.selection onChange { (_, _, selectedRange) =>
       val foldedStyleSpans = nodeContentText.styleSpansAt(selectedRange).foldLeft(List.empty[StyleSpan[LinkStyleInfo]]) {
@@ -258,10 +179,9 @@ class NodeEditor private (dialogTitle: String,
       else selectionModel().clearSelection()
     }
 
-    items <== node.contentProperty().rulesetsProperty
-    editable = true
-    placeholder = new Label("")
+    items <== monadicNode flatMap[UiNodeContent] (_.contentProperty) flatMap[ObservableList[UiRuleset]] (_.rulesetsProperty)
   }
+
   lazy val nodeContentText = new NodeContentTextArea {
     setWrapText(true)
     replaceText(node.content.text)
@@ -284,7 +204,7 @@ class NodeEditor private (dialogTitle: String,
                                                     actionDefinitions filter (_.actionLocationTypes contains NodeContentAction),
                                                     ObservableBuffer.empty,
                                                     story) {
-    disableAddRule <== textRulesTable.selectionModel().selectedItem.isNull
+    disableAddRule <== rulesetsList.selectionModel().selectedItem.isNull
   }
   val nodeRulesPane = new RulesPane("Node rules",
                                     conditionDefinitions,
@@ -318,13 +238,13 @@ class NodeEditor private (dialogTitle: String,
           nodeContentText.setStyle(start,
                                    end,
                                    new LinkStyleInfo(Some(newRuleset)))
-          textRulesTable.selectionModel().select(newRuleset)
+          rulesetsList.selectionModel().select(newRuleset)
         }
       }
     }
-    children += textRulesTable
+    children += rulesetsList
 
-    VBox.setVgrow(textRulesTable, Priority.Always)
+    VBox.setVgrow(rulesetsList, Priority.Always)
   }
   val contentTextAndRulesetsListPane = new CollapsibleSplitPane {
     orientation = Orientation.HORIZONTAL
