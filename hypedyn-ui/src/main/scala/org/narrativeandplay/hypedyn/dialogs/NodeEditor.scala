@@ -94,13 +94,6 @@ class NodeEditor private (dialogTitle: String,
 
   dialogPane().setPrefSize(1280, 800)
 
-  dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
-
-  dialogPane().scene().window().focused onChange { (_, _, f) =>
-    Option(f) foreach { isFocused =>
-      if (isFocused) dialogPane().scene().window().asInstanceOf[Stage].toFront()
-    }
-  }
 
   val story: ObjectProperty[UiStory] = ObjectProperty(narrative)
   val node: ObjectProperty[UiNode] = ObjectProperty(nodeToEdit getOrElse NodeEditor.newNode)
