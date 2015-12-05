@@ -11,7 +11,7 @@ import rx.lang.scala.Observable
 import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
-import org.narrativeandplay.hypedyn.story.NodeId
+import org.narrativeandplay.hypedyn.story.{Nodal, NodeId}
 import org.narrativeandplay.hypedyn.uicomponents.FactViewer
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 
@@ -123,8 +123,14 @@ object UiEventDispatcher {
     }
   }
 
+  EventBus.NodeCreatedEvents foreach { evt =>
+    openedNodeEditors find (_.node().id == evt.originalNodeData.id) foreach (_.node() = evt.node)
+  }
+  EventBus.NodeUpdatedEvents foreach { evt =>
+    openedNodeEditors find (_.node().id == evt.node.id) foreach (_.node() = evt.updatedNode)
+  }
   EventBus.NodeDestroyedEvents foreach { evt =>
-    openedNodeEditors find (_.node.id == evt.node.id) foreach (_.close())
+    openedNodeEditors find (_.node().id == evt.node.id) foreach (_.close())
   }
 
   EventBus.UiNodeSelectedEvents foreach { evt => selectedNode() = Some(evt.id) }
