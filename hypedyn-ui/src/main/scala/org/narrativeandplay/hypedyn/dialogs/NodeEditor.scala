@@ -196,9 +196,6 @@ class NodeEditor private (dialogTitle: String,
 
     getUndoManager.forgetHistory() // Ensure that the initialisation of the text done above is not undoable
 
-    beingUpdatedProperty onChange { (_, _, beingUpdated) =>
-      if (!beingUpdated) {
-        updateNodeContentRulesetsIndexes()
     node onChange { (_, _, newNode) =>
       replaceText(newNode.content.text)
       newNode.content.rulesetsProperty() foreach { ruleset =>
