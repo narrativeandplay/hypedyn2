@@ -31,14 +31,6 @@ object UiEventDispatcher {
   EventBus.NewNodeResponses foreach { response =>
     val editor = Main.nodeEditor("New Node", response.conditionDefinitions, response.actionDefinitions, response.story)
 
-    editor.result onChange { (_, _, newNode) =>
-      // The onChange listener takes 3 values: the observable whose value changes, the old value of the observable,
-      // and the new value of the observable. Due to ScalaFX not properly wrapping JavaFX, and there being no guarantee
-      // from JavaFX that the new value will not be null, the new value is first wrapped into an Option for null-safety,
-      // then processed.
-      Option(newNode) foreach { n => EventBus.send(CreateNode(n, UiEventSourceIdentity)) }
-    }
-
     editor.onCloseRequest = { _ =>
       openedNodeEditors -= editor
     }
@@ -47,20 +39,10 @@ object UiEventDispatcher {
     editor.show()
   }
   EventBus.EditNodeResponses foreach { response =>
-    openedNodeEditors find (_.node.id == response.node.id) match {
+    openedNodeEditors find (_.node().id == response.node.id) match {
       case Some(editor) => editor.dialogPane().scene().window().requestFocus()
       case None =>
         val editor = Main.nodeEditor("Edit Node", response.conditionDefinitions, response.actionDefinitions, response.story, response.node)
-
-        editor.result onChange { (_, _, editedNode) =>
-          // The onChange listener takes 3 values: the observable whose value changes, the old value of the observable,
-          // and the new value of the observable. Due to ScalaFX not properly wrapping JavaFX, and there being no guarantee
-          // from JavaFX that the new value will not be null, the new value is first wrapped into an Option for null-safety,
-          // then processed.
-          Option(editedNode) foreach { n =>
-            EventBus.send(UpdateNode(response.node, n, UiEventSourceIdentity))
-          }
-        }
 
         editor.onCloseRequest = { _ =>
           openedNodeEditors -= editor
@@ -229,6 +211,13 @@ object UiEventDispatcher {
   }
   def requestRedo(): Unit = {
     EventBus.send(RedoRequest(UiEventSourceIdentity))
+  }
+
+  def createNode(newNode: Nodal): Unit = {
+    EventBus.send(CreateNode(newNode, UiEventSourceIdentity))
+  }
+  def updateNode(originalNode: Nodal)(editedNode: Nodal): Unit = {
+    EventBus.send(UpdateNode(originalNode, editedNode, UiEventSourceIdentity))
   }
 
   /**

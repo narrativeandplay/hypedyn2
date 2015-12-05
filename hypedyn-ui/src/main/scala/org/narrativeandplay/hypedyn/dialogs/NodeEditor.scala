@@ -1,14 +1,16 @@
 package org.narrativeandplay.hypedyn.dialogs
 
-import java.util.function.Function
-import javafx.event.EventHandler
-import javafx.scene.control.{TableCell => JfxTableCell, IndexRange => JfxIndexRange}
-import javafx.scene.input.{KeyCode => JfxKeyCode, KeyEvent => JfxKeyEvent, MouseEvent => JfxMouseEvent}
-import javafx.stage.Stage
+import javafx.collections.ObservableList
+import javafx.{event => jfxe}
+import javafx.event.{ActionEvent => JfxActionEvent, EventHandler}
+import javafx.scene.control.{IndexRange => JfxIndexRange}
+import javafx.scene.{input => jfxsi}
+import javafx.scene.input.{KeyEvent => JfxKeyEvent}
 
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
+import scalafx.event.{Event, ActionEvent}
 import scalafx.geometry.{Pos, Insets, Orientation}
 import scalafx.scene.control._
 import scalafx.scene.input.{MouseEvent, KeyEvent}
@@ -21,6 +23,7 @@ import org.fxmisc.easybind.EasyBind
 import org.fxmisc.richtext.{StyleSpan, InlineStyleTextArea}
 
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor.{NodeContentTextArea, LinkStyleInfo}
+import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 import org.narrativeandplay.hypedyn.story.NodalContent.{RulesetId, TextIndex, RulesetIndexes}
 import org.narrativeandplay.hypedyn.story.UiNodeContent.UiRuleset
 import org.narrativeandplay.hypedyn.story._
@@ -94,9 +97,45 @@ class NodeEditor private (dialogTitle: String,
 
   dialogPane().setPrefSize(1280, 800)
 
+  dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Apply, ButtonType.Cancel)
+  private[this] val okButton: Button = dialogPane().lookupButton(ButtonType.OK).asInstanceOf[javafx.scene.control.Button]
+  private[this] val applyButton: Button = dialogPane().lookupButton(ButtonType.Apply).asInstanceOf[javafx.scene.control.Button]
 
   val story: ObjectProperty[UiStory] = ObjectProperty(narrative)
   val node: ObjectProperty[UiNode] = ObjectProperty(nodeToEdit getOrElse NodeEditor.newNode)
+  private[this] val monadicNode = EasyBind monadic node
+
+  private var updateFunc = UiEventDispatcher.updateNode(node()) _
+  node onChange { (_, _, newNode) =>
+    updateFunc = UiEventDispatcher.updateNode(node())
+  }
+
+  okButton.addEventFilter(ActionEvent.Any, { ae: JfxActionEvent =>
+    node().contentProperty().textProperty() = nodeContentText.getText
+    updateNodeContentRulesetsIndexes()
+
+    if (node().id.isValid) {
+      updateFunc(node())
+    }
+    else {
+      UiEventDispatcher.createNode(node())
+    }
+
+    result = node()
+    ae.consume()
+  })
+  applyButton.addEventFilter(ActionEvent.Any, { ae: JfxActionEvent =>
+    node().contentProperty().textProperty() = nodeContentText.getText
+    updateNodeContentRulesetsIndexes()
+
+    if (node().id.isValid) {
+      updateFunc(node())
+    }
+    else {
+      UiEventDispatcher.createNode(node())
+    }
+    ae.consume()
+  })
 
   val nodeNameField = new TextField() {
     text <==> node().nameProperty
