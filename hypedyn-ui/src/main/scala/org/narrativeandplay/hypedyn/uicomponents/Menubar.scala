@@ -66,7 +66,9 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
     items = HypedynPreferences.recentFiles map { file =>
       new MenuItem(file.getName) {
         onAction = { _ =>
-          UiEventDispatcher.loadStory(file)
+          UiEventDispatcher.requestExit() foreach { loadStory =>
+            if (loadStory) UiEventDispatcher.loadStory(file)
+          }
         }
       }
     }
@@ -75,7 +77,9 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
       items = HypedynPreferences.recentFiles map { file =>
         new MenuItem(file.getName) {
           onAction = { _ =>
-            UiEventDispatcher.loadStory(file)
+            UiEventDispatcher.requestExit() foreach { loadStory =>
+              if (loadStory) UiEventDispatcher.loadStory(file)
+            }
           }
         }
       }
