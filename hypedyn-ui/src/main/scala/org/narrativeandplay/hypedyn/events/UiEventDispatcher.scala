@@ -16,6 +16,7 @@ import org.narrativeandplay.hypedyn.dialogs.NodeEditor
 import org.narrativeandplay.hypedyn.story.{Nodal, NodeId}
 import org.narrativeandplay.hypedyn.uicomponents.FactViewer
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
+import org.narrativeandplay.hypedyn.utils.HypedynPreferences
 
 /**
  * Dispatcher for UI events
@@ -85,7 +86,11 @@ object UiEventDispatcher {
   EventBus.LoadResponses foreach { _ =>
     val fileToLoad = Main.fileDialog.showOpenFileDialog()
 
-    fileToLoad foreach { f => EventBus.send(LoadFromFile(f, UiEventSourceIdentity)) }
+    fileToLoad foreach { f =>
+      HypedynPreferences.recentFiles +:= f
+
+      EventBus.send(LoadFromFile(f, UiEventSourceIdentity))
+    }
   }
 
   EventBus.ExportResponses foreach { evt =>
