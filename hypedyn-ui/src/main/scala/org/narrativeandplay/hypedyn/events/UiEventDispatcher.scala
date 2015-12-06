@@ -88,6 +88,7 @@ object UiEventDispatcher {
 
     fileToLoad foreach { f =>
       HypedynPreferences.recentFiles +:= f
+      Main.refreshRecent.onNext(())
 
       EventBus.send(LoadFromFile(f, UiEventSourceIdentity))
     }

@@ -70,6 +70,16 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
         }
       }
     }
+
+    Main.refreshRecent foreach { _ =>
+      items = HypedynPreferences.recentFiles map { file =>
+        new MenuItem(file.getName) {
+          onAction = { _ =>
+            UiEventDispatcher.loadStory(file)
+          }
+        }
+      }
+    }
   }
 
   private lazy val saveStory = new MenuItem("Save") {
