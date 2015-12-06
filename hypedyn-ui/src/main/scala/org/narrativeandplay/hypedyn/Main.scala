@@ -12,6 +12,7 @@ import scalafx.scene.image.Image
 import scalafx.scene.layout.{VBox, BorderPane}
 
 import org.fxmisc.easybind.EasyBind
+import rx.lang.scala.subjects.{PublishSubject, SerializedSubject}
 
 import org.narrativeandplay.hypedyn.dialogs._
 import org.narrativeandplay.hypedyn.events._
@@ -39,6 +40,9 @@ object Main extends JFXApp {
 
   private val loadedFilename = new StringProperty("Untitled")
   private val editedMarker = EasyBind map (UiEventDispatcher.isStoryEdited.delegate.asInstanceOf[ObservableValue[Boolean]], if (_: Boolean) "*" else "")
+
+  private val refreshStream = SerializedSubject(PublishSubject[Unit]())
+  def refreshRecent = refreshStream
 
   /**
    * Returns a new file dialog

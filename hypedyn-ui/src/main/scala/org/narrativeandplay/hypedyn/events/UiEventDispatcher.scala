@@ -1,5 +1,7 @@
 package org.narrativeandplay.hypedyn.events
 
+import java.io.File
+
 import scala.collection.mutable.ArrayBuffer
 
 import scalafx.Includes._
@@ -14,6 +16,7 @@ import org.narrativeandplay.hypedyn.dialogs.NodeEditor
 import org.narrativeandplay.hypedyn.story.{Nodal, NodeId}
 import org.narrativeandplay.hypedyn.uicomponents.FactViewer
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
+import org.narrativeandplay.hypedyn.utils.HypedynPreferences
 
 /**
  * Dispatcher for UI events
@@ -83,7 +86,12 @@ object UiEventDispatcher {
   EventBus.LoadResponses foreach { _ =>
     val fileToLoad = Main.fileDialog.showOpenFileDialog()
 
-    fileToLoad foreach { f => EventBus.send(LoadFromFile(f, UiEventSourceIdentity)) }
+    fileToLoad foreach { f =>
+      HypedynPreferences.recentFiles +:= f
+      Main.refreshRecent.onNext(())
+
+      EventBus.send(LoadFromFile(f, UiEventSourceIdentity))
+    }
   }
 
   EventBus.ExportResponses foreach { evt =>
@@ -224,6 +232,10 @@ object UiEventDispatcher {
   }
   def updateNode(originalNode: Nodal)(editedNode: Nodal): Unit = {
     EventBus.send(UpdateNode(originalNode, editedNode, UiEventSourceIdentity))
+  }
+
+  def loadStory(file: File): Unit = {
+    EventBus.send(LoadFromFile(file, UiEventSourceIdentity))
   }
 
   /**

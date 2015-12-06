@@ -4,11 +4,12 @@ import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.beans.property.ReadOnlyBooleanProperty
 import scalafx.event.ActionEvent
-import scalafx.scene.control.{Menu, MenuBar, SeparatorMenuItem}
+import scalafx.scene.control._
 
+import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 import org.narrativeandplay.hypedyn.keycombinations.KeyCombinations
-import org.narrativeandplay.hypedyn.utils.System
+import org.narrativeandplay.hypedyn.utils.{HypedynPreferences, System}
 
 /**
  * Menu bar for the application
@@ -34,7 +35,11 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
    * File Menu
    */
   private lazy val fileMenu = new Menu("File") {
-    items.addAll(newStory, openStory, saveStory, saveAs, export, new SeparatorMenuItem(), editStoryProperties, new SeparatorMenuItem(), exit)
+    items.addAll(newStory, openStory, openRecentStory, saveStory, saveAs, export,
+                 new SeparatorMenuItem(),
+                 editStoryProperties,
+                 new SeparatorMenuItem(),
+                 exit)
   }
 
   private lazy val newStory = new MenuItem("New") {
@@ -53,6 +58,26 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
     onAction = { ae: ActionEvent =>
       UiEventDispatcher.requestExit() foreach { loadStory =>
         if (loadStory) UiEventDispatcher.requestLoad()
+      }
+    }
+  }
+
+  private lazy val openRecentStory = new Menu("Open Recent") {
+    items = HypedynPreferences.recentFiles map { file =>
+      new MenuItem(file.getName) {
+        onAction = { _ =>
+          UiEventDispatcher.loadStory(file)
+        }
+      }
+    }
+
+    Main.refreshRecent foreach { _ =>
+      items = HypedynPreferences.recentFiles map { file =>
+        new MenuItem(file.getName) {
+          onAction = { _ =>
+            UiEventDispatcher.loadStory(file)
+          }
+        }
       }
     }
   }
