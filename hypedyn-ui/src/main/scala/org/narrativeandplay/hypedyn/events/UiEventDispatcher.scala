@@ -1,5 +1,7 @@
 package org.narrativeandplay.hypedyn.events
 
+import java.io.File
+
 import scala.collection.mutable.ArrayBuffer
 
 import scalafx.Includes._
@@ -224,6 +226,10 @@ object UiEventDispatcher {
   }
   def updateNode(originalNode: Nodal)(editedNode: Nodal): Unit = {
     EventBus.send(UpdateNode(originalNode, editedNode, UiEventSourceIdentity))
+  }
+
+  def loadStory(file: File): Unit = {
+    EventBus.send(LoadFromFile(file, UiEventSourceIdentity))
   }
 
   /**
