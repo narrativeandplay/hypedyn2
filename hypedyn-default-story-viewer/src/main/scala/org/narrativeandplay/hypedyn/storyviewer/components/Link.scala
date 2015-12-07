@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.storyviewer.components
 
-import scalafx.Includes.jfxObservableValue2sfx
+import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, ObjectProperty}
 import scalafx.geometry.{Point2D, Pos}
 import scalafx.scene.control.Label
@@ -72,8 +72,8 @@ class Link(val from: ViewerNode,
       }
     }
 
-    endPointPairs minBy (_._5) match { case minPtPair @ (_, fromCoords, _, toCoords, _) =>
-      (fromCoords, toCoords)
+    endPointPairs minBy (_._5) match { case minPtPair @ (fromPosition, fromCoords, toPosition, toCoords, _) =>
+      (fromPosition, fromCoords, toPosition, toCoords)
     }
   }
 
@@ -139,7 +139,7 @@ class Link(val from: ViewerNode,
   def path = {
     val edgeGroupIndex = parentLinkGroup.indexOf(this)
 
-    val (startPoint, endPoint) = endPoints
+    val (_, startPoint, _, endPoint) = endPoints
 
     val x = parentLinkGroup.size
     val y = (endPoint - startPoint).length / 100
