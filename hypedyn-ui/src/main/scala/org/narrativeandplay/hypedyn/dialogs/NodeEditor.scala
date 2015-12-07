@@ -193,7 +193,6 @@ class NodeEditor private (dialogTitle: String,
     selectionModel().selectedItemProperty onChange { (_, _, `new`) =>
       Option(`new`) match {
         case Some(ruleset) =>
-          updateNodeContentRulesetsIndexes()
           nodeContentText.selectRange(ruleset.indexes.startIndex.index.toInt, ruleset.indexes.endIndex.index.toInt)
           textRulesPane.rules() = ruleset.rulesProperty
         case None =>
@@ -235,7 +234,12 @@ class NodeEditor private (dialogTitle: String,
 
     getUndoManager.forgetHistory() // Ensure that the initialisation of the text done above is not undoable
 
+    var indexUpdateSub = beingUpdatedProperty() onChange { (_, _, beingUpdated) =>
+      if (!beingUpdated) updateNodeContentRulesetsIndexes()
+    }
+
     node onChange { (_, _, newNode) =>
+      indexUpdateSub.cancel()
       replaceText(newNode.content.text)
       setStyle(0, text().length, new LinkStyleInfo()) // Clear text styling before applying text styling from rulesets
       newNode.content.rulesetsProperty() foreach { ruleset =>
@@ -245,6 +249,10 @@ class NodeEditor private (dialogTitle: String,
       }
 
       getUndoManager.forgetHistory() // Ensure that the initialisation of the text done above is not undoable
+
+      indexUpdateSub = beingUpdatedProperty() onChange { (_, _, beingUpdated) =>
+        if (!beingUpdated) updateNodeContentRulesetsIndexes()
+      }
     }
   }
 
