@@ -108,7 +108,7 @@ class NodeEditor private (dialogTitle: String,
 
   private var updateFunc = UiEventDispatcher.updateNode(node())
   node onChange { (_, _, newNode) =>
-    updateFunc = UiEventDispatcher.updateNode(node())
+    updateFunc = UiEventDispatcher.updateNode(newNode)
   }
 
   okButton.addEventFilter(ActionEvent.Any, { ae: JfxActionEvent =>
