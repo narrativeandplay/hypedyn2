@@ -230,7 +230,7 @@ object UiEventDispatcher {
   def createNode(newNode: Nodal): Unit = {
     EventBus.send(CreateNode(newNode, UiEventSourceIdentity))
   }
-  def updateNode(originalNode: Nodal)(editedNode: Nodal): Unit = {
+  def updateNode(originalNode: Nodal) = { editedNode: Nodal =>
     EventBus.send(UpdateNode(originalNode, editedNode, UiEventSourceIdentity))
   }
 

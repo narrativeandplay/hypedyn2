@@ -106,7 +106,7 @@ class NodeEditor private (dialogTitle: String,
   val node: ObjectProperty[UiNode] = ObjectProperty(nodeToEdit getOrElse NodeEditor.newNode)
   private[this] val monadicNode = EasyBind monadic node
 
-  private var updateFunc = UiEventDispatcher.updateNode(node()) _
+  private var updateFunc = UiEventDispatcher.updateNode(node())
   node onChange { (_, _, newNode) =>
     updateFunc = UiEventDispatcher.updateNode(node())
   }
