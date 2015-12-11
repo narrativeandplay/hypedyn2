@@ -3,6 +3,7 @@ package org.narrativeandplay.hypedyn.storyviewer
 import javafx.scene.Node
 import javafx.scene.control.Skin
 
+import scalafx.Includes._
 import scalafx.scene.layout.Pane
 
 /**
@@ -22,12 +23,17 @@ class StoryViewerContentSkin(storyViewerContent: StoryViewerContent) extends Ski
 
     storyViewerContent.links foreach { link =>
       link.draw match {
-        case (path, Some(highlight), Some(label), Some(labelBg), arrowhead) =>
-          root.children.addAll(highlight, path, labelBg, label, arrowhead)
-        case (path, None, Some(label), Some(labelBg), arrowhead) =>
-          root.children.addAll(path, labelBg, label, arrowhead)
-        case (path, _, _, _, arrowhead) =>
-          root.children.addAll(path, arrowhead)
+        case (path, Some(highlight), Some(label), Some(labelBg), arrowheads) =>
+          root.children.addAll(highlight, path)
+          arrowheads foreach (root.children += _)
+          root.children.addAll(labelBg, label)
+        case (path, None, Some(label), Some(labelBg), arrowheads) =>
+          root.children.addAll(path)
+          arrowheads foreach (root.children += _)
+          root.children.addAll(labelBg, label)
+        case (path, _, _, _, arrowheads) =>
+          root.children.addAll(path)
+          arrowheads foreach (root.children += _)
       }
     }
 

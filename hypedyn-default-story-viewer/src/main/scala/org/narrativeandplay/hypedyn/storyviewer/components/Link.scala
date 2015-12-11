@@ -220,20 +220,20 @@ class Link(val from: ViewerNode,
       labelBackground
     }
 
-    val tangentVector = -(path gradientAt 0.85).normalise * 10
-    val headToTail1 = tangentVector rotate 30
-    val headToTail2 = tangentVector rotate -30
-    val triangleHead = path pointAt 0.85
-    val tail1 = triangleHead + headToTail1
-    val tail2 = triangleHead + headToTail2
+    val arrowheads = List(0.2, 0.4, 0.6, 0.8) map { t =>
+      val tangentVector = -(path gradientAt t).normalise * 10
+      val headToTail1 = tangentVector rotate 30
+      val headToTail2 = tangentVector rotate -30
+      val triangleHead = path pointAt t
+      val tail1 = triangleHead + headToTail1
+      val tail2 = triangleHead + headToTail2
 
-    val arrowhead = Polygon(triangleHead.x, triangleHead.y,
-                            tail1.x, tail1.y,
-                            tail2.x, tail2.y)
-    arrowhead.fill = Color.Black
+      Polygon(triangleHead.x, triangleHead.y,
+              tail1.x, tail1.y,
+              tail2.x, tail2.y)
+    }
 
-
-    (line, highlight, label, labelBg, arrowhead)
+    (line, highlight, label, labelBg, arrowheads)
   }
 }
 
