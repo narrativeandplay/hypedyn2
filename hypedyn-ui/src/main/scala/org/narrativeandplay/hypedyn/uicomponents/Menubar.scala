@@ -177,5 +177,9 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
     items.addAll(about)
   }
 
-  private lazy val about = new MenuItem("About")
+  private lazy val about = new MenuItem("About") {
+    onAction = { _ =>
+      Main.aboutDialog.showAndWait()
+    }
+  }
 }

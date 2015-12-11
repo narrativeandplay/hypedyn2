@@ -8,7 +8,8 @@ import scalafx.application.{Platform, JFXApp}
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.beans.property.StringProperty
 import scalafx.scene.Scene
-import scalafx.scene.image.Image
+import scalafx.scene.control.Alert
+import scalafx.scene.image.{ImageView, Image}
 import scalafx.scene.layout.{VBox, BorderPane}
 
 import org.fxmisc.easybind.EasyBind
@@ -112,6 +113,17 @@ object Main extends JFXApp {
    * @return A new dialog for editing the given story's properties
    */
   def storyPropertiesEditor(story: Narrative) = new StoryPropertiesDialog(story, stage)
+
+  def aboutDialog = new Alert(Alert.AlertType.Information) {
+    initOwner(stage)
+    title = "About HypeDyn 2"
+    headerText = "HypeDyn 2"
+    graphic = new ImageView(icon)
+    contentText =
+      """Hypertext Fiction Editor
+        |Version 1.0
+      """.stripMargin
+  }
 
   def editFilename(newFilename: String): Unit = loadedFilename() = newFilename
 
