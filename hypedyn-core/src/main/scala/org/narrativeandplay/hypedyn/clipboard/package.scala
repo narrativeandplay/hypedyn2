@@ -15,7 +15,7 @@ package object clipboard {
    * Typeclass instance for cutting/copying/pasting nodes
    */
   implicit object NodeCopier extends Copyable[Nodal] {
-    val NodeDataFormat = new DataFormat("application/x-hypedyn-node")
+    val NodeDataFormat = new DataFormat("application/x-hypedyn2-node")
     val clipboard = new Clipboard(Clipboard.systemClipboard)
     /**
      * Defines what to do on a cut action

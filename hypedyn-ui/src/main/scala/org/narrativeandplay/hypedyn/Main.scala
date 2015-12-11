@@ -131,7 +131,7 @@ object Main extends JFXApp {
   }
 
   stage = new PrimaryStage {
-    title <== loadedFilename + editedMarker + " - HypeDyn"
+    title <== loadedFilename + editedMarker + " - HypeDyn 2"
     icons.add(icon)
 
     val mainStageFocused = focused

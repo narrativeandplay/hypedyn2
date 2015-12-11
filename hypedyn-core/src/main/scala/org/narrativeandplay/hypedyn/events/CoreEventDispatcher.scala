@@ -123,7 +123,7 @@ object CoreEventDispatcher {
 
   EventBus.ExportRequests foreach { _ => EventBus.send(ExportResponse(CoreEventSourceIdentity)) }
   EventBus.RunRequests foreach { _ =>
-    val tmpDir = Files.createTempDirectory("hypedyn").toFile
+    val tmpDir = Files.createTempDirectory("hypedyn2").toFile
     tmpDir.deleteOnExit()
 
     IoController.copyResourceToFilesystem("export/reader/", tmpDir)

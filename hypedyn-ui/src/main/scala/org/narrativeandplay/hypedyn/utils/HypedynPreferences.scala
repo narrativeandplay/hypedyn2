@@ -10,7 +10,7 @@ object HypedynPreferences {
     val RecentFiles = "recentFiles"
   }
 
-  private val preferences = Preferences.userRoot().node("hypedyn")
+  private val preferences = Preferences.userRoot().node("hypedyn2")
   preferences.flush()
 
   private val MaxRecentFiles = 10

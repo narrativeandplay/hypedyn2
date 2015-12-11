@@ -12,7 +12,7 @@ import scalafx.stage.FileChooser.ExtensionFilter
  * @param ownerWindow The parent dialog of the file chooser, for inheriting icons
  */
 class FileDialog(ownerWindow: Window) extends FileChooser {
-  extensionFilters += new ExtensionFilter("HypeDyn Story", "*.dyn")
+  extensionFilters += new ExtensionFilter("HypeDyn 2 Story", "*.dyn2")
 
   /**
    * Shows a new open file dialog
