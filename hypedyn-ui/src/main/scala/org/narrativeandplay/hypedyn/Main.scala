@@ -168,4 +168,10 @@ object Main extends JFXApp {
       }
     }
   }
+
+  if (parameters.raw.length == 1) {
+    val fileToOpen = new File(parameters.raw.head)
+
+    if (fileToOpen.exists()) UiEventDispatcher.loadStory(fileToOpen)
+  }
 }
