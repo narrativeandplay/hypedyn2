@@ -3,7 +3,7 @@ package org.narrativeandplay.hypedyn.storyviewer.utils
 import DoubleUtils._
 
 /**
- * Class representing a cubic polynomial of the form ax^3 + bx^2 + cx + d
+ * Class representing a cubic polynomial of the form ax^3^ + bx^2^ + cx + d
  *
  * @param a The coefficient of the cube term. This cannot be 0.
  * @param b The coefficient of the square term.
