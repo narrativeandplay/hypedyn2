@@ -29,36 +29,5 @@ case class CubicPolynomial(a: Double, b: Double, c: Double, d: Double) {
 
   def apply = valueAt _
   def valueAt(x: Double) = a * pow(x, 3) + b * pow(x, 2) + c * x + d
-}
 
-/**
- * A complex number of the form a + ib
- */
-sealed case class ComplexNumber(a: Double, b: Double) {
-  def conjugate = ComplexNumber(a, -b)
-  def unary_~ = conjugate
-  def absSqr = a*a + b*b
-  def abs = math.sqrt(absSqr)
-
-  def +(z: ComplexNumber) = ComplexNumber(a + z.a, b + z.b)
-  def -(z: ComplexNumber) = ComplexNumber(a - z.a, b - z.b)
-
-  def *(z: ComplexNumber) = ComplexNumber(a * z.a - b * z.b, b * z.a + a * z.b)
-  def /(z: ComplexNumber) = ComplexNumber((a * z.a + b * z.b)/z.absSqr, (b * z.a - a * z.b)/z.absSqr)
-
-  def isReal = b ~= 0
-  def isComplex = !isReal
-
-  def toDouble = if (isReal) a else abs
-
-  override def toString = s"$a + ${b}i"
-
-  override def equals(obj: Any): Boolean = {
-    case z: ComplexNumber => (a ~= z.a) && (b ~= z.b)
-    case _ => false
-  }
-}
-
-object ComplexNumber {
-  def apply(d: Double) = ComplexNumber(d, 0)
 }
