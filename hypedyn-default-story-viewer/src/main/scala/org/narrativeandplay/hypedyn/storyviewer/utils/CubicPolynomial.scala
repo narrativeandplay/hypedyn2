@@ -30,4 +30,6 @@ case class CubicPolynomial(a: Double, b: Double, c: Double, d: Double) {
   def apply = valueAt _
   def valueAt(x: Double) = a * pow(x, 3) + b * pow(x, 2) + c * x + d
 
+  def derivativeAt(x: Double) = 3 * a * pow(x, 2) + 2 * b * x + c
+  def secondDerivativeAt(x: Double) = 6 * a * x + 2 * b
 }
