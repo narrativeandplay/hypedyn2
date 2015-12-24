@@ -50,13 +50,13 @@ case class CubicPolynomial(a: Double, b: Double, c: Double, d: Double) {
       findRoot(x_inflec)
     }
     else if (f_x_inflec >~ 0) {
-      val x_low :: x_high :: _ = List(x_inflec + (2d / 3d * math.sqrt(D)),
+      val x_low :: _ = List(x_inflec + (2d / 3d * math.sqrt(D)),
         x_inflec - (2d / 3d * math.sqrt(D))).sorted
 
       findRoot(x_low)
     }
     else {
-      val x_low :: x_high :: _ = List(x_inflec + (2d / 3d * math.sqrt(D)),
+      val _ :: x_high :: _ = List(x_inflec + (2d / 3d * math.sqrt(D)),
         x_inflec - (2d / 3d * math.sqrt(D))).sorted
 
       findRoot(x_high)
