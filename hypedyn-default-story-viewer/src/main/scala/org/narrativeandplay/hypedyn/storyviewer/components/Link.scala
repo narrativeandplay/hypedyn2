@@ -12,7 +12,7 @@ import com.github.benedictleejh.scala.math.vector.Vector2
 import org.fxmisc.easybind.EasyBind
 
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
-import org.narrativeandplay.hypedyn.storyviewer.utils.BezierCurve
+import org.narrativeandplay.hypedyn.storyviewer.utils.{CubicPolynomial, Line, BezierCurve}
 import org.narrativeandplay.hypedyn.story.rules.RuleLike
 import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils._
 import org.narrativeandplay.hypedyn.storyviewer.utils.VectorImplicitConversions._
@@ -220,20 +220,56 @@ class Link(val from: ViewerNode,
       labelBackground
     }
 
-    val arrowheads = List(0.2, 0.4, 0.6, 0.8) map { t =>
-      val tangentVector = -(path gradientAt t).normalise * 10
-      val headToTail1 = tangentVector rotate 30
-      val headToTail2 = tangentVector rotate -30
-      val triangleHead = path pointAt t
-      val tail1 = triangleHead + headToTail1
-      val tail2 = triangleHead + headToTail2
+    val h = Vector2(0d, to.height)
+    val v = Vector2(to.width, 0d)
+    val p = path
+    val x_3 = p.endPoint.x
+    val x_2 = p.controlPoint2.x
+    val x_1 = p.controlPoint1.x
+    val x_0 = p.startPoint.x
+    val y_3 = p.endPoint.y
+    val y_2 = p.controlPoint2.y
+    val y_1 = p.controlPoint1.y
+    val y_0 = p.startPoint.y
+    import ViewerNode.Edge._
+    val potentialArrowheadLocations = to.edgePoints flatMap { case (edge, midpoint) =>
+      val edgeLine = edge match {
+        case Left | Right => Line(midpoint, midpoint + h)
+        case Top | Bottom => Line(midpoint, midpoint + v)
+      }
 
+      val A = edgeLine.a
+      val B = edgeLine.b
+
+      val a = (A * (-x_0 + 3 * x_1 - 3 * x_2 + x_3)) + (B * (-y_0 + 3 * y_1 - 3 * y_2 + y_3))
+      val b = (A * (3 * x_0 - 6 * x_1 + 3 * x_2)) + B * (3 * y_0 - 6 * y_1 + 3 * y_2)
+      val c = (A * (-3 * x_0 + 3 * x_1)) + B * (-3 * y_0 + 3 * y_1)
+      val d = A * x_0 + B * y_0 + edgeLine.c
+
+      if (a ~= 0) Nil else CubicPolynomial(a, b, c, d).roots
+    }
+
+    val validArrowheadLocations = potentialArrowheadLocations filter { t =>
+      (t >~= 0) && (t <~= 1.0001) && // remove out of bound values for a Bezier curve
+        (to.bounds contains (path pointAt t)) // because lines extend to infinity,
+                                              // ensure that the point lies on the end point node
+    }
+
+    // Put the arrowhead slightly before the intersection to increase its visibility
+    val t = validArrowheadLocations.toList.sorted.head - 0.005
+    val tangentVector = -(path gradientAt t).normalise * 10
+    val headToTail1 = tangentVector rotate 30
+    val headToTail2 = tangentVector rotate -30
+    val triangleHead = path pointAt t
+    val tail1 = triangleHead + headToTail1
+    val tail2 = triangleHead + headToTail2
+
+    val arrowhead =
       Polygon(triangleHead.x, triangleHead.y,
               tail1.x, tail1.y,
               tail2.x, tail2.y)
-    }
 
-    (line, highlight, label, labelBg, arrowheads)
+    (line, highlight, label, labelBg, arrowhead)
   }
 }
 

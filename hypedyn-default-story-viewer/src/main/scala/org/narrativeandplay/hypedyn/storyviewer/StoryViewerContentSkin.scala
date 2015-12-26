@@ -23,17 +23,17 @@ class StoryViewerContentSkin(storyViewerContent: StoryViewerContent) extends Ski
 
     storyViewerContent.links foreach { link =>
       link.draw match {
-        case (path, Some(highlight), Some(label), Some(labelBg), arrowheads) =>
+        case (path, Some(highlight), Some(label), Some(labelBg), arrowhead) =>
           root.children.addAll(highlight, path)
-          arrowheads foreach (root.children += _)
+          root.children += arrowhead
           root.children.addAll(labelBg, label)
-        case (path, None, Some(label), Some(labelBg), arrowheads) =>
+        case (path, None, Some(label), Some(labelBg), arrowhead) =>
           root.children.addAll(path)
-          arrowheads foreach (root.children += _)
+          root.children += arrowhead
           root.children.addAll(labelBg, label)
-        case (path, _, _, _, arrowheads) =>
+        case (path, _, _, _, arrowhead) =>
           root.children.addAll(path)
-          arrowheads foreach (root.children += _)
+          root.children += arrowhead
       }
     }
 
