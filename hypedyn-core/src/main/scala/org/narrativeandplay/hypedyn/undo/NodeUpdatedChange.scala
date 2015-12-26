@@ -24,5 +24,6 @@ sealed case class NodeUpdatedChange(notUpdatedNode: Node, updatedNode: Node, cha
   override def redo(): Unit = {
     UndoEventDispatcher.updateNode(notUpdatedNode, updatedNode)
     changedStartNode foreach { case (unchanged, changed) => UndoEventDispatcher.updateNode(unchanged, changed) }
+    UndoableStream.send(this)
   }
 }

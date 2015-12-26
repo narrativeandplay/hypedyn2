@@ -17,6 +17,7 @@ sealed abstract class NodeChange(changedNode: Node, affectedNodes: Map[Node, Nod
     affectedNodes foreach { case (unchanged, changed) =>
       UndoEventDispatcher.updateNode(unchanged, changed)
     }
+    UndoableStream.send(this)
   }
 }
 
@@ -33,14 +34,6 @@ sealed case class NodeCreatedChange(createdNode: Node, affectedNodes: Map[Node, 
    * Defines what to do when an undo action happens
    */
   override def undo(): NodeChange = NodeDestroyedChange(createdNode, affectedNodes map (_.swap))
-
-  /**
-   * Defines how to reverse an undo action
-   */
-  override def redo(): Unit = {
-    super.redo()
-    UndoableStream.send(this)
-  }
 }
 
 /**
