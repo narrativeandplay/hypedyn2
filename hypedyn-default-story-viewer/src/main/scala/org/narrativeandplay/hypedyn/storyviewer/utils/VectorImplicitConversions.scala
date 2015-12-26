@@ -1,9 +1,10 @@
 package org.narrativeandplay.hypedyn.storyviewer.utils
 
 import java.awt.Point
-import java.awt.geom.Point2D
 
 import scala.language.implicitConversions
+
+import scalafx.geometry.Point2D
 
 import com.github.benedictleejh.scala.math.vector.{Vector2, VectorN}
 
@@ -16,6 +17,8 @@ object VectorImplicitConversions {
   implicit def pointToVector2Int(p: Point): Vector2[Int] = new Vector2(p.x, p.y)
 
   implicit def point2dToVector2Double(p: Point2D): Vector2[Double] = new Vector2(p.getX, p.getY)
+
+  implicit def vector2Double2Point2D(p: Vector2[Double]): Point2D = new Point2D(p.x, p.y)
 
   implicit def vectorNIntToPoint(v: VectorN[Int]): Point = {
     v.dimension match {
