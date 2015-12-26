@@ -137,6 +137,11 @@ case class Story(title: String = "Untitled",
    * Returns all the rules in the story (text, node, and story rules)
    */
   def allRules = rules ++ (nodes flatMap (_.rules)) ++ (nodes flatMap (_.content.rulesets) flatMap (_.rules))
+
+  /**
+   * Returns the start node of the story if it has one, or None if the start node has not yet been set
+   */
+  def startNode = nodes find (_.isStartNode)
 }
 
 object Story {
