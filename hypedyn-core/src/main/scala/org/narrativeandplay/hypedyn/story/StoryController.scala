@@ -120,7 +120,7 @@ object StoryController {
    *         changed node if the node to update was made the start node, or None if the node to update did not exist
    */
   def update(node: Nodal, editedNode: Nodal): Option[(Node, Node, Option[(Node, Node)])] = {
-    val updatedOldStartNodeOption = if (editedNode.isStartNode) {
+    val updatedOldStartNodeOption = if (editedNode.isStartNode && !node.isStartNode) {
       currentStory.startNode flatMap { oldStartNode =>
         updateNode(oldStartNode, oldStartNode.copy(isStartNode = false))
       }
