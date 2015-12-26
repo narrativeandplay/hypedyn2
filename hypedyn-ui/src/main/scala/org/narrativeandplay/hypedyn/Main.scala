@@ -12,6 +12,8 @@ import scalafx.scene.control.Alert
 import scalafx.scene.image.{ImageView, Image}
 import scalafx.scene.layout.{VBox, BorderPane}
 
+import com.apple.eawt.AppEvent.OpenFilesEvent
+import com.apple.eawt.{OpenFilesHandler, Application}
 import org.fxmisc.easybind.EasyBind
 import rx.lang.scala.subjects.{PublishSubject, SerializedSubject}
 
@@ -173,5 +175,20 @@ object Main extends JFXApp {
     val fileToOpen = new File(parameters.raw.head)
 
     if (fileToOpen.exists()) UiEventDispatcher.loadStory(fileToOpen)
+  }
+
+  System.setProperty("com.apple.mrj.application.apple.menu.about.name", "HypeDyn 2")
+
+  if (Sys.isMac) {
+    Application.getApplication.setOpenFileHandler(new OpenFilesHandler {
+      override def openFiles(e: OpenFilesEvent): Unit = {
+        import scala.collection.JavaConversions._
+        e.getFiles foreach { f =>
+          if (f.isInstanceOf[File] && f.asInstanceOf[File].exists()) {
+            UiEventDispatcher.loadStory(f.asInstanceOf[File])
+          }
+        }
+      }
+    })
   }
 }

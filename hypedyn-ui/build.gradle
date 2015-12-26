@@ -3,6 +3,7 @@ dependencies {
     compile 'com.miglayout:miglayout-javafx:5.0'
     compile 'org.fxmisc.richtext:richtextfx:0.6.10'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
+    compile 'com.yuvimasory:orange-extensions:1.3.0' // For com.apple packages on other platforms
 
     compile project(':hypedyn-api')
     compile project(':hypedyn-core')
