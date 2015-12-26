@@ -54,7 +54,9 @@ object CoreEventDispatcher {
   EventBus.CreateNodeEvents foreach { evt =>
     val created = StoryController.create(evt.node)
 
-    UndoableStream.send(new NodeCreatedChange(created, Map.empty))
+    if (evt.src != UndoEventSourceIdentity) {
+      UndoableStream.send(new NodeCreatedChange(created, Map.empty))
+    }
 
     EventBus.send(NodeCreated(evt.node, created, CoreEventSourceIdentity))
     EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
