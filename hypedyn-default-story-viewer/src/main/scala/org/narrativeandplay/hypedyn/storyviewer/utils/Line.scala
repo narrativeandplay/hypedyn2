@@ -24,6 +24,8 @@ case class Line(xCoeff: Double, yCoeff: Double, const: Double) {
   def a = xCoeff
   def b = yCoeff
   def c = const
+
+  override def toString: String = s"${a}x + ${b}y + $c = 0"
 }
 
 object Line {
