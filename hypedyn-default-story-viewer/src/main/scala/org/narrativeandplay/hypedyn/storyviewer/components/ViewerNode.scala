@@ -134,8 +134,10 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
    * @param y The y-coordinate to move this node to
    */
   override def relocate(x: Double, y: Double): Unit = {
-    super.relocate(x, y)
-    topLeft = (x, y)
+    val clampedX = if (x <~ 0) 0 else x
+    val clampedY = if (y <~ 0) 0 else y
+    super.relocate(clampedX, clampedY)
+    topLeft = (clampedX, clampedY)
   }
 
   /**
