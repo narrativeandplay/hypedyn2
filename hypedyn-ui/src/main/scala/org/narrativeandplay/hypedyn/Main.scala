@@ -178,17 +178,4 @@ object Main extends JFXApp {
   }
 
   System.setProperty("com.apple.mrj.application.apple.menu.about.name", "HypeDyn 2")
-
-  if (Sys.isMac) {
-    Application.getApplication.setOpenFileHandler(new OpenFilesHandler {
-      override def openFiles(e: OpenFilesEvent): Unit = {
-        import scala.collection.JavaConversions._
-        e.getFiles foreach { f =>
-          if (f.isInstanceOf[File] && f.asInstanceOf[File].exists()) {
-            UiEventDispatcher.loadStory(f.asInstanceOf[File])
-          }
-        }
-      }
-    })
-  }
 }
