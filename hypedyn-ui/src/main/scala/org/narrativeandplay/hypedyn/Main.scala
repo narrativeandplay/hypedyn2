@@ -12,8 +12,8 @@ import scalafx.scene.control.Alert
 import scalafx.scene.image.{ImageView, Image}
 import scalafx.scene.layout.{VBox, BorderPane}
 
-import com.apple.eawt.AppEvent.OpenFilesEvent
-import com.apple.eawt.{OpenFilesHandler, Application}
+import com.sun.glass.ui
+import com.sun.glass.ui.Application.EventHandler
 import org.fxmisc.easybind.EasyBind
 import rx.lang.scala.subjects.{PublishSubject, SerializedSubject}
 
@@ -178,4 +178,18 @@ object Main extends JFXApp {
   }
 
   System.setProperty("com.apple.mrj.application.apple.menu.about.name", "HypeDyn 2")
+
+  private val app = ui.Application.GetApplication()
+  app.setEventHandler(new EventHandler {
+    override def handleOpenFilesAction(app: ui.Application, time: Long, filepaths: Array[String]): Unit = {
+      super.handleOpenFilesAction(app, time, filepaths)
+      // The filtering is for when HypeDyn is run directly from the IDE (and possibly via the
+      // command line using Gradle) because it's passed the classname to run, and without removing
+      //  that the application would crash
+      val files = filepaths map (new File(_)) filterNot (_.getName contains "org.narrativeandplay.hypedyn.Main")
+      if (files.length > 0) {
+        UiEventDispatcher.loadStory(files.head)
+      }
+    }
+  })
 }

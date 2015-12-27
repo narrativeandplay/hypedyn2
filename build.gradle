@@ -10,7 +10,7 @@ dependencies {
 }
 
 javafx {
-    mainClass 'org.narrativeandplay.hypedyn.utils.Launcher'
+    mainClass 'org.narrativeandplay.hypedyn.Main'
 }
 
 ext {
