@@ -186,7 +186,7 @@ object Main extends JFXApp {
       // The filtering is for when HypeDyn is run directly from the IDE (and possibly via the
       // command line using Gradle) because it's passed the classname to run, and without removing
       //  that the application would crash
-      val files = filepaths map (new File(_)) filterNot (_.getName contains "org.narrativeandplay.hypedyn.Main")
+      val files = filepaths filterNot (_ == "org.narrativeandplay.hypedyn.Main") map (new File(_))
       if (files.length > 0) {
         UiEventDispatcher.loadStory(files.head)
       }
