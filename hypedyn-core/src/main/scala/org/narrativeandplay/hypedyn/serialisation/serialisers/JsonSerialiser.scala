@@ -41,6 +41,7 @@ object JsonSerialiser {
 
   private def jValueToAstElement(jValue: JValue): AstElement = jValue match {
     case JInt(i) => AstInteger(i)
+    case JLong(l) => AstInteger(l)
     case JDouble(f) => AstFloat(f)
     case JString(s) => AstString(s)
     case JBool(b) => AstBoolean(b)

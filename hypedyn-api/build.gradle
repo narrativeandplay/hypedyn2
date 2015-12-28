@@ -1,7 +1,7 @@
 version = '0.18.0'
 
 dependencies {
-    compile "io.reactivex:rxscala_${rootProject.majorScalaVersion}:0.25.0"
+    compile "io.reactivex:rxscala_${rootProject.majorScalaVersion}:0.25.1"
     compile 'org.fxmisc.undo:undofx:1.2'
 
     compile "org.scalafx:scalafx_${rootProject.majorScalaVersion}:8.0.60-R9"
