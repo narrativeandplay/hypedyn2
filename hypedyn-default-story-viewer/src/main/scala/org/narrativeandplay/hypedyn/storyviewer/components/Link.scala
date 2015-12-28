@@ -256,7 +256,7 @@ class Link(val from: ViewerNode,
     }
 
     // Put the arrowhead slightly before the intersection to increase its visibility
-    val t = validArrowheadLocations.toList.sorted.headOption map (_ - 0.005) getOrElse 1d
+    val t = (validArrowheadLocations.toList.sorted.headOption getOrElse 1d) - 0.008
     val tangentVector = -(pathCurve gradientAt t).normalise * 10
     val headToTail1 = tangentVector rotate 30
     val headToTail2 = tangentVector rotate -30
