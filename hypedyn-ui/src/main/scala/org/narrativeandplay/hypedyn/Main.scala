@@ -191,5 +191,13 @@ object Main extends JFXApp {
         UiEventDispatcher.loadStory(files.head)
       }
     }
+
+    override def handleQuitAction(app: ui.Application, time: Long): Unit = {
+      super.handleQuitAction(app, time)
+
+      UiEventDispatcher.requestExit() foreach { exit =>
+        if (exit) Platform.exit()
+      }
+    }
   })
 }
