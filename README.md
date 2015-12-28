@@ -50,3 +50,7 @@ This project follows standard gitflow conventions, with the only deviation from 
 `develop` branch is named `development` instead.
 
 ## License
+
+Copyright (C) 2015  National University of Singapore
+
+Licensed under the GNU General Public License v3. See LICENSE for details.
