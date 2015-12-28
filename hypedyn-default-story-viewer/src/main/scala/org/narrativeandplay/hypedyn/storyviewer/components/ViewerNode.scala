@@ -98,16 +98,20 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
     requestLayout()
   }
   onMouseDragged = { me =>
-    val translation = Vector2(me.sceneX, me.sceneY) - anchor
-    val finalPos = topLeft + translation
+    val mouseLocationInStoryViewer = storyViewer.sceneToLocal(me.sceneX, me.sceneY)
 
-    pluginEventDispatcher.notifyNodeMove(id, topLeft, finalPos)
+    if (mouseLocationInStoryViewer.getX >= 0 && mouseLocationInStoryViewer.getY >= 0) {
+      val translation = Vector2(me.sceneX, me.sceneY) - anchor
+      val finalPos = topLeft + translation
 
-    relocate(finalPos.x, finalPos.y)
-    anchor = (me.sceneX, me.sceneY)
-    topLeft = (layoutX, layoutY)
+      pluginEventDispatcher.notifyNodeMove(id, topLeft, finalPos)
 
-    storyViewer.sizeToChildren()
+      relocate(finalPos.x, finalPos.y)
+      anchor = (me.sceneX, me.sceneY)
+      topLeft = (layoutX, layoutY)
+
+      storyViewer.sizeToChildren()
+    }
   }
 
   /**
