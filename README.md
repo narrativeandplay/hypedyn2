@@ -31,6 +31,19 @@ On Windows, `gradlew` may need to be replaced with `gradlew.bat`.
 
 To execute the tests, run `gradlew test`.
 
+### Building packages
+
+The Gradle JavaFX plugin used in the project will by default build the appropriate packages for the system it is 
+being built on. On OS X, this will automatically build a DMG. On other platforms, this defaults to a folder with all
+the necessary files.
+
+On Windows, if Inno Setup is installed and available on the PATH, an installable exe can be created
+(details [here](https://bitbucket.org/shemnon/javafx-gradle/issues/20/native-installers-not-create-on-windows) for how to correctly place the path onto the PATH variable).
+
+On Linux, if the required build tools are present (only for RPM and DEB based distros), the appropriate package
+can be built. Details [here](http://docs.oracle.com/javafx/2/deployment/self-contained-packaging.htm).
+
+
 ## Contributing
 
 This project follows standard gitflow conventions, with the only deviation from standard conventions being that the
