@@ -183,10 +183,11 @@ class Link(val from: ViewerNode,
    * Returns the full graphical representation of the link
    */
   def draw = {
-    val line = path.toFxPath
+    val pathCurve = path
+    val line = pathCurve.toFxPath
 
     val highlight = if (selected()) {
-      val h = path.toFxPath
+      val h = pathCurve.toFxPath
       h.stroke = Color.Red
       h.strokeWidth = 5
       Some(h)
@@ -196,19 +197,19 @@ class Link(val from: ViewerNode,
     import Link.NameDisplayType._
     val label: Option[Label] = Link.NameDisplay match {
       case OnLinkAlways =>
-        val labelMidpoint = path pointAt 0.5
+        val labelMidpoint = pathCurve pointAt 0.5
         linkLabel.relocate(labelMidpoint.x - Link.LabelWidth / 2, labelMidpoint.y - Link.LabelHeight / 2)
         Some(linkLabel)
       case OnLinkOnClick =>
         if (selected()) {
-          val labelMidpoint = path pointAt 0.5
+          val labelMidpoint = pathCurve pointAt 0.5
           linkLabel.relocate(labelMidpoint.x - Link.LabelWidth / 2, labelMidpoint.y - Link.LabelHeight / 2)
           Some(linkLabel)
         }
         else None
       case AtMouseOnClick =>
         if (selected()) {
-          val labelMidpoint = path pointAt closestBezierParam
+          val labelMidpoint = pathCurve pointAt closestBezierParam
           linkLabel.relocate(labelMidpoint.x - Link.LabelWidth / 2, labelMidpoint.y - Link.LabelHeight / 2)
           Some(linkLabel)
         }
@@ -222,15 +223,14 @@ class Link(val from: ViewerNode,
 
     val h = Vector2(0d, to.height)
     val v = Vector2(to.width, 0d)
-    val p = path
-    val x_3 = p.endPoint.x
-    val x_2 = p.controlPoint2.x
-    val x_1 = p.controlPoint1.x
-    val x_0 = p.startPoint.x
-    val y_3 = p.endPoint.y
-    val y_2 = p.controlPoint2.y
-    val y_1 = p.controlPoint1.y
-    val y_0 = p.startPoint.y
+    val x_3 = pathCurve.endPoint.x
+    val x_2 = pathCurve.controlPoint2.x
+    val x_1 = pathCurve.controlPoint1.x
+    val x_0 = pathCurve.startPoint.x
+    val y_3 = pathCurve.endPoint.y
+    val y_2 = pathCurve.controlPoint2.y
+    val y_1 = pathCurve.controlPoint1.y
+    val y_0 = pathCurve.startPoint.y
     import ViewerNode.Edge._
     val potentialArrowheadLocations = to.edgePoints flatMap { case (edge, midpoint) =>
       val edgeLine = edge match {
@@ -251,16 +251,16 @@ class Link(val from: ViewerNode,
 
     val validArrowheadLocations = potentialArrowheadLocations filter { t =>
       (t >~= 0) && (t <~= 1.0001) && // remove out of bound values for a Bezier curve
-        (to.bounds contains (path pointAt t)) // because lines extend to infinity,
+        (to.bounds contains (pathCurve pointAt t)) // because lines extend to infinity,
                                               // ensure that the point lies on the end point node
     }
 
     // Put the arrowhead slightly before the intersection to increase its visibility
     val t = validArrowheadLocations.toList.sorted.headOption map (_ - 0.005) getOrElse 1d
-    val tangentVector = -(path gradientAt t).normalise * 10
+    val tangentVector = -(pathCurve gradientAt t).normalise * 10
     val headToTail1 = tangentVector rotate 30
     val headToTail2 = tangentVector rotate -30
-    val triangleHead = path pointAt t
+    val triangleHead = pathCurve pointAt t
     val tail1 = triangleHead + headToTail1
     val tail2 = triangleHead + headToTail2
 
