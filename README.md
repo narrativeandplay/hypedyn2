@@ -33,15 +33,21 @@ To execute the tests, run `gradlew test`.
 
 ### Building packages
 
-The Gradle JavaFX plugin used in the project will by default build the appropriate packages for the system it is 
-being built on. On OS X, this will automatically build a DMG. On other platforms, this defaults to a folder with all
-the necessary files.
+The Gradle JavaFX plugin used in the project will by default build all appropriate packages for the system it is 
+being built on. The built packages will be found in `build/distributions`. On all platforms, a base package containing 
+an executable and all the required files will be built in a `build/distributions/HypeDyn2` folder.
 
-On Windows, if Inno Setup is installed and available on the PATH, an installable exe can be created
+On Windows, if Inno Setup 5 or later is installed and available on the PATH, an installable exe will be created
 (details [here](https://bitbucket.org/shemnon/javafx-gradle/issues/20/native-installers-not-create-on-windows) for how to correctly place the path onto the PATH variable).
+Also, if the [WiX toolset](http://wixtoolset.org/) is available, MSI installers will be built.
 
-On Linux, if the required build tools are present (only for RPM and DEB based distros), the appropriate package
-can be built. Details [here](http://docs.oracle.com/javafx/2/deployment/self-contained-packaging.htm).
+
+On OS X, this will also build DMG and pkg files automatically.
+
+On Linux, if the required build tools are present (RPMBuild and/or deb packaging tools), the appropriate package
+will be built.
+
+More details on the packaging process can be found [here](http://docs.oracle.com/javafx/2/deployment/self-contained-packaging.htm).
 
 
 ## Contributing
