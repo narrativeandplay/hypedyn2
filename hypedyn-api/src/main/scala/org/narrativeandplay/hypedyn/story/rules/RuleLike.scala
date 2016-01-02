@@ -1,6 +1,7 @@
 package org.narrativeandplay.hypedyn.story.rules
 
 import org.narrativeandplay.hypedyn.story.NodeId
+import org.narrativeandplay.hypedyn.story.NodalContent
 
 /**
  * An interface for a rule
@@ -52,7 +53,7 @@ object RuleLike {
   sealed trait ParamValue
   object ParamValue {
     case class Node(node: NodeId) extends ParamValue
-    case class Link(link: RuleId) extends ParamValue
+    case class Link(link: NodalContent.RulesetId) extends ParamValue
 
     case class IntegerFact(fact: FactId) extends ParamValue
     case class BooleanFact(fact: FactId) extends ParamValue

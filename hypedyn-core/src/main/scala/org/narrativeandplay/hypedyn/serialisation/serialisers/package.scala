@@ -1,6 +1,7 @@
 package org.narrativeandplay.hypedyn.serialisation
 
 import org.narrativeandplay.hypedyn.story.Narrative.ReaderStyle
+import org.narrativeandplay.hypedyn.story.NodalContent.RulesetId
 import org.narrativeandplay.hypedyn.story.internal.Story.Metadata
 import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.{And, Or}
 import org.narrativeandplay.hypedyn.story.rules.RuleLike.ParamValue
@@ -238,7 +239,7 @@ package object serialisers {
     import ParamValue._
     m("type").asInstanceOf[AstString].s match {
       case "node" => ParamValue.Node(NodeId(m("value").asInstanceOf[AstInteger].i))
-      case "link" => Link(RuleId(m("value").asInstanceOf[AstInteger].i))
+      case "link" => Link(RulesetId(m("value").asInstanceOf[AstInteger].i))
       case "integerFact" => IntegerFact(FactId(m("value").asInstanceOf[AstInteger].i))
       case "booleanFact" => BooleanFact(FactId(m("value").asInstanceOf[AstInteger].i))
       case "stringFact" => StringFact(FactId(m("value").asInstanceOf[AstInteger].i))

@@ -96,9 +96,8 @@ class UiStory(initTitle: String,
    */
   override def rules: List[UiRule] = rulesProperty().toList
 
-  def links: ObservableBuffer[UiRule] = nodesProperty() flatMap (_.contentProperty().rulesetsProperty()) flatMap (_.rulesProperty) filter { rule =>
-    rule.actions map (_.actionType) contains ActionType("LinkTo")
-  }
+  def links: ObservableBuffer[UiNodeContent.UiRuleset] = nodesProperty() flatMap (_.contentProperty().rulesetsProperty()) filter { ruleset =>
+    ruleset.rulesProperty exists ( rule => rule.actions map (_.actionType) contains ActionType("LinkTo"))}
 }
 
 object UiStory {
