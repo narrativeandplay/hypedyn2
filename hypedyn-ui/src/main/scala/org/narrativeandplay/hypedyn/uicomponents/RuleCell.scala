@@ -2,12 +2,14 @@ package org.narrativeandplay.hypedyn.uicomponents
 
 import javafx.scene.control.{ListCell => JfxListCell}
 
+import org.narrativeandplay.hypedyn.uicomponents.RuleCellComponents.ConditionCell
+
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
-import scalafx.geometry.Pos
+import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control._
-import scalafx.scene.layout.{Priority, HBox}
+import scalafx.scene.layout.{Priority, HBox, StackPane}
 import scalafx.util.StringConverter
 import scalafx.scene.Parent.sfxParent2jfx
 
@@ -83,16 +85,16 @@ class RuleCell(val rule: UiRule,
 
     children += moveUpButton
     children += moveDownButton
-    children += new TextField() {
-      text <==> rule.nameProperty
-
-      HBox.setHgrow(this, Priority.Always)
-    }
     children += new Button("−") {
       onAction = { _ =>
         ruleList -= rule
         self.parent().children -= self
       }
+    }
+    children += new TextField() {
+      text <==> rule.nameProperty
+
+      HBox.setHgrow(this, Priority.Always)
     }
     children += new CheckBox("Stop if true") {
       allowIndeterminate = false
@@ -107,7 +109,6 @@ class RuleCell(val rule: UiRule,
       children += new Label("If ")
       children += conditionCombineType
       children += new Label(" of the following conditions are true:")
-      children += new ExpandableEmptySpace
       children += addCondButton
 
       alignment = Pos.CenterLeft
@@ -118,23 +119,28 @@ class RuleCell(val rule: UiRule,
 
     graphic = new HBox {
       children += new Label("Then perform the following actions:")
-      children += new ExpandableEmptySpace
       children += addActionButton
 
       alignment = Pos.CenterLeft
     }
   }
 
-  lazy val addCondButton: Button = new Button("Add condition") {
-    onAction = { _ =>
-      val newCond = addCondition()
-      conditionsNode.children += new RuleCellComponents.ConditionCell(newCond, conditionDefs, story, self, rule)
+  lazy val addCondButton: StackPane = new StackPane {
+    padding = Insets(0, 0, 0, 10)
+    children += new Button("Add condition") {
+      onAction = { _ =>
+        val newCond = addCondition()
+        conditionsNode.children += new ConditionCell(newCond, conditionDefs, story, self, rule)
+      }
     }
   }
-  lazy val addActionButton: Button = new Button("Add action") {
-    onAction = { _ =>
-      val newAction = addAction()
-      actionsNode.children += new RuleCellComponents.ActionCell(newAction, actionDefs, story, self, rule)
+  lazy val addActionButton: StackPane = new StackPane {
+    padding = Insets(0, 0, 0, 10)
+    children += new Button("Add action") {
+      onAction = { _ =>
+        val newAction = addAction()
+        actionsNode.children += new RuleCellComponents.ActionCell(newAction, actionDefs, story, self, rule)
+      }
     }
   }
 

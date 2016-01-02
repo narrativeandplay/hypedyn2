@@ -184,7 +184,7 @@ class NodeEditor private (dialogTitle: String,
                 }
               }
 
-              graphic = new HBox(10, nameField, removeButton)
+              graphic = new HBox(10, removeButton, nameField)
             case None => graphic = null
           }
         }
@@ -311,8 +311,6 @@ class NodeEditor private (dialogTitle: String,
     children += new HBox {
       padding = Insets(5)
       alignment = Pos.CenterLeft
-      children += new Label("Fragments")
-      children += new ExpandableEmptySpace
       children += new Button("Add fragment") {
         disable <== EasyBind combine (nodeContentText.selectedTextProperty, nodeContentText.selectionProperty, { (s: String, i: JfxIndexRange) =>
           val spansInSelection = nodeContentText styleSpansAt i map (_.getStyle.ruleset)
@@ -345,9 +343,6 @@ class NodeEditor private (dialogTitle: String,
     orientation = Orientation.HORIZONTAL
     add(rulesetsListVBox)
     add(new VBox {
-      children += new Label("Content:") {
-        padding = Insets(5)
-      }
       children += nodeContentText
 
       VBox.setVgrow(nodeContentText, Priority.Always)
@@ -383,11 +378,11 @@ class NodeEditor private (dialogTitle: String,
 
   val contentPane = new BorderPane() {
     top = new VBox() {
-      children += new Label("Name:")
       children += new HBox(10) {
         padding = Insets(5, 0, 5, 0)
         alignment = Pos.CenterLeft
 
+        children += new Label("Name:")
         children += nodeNameField
         children += startNodeCheckbox
 
@@ -406,12 +401,14 @@ class NodeEditor private (dialogTitle: String,
         visible = false
       }
       items += new Button {
-        text = "Show/hide rules"
+        text = "Hide rules"
 
         onAction = { _ =>
           mainContentPane isShown textAndNodeRulesPane match {
             case true => mainContentPane.hide(textAndNodeRulesPane)
+              text = "Show rules"
             case false => mainContentPane.show(textAndNodeRulesPane)
+              text = "Hide rules"
           }
         }
       }
@@ -421,11 +418,13 @@ class NodeEditor private (dialogTitle: String,
       style = "-fx-background-color: transparent;"
       orientation = Orientation.VERTICAL
 
-      items += new SidebarButton("Fragments") {
+      items += new SidebarButton("Hide fragments") {
         onAction = { _ =>
           contentTextAndRulesetsListPane isShown rulesetsListVBox match {
             case true => contentTextAndRulesetsListPane.hide(rulesetsListVBox)
+              buttonText = "Show fragments"
             case false => contentTextAndRulesetsListPane.show(rulesetsListVBox)
+              buttonText = "Hide fragments"
           }
         }
       }
@@ -495,7 +494,7 @@ class NodeEditor private (dialogTitle: String,
   /**
    * Shows a blocking node editor dialog
    *
-   * @return An option containg the edited face, or None if the dialog was not closed with the OK button
+   * @return An option containing the edited face, or None if the dialog was not closed with the OK button
    */
   def showAndWait(): Option[Nodal] = {
     initModality(Modality.APPLICATION_MODAL)

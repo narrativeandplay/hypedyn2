@@ -57,8 +57,6 @@ class RulesPane(labelText: String,
     alignment = Pos.CenterLeft
     padding = Insets(5, 5, 0, 5)
 
-    children += label
-    children += new ExpandableEmptySpace
     children += addRuleButton
   }
   children += rulesList

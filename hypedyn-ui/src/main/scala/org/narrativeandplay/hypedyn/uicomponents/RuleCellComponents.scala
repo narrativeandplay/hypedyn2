@@ -125,7 +125,7 @@ object RuleCellComponents {
     }
 
     lazy val removeButton = new StackPane {
-      padding = Insets(0, 0, 0, 10)
+      padding = Insets(0, 10, 0, 0)
       children += new Button("−") {
         onAction = { _ =>
           parentTreeItem.getChildren.remove(self)
@@ -187,7 +187,7 @@ object RuleCellComponents {
         condParamsChildren += newComponent
       }
 
-    graphic = new HBox(rearrangeButtons, condTypeCombo, condParams, removeButton)
+    graphic = new HBox(rearrangeButtons, removeButton, condTypeCombo, condParams)
     
   }
 
@@ -252,7 +252,7 @@ object RuleCellComponents {
     }
 
     lazy val removeButton = new StackPane {
-      padding = Insets(0, 0, 0, 10)
+      padding = Insets(0, 10, 0, 0)
       children += new Button("−") {
         onAction = { _ =>
           parentTreeItem.getChildren.remove(self)
@@ -314,7 +314,7 @@ object RuleCellComponents {
         actionParamsChildren += newComponent
       }
 
-    graphic = new HBox(rearrangeButtons, actionTypeCombo, actionParams, removeButton)
+    graphic = new HBox(rearrangeButtons, removeButton, actionTypeCombo, actionParams)
   }
 
   /**
