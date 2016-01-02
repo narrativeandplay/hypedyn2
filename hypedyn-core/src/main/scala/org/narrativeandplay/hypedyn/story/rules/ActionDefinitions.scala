@@ -10,11 +10,11 @@ object ActionDefinitions {
   import ActionLocationType.{NodeContentAction, NodeAction, StoryAction}
 
   private val definitions = List(
-    ActionDefinition(ActionType("LinkTo"), "Link to", List(NodeContentAction),
+    ActionDefinition(ActionType("LinkTo"), "Follow link to", List(NodeContentAction),
                      List(RuleParameter("node", Nodes))),
     ActionDefinition(ActionType("ShowPopupNode"), "Show node in popup", List(NodeContentAction),
                      List(RuleParameter("node", Nodes))),
-    ActionDefinition(ActionType("UpdateText"), "Update text", List(NodeContentAction),
+    ActionDefinition(ActionType("UpdateText"), "Update fragment text", List(NodeContentAction),
                      List(RuleParameter("text", Union(Map(
                       "Input" -> RuleParameter("textInput", UserInputString),
                       "String Fact" -> RuleParameter("stringFactValue", StringFacts),
