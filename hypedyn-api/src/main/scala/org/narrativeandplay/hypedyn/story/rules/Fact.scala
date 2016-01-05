@@ -13,15 +13,6 @@ sealed trait Fact {
    * Returns the name of the fact
    */
   def name: String
-
-  override def hashCode(): Int = id.hashCode()
-
-  override def equals(that: Any): Boolean = that match {
-    case that: Fact => (that canEqual this) && (id == that.id)
-    case _ => false
-  }
-
-  def canEqual(that: Any): Boolean = that.isInstanceOf[Fact]
 }
 
 object Fact {
