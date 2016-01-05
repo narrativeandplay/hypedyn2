@@ -55,11 +55,13 @@ object Actionable {
  * @param actionType The name of the action type being defined
  * @param description The description of the action, also used as its string representation in the UI
  * @param actionLocationTypes The locations the action may be used
+ * @param canActivate Whether this action makes the associated fragment clickable
  * @param parameters The list of parameters that the action has
  */
 sealed case class ActionDefinition(actionType: Actionable.ActionType,
                                    description: String,
                                    actionLocationTypes: List[ActionLocationType],
+                                   canActivate: Boolean,
                                    parameters: List[RuleParameter])
 
 /**
