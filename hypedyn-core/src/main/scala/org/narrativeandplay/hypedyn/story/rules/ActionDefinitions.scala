@@ -11,26 +11,34 @@ object ActionDefinitions {
 
   private val definitions = List(
     ActionDefinition(ActionType("LinkTo"), "Follow link to", List(NodeContentAction),
+                     true,
                      List(RuleParameter("node", Nodes))),
     ActionDefinition(ActionType("ShowPopupNode"), "Show node in popup", List(NodeContentAction),
+                     true,
                      List(RuleParameter("node", Nodes))),
     ActionDefinition(ActionType("UpdateText"), "Update fragment text", List(NodeContentAction),
+                     false,
                      List(RuleParameter("text", Union(Map(
                       "Input" -> RuleParameter("textInput", UserInputString),
                       "String Fact" -> RuleParameter("stringFactValue", StringFacts),
                       "Number Fact" -> RuleParameter("NumberFactValue", IntegerFacts)
                      ))))),
     ActionDefinition(ActionType("UpdateBooleanFact"), "Update true/false fact", List(NodeContentAction, NodeAction, StoryAction),
+                     true,
                      List(RuleParameter("fact", BooleanFacts),
                           RuleParameter("value", ListOfValues("true", "false")))),
     ActionDefinition(ActionType("UpdateStringFact"), "Update text fact", List(NodeContentAction, NodeAction, StoryAction),
+                     true,
                      List(RuleParameter("fact", StringFacts),
                           RuleParameter("value", UserInputString))),
     ActionDefinition(ActionType("EnableAnywhereLinkToHere"), "Enable anywhere link to here", List(NodeAction),
+                     false,
                      List()),
     ActionDefinition(ActionType("ShowDisabledAnywhereLink"), "Show disabled anywhere link", List(NodeAction),
+                     false,
                      List()),
     ActionDefinition(ActionType("UpdateIntegerFacts"), "Update number fact", List(NodeAction, NodeContentAction, StoryAction),
+                     true,
                      List(
                        RuleParameter("fact", IntegerFacts),
                        RuleParameter("updateValue", Union(Map(

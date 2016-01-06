@@ -14,9 +14,14 @@ object ViewerConversions {
    */
   implicit class StoryViewerNode(nodal: Nodal) {
     /**
-     * Returns the list of links of a node
+     * Returns the list of "follow link" links of a node
      */
     def links = nodal.content.rulesets flatMap (_.rules) filter (_.isLink)
+
+    /**
+      * Returns the list of "show in popup" links of a node
+      */
+    def showInPopups = nodal.content.rulesets flatMap (_.rules) filter (_.isShowInPopup)
 
     /**
      * Returns true is the node is an anywhere node, false otherwise
@@ -34,9 +39,13 @@ object ViewerConversions {
    */
   implicit class StoryViewerRule(ruleLike: RuleLike) {
     /**
-     * Returns true if a rule is a link, false otherwise
+     * Returns true if a rule is a "follow link to" link, false otherwise
      */
     def isLink = ruleLike.actions map (_.actionType) contains ActionType("LinkTo")
+    /**
+      * Returns true if a rule is a "show in popup" link, false otherwise
+      */
+    def isShowInPopup = ruleLike.actions map (_.actionType) contains ActionType("ShowPopupNode")
   }
 
 }

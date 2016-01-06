@@ -5,6 +5,8 @@ import javafx.event.EventHandler
 import javafx.scene.control.{Control => JfxControl, Skin}
 import javafx.scene.{input => jfxsi}
 
+import org.narrativeandplay.hypedyn.story.rules.RuleLike
+
 import scala.collection.mutable.ArrayBuffer
 
 import scalafx.Includes._
@@ -78,7 +80,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   def addNode(node: Nodal): ViewerNode = {
     val n = makeNode(node)
 
-    makeLinks(n)
+    makeAllLinks(n)
 
     n
   }
@@ -99,7 +101,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
         grp.removeAll(linksToRemove)
       }
 
-      makeLinks(viewerNode)
+      makeAllLinks(viewerNode)
     }
 
     requestLayout()
@@ -127,7 +129,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
    */
   def loadStory(story: Narrative): Unit = {
     val ns = story.nodes map makeNode
-    ns foreach makeLinks
+    ns foreach makeAllLinks
   }
 
   /**
@@ -145,13 +147,26 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   }
 
   /**
+    * creates both types of links ("follow link to" and "show in popup") for a given node
+    *
+    * @param viewerNode The node to create links for
+    *
+    */
+  private def makeAllLinks(viewerNode: ViewerNode): Unit = {
+    makeLinks(viewerNode, viewerNode.node().links, ActionType("LinkTo"))
+    makeLinks(viewerNode, viewerNode.node().showInPopups, ActionType("ShowPopupNode"))
+  }
+
+  /**
    * Creates the links for a given node
    *
    * @param viewerNode The node to create links for
+   * @param links list of links
+   * @param actionType type of action for these links
    */
-  private def makeLinks(viewerNode: ViewerNode): Unit = {
-    viewerNode.node().links foreach { link =>
-      val toNode = link.actions find (_.actionType == ActionType("LinkTo")) flatMap (_.params get ParamName("node")) flatMap { linkTo =>
+  private def makeLinks(viewerNode: ViewerNode, links: List[RuleLike], actionType: ActionType): Unit = {
+    links foreach { link =>
+      val toNode = link.actions find (_.actionType == actionType) flatMap (_.params get ParamName("node")) flatMap { linkTo =>
         val nodeId = linkTo.asInstanceOf[ParamValue.Node].node
         nodes find (_.id == nodeId)
       }

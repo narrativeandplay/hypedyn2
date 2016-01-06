@@ -417,7 +417,7 @@ object RuleCellComponents {
     }
 
     converter = new StringConverter[UiNodeContent.UiRuleset] {
-      override def fromString(string: String): UiNodeContent.UiRuleset = (story().links find (_.name == string)).get
+      override def fromString(string: String): UiNodeContent.UiRuleset = (story().canActivate find (_.name == string)).get
 
       override def toString(t: UiNodeContent.UiRuleset): String = t.name
     }
@@ -426,12 +426,12 @@ object RuleCellComponents {
       Option(value()) foreach { v => paramMap += paramName -> ParamValue.Link(v.id) }
     }
 
-    items <== EasyBind monadic story map[ObservableList[UiNodeContent.UiRuleset]] (_.links)
+    items <== EasyBind monadic story map[ObservableList[UiNodeContent.UiRuleset]] (_.canActivate)
 
     items onChange {
       `val` foreach {
         case ParamValue.Link(id) =>
-          story().links find (_.id == id) foreach { r => value = r }
+          story().canActivate find (_.id == id) foreach { r => value = r }
         case pv =>
           throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.Link, got: $pv")
       }
@@ -444,7 +444,7 @@ object RuleCellComponents {
         case ParamValue.Link(l) => l
         case pv => throw RuleCellParameterComponent.InvalidParamValueException(s"Expected type ParamValue.Link, got: $pv")
       }
-      story().links find (_.id == idToSet) foreach { r => value = r }
+      story().canActivate find (_.id == idToSet) foreach { r => value = r }
     }
   }
 

@@ -6,7 +6,7 @@ import scalafx.collections.ObservableBuffer
 
 import org.narrativeandplay.hypedyn.story.Narrative.{Metadata, ReaderStyle}
 import org.narrativeandplay.hypedyn.story.rules.Actionable.ActionType
-import org.narrativeandplay.hypedyn.story.rules.Fact
+import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, Fact}
 
 /**
  * UI implementation for Narrative
@@ -96,8 +96,12 @@ class UiStory(initTitle: String,
    */
   override def rules: List[UiRule] = rulesProperty().toList
 
-  def links: ObservableBuffer[UiNodeContent.UiRuleset] = nodesProperty() flatMap (_.contentProperty().rulesetsProperty()) filter { ruleset =>
-    ruleset.rulesProperty exists ( rule => rule.actions map (_.actionType) contains ActionType("LinkTo"))}
+  /**
+    * Returns an observable buffer (why not a list?) of rulesets that can be activated (usually by clicking)
+    */
+  def canActivate: ObservableBuffer[UiNodeContent.UiRuleset] = nodesProperty() flatMap (_.contentProperty().rulesetsProperty()) filter { ruleset =>
+    ActionDefinitions() filter { actionDefinition => actionDefinition.canActivate } map(_.actionType.value) exists (thisActionType =>
+      (ruleset.rulesProperty.exists( rule => rule.actions.map(_.actionType) contains ActionType(thisActionType)))) }
 }
 
 object UiStory {
