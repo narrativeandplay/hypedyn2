@@ -119,7 +119,7 @@ object UiEventDispatcher {
     openedNodeEditors foreach (_.story() = evt.story)
   }
   EventBus.FileLoadedEvents foreach { evt =>
-    Main.editFilename(evt.filename)
+    Main.editFilename(evt.fileOption map (_.getName) getOrElse "Untitled")
   }
 
   EventBus.NewStoryResponses foreach { _ => EventBus.send(CreateStory(src = UiEventSourceIdentity)) }

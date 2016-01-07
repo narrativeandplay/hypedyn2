@@ -177,7 +177,7 @@ object CoreEventDispatcher {
 
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
     EventBus.send(DataLoaded(pluginData, CoreEventSourceIdentity))
-    EventBus.send(FileLoaded(evt.file.getName, CoreEventSourceIdentity))
+    EventBus.send(FileLoaded(loadedFile, CoreEventSourceIdentity))
   }
 
   EventBus.ExportToFileEvents foreach { evt =>
@@ -207,7 +207,7 @@ object CoreEventDispatcher {
     UndoController.markCurrentPosition()
 
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
-    EventBus.send(FileLoaded("Untitled", CoreEventSourceIdentity))
+    EventBus.send(FileLoaded(loadedFile, CoreEventSourceIdentity))
   }
   EventBus.UpdateStoryPropertiesEvents foreach { evt =>
     StoryController.editStory(evt.title, evt.author, evt.description, evt.metadata)

@@ -146,7 +146,7 @@ sealed case class StorySaved(filename: String, src: String) extends Completion
 sealed case class StoryLoaded(story: Narrative, src: String) extends Completion
 sealed case class StoryUpdated(story: Narrative, src: String) extends Completion
 sealed case class DataLoaded(data: Map[String, AstElement], src: String) extends Completion
-sealed case class FileLoaded(filename: String, src: String) extends Completion
+sealed case class FileLoaded(fileOption: Option[File], src: String) extends Completion
 
 sealed case class StoryExported(src: String) extends Completion
 sealed case class StoryRan(src: String) extends Completion
