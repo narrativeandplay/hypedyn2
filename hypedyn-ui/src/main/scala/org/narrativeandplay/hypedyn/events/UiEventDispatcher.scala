@@ -87,9 +87,6 @@ object UiEventDispatcher {
     val fileToLoad = Main.fileDialog.showOpenFileDialog()
 
     fileToLoad foreach { f =>
-      HypedynPreferences.recentFiles +:= f
-      Main.refreshRecent.onNext(())
-
       EventBus.send(LoadFromFile(f, UiEventSourceIdentity))
     }
   }
@@ -119,6 +116,11 @@ object UiEventDispatcher {
     openedNodeEditors foreach (_.story() = evt.story)
   }
   EventBus.FileLoadedEvents foreach { evt =>
+    evt.fileOption foreach { f =>
+      HypedynPreferences.recentFiles +:= f
+      Main.refreshRecent.onNext(())
+    }
+
     Main.editFilename(evt.fileOption map (_.getName) getOrElse "Untitled")
   }
 
