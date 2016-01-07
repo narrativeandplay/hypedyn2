@@ -133,6 +133,7 @@ object EventBus {
   val StoryUpdatedEvents = eventBus collect { case e: StoryUpdated => e }
   val StoryLoadedEvents = eventBus collect { case e: StoryLoaded => e }
   val DataLoadedEvents = eventBus collect { case e: DataLoaded => e }
+  val FileSavedEvents = eventBus collect { case e: FileSaved => e }
   val FileLoadedEvents = eventBus collect { case e: FileLoaded => e }
 
   val StoryExportedEvents = eventBus collect { case e: StoryExported => e }

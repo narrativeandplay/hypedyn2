@@ -105,15 +105,15 @@ object UiEventDispatcher {
     EventBus.send(StoryRan(UiEventSourceIdentity))
   }
 
-  EventBus.StorySavedEvents foreach { evt =>
-    Main.editFilename(evt.filename)
-  }
   EventBus.StoryLoadedEvents foreach { evt =>
     FactViewer.facts.clear()
     evt.story.facts foreach { f => FactViewer.facts += f }
   }
   EventBus.StoryUpdatedEvents foreach { evt =>
     openedNodeEditors foreach (_.story() = evt.story)
+  }
+  EventBus.FileSavedEvents foreach { evt =>
+    Main.editFilename(evt.file.getName)
   }
   EventBus.FileLoadedEvents foreach { evt =>
     evt.fileOption foreach { f =>

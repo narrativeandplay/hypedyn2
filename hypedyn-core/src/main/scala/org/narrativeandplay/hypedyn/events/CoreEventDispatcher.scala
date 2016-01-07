@@ -157,7 +157,8 @@ object CoreEventDispatcher {
 
         UndoController.markCurrentPosition()
 
-        EventBus.send(StorySaved(saveFileEvt.file.getName, CoreEventSourceIdentity))
+        EventBus.send(StorySaved(StoryController.story, CoreEventSourceIdentity))
+        EventBus.send(FileSaved(saveFileEvt.file, CoreEventSourceIdentity))
       }
   }
 
