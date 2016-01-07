@@ -113,6 +113,9 @@ object UiEventDispatcher {
     openedNodeEditors foreach (_.story() = evt.story)
   }
   EventBus.FileSavedEvents foreach { evt =>
+    HypedynPreferences.recentFiles +:= evt.file
+    Main.refreshRecent.onNext(())
+
     Main.editFilename(evt.file.getName)
   }
   EventBus.FileLoadedEvents foreach { evt =>
