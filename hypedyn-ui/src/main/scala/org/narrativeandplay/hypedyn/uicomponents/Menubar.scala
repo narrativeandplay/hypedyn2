@@ -61,7 +61,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   }
 
   private lazy val openRecentStory = new Menu("Open Recent") {
-    items = HypedynPreferences.recentFiles map { file =>
+    def makeMenuItems() = items = HypedynPreferences.recentFiles map { file =>
       new MenuItem(file.getName) {
         onAction = { _ =>
           UiEventDispatcher requestExit { loadStory =>
@@ -71,17 +71,9 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
       }
     }
 
-    Main.refreshRecent foreach { _ =>
-      items = HypedynPreferences.recentFiles map { file =>
-        new MenuItem(file.getName) {
-          onAction = { _ =>
-            UiEventDispatcher requestExit { loadStory =>
-              if (loadStory) UiEventDispatcher.loadStory(file)
-            }
-          }
-        }
-      }
-    }
+    makeMenuItems()
+
+    Main.refreshRecent foreach { _ => makeMenuItems() }
   }
 
   private lazy val saveStory = new MenuItem("Save") {
