@@ -45,7 +45,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   private lazy val newStory = new MenuItem("New") {
     accelerator = KeyCombinations.New
 
-    onAction = { ae: ActionEvent =>
+    onAction = { _ =>
       UiEventDispatcher requestExit { createNewStory =>
         if (createNewStory) UiEventDispatcher.requestNewStory()
       }
@@ -55,7 +55,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   private lazy val openStory = new MenuItem("Open"){
     accelerator = KeyCombinations.Open
 
-    onAction = { ae: ActionEvent =>
+    onAction = { _ =>
       UiEventDispatcher requestExit { loadStory =>
         if (loadStory) UiEventDispatcher.requestLoad()
       }
@@ -89,7 +89,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   private lazy val saveStory = new MenuItem("Save") {
     accelerator = KeyCombinations.Save
 
-    onAction = { ae: ActionEvent =>
+    onAction = { _ =>
       UiEventDispatcher.requestSave()
     }
   }
@@ -97,7 +97,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   private lazy val saveAs = new MenuItem("Save As...") {
     accelerator = KeyCombinations.SaveAs
 
-    onAction = { ae: ActionEvent =>
+    onAction = { _ =>
       UiEventDispatcher.requestSaveAs()
     }
   }
@@ -105,7 +105,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   private lazy val export = new MenuItem("Export...") {
     //accelerator = KeyCombinations.Export
 
-    onAction = { ae: ActionEvent =>
+    onAction = { _ =>
       UiEventDispatcher.requestExport()
     }
   }
@@ -115,7 +115,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   }
 
   private lazy val exit = new MenuItem("Exit") {
-    onAction = { actionEvent: ActionEvent =>
+    onAction = { _ =>
       UiEventDispatcher requestExit { exit =>
         if (exit) Platform.exit()
       }
@@ -133,7 +133,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
 
     disable <== !UiEventDispatcher.undoAvailable || !mainStageFocused
 
-    onAction = { actionEvent: ActionEvent =>
+    onAction = { _ =>
       UiEventDispatcher.requestUndo()
     }
   }
@@ -143,7 +143,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
 
     disable <== !UiEventDispatcher.redoAvailable || !mainStageFocused
 
-    onAction = { actionEvent: ActionEvent =>
+    onAction = { _ =>
       UiEventDispatcher.requestRedo()
     }
   }
@@ -151,7 +151,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   private lazy val cut = new MenuItem("Cut") {
     accelerator = KeyCombinations.Cut
 
-    onAction = { actionEvent: ActionEvent =>
+    onAction = { _ =>
       UiEventDispatcher.requestCut()
     }
   }
@@ -159,7 +159,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   private lazy val copy = new MenuItem("Copy") {
     accelerator = KeyCombinations.Copy
 
-    onAction = { actionEvent: ActionEvent =>
+    onAction = { _ =>
       UiEventDispatcher.requestCopy()
     }
   }
@@ -167,7 +167,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   private lazy val paste = new MenuItem("Paste") {
     accelerator = KeyCombinations.Paste
 
-    onAction = { actionEvent: ActionEvent =>
+    onAction = { _ =>
       UiEventDispatcher.requestPaste()
     }
   }
