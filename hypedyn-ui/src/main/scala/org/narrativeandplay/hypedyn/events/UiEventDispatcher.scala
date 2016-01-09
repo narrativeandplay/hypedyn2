@@ -75,13 +75,19 @@ object UiEventDispatcher {
       case None =>
         val fileToSaveTo = Main.fileDialog.showSaveFileDialog()
 
-        fileToSaveTo foreach { f => EventBus.send(SaveToFile(f, UiEventSourceIdentity)) }
+        fileToSaveTo match {
+          case Some(f) => EventBus.send(SaveToFile(f, UiEventSourceIdentity))
+          case None => EventBus.send(SaveCancelled(UiEventSourceIdentity))
+        }
     }
   }
   EventBus.SaveAsResponses foreach { _ =>
     val fileToSaveTo = Main.fileDialog.showSaveFileDialog()
 
-    fileToSaveTo foreach { f => EventBus.send(SaveToFile(f, UiEventSourceIdentity)) }
+    fileToSaveTo match {
+      case Some(f) => EventBus.send(SaveToFile(f, UiEventSourceIdentity))
+      case None => EventBus.send(SaveCancelled(UiEventSourceIdentity))
+    }
   }
   EventBus.LoadResponses foreach { _ =>
     val fileToLoad = Main.fileDialog.showOpenFileDialog()
