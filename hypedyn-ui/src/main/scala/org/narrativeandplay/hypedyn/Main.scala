@@ -153,7 +153,7 @@ object Main extends JFXApp {
     // CLose all windows when closing the main application window, i.e. make closing the main window equivalent to
     // an exiting of the program
     onCloseRequest = { evt =>
-      UiEventDispatcher.requestExit() foreach { exit =>
+      UiEventDispatcher requestExit { exit =>
         if (exit) Platform.exit() else evt.consume()
       }
     }
@@ -195,7 +195,7 @@ object Main extends JFXApp {
     override def handleQuitAction(app: ui.Application, time: Long): Unit = {
       super.handleQuitAction(app, time)
 
-      UiEventDispatcher.requestExit() foreach { exit =>
+      UiEventDispatcher requestExit { exit =>
         if (exit) Platform.exit()
       }
     }

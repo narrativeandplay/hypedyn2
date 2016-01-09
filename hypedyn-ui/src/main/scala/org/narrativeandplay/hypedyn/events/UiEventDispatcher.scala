@@ -250,12 +250,22 @@ object UiEventDispatcher {
   }
 
   /**
-   * Checks to see if the current story has unsaved changes before exiting
+   * Checks to see if the current story is changed before taking an action that results in changing the currently
+   * loaded story
    *
-   * @return An Rx Observable of exactly one boolean value,
-   *         which is `true` is the program is to be exited, and `false` otherwise
+   * @param f The action to perform
    */
-  def requestExit(): Observable[Boolean] = {
+  def requestExit(f: Boolean => Unit): Unit = {
+    // Bind the action to perform if a save is requested first before checking
+    // This ensures that there won't be a race condition with the save request
+    val subscription = EventBus.StorySavedEvents merge EventBus.SaveCancelledEvents subscribe { evt: Completion =>
+      evt match {
+        case e: StorySaved => f(true)
+        case e: SaveCancelled => f(false)
+        case _ => assert(false, "Impossible match")
+      }
+    }
+
     isStoryEdited() match {
       case true =>
         val Yes = new ButtonType("Yes")
@@ -271,14 +281,15 @@ object UiEventDispatcher {
         }
 
         confirmExit.showAndWait() match {
-          case Some(Yes) =>
-            requestSave()
-            EventBus.StorySavedEvents flatMap { _ => Observable.just(true) }
-          case Some(No) => Observable.just(true)
-          case _ => Observable.just(false)
+          case Some(Yes) => requestSave()
+          case Some(No) => f(true)
+          case _ => f(false)
         }
-      case false => Observable.just(true)
+      case false => f(true)
     }
+
+    // Clear the earlier binding, to prevent multiple executions of the callback
+    subscription.unsubscribe()
   }
 
 }

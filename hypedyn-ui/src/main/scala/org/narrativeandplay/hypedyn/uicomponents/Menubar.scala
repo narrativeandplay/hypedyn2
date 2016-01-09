@@ -46,7 +46,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
     accelerator = KeyCombinations.New
 
     onAction = { ae: ActionEvent =>
-      UiEventDispatcher.requestExit() foreach { createNewStory =>
+      UiEventDispatcher requestExit { createNewStory =>
         if (createNewStory) UiEventDispatcher.requestNewStory()
       }
     }
@@ -56,7 +56,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
     accelerator = KeyCombinations.Open
 
     onAction = { ae: ActionEvent =>
-      UiEventDispatcher.requestExit() foreach { loadStory =>
+      UiEventDispatcher requestExit { loadStory =>
         if (loadStory) UiEventDispatcher.requestLoad()
       }
     }
@@ -66,7 +66,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
     items = HypedynPreferences.recentFiles map { file =>
       new MenuItem(file.getName) {
         onAction = { _ =>
-          UiEventDispatcher.requestExit() foreach { loadStory =>
+          UiEventDispatcher requestExit { loadStory =>
             if (loadStory) UiEventDispatcher.loadStory(file)
           }
         }
@@ -77,7 +77,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
       items = HypedynPreferences.recentFiles map { file =>
         new MenuItem(file.getName) {
           onAction = { _ =>
-            UiEventDispatcher.requestExit() foreach { loadStory =>
+            UiEventDispatcher requestExit { loadStory =>
               if (loadStory) UiEventDispatcher.loadStory(file)
             }
           }
@@ -116,7 +116,9 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
 
   private lazy val exit = new MenuItem("Exit") {
     onAction = { actionEvent: ActionEvent =>
-      Platform.exit()
+      UiEventDispatcher requestExit { exit =>
+        if (exit) Platform.exit()
+      }
     }
   }
 
