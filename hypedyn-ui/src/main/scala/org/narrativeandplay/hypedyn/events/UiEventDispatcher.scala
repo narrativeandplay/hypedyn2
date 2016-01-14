@@ -101,7 +101,7 @@ object UiEventDispatcher {
     // get location to export to (a directory)
     val dirToSaveTo = Main.directoryDialog.showDialog()
 
-    dirToSaveTo foreach { d => EventBus.send(ExportToFile(d, Main.getFilename, UiEventSourceIdentity)) }
+    dirToSaveTo foreach { d => EventBus.send(ExportToFile(d, Main.loadedFileName, UiEventSourceIdentity)) }
   }
   // actually run the story
   EventBus.RunResponses foreach { evt => EventBus.send(RunStory(evt.fileToRun, UiEventSourceIdentity)) }
@@ -122,7 +122,7 @@ object UiEventDispatcher {
     HypedynPreferences.recentFiles +:= evt.file
     Main.refreshRecent.onNext(())
 
-    Main.editFilename(evt.file.getName)
+    Main.loadedFileName = evt.file.getName
   }
   EventBus.FileLoadedEvents foreach { evt =>
     evt.fileOption foreach { f =>
@@ -130,7 +130,7 @@ object UiEventDispatcher {
       Main.refreshRecent.onNext(())
     }
 
-    Main.editFilename(evt.fileOption map (_.getName) getOrElse "Untitled")
+    Main.loadedFileName = evt.fileOption map (_.getName) getOrElse "Untitled"
   }
 
   EventBus.NewStoryResponses foreach { _ => EventBus.send(CreateStory(src = UiEventSourceIdentity)) }

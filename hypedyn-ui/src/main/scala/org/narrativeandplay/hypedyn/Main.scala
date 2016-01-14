@@ -127,8 +127,8 @@ object Main extends JFXApp {
       """.stripMargin
   }
 
-  def editFilename(newFilename: String): Unit = loadedFilename() = newFilename
-  def getFilename = loadedFilename()
+  def loadedFileName_=(newFilename: String): Unit = loadedFilename() = newFilename
+  def loadedFileName = loadedFilename()
 
   def runInBrowser(file: File): Unit = {
     val runtime = Runtime.getRuntime
