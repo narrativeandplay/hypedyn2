@@ -114,7 +114,7 @@ sealed case class SaveData(pluginName: String, data: AstElement, src: String) ex
 sealed case class SaveToFile(file: File, src: String) extends Action
 sealed case class LoadFromFile(file: File, src: String) extends Action
 
-sealed case class ExportToFile(file: File, src: String) extends Action
+sealed case class ExportToFile(dir: File, filename: String, src: String) extends Action
 sealed case class RunStory(fileToRun: File, src: String) extends Action
 
 sealed case class CreateStory(title: String = "Untitled",

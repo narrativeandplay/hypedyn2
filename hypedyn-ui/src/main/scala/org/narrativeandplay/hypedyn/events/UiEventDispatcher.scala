@@ -99,9 +99,9 @@ object UiEventDispatcher {
 
   EventBus.ExportResponses foreach { evt =>
     // get location to export to (a directory)
-    val fileToSaveTo = Main.directoryDialog.showDialog()
+    val dirToSaveTo = Main.directoryDialog.showDialog()
 
-    fileToSaveTo foreach { f => EventBus.send(ExportToFile(f, UiEventSourceIdentity)) }
+    dirToSaveTo foreach { d => EventBus.send(ExportToFile(d, Main.getFilename, UiEventSourceIdentity)) }
   }
   // actually run the story
   EventBus.RunResponses foreach { evt => EventBus.send(RunStory(evt.fileToRun, UiEventSourceIdentity)) }

@@ -182,7 +182,7 @@ object CoreEventDispatcher {
   }
 
   EventBus.ExportToFileEvents foreach { evt =>
-    val exportDirectory = new File(evt.file, "export")
+    val exportDirectory = new File(evt.dir, evt.filename.stripSuffix(".dyn2") + "-export")
 
     IoController.copyResourceToFilesystem("export/reader/", exportDirectory)
 

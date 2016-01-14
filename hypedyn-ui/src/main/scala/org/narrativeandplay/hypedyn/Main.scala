@@ -128,6 +128,7 @@ object Main extends JFXApp {
   }
 
   def editFilename(newFilename: String): Unit = loadedFilename() = newFilename
+  def getFilename = loadedFilename()
 
   def runInBrowser(file: File): Unit = {
     val runtime = Runtime.getRuntime
