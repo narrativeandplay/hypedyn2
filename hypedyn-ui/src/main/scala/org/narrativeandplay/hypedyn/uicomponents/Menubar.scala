@@ -9,6 +9,7 @@ import scalafx.scene.control._
 import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 import org.narrativeandplay.hypedyn.keycombinations.KeyCombinations
+import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.utils.{HypedynPreferences, System}
 
 /**
@@ -107,7 +108,13 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   private lazy val exit = new MenuItem("Exit") {
     onAction = { _ =>
       UiEventDispatcher requestExit { exit =>
-        if (exit) Platform.exit()
+        if (exit) {
+          Logger.info("Exiting HypeDyn 2 via menu item")
+          Platform.exit()
+        }
+        else {
+          Logger.info("Menu item exit request cancelled/failed.")
+        }
       }
     }
   }

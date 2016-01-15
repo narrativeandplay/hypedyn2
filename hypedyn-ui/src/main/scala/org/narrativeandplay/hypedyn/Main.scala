@@ -19,6 +19,7 @@ import rx.lang.scala.subjects.{PublishSubject, SerializedSubject}
 
 import org.narrativeandplay.hypedyn.dialogs._
 import org.narrativeandplay.hypedyn.events._
+import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition, Fact}
@@ -40,6 +41,7 @@ object Main extends JFXApp {
   UiEventDispatcher
   ClipboardEventDispatcher
   UndoEventDispatcher
+  Logger
 
   private val icon = new Image(getClass.getResourceAsStream("hypedyn-icon.jpg"))
 
@@ -157,7 +159,14 @@ object Main extends JFXApp {
     // an exiting of the program
     onCloseRequest = { evt =>
       UiEventDispatcher requestExit { exit =>
-        if (exit) Platform.exit() else evt.consume()
+        if (exit) {
+          Logger.info("Exiting HypeDyn 2 via main window close")
+          Platform.exit()
+        }
+        else {
+          Logger.info("Window close exit request cancelled/failed.")
+          evt.consume()
+        }
       }
     }
 
@@ -199,7 +208,13 @@ object Main extends JFXApp {
       super.handleQuitAction(app, time)
 
       UiEventDispatcher requestExit { exit =>
-        if (exit) Platform.exit()
+        if (exit) {
+          Logger.info("Exiting HypeDyn 2 via Cmd-Q")
+          Platform.exit()
+        }
+        else {
+          Logger.info("Cmd-Q exit request cancelled/failed.")
+        }
       }
     }
   })
