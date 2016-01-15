@@ -43,6 +43,10 @@ object Main extends JFXApp {
   UndoEventDispatcher
   Logger
 
+  Thread.currentThread().setUncaughtExceptionHandler({ (_, throwable) =>
+    Logger.error("Error: ", throwable)
+  })
+
   private val icon = new Image(getClass.getResourceAsStream("hypedyn-icon.jpg"))
 
   private val loadedFilename = new StringProperty("Untitled")
@@ -188,8 +192,6 @@ object Main extends JFXApp {
 
     if (fileToOpen.exists()) UiEventDispatcher.loadStory(fileToOpen)
   }
-
-  System.setProperty("com.apple.mrj.application.apple.menu.about.name", "HypeDyn 2")
 
   private val app = ui.Application.GetApplication()
   app.setEventHandler(new EventHandler {
