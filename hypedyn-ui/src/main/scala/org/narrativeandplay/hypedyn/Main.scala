@@ -31,6 +31,8 @@ import org.narrativeandplay.hypedyn.utils.{System => Sys}
  * Entry point for the application
  */
 object Main extends JFXApp {
+  System.setProperty("org.slf4j.simpleLogger.logFile", s"${System.getProperty("user.home")}/hypedyn2.log")
+
   EventBus
   UndoController
   PluginsController
