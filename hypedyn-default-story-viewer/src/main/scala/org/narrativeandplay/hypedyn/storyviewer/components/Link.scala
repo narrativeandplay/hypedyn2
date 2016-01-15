@@ -1,7 +1,5 @@
 package org.narrativeandplay.hypedyn.storyviewer.components
 
-import javafx.collections.ObservableList
-
 import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, ObjectProperty}
 import scalafx.geometry.{Point2D, Pos}
@@ -14,7 +12,8 @@ import com.github.benedictleejh.scala.math.vector.Vector2
 import org.fxmisc.easybind.EasyBind
 
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
-import org.narrativeandplay.hypedyn.storyviewer.utils.{ViewerConversions, CubicPolynomial, Line, BezierCurve}
+import org.narrativeandplay.hypedyn.storyviewer.utils.{CubicPolynomial, Line, BezierCurve}
+import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions.StoryViewerRule
 import org.narrativeandplay.hypedyn.story.rules.RuleLike
 import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils._
 import org.narrativeandplay.hypedyn.storyviewer.utils.VectorImplicitConversions._
@@ -49,7 +48,7 @@ class Link(val from: ViewerNode,
   val selected = BooleanProperty(false)
 
   private val linkLabel = new Label {
-    prefWidth <== EasyBind map (name, { s: String => Double box new Text(s).layoutBounds().getWidth })
+    prefWidth <== name map[java.lang.Double] { s => new Text(s).layoutBounds().width }
     maxWidth = Link.LabelWidth
     maxHeight = Link.LabelHeight
     alignment = Pos.Center
@@ -185,17 +184,15 @@ class Link(val from: ViewerNode,
    * Returns the full graphical representation of the link
    */
   def draw = {
-    val storyviewerrule = ViewerConversions.StoryViewerRule(rule())
-
     val pathCurve = path
     val line = pathCurve.toFxPath
-    if(storyviewerrule.isShowInPopup) line.getStrokeDashArray.addAll(3.0,7.0)
+    if(rule().isShowInPopup) line.strokeDashArray.addAll(3.0,7.0)
 
     val highlight = if (selected()) {
       val h = pathCurve.toFxPath
       h.stroke = Color.Red
       h.strokeWidth = 5
-      if(storyviewerrule.isShowInPopup) h.getStrokeDashArray.addAll(3.0,7.0)
+      if(rule().isShowInPopup) h.strokeDashArray.addAll(3.0,7.0)
 
       Some(h)
     }

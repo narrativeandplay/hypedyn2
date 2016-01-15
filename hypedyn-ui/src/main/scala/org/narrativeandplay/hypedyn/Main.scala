@@ -48,7 +48,7 @@ object Main extends JFXApp {
   private val icon = new Image(getClass.getResourceAsStream("hypedyn-icon.jpg"))
 
   private val loadedFilename = new StringProperty("Untitled")
-  private val editedMarker = EasyBind map (UiEventDispatcher.isStoryEdited.delegate.asInstanceOf[ObservableValue[Boolean]], if (_: Boolean) "*" else "")
+  private val editedMarker = EasyBind monadic UiEventDispatcher.isStoryEdited map[String] (if (_) "*" else "")
 
   private val refreshStream = SerializedSubject(PublishSubject[Unit]())
   def refreshRecent = refreshStream
