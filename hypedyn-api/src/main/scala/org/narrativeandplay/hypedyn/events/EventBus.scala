@@ -2,6 +2,8 @@ package org.narrativeandplay.hypedyn.events
 
 import rx.lang.scala.subjects.{PublishSubject, SerializedSubject}
 
+import org.narrativeandplay.hypedyn.logging.Logger
+
 /**
  * The object managing the event stream of the application
  *
@@ -18,7 +20,7 @@ object EventBus {
    * @param event The event to be sent
    */
   def send(event: Event) = {
-    println(event)
+    Logger.info(event)
     eventBus.onNext(event)
   }
 
