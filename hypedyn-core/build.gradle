@@ -1,7 +1,6 @@
 dependencies {
     // For runtime plugin finding
     compile "org.clapper:classutil_${rootProject.majorScalaVersion}:1.0.6"
-    compile 'ch.qos.logback:logback-classic:1.1.3'
 
     // For serialisation to JSON (save/load/export)
     compile "org.json4s:json4s-native_${rootProject.majorScalaVersion}:3.3.0"
