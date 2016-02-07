@@ -97,11 +97,14 @@ class UiStory(initTitle: String,
   override def rules: List[UiRule] = rulesProperty().toList
 
   /**
-    * Returns an observable buffer (why not a list?) of rulesets that can be activated (usually by clicking)
-    */
-  def canActivate: ObservableBuffer[UiNodeContent.UiRuleset] = nodesProperty() flatMap (_.contentProperty().rulesetsProperty()) filter { ruleset =>
-    ActionDefinitions() filter { actionDefinition => actionDefinition.canActivate } map(_.actionType.value) exists (thisActionType =>
-      (ruleset.rulesProperty.exists( rule => rule.actions.map(_.actionType) contains ActionType(thisActionType)))) }
+   * Returns an observable buffer (why not a list?) of rulesets that can be activated (usually by clicking)
+   */
+  def canActivate: ObservableBuffer[UiNodeContent.UiRuleset] =
+    nodesProperty() flatMap (_.contentProperty().rulesetsProperty()) filter { ruleset =>
+      ActionDefinitions() filter (_.canActivate) map (_.actionType.value) exists { thisActionType =>
+        ruleset.rulesProperty.exists( rule => rule.actions.map(_.actionType) contains ActionType(thisActionType))
+    }
+  }
 }
 
 object UiStory {
@@ -158,6 +161,11 @@ object UiStory {
      */
     override def readerStyle: ReaderStyle = readerStyleProperty()
 
-    override def toString: String = s"${getClass.getSimpleName}(comments: $comments, readerStyle: $readerStyle, backDisabled?: $isBackButtonDisabled, restartDisabled: $isRestartButtonDisabled)"
+    override def toString: String =
+      s"""${getClass.getSimpleName} (
+         |  comments: "$comments",
+         |  readerStyle: $readerStyle,
+         |  backDisabled?: $isBackButtonDisabled,
+         |  restartDisabled: $isRestartButtonDisabled)""".stripMargin
   }
 }

@@ -57,7 +57,19 @@ class UiNode(val id: NodeId,
    */
   override def isStartNode: Boolean = isStartNodeProperty()
 
-  override def toString: String = s"UiNode($id, $name, $content, isStartNode = $isStartNode, $rules)"
+  override def toString: String = {
+    val rulesString = rules match {
+      case Nil => "Nil"
+      case _ => s"""List(
+                   |    ${rules map (_.toString) mkString ",\n        "})"""
+    }
+    s"""UiNode(
+       |  id = $id,
+       |  name = $name,
+       |  content = $content,
+       |  isStartNode = $isStartNode,
+       |  rules = $rulesString""".stripMargin
+  }
 }
 
 object UiNode {

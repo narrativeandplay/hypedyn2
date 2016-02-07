@@ -2,8 +2,11 @@ package org.narrativeandplay.hypedyn.events
 
 import java.io.File
 
+import org.kiama.output.PrettyPrinter
+
 import org.narrativeandplay.hypedyn.serialisation.AstElement
-import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition, Fact, FactId}
+import org.narrativeandplay.hypedyn.story.NodalContent.RulesetId
+import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.{NodeId, Narrative, Nodal}
 
 /**
@@ -22,11 +25,44 @@ import org.narrativeandplay.hypedyn.story.{NodeId, Narrative, Nodal}
  *
  *
  */
-sealed trait Event {
+sealed trait Event extends PrettyPrinter {
   /**
    * Returns the originator of the event
    */
   def src: String
+
+  override def any (a : Any) : Doc =
+    if (a == null)
+      "null"
+    else
+      a match {
+        case v : Vector[_] => list (v.toList, "Vector ", any)
+        case m : Map[_,_]  => list (m.toList, "Map ", any)
+        case Nil           => "Nil"
+        case l : List[_]   => list (l, "List ", any)
+        case (l, r)        => any (l) <+> "->" <+> any (r)
+        case Some(v)       => s"Some ($v)"
+        case None          => "None"
+        case NodeId(id)    => s"NodeId ($id)"
+        case FactId(id)    => s"FactId ($id)"
+        case RuleId(id)    => s"RuleId ($id)"
+        case RulesetId(id) => s"RulesetId ($id)"
+        case p : Product   =>
+          val fields = p.getClass.getDeclaredFields map (_.getName) zip p.productIterator.to
+          if (fields.length == 0) {
+            s"${p.productPrefix}"
+          } else {
+            list (fields.toList,
+                  s"${p.productPrefix} ",
+                  any)
+          }
+        case s : String    => dquotes (text (s))
+        case _             => a.toDoc
+      }
+
+  override val defaultIndent = 2
+
+  override def toString: String = pretty(any(this))
 }
 
 

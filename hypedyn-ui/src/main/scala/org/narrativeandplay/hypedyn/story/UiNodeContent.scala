@@ -34,7 +34,16 @@ class UiNodeContent(initText: String, initRulesets: List[UiNodeContent.UiRuleset
    */
   override def rulesets: List[RulesetLike] = rulesetsProperty().toList
 
-  override def toString: String = s"${getClass.getCanonicalName}(text = '$text', rulesets = $rulesets"
+  override def toString: String = {
+    val rulesetsString = rulesets match {
+      case Nil => "Nil"
+      case _ => s"""List(
+                   |      ${rulesets map (_.toString) mkString ",\n        "})"""
+    }
+    s"""${getClass.getSimpleName} (
+       |    text = "$text",
+       |    rulesets = $rulesetsString""".stripMargin
+  }
 }
 
 object UiNodeContent {
@@ -92,6 +101,17 @@ object UiNodeContent {
 
     def canEqual(that: Any): Boolean = that.isInstanceOf[UiRuleset]
 
-    override def toString: String = s"${getClass.getCanonicalName}(id = $id, name = $name, indexes = (${indexes.startIndex.index}, ${indexes.endIndex.index}) rules = $rules)"
+    override def toString: String = {
+      val rulesString = rules match {
+        case Nil => "Nil"
+        case _ => s"""List(
+                     |    ${rules map (_.toString) mkString ",\n        "})"""
+      }
+      s"""${getClass.getSimpleName}(
+         |      id = $id,
+         |      name = $name,
+         |      indexes = (${indexes.startIndex.index}, ${indexes.endIndex.index}),
+         |      rules = $rulesString""".stripMargin
+    }
   }
 }
