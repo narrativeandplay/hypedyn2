@@ -9,9 +9,11 @@ import scalafx.scene.control.Label
 import scalafx.scene.layout.{StackPane, Pane}
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
+import scalafx.scene.text.TextAlignment
 
 /**
  * View (as in an MVC view) for the visual representation of a node
+ *
  * @param viewerNode
  */
 class ViewerNodeSkin(viewerNode: ViewerNode) extends Skin[ViewerNode] {
@@ -43,6 +45,7 @@ class ViewerNodeSkin(viewerNode: ViewerNode) extends Skin[ViewerNode] {
   private val nodeName = new Label {
     wrapText = true
     alignment = Pos.Center
+    textAlignment = TextAlignment.Center
 
     maxWidth <== viewerNode.widthProperty()
     maxHeight = ViewerNodeSkin.HeadingHeight
