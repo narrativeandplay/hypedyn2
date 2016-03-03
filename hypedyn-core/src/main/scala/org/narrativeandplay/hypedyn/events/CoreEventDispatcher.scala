@@ -136,7 +136,8 @@ object CoreEventDispatcher {
 
     val storyData = Serialiser serialise StoryController.story
     val saveData = AstMap("story" -> storyData)
-    IoController.write(Serialiser toString saveData, new File(tmpDir, "story.dyn"))
+    // wrap the JSON in a .js file to allow to avoid cross origin request error running localling in Chrome
+    IoController.write("function getStoryData(){\nreturn" + (Serialiser toString saveData) + ";\n};", new File(tmpDir, "story.js"))
 
     EventBus.send(RunResponse(new File(tmpDir, "index.html"), CoreEventSourceIdentity))
   }
