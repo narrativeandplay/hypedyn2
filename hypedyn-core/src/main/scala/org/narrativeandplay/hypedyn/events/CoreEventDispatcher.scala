@@ -4,6 +4,7 @@ import java.io.File
 import java.net.URI
 import java.nio.file.Files
 
+import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement}
 import org.narrativeandplay.hypedyn.serialisation.serialisers._
@@ -163,7 +164,7 @@ object CoreEventDispatcher {
       }
   }
 
-  EventBus.LoadFromFileEvents foreach { evt =>
+  EventBus.LoadFromFileEvents subscribe ({ evt =>
     val dataToLoad = IoController read evt.file
     val dataAst = (Serialiser fromString dataToLoad).asInstanceOf[AstMap]
 
@@ -180,7 +181,10 @@ object CoreEventDispatcher {
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
     EventBus.send(DataLoaded(pluginData, CoreEventSourceIdentity))
     EventBus.send(FileLoaded(loadedFile, CoreEventSourceIdentity))
-  }
+  }, { throwable =>
+    Logger.error("File loading error", throwable)
+    EventBus.send(Error("An error occurred while trying to load the story", throwable, CoreEventSourceIdentity))
+  })
 
   EventBus.ExportToFileEvents foreach { evt =>
     val exportDirectory = new File(evt.dir, evt.filename.stripSuffix(".dyn2") + "-export")
