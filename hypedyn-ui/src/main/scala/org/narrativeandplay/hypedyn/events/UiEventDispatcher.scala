@@ -42,7 +42,7 @@ object UiEventDispatcher {
     editor.show()
   }
   EventBus.EditNodeResponses foreach { response =>
-    openedNodeEditors find (_.node().id == response.node.id) match {
+    openedNodeEditors find (_.id == response.node.id) match {
       case Some(editor) => editor.dialogPane().scene().window().requestFocus()
       case None =>
         val editor = Main.nodeEditor("Edit Node", response.conditionDefinitions, response.actionDefinitions, response.story, response.node)
@@ -143,13 +143,13 @@ object UiEventDispatcher {
   }
 
   EventBus.NodeCreatedEvents foreach { evt =>
-    openedNodeEditors find (_.node().id == evt.originalNodeData.id) foreach (_.node() = evt.node)
+    openedNodeEditors find (_.id == evt.originalNodeData.id) foreach (_.updateNodeData(evt.node))
   }
   EventBus.NodeUpdatedEvents foreach { evt =>
-    openedNodeEditors find (_.node().id == evt.node.id) foreach (_.node() = evt.updatedNode)
+    openedNodeEditors find (_.id == evt.node.id) foreach (_.updateNodeData(evt.updatedNode))
   }
   EventBus.NodeDestroyedEvents foreach { evt =>
-    openedNodeEditors find (_.node().id == evt.node.id) foreach (_.close())
+    openedNodeEditors find (_.id == evt.node.id) foreach (_.close())
   }
 
   EventBus.UiNodeSelectedEvents foreach { evt => selectedNode() = Some(evt.id) }
