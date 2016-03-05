@@ -197,3 +197,4 @@ sealed trait Notification extends Event
 sealed case class FileStatus(isChanged: Boolean, src: String) extends Notification
 sealed case class UndoStatus(isAvailable: Boolean, src: String) extends Notification
 sealed case class RedoStatus(isAvailable: Boolean, src: String) extends Notification
+sealed case class Error(msg: String, throwable: Throwable, src: String) extends Notification

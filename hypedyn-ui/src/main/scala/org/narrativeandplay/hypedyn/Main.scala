@@ -52,17 +52,6 @@ object Main extends JFXApp {
     }
 
     Logger.error("", actualThrowable)
-
-    // Show an error dialog to the user on story loading exceptions
-    actualThrowable match {
-      case _: DeserialisationException | _: org.json4s.ParserUtil.ParseException =>
-        new Alert(
-          Alert.AlertType.Error,
-          "There was an error in reading the story file.",
-          ButtonType.OK
-        ).showAndWait()
-      case _ =>
-    }
   })
 
   private val icon = new Image(getClass.getResourceAsStream("hypedyn-icon.jpg"))

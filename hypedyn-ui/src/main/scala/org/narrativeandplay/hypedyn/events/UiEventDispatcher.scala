@@ -170,6 +170,10 @@ object UiEventDispatcher {
     redoAvailable() = evt.isAvailable
   }
 
+  EventBus.ErrorEvents foreach { err =>
+    new Alert(Alert.AlertType.Error, err.msg, ButtonType.OK).showAndWait()
+  }
+
   def requestNewNode(): Unit = {
     EventBus.send(NewNodeRequest(UiEventSourceIdentity))
   }
