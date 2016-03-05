@@ -8,7 +8,7 @@ import scalafx.application.{Platform, JFXApp}
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.beans.property.StringProperty
 import scalafx.scene.Scene
-import scalafx.scene.control.Alert
+import scalafx.scene.control.{ButtonType, Alert}
 import scalafx.scene.image.{ImageView, Image}
 import scalafx.scene.layout.{VBox, BorderPane}
 
@@ -21,6 +21,7 @@ import org.narrativeandplay.hypedyn.dialogs._
 import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.plugins.PluginsController
+import org.narrativeandplay.hypedyn.serialisation.serialisers.DeserialisationException
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition, Fact}
 import org.narrativeandplay.hypedyn.uicomponents._
@@ -42,7 +43,26 @@ object Main extends JFXApp {
   Logger
 
   Thread.currentThread().setUncaughtExceptionHandler({ (_, throwable) =>
-    Logger.error("Error: ", throwable)
+    // Most exceptions will show up as a `OnErrorNotImplementedException` because
+    // of RxScala, so we grab the actual exception instead of allowing it to
+    // pollute the logs
+    val actualThrowable = throwable match {
+      case e: rx.exceptions.OnErrorNotImplementedException => e.getCause
+      case e => e
+    }
+
+    Logger.error("", actualThrowable)
+
+    // Show an error dialog to the user on story loading exceptions
+    actualThrowable match {
+      case _: DeserialisationException | _: org.json4s.ParserUtil.ParseException =>
+        new Alert(
+          Alert.AlertType.Error,
+          "There was an error in reading the story file.",
+          ButtonType.OK
+        ).showAndWait()
+      case _ =>
+    }
   })
 
   private val icon = new Image(getClass.getResourceAsStream("hypedyn-icon.jpg"))
