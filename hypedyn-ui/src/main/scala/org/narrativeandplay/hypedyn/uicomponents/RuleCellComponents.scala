@@ -683,6 +683,8 @@ object RuleCellComponents {
       override def decrement(steps: Int): Unit = setValue(getValue - steps)
     }
 
+    paramMap += paramName -> ParamValue.IntegerInput(value())
+
     value onChange { (_, _, newValue) =>
       Option(newValue) foreach { v => paramMap += paramName -> ParamValue.IntegerInput(v) }
     }
