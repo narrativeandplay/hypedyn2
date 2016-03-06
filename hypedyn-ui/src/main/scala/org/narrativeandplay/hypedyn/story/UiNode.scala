@@ -70,6 +70,8 @@ class UiNode(val id: NodeId,
        |  isStartNode = $isStartNode,
        |  rules = $rulesString""".stripMargin
   }
+
+  def copy = new UiNode(id, name, content, isStartNode, rules)
 }
 
 object UiNode {

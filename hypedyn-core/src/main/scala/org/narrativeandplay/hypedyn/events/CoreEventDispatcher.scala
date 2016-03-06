@@ -3,6 +3,7 @@ package org.narrativeandplay.hypedyn.events
 import java.io.File
 import java.nio.file.Files
 
+import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.serialisation.serialisers._
 import org.narrativeandplay.hypedyn.serialisation.{AstElement, AstMap, IoController, Serialiser}
@@ -137,7 +138,8 @@ object CoreEventDispatcher {
 
     val storyData = Serialiser serialise StoryController.story
     val saveData = AstMap("story" -> storyData)
-    IoController.write(Serialiser toString saveData, new File(tmpDir, "story.dyn"))
+    // wrap the JSON in a .js file to allow to avoid cross origin request error running localling in Chrome
+    IoController.write("function getStoryData(){\nreturn" + (Serialiser toString saveData) + ";\n};", new File(tmpDir, "story.js"))
 
     EventBus.send(RunResponse(new File(tmpDir, "index.html"), CoreEventSourceIdentity))
   }
@@ -163,7 +165,7 @@ object CoreEventDispatcher {
       }
   }
 
-  EventBus.LoadFromFileEvents foreach { evt =>
+  EventBus.LoadFromFileEvents subscribe ({ evt =>
     val dataToLoad = IoController read evt.file
     val dataAst = (Serialiser fromString dataToLoad).asInstanceOf[AstMap]
 
@@ -180,7 +182,10 @@ object CoreEventDispatcher {
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
     EventBus.send(DataLoaded(pluginData, CoreEventSourceIdentity))
     EventBus.send(FileLoaded(loadedFile, CoreEventSourceIdentity))
-  }
+  }, { throwable =>
+    Logger.error("File loading error", throwable)
+    EventBus.send(Error("An error occurred while trying to load the story", throwable, CoreEventSourceIdentity))
+  })
 
   EventBus.ImportFromFileEvents foreach { evt =>
     val dataToImport = IoController read evt.file

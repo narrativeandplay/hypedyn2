@@ -1,6 +1,16 @@
 package org.narrativeandplay.hypedyn
 
 import java.io.File
+import javafx.beans.value.ObservableValue
+
+import scalafx.Includes._
+import scalafx.application.{Platform, JFXApp}
+import scalafx.application.JFXApp.PrimaryStage
+import scalafx.beans.property.StringProperty
+import scalafx.scene.Scene
+import scalafx.scene.control.{ButtonType, Alert}
+import scalafx.scene.image.{ImageView, Image}
+import scalafx.scene.layout.{VBox, BorderPane}
 
 import com.sun.glass.ui
 import com.sun.glass.ui.Application.EventHandler
@@ -9,6 +19,8 @@ import org.narrativeandplay.hypedyn.dialogs._
 import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.plugins.PluginsController
+import org.narrativeandplay.hypedyn.serialisation.serialisers.DeserialisationException
+import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition, Fact}
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.uicomponents._
@@ -39,7 +51,15 @@ object Main extends JFXApp {
   Logger
 
   Thread.currentThread().setUncaughtExceptionHandler({ (_, throwable) =>
-    Logger.error("Error: ", throwable)
+    // Most exceptions will show up as a `OnErrorNotImplementedException` because
+    // of RxScala, so we grab the actual exception instead of allowing it to
+    // pollute the logs
+    val actualThrowable = throwable match {
+      case e: rx.exceptions.OnErrorNotImplementedException => e.getCause
+      case e => e
+    }
+
+    Logger.error("", actualThrowable)
   })
 
   private val icon = new Image(getClass.getResourceAsStream("hypedyn-icon.jpg"))

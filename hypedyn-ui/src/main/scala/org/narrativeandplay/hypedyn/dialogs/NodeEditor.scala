@@ -103,12 +103,13 @@ class NodeEditor private (dialogTitle: String,
   private[this] val applyButton: Button = dialogPane().lookupButton(ButtonType.Apply).asInstanceOf[javafx.scene.control.Button]
 
   val story: ObjectProperty[UiStory] = ObjectProperty(narrative)
-  val node: ObjectProperty[UiNode] = ObjectProperty(nodeToEdit getOrElse NodeEditor.newNode)
+  private val node: ObjectProperty[UiNode] = ObjectProperty(nodeToEdit getOrElse NodeEditor.newNode)
   private[this] val monadicNode = EasyBind monadic node
 
-  private var updateFunc = UiEventDispatcher.updateNode(node())
-  node onChange { (_, _, newNode) =>
-    updateFunc = UiEventDispatcher.updateNode(newNode)
+  private var updateFunc = UiEventDispatcher.updateNode(nodeToEdit getOrElse NodeEditor.newNode)
+
+  story onChange { (_, _, newStory) =>
+    newStory.nodes find (_.id == node().id) foreach updateNodeData
   }
 
   okButton.addEventFilter(ActionEvent.Any, { ae: JfxActionEvent =>
@@ -490,6 +491,13 @@ class NodeEditor private (dialogTitle: String,
       nodeContentText.replaceText("")
     }
   }
+
+  def updateNodeData(updatedNode: UiNode): Unit = {
+    node() = updatedNode
+    updateFunc = UiEventDispatcher.updateNode(updatedNode.copy)
+  }
+
+  def id = node().id
 
   /**
    * Shows a blocking node editor dialog

@@ -156,4 +156,5 @@ object EventBus {
   val FileStatusEvents = eventBus collect { case e: FileStatus => e }
   val UndoStatusEvents = eventBus collect { case e: UndoStatus => e }
   val RedoStatusEvents = eventBus collect { case e: RedoStatus => e }
+  val ErrorEvents = eventBus collect { case e: Error => e }
 }
