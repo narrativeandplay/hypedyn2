@@ -1,12 +1,9 @@
 package org.narrativeandplay.hypedyn.story
 
-import org.narrativeandplay.hypedyn.story.internal.NodeContent.Ruleset
-import org.narrativeandplay.hypedyn.story.internal.Story.Metadata
-import org.narrativeandplay.hypedyn.story.internal.{NodeContent, Node, Story}
 import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions._
-import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamValue, ParamName}
+import org.narrativeandplay.hypedyn.story.internal.{Node, NodeContent, Story}
+import org.narrativeandplay.hypedyn.story.rules.RuleLike.ParamValue
 import org.narrativeandplay.hypedyn.story.rules._
-import org.narrativeandplay.hypedyn.story.rules.internal.Rule
 
 /**
  * Controller for handling story-related actions

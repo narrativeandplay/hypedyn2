@@ -1,32 +1,29 @@
 package org.narrativeandplay.hypedyn
 
 import java.io.File
-import javafx.beans.value.ObservableValue
-
-import scalafx.Includes._
-import scalafx.application.{Platform, JFXApp}
-import scalafx.application.JFXApp.PrimaryStage
-import scalafx.beans.property.StringProperty
-import scalafx.scene.Scene
-import scalafx.scene.control.Alert
-import scalafx.scene.image.{ImageView, Image}
-import scalafx.scene.layout.{VBox, BorderPane}
 
 import com.sun.glass.ui
 import com.sun.glass.ui.Application.EventHandler
 import org.fxmisc.easybind.EasyBind
-import rx.lang.scala.subjects.{PublishSubject, SerializedSubject}
-
 import org.narrativeandplay.hypedyn.dialogs._
 import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.plugins.PluginsController
-import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition, Fact}
+import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.uicomponents._
 import org.narrativeandplay.hypedyn.undo.UndoController
-import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 import org.narrativeandplay.hypedyn.utils.{System => Sys}
+import rx.lang.scala.subjects.{PublishSubject, SerializedSubject}
+
+import scalafx.Includes._
+import scalafx.application.JFXApp.PrimaryStage
+import scalafx.application.{JFXApp, Platform}
+import scalafx.beans.property.StringProperty
+import scalafx.scene.Scene
+import scalafx.scene.control.Alert
+import scalafx.scene.image.{Image, ImageView}
+import scalafx.scene.layout.{BorderPane, VBox}
 
 /**
  * Entry point for the application
@@ -54,9 +51,14 @@ object Main extends JFXApp {
   def refreshRecent = refreshStream
 
   /**
-   * Returns a new file dialog
-   */
+    * Returns a new file dialog
+    */
   def fileDialog = new FileDialog(stage)
+
+  /**
+    * Returns a new legacy file dialog
+    */
+  def legacyFileDialog = new LegacyFileDialog(stage)
 
   /**
    * Returns a new directory selection dialog

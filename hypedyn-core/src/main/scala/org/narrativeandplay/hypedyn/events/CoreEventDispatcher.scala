@@ -1,16 +1,16 @@
 package org.narrativeandplay.hypedyn.events
 
 import java.io.File
-import java.net.URI
 import java.nio.file.Files
 
 import org.narrativeandplay.hypedyn.plugins.PluginsController
-import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement}
 import org.narrativeandplay.hypedyn.serialisation.serialisers._
+import org.narrativeandplay.hypedyn.serialisation.{AstElement, AstMap, IoController, Serialiser}
+import org.narrativeandplay.hypedyn.story.StoryController
 import org.narrativeandplay.hypedyn.story.internal.Story
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, ConditionDefinitions, Fact}
 import org.narrativeandplay.hypedyn.undo._
-import org.narrativeandplay.hypedyn.story.StoryController
+import org.narrativeandplay.hypedyn.utils.parsing.SchemeParser
 
 /**
  * Main event dispatcher for the core
@@ -128,6 +128,7 @@ object CoreEventDispatcher {
   EventBus.LoadRequests foreach { _ => EventBus.send(LoadResponse(CoreEventSourceIdentity)) }
 
   EventBus.ExportRequests foreach { _ => EventBus.send(ExportResponse(CoreEventSourceIdentity)) }
+  EventBus.ImportRequests foreach { _ => EventBus.send(ImportResponse(CoreEventSourceIdentity)) }
   EventBus.RunRequests foreach { _ =>
     val tmpDir = Files.createTempDirectory("hypedyn2").toFile
     tmpDir.deleteOnExit()
@@ -178,6 +179,21 @@ object CoreEventDispatcher {
 
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
     EventBus.send(DataLoaded(pluginData, CoreEventSourceIdentity))
+    EventBus.send(FileLoaded(loadedFile, CoreEventSourceIdentity))
+  }
+
+  EventBus.ImportFromFileEvents foreach { evt =>
+    val dataToImport = IoController read evt.file
+    val story:Story = SchemeParser.parse(dataToImport)
+
+    StoryController.load(story)
+
+    loadedFile = None
+
+    UndoController.clearHistory()
+    UndoController.markCurrentPosition()
+
+    EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
     EventBus.send(FileLoaded(loadedFile, CoreEventSourceIdentity))
   }
 

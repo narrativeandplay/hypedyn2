@@ -1,16 +1,15 @@
 package org.narrativeandplay.hypedyn.uicomponents
 
-import scalafx.Includes._
-import scalafx.application.Platform
-import scalafx.beans.property.ReadOnlyBooleanProperty
-import scalafx.event.ActionEvent
-import scalafx.scene.control._
-
 import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 import org.narrativeandplay.hypedyn.keycombinations.KeyCombinations
 import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.utils.{HypedynPreferences, System}
+
+import scalafx.Includes._
+import scalafx.application.Platform
+import scalafx.beans.property.ReadOnlyBooleanProperty
+import scalafx.scene.control._
 
 /**
  * Menu bar for the application
@@ -34,7 +33,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
    * File Menu
    */
   private lazy val fileMenu = new Menu("File") {
-    items.addAll(newStory, openStory, openRecentStory, saveStory, saveAs, export,
+    items.addAll(newStory, openStory, openRecentStory, saveStory, saveAs, importLegacy, export,
                  new SeparatorMenuItem(),
                  editStoryProperties,
                  new SeparatorMenuItem(),
@@ -93,6 +92,11 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
     }
   }
 
+  private lazy val importLegacy = new MenuItem("Import...") {
+    onAction = { _ =>
+      UiEventDispatcher.requestImport()
+    }
+  }
   private lazy val export = new MenuItem("Export...") {
     //accelerator = KeyCombinations.Export
 

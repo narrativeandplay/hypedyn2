@@ -19,6 +19,7 @@ trait NarrativeViewer {
    * The plugin is automatically hooked into the appropriate event streams
    */
   EventBus.NodeCreatedEvents foreach { n => onNodeCreated(n.node) }
+  EventBus.MoveNodeEvents foreach { n => onMoveNode(n.node, n.x, n.y) }
   EventBus.NodeUpdatedEvents foreach { n => onNodeUpdated(n.node, n.updatedNode) }
   EventBus.NodeDestroyedEvents foreach { n => onNodeDestroyed(n.node) }
 
@@ -30,12 +31,21 @@ trait NarrativeViewer {
   def onNodeCreated(node: Nodal): Unit
 
   /**
-   * Defines what to do when a node is updated
-   *
-   * @param node The node to be updated
-   * @param updatedNode The same node with the updates already applied
-   */
+    * Defines what to do when a node is updated
+    *
+    * @param node The node to be updated
+    * @param updatedNode The same node with the updates already applied
+    */
   def onNodeUpdated(node: Nodal, updatedNode: Nodal): Unit
+
+  /**
+    * Defines what to do when a node should move
+    *
+    * @param node The node to be moved
+    * @param x The x coordinate
+    * @param y The y coordinate
+    */
+  def onMoveNode(node: Nodal, x:Double, y:Double): Unit
 
   /**
    * Defines what to do when a node is destroyed
