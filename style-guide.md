@@ -63,6 +63,10 @@ package object mypackage {
 
 Limit the number of public methods in your class to 30.
 
+## Case Classes
+
+Do not use `new` to construct new instances of case classes.
+
 # Imports
 
 ## Ordering
@@ -279,6 +283,22 @@ aLongMethodNameThatReturnsAFuture(
 ) map { res =>
   ...
 }
+```
+
+When calling `.apply` methods, do not explicitly invoke `.apply`. This is a standard Scala convention, and it makes no
+sense to explicitly invoke `.apply` as it conveys no information to the reader about the method call that is not
+already obvious from conventions.
+
+For example, use:
+
+```scala
+Option(1)
+```
+
+instead of:
+
+```
+Option.apply(1)
 ```
 
 ## Anonymous functions
