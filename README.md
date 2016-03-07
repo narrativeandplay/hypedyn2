@@ -55,6 +55,8 @@ More details on the packaging process can be found [here](http://docs.oracle.com
 This project follows standard gitflow conventions, with the only deviation from standard conventions being that the
 `develop` branch is named `development` instead.
 
+All code contributions must follow the code style as set out in the [style guide](style-guide.md)
+
 ## License
 
 Copyright (C) 2015  National University of Singapore
