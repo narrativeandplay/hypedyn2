@@ -12,6 +12,7 @@ import org.narrativeandplay.hypedyn.story.internal.Story
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, ConditionDefinitions, Fact}
 import org.narrativeandplay.hypedyn.undo._
 import org.narrativeandplay.hypedyn.story.StoryController
+import rx.exceptions.Exceptions
 
 /**
  * Main event dispatcher for the core
@@ -164,27 +165,41 @@ object CoreEventDispatcher {
       }
   }
 
-  EventBus.LoadFromFileEvents subscribe ({ evt =>
-    val dataToLoad = IoController read evt.file
-    val dataAst = (Serialiser fromString dataToLoad).asInstanceOf[AstMap]
+  EventBus.LoadFromFileEvents foreach { evt =>
+    try {
+      val dataToLoad = IoController read evt.file
+      val dataAst = Serialiser fromString dataToLoad match {
+        case d: AstMap => d
+        case e => throw DeserialisationException(s"Expected AstMap in deserialising story, received $e")
+      }
 
-    val pluginData = dataAst("plugins").asInstanceOf[AstMap].toMap
+      val pluginData = dataAst("plugins") match {
+        case d: AstMap => d.toMap
+        case e => throw DeserialisationException(s"Expected AstMap in deserialising plugin data, received $e")
+      }
 
-    val story = Serialiser.deserialise[Story](dataAst("story"))
-    StoryController load story
+      val story = Serialiser.deserialise[Story](dataAst("story"))
+      StoryController load story
 
-    loadedFile = Some(evt.file)
+      loadedFile = Some(evt.file)
 
-    UndoController.clearHistory()
-    UndoController.markCurrentPosition()
+      UndoController.clearHistory()
+      UndoController.markCurrentPosition()
 
-    EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
-    EventBus.send(DataLoaded(pluginData, CoreEventSourceIdentity))
-    EventBus.send(FileLoaded(loadedFile, CoreEventSourceIdentity))
-  }, { throwable =>
-    Logger.error("File loading error", throwable)
-    EventBus.send(Error("An error occurred while trying to load the story", throwable, CoreEventSourceIdentity))
-  })
+      EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
+      EventBus.send(DataLoaded(pluginData, CoreEventSourceIdentity))
+      EventBus.send(FileLoaded(loadedFile, CoreEventSourceIdentity))
+    }
+    catch {
+      case throwable: Throwable =>
+        Logger.error("File loading error", throwable)
+        EventBus.send(Error("An error occurred while trying to load the story", throwable, CoreEventSourceIdentity))
+
+        // Rethrow if this is not an exception we should be handling, e.g.
+        // StackOverflowException
+        Exceptions.throwIfFatal(throwable)
+    }
+  }
 
   EventBus.ExportToFileEvents foreach { evt =>
     val exportDirectory = new File(evt.dir, evt.filename.stripSuffix(".dyn2") + "-export")
