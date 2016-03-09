@@ -1,18 +1,18 @@
 package org.narrativeandplay.hypedyn.events
 
 import java.io.File
-import java.net.URI
 import java.nio.file.Files
 
 import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.plugins.PluginsController
-import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement}
 import org.narrativeandplay.hypedyn.serialisation.serialisers._
+import org.narrativeandplay.hypedyn.serialisation.{AstElement, AstMap, IoController, Serialiser}
+import org.narrativeandplay.hypedyn.story.StoryController
 import org.narrativeandplay.hypedyn.story.internal.Story
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, ConditionDefinitions, Fact}
 import org.narrativeandplay.hypedyn.undo._
-import org.narrativeandplay.hypedyn.story.StoryController
-import rx.exceptions.Exceptions
+
+import scala.util.control.NonFatal
 
 /**
  * Main event dispatcher for the core
@@ -191,13 +191,9 @@ object CoreEventDispatcher {
       EventBus.send(FileLoaded(loadedFile, CoreEventSourceIdentity))
     }
     catch {
-      case throwable: Throwable =>
+      case NonFatal(throwable) =>
         Logger.error("File loading error", throwable)
         EventBus.send(Error("An error occurred while trying to load the story", throwable, CoreEventSourceIdentity))
-
-        // Rethrow if this is not an exception we should be handling, e.g.
-        // StackOverflowException
-        Exceptions.throwIfFatal(throwable)
     }
   }
 
