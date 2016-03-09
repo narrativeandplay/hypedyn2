@@ -490,10 +490,11 @@ package object serialisers {
      *
      * @param serialised The serialised form of the object
      */
-    override def deserialise(serialised: AstElement): ReaderStyle = safeCast[AstString](serialised, "reader style").s match {
-      case "standard" => Standard
-      case "fancy" => Fancy
-      case file => Custom(file)
-    }
+    override def deserialise(serialised: AstElement): ReaderStyle =
+      safeCast[AstString](serialised, "reader style").s match {
+        case "standard" => Standard
+        case "fancy" => Fancy
+        case file => Custom(file)
+      }
   }
 }
