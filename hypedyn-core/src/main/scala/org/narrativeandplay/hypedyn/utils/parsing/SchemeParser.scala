@@ -1,99 +1,108 @@
 package org.narrativeandplay.hypedyn.utils.parsing
 
-import org.narrativeandplay.hypedyn.events._
+import scala.collection.mutable
+
+import fastparse.all._
+
+import org.narrativeandplay.hypedyn.serialisation._
 import org.narrativeandplay.hypedyn.story.NodalContent.{RulesetId, RulesetIndexes, TextIndex}
 import org.narrativeandplay.hypedyn.story._
 import org.narrativeandplay.hypedyn.story.internal.NodeContent.Ruleset
 import org.narrativeandplay.hypedyn.story.internal.{Node, NodeContent, Story}
 import org.narrativeandplay.hypedyn.story.rules.Actionable.ActionType
 import org.narrativeandplay.hypedyn.story.rules.Conditional.ConditionType
-import org.narrativeandplay.hypedyn.story.rules.RuleLike.ParamValue.{StringInput, SelectedListValue, UnionValueSelected}
-import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamValue, ParamName}
+import org.narrativeandplay.hypedyn.story.rules.RuleLike.ParamValue.{SelectedListValue, StringInput, UnionValueSelected}
+import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
 import org.narrativeandplay.hypedyn.story.rules.internal.{Action, _}
 import org.narrativeandplay.hypedyn.story.rules.{BooleanOperator, _}
 
-import scala.collection.mutable
-import scala.util.parsing.combinator.JavaTokenParsers
+object SchemeParser {
 
-object SchemeParser extends JavaTokenParsers {
-  var isParsing = false
+  /**
+   * Keeps track of node positions
+   */
+  private var nodePositions = AstList()
 
-  def boolean: Parser[Boolean] = ("#t" | "#f" | "true" | "false") ^^ { case "#t" => true; case "true" => true; case "#f" => false; case "false" => false }
+  /**
+   * Parses a string into a Story
+   *
+   * @param s The input string to parse
+   * @return The parsed story
+   */
+  def parse(s: String): Map[String, Any] = {
 
-  def int = wholeNumber ^^ { s => BigInt.apply(s) }
+    val spaceValue = P(CharsWhile(" \r\n".contains(_: Char)).?)
+    val digitValue = P("-".? ~ CharsWhile('0' to '9' contains (_: Char)).!).map(x => if (x.nonEmpty) BigInt(x.toString))
+    val doubleValue = P((digitValue ~ "." ~ digitValue).!).map(x => x.toString.toDouble)
 
-  def string: Parser[String] = stringLiteral ^^ { str => StringContext treatEscapes str.substring(1, str.length - 1) }
+    val trueValue = P(P("#t") | P("true")).map(_ => true)
+    val falseValue = P(P("#f") | P("false")).map(_ => false)
+    val booleanValue = trueValue | falseValue
 
-  def id = "([A-Za-z-!:?0-9])+".r ^^ {
-    _.toString
+    val escape = P(P("\\") ~ CharIn("\"/\\bfnrt").!)
+
+    val stringCharsValue = P(CharsWhile(!"\"\\".contains(_: Char)).!)
+    val identifier = P(CharsWhile(!"\" )".contains(_: Char)).!)
+
+    val stringLiteralValue = P(spaceValue ~
+      "\"" ~ (stringCharsValue | escape).rep.! ~ "\"").map(StringContext treatEscapes _.toString)
+
+    lazy val listValue = P("(" ~ expressionValue.rep.? ~ ")").map(x => if (x.nonEmpty) x.get.toList)
+    lazy val expressionValue: P[Any] = P(spaceValue ~
+      P(listValue | booleanValue | doubleValue | digitValue | identifier | stringLiteralValue) ~ spaceValue)
+
+    var story = Story()
+
+    val list: List[Any] = expressionValue.parse(s).get.value.asInstanceOf[List[Any]]
+
+    story = process(list, story)
+
+    val mapFields: AstMap = AstMap("zoomLevel" -> AstFloat(1.0), "nodes" -> nodePositions)
+    val pluginData: AstElement = AstMap("Default Story Viewer" -> mapFields)
+
+    val map = Map("story" -> story, "plugins" -> pluginData)
+
+    map
   }
 
-  def double = "[0-9]+[.][0-9]+".r ^^ {
-    _.toDouble
-  }
+  /**
+   * Processes a list of tokens into a Story
+   *
+   * @param l     The list of tokens to be parsed
+   * @param story The existing story to parse the tokens into
+   * @return The updated story
+   */
+  private def process(l: List[Any], story: Story): Story = {
+    var newStory = story
 
-  var startNode: BigInt = BigInt.int2bigInt(-1)
-
-  def list: Parser[List[Any]] = "(" ~> rep(expression) <~ ")" ^^ { s: List[Any] => s }
-
-  var nodes: mutable.Map[NodeId, Node] = new mutable.HashMap[NodeId, Node]()
-  var nodesX: mutable.Map[NodeId, Double] = new mutable.HashMap[NodeId, Double]()
-  var nodesY: mutable.Map[NodeId, Double] = new mutable.HashMap[NodeId, Double]()
-  var latestNode: Node = null
-  var story: Story = null
-  var isWithinNode = true
-
-  def expression: Parser[Any] = list | boolean | double | int | id | string
-
-  EventBus.StoryLoadedEvents foreach { n => {
-    if (isParsing) {
-      isParsing = false
-
-      for ((k, v) <- nodes)
-      {
-        EventBus.send(MoveNode(v, nodesX.get(v.id).get, nodesY.get(v.id).get, "SchemeParser"))
-      }
-    }
-  }
-  }
-
-  def parse(s: String) = {
-    story = new Story()
-    nodes.clear()
-    nodesX.clear()
-    nodesY.clear()
-    isWithinNode = true
-    latestNode = null
-    startNode = BigInt.int2bigInt(-1)
-
-    val list: List[Any] = this.parseAll(this.list, s).get
-    process(list)
-    isParsing = true
-
-    for ((k, v) <- nodes) {
-      story = story.addNode(v)
-    }
-
-    story
-   // EventBus.send(NewStoryRequest("SchemeParser"))
-  }
-
-  def process(l: List[Any]): Unit = {
     val iterator = l.iterator
     while (iterator.hasNext) {
       val current = iterator.next()
       current match {
-        case list: List[Any] => process(current.asInstanceOf[List[Any]])
+        case list: List[Any] => newStory = process(current.asInstanceOf[List[Any]], newStory)
         case currentString: String =>
           currentString match {
-            case "begin" => processSection(iterator)
+            case "begin" => newStory = processFirstLevel(iterator, newStory)
             case _ =>
           }
       }
     }
+
+    newStory
   }
 
-  def processHeader(iterator: Iterator[Any]): Unit = {
+  /**
+   * Processes the header tokens
+   *
+   * @param iterator The token iterator
+   * @param story    The story to be updated
+   * @return The updated story
+   */
+  private def processHeader(iterator: Iterator[Any], story: Story): Story = {
+    var newStory = story
+    var currentNode = Option.empty[Node]
+    var isWithinNode = true
+
     while (iterator.hasNext) {
       val current = iterator.next()
       current match {
@@ -104,22 +113,52 @@ object SchemeParser extends JavaTokenParsers {
             case instruction: String =>
               instruction match {
                 case "create-node" =>
-                  processCreateNode(i)
+                  val nodeOption = Option(processCreateNode(i))
+                  if (nodeOption.nonEmpty) newStory = newStory.addNode(nodeOption.get)
+                  currentNode = nodeOption
                   isWithinNode = true
                 case "create-link" =>
-                  processCreateLink(i)
+                  val nodeOption = processCreateLink(i, newStory)
+
+                  if (nodeOption.nonEmpty) {
+                    newStory.nodes.filter(_.id == nodeOption.get.id).foreach(node => {
+                      newStory = newStory.removeNode(node)
+                    })
+                    newStory = newStory.addNode(nodeOption.get)
+                  }
+                  currentNode = nodeOption
                   isWithinNode = false
                 case "begin" =>
-                  processSubSection(i)
+                  val nodeOption = processSecondLevel(i, currentNode, isWithinNode)
+                  if (nodeOption.nonEmpty) {
+                    newStory.nodes.filter(_.id == nodeOption.get.id).foreach(node => {
+                      newStory = newStory.removeNode(node)
+                    })
+                    newStory = newStory.addNode(nodeOption.get)
+                  }
+                  currentNode = nodeOption
                 case _ => //Console.println("Header: " + instruction)
               }
           }
         case _ =>
       }
     }
+
+    newStory
   }
 
-  def processCreateTypedRule3(i: Iterator[Any]): Unit = {
+  /**
+   * Process the tokens for create-typed-rule-3 rule
+   *
+   * @param i            The token iterator
+   * @param currentNode  The latest node processed
+   * @param isWithinNode Flag that determines if the rule resides at the Node or Fragment level
+   * @return The modified node
+   */
+  private def processCreateTypedRule3(i: Iterator[Any],
+                                      currentNode: Option[Node],
+                                      isWithinNode: Boolean): Option[Node] = {
+
     val ruleName = i.next().asInstanceOf[String]
     //val ruleType =
     i.next().asInstanceOf[List[Any]].lift(2)
@@ -135,20 +174,17 @@ object SchemeParser extends JavaTokenParsers {
     i.next().asInstanceOf[String]
     val fallThrough = i.next().asInstanceOf[Boolean]
 
-    val node = latestNode
-
-    if (node != null) {
-      val rule = new Rule(new RuleId(fixedId), ruleName, !fallThrough, boolOperator, List(), List())
+    val rule = Rule(RuleId(fixedId), ruleName, !fallThrough, boolOperator, List(), List())
+    if (currentNode.nonEmpty) {
+      val node = currentNode.get
       if (isWithinNode) {
 
         val newRules: List[Rule] = node.rules.:+(rule)
         val newNode = node.copy(node.id, node.name, node.content, node.isStartNode, newRules)
 
-        nodes.remove(node.id)
-        nodes.put(newNode.id, newNode)
-        latestNode = newNode
+        return Option(newNode)
       } else {
-        node.content.rulesets.filter(_.id == new RulesetId(linkId)).foreach(ruleSet => {
+        node.content.rulesets.filter(_.id == RulesetId(linkId)).foreach(ruleSet => {
 
           val newRules: List[Rule] = ruleSet.rules.:+(rule)
 
@@ -157,36 +193,54 @@ object SchemeParser extends JavaTokenParsers {
           val newContent = node.content.copy(node.content.text, newFullSet)
           val newNode = node.copy(node.id, node.name, newContent, node.isStartNode, node.rules)
 
-          nodes.remove(node.id)
-          nodes.put(newNode.id, newNode)
-          latestNode = newNode
+          return Option(newNode)
         })
       }
     }
+
+    Option.empty[Node]
   }
 
-  def processFollowLink(expression: List[Any], parentRuleId: BigInt): Unit = {
+  /**
+   * Process the tokens for the follow-link rule
+   *
+   * @param expression   The combination of tokens that make up an expression
+   * @param parentRuleId The parent rule identifier
+   * @param currentNode  The latest node processed
+   * @return
+   */
+  private def processFollowLink(expression: List[Any],
+                                parentRuleId: BigInt,
+                                currentNode: Option[Node]): Option[Node] = {
     val newActionType = "LinkTo"
     //val linkId = expression.lift(2).get.asInstanceOf[BigInt]
     //val ruleId = expression.lift(3).get.asInstanceOf[BigInt]
     val toNodeId = expression.lift(5).get.asInstanceOf[BigInt]
 
-    val node = latestNode
-    if (node != null) {
+
+    if (currentNode.nonEmpty) {
+      val node = currentNode.get
       node.content.rulesets.foreach(ruleSet => {
         ruleSet.rules.foreach(rule => {
-          if (rule.id == new RuleId(parentRuleId)) {
-            val definitions = ActionDefinitions.apply()
+          if (rule.id == RuleId(parentRuleId)) {
+            val definitions = ActionDefinitions()
             definitions.foreach(definition => {
 
-              if (definition.actionType == new ActionType(newActionType)) {
+              if (definition.actionType == ActionType(newActionType)) {
                 val params = Map(
-                  new ParamName("node") -> ParamValue.Node.apply(new NodeId(toNodeId))
+                  ParamName("node") -> ParamValue.Node(NodeId(toNodeId))
                 )
 
-                val newAction = new Action(new ActionType(newActionType), params)
+                val newAction = Action(ActionType(newActionType), params)
                 val newActions: List[Action] = rule.actions.:+(newAction)
-                val newRule = rule.copy(rule.id, rule.name, rule.stopIfTrue, rule.conditionsOp, rule.conditions, newActions)
+                val newRule = rule.copy(
+                  rule.id,
+                  rule.name,
+                  rule.stopIfTrue,
+                  rule.conditionsOp,
+                  rule.conditions,
+                  newActions
+                )
                 val newRules: List[Rule] = ruleSet.rules.map { x => if (x == rule) newRule else x }
 
                 val newSet: Ruleset = ruleSet.copy(ruleSet.id, ruleSet.name, ruleSet.indexes, newRules)
@@ -194,18 +248,25 @@ object SchemeParser extends JavaTokenParsers {
                 val newContent = node.content.copy(node.content.text, newFullSet)
                 val newNode = node.copy(node.id, node.name, newContent, node.isStartNode, node.rules)
 
-                nodes.remove(node.id)
-                nodes.put(newNode.id, newNode)
-                latestNode = newNode
+                return Option(newNode)
               }
             })
           }
         })
       })
     }
+
+    Option.empty[Node]
   }
 
-  def processSetNumberFact(expression: List[Any], ruleId: BigInt): Action = {
+  /**
+   * Processes the tokens for the set-number-fact action
+   *
+   * @param expression The combination of tokens that make up an expression
+   * @param ruleId     The rule identifier
+   * @return The created action
+   */
+  private def processSetNumberFact(expression: List[Any], ruleId: BigInt): Action = {
     val factId = expression.lift(2).get.asInstanceOf[BigInt]
     val setOption = expression.lift(3).get.asInstanceOf[String] // Input, Random, Fact, Math
 
@@ -217,9 +278,9 @@ object SchemeParser extends JavaTokenParsers {
         //val setFactMode = expression.lift(3).get.asInstanceOf[String]
         val setFactValue = expression.lift(4).get.asInstanceOf[String]
 
-        params += (new ParamName("updateValue") -> ParamValue.UnionValueSelected("inputValue"))
-        params += (new ParamName("fact") -> ParamValue.IntegerFact(new FactId(setFactId)))
-        params += (new ParamName("inputValue") -> ParamValue.IntegerInput(BigInt.apply(setFactValue)))
+        params += (ParamName("updateValue") -> ParamValue.UnionValueSelected("inputValue"))
+        params += (ParamName("fact") -> ParamValue.IntegerFact(FactId(setFactId)))
+        params += (ParamName("inputValue") -> ParamValue.IntegerInput(BigInt(setFactValue)))
       case "Math" =>
         val optionExpression = expression.lift(4).get.asInstanceOf[List[Any]]
         val eOperator = optionExpression.lift(1).get.asInstanceOf[String]
@@ -234,28 +295,28 @@ object SchemeParser extends JavaTokenParsers {
         val operand1 = if (operand1IsFact) "factOperand1" else "userOperand1"
         val operand2 = if (operand2IsFact) "factOperand2" else "userOperand2"
 
-        params += (new ParamName("fact") -> ParamValue.IntegerFact(new FactId(factId)))
-        params += (new ParamName("updateValue") -> ParamValue.UnionValueSelected("computation"))
-        params += (new ParamName("operand1") -> ParamValue.UnionValueSelected(operand1))
+        params += (ParamName("fact") -> ParamValue.IntegerFact(FactId(factId)))
+        params += (ParamName("updateValue") -> ParamValue.UnionValueSelected("computation"))
+        params += (ParamName("operand1") -> ParamValue.UnionValueSelected(operand1))
         if (operand1IsFact) {
-          params += (new ParamName(operand1) -> ParamValue.IntegerFact(new FactId(BigInt.apply(value1))))
+          params += (ParamName(operand1) -> ParamValue.IntegerFact(FactId(BigInt(value1))))
         } else {
-          params += (new ParamName(operand1) -> ParamValue.IntegerInput(BigInt.apply(value1)))
+          params += (ParamName(operand1) -> ParamValue.IntegerInput(BigInt(value1)))
         }
-        params += (new ParamName("operator") -> ParamValue.SelectedListValue(eOperator))
-        params += (new ParamName("operand2") -> ParamValue.UnionValueSelected(operand2))
+        params += (ParamName("operator") -> ParamValue.SelectedListValue(eOperator))
+        params += (ParamName("operand2") -> ParamValue.UnionValueSelected(operand2))
         if (operand2IsFact) {
-          params += (new ParamName(operand2) -> ParamValue.IntegerFact(new FactId(BigInt.apply(value2))))
+          params += (ParamName(operand2) -> ParamValue.IntegerFact(FactId(BigInt(value2))))
         } else {
-          params += (new ParamName(operand2) -> ParamValue.IntegerInput(BigInt.apply(value2)))
+          params += (ParamName(operand2) -> ParamValue.IntegerInput(BigInt(value2)))
         }
-        params += (new ParamName("computation") -> ParamValue.ProductValue(List("operand1", "operator", "operand2")))
+        params += (ParamName("computation") -> ParamValue.ProductValue(List("operand1", "operator", "operand2")))
       case "Fact" =>
         val setFromFactId = expression.lift(2).get.asInstanceOf[BigInt]
         val setToFactId = expression.lift(4).get.asInstanceOf[BigInt]
-        params += (new ParamName("updateValue") -> ParamValue.UnionValueSelected("integerFactValue"))
-        params += (new ParamName("fact") -> ParamValue.IntegerFact(new FactId(setFromFactId)))
-        params += (new ParamName("integerFactValue") -> ParamValue.IntegerFact(new FactId(setToFactId)))
+        params += (ParamName("updateValue") -> ParamValue.UnionValueSelected("integerFactValue"))
+        params += (ParamName("fact") -> ParamValue.IntegerFact(FactId(setFromFactId)))
+        params += (ParamName("integerFactValue") -> ParamValue.IntegerFact(FactId(setToFactId)))
 
       case "Random" =>
         val optionExpression = expression.lift(4).get.asInstanceOf[List[Any]]
@@ -270,91 +331,127 @@ object SchemeParser extends JavaTokenParsers {
         val operand1 = if (operand1IsFact) "startFact" else "startInput"
         val operand2 = if (operand2IsFact) "endFact" else "endInput"
 
-        params += (new ParamName("randomValue") -> ParamValue.ProductValue(List("start", "end")))
-        params += (new ParamName("updateValue") -> ParamValue.UnionValueSelected("randomValue"))
-        params += (new ParamName("fact") -> ParamValue.IntegerFact(new FactId(factId)))
+        params += (ParamName("randomValue") -> ParamValue.ProductValue(List("start", "end")))
+        params += (ParamName("updateValue") -> ParamValue.UnionValueSelected("randomValue"))
+        params += (ParamName("fact") -> ParamValue.IntegerFact(FactId(factId)))
 
-        params += (new ParamName("start") -> ParamValue.UnionValueSelected(operand1))
+        params += (ParamName("start") -> ParamValue.UnionValueSelected(operand1))
         if (operand1IsFact) {
-          params += (new ParamName(operand1) -> ParamValue.IntegerFact(new FactId(BigInt.apply(value1))))
+          params += (ParamName(operand1) -> ParamValue.IntegerFact(FactId(BigInt(value1))))
         } else {
-          params += (new ParamName(operand1) -> ParamValue.IntegerInput(BigInt.apply(value1)))
+          params += (ParamName(operand1) -> ParamValue.IntegerInput(BigInt(value1)))
         }
 
-        params += (new ParamName("end") -> ParamValue.UnionValueSelected(operand2))
+        params += (ParamName("end") -> ParamValue.UnionValueSelected(operand2))
         if (operand2IsFact) {
-          params += (new ParamName(operand2) -> ParamValue.IntegerFact(new FactId(BigInt.apply(value2))))
+          params += (ParamName(operand2) -> ParamValue.IntegerFact(FactId(BigInt(value2))))
         } else {
-          params += (new ParamName(operand2) -> ParamValue.IntegerInput(BigInt.apply(value2)))
+          params += (ParamName(operand2) -> ParamValue.IntegerInput(BigInt(value2)))
         }
     }
 
-    val action = new Action(new ActionType("UpdateIntegerFacts"), params.toMap)
+    val action = Action(ActionType("UpdateIntegerFacts"), params.toMap)
 
     action
   }
 
-  def processActionSetFact(expression: List[Any], parentRuleId: BigInt, boolValue: Boolean): Action = {
+  /**
+   * Processes the tokens that set a boolean fact
+   *
+   * @param expression   The combination of tokens that make up an expression
+   * @param parentRuleId The parent rule identifier
+   * @param boolValue    The value to set the boolean fact to
+   * @return The created action
+   */
+  private def processActionSetFact(expression: List[Any], parentRuleId: BigInt, boolValue: Boolean): Action = {
     val factId = expression.lift(2).get.asInstanceOf[BigInt]
     val params = Map(
-      new ParamName("fact") -> new ParamValue.BooleanFact(new FactId(factId)),
-      new ParamName("value") -> new SelectedListValue(if (boolValue) "true" else "false")
+      ParamName("fact") -> ParamValue.BooleanFact(FactId(factId)),
+      ParamName("value") -> SelectedListValue(if (boolValue) "true" else "false")
     )
 
-    val action = new Action(new ActionType("UpdateBooleanFact"), params)
+    val action = Action(ActionType("UpdateBooleanFact"), params)
 
     action
   }
 
-  def processAnywhereCheck(expression: List[Any], parentRuleId: BigInt): Action = {
+  /**
+   * Processes the tokens that enables anywhere links to a node
+   *
+   * @param expression   The combination of tokens that make up an expression
+   * @param parentRuleId The parent rule identifier
+   * @return The created action
+   */
+  private def processAnywhereCheck(expression: List[Any], parentRuleId: BigInt): Action = {
     //val factId = expression.lift(2).get.asInstanceOf[BigInt]
-    val action = new Action(new ActionType("EnableAnywhereLinkToHere"), Map())
+    val action = Action(ActionType("EnableAnywhereLinkToHere"), Map())
     action
   }
 
-  def processDisplayedNode(expression: List[Any], parentRuleId: BigInt): Action = {
+  /**
+   * Processes the tokens for the displayed-node action
+   *
+   * @param expression   The combination of tokens that make up an expression
+   * @param parentRuleId The parent rule identifier
+   * @return The created action
+   */
+  private def processDisplayedNode(expression: List[Any], parentRuleId: BigInt): Action = {
     //val instruction = expression.lift(1).get.asInstanceOf[List[Any]].lift(1).get.asInstanceOf[String]
 
     val factType = expression.lift(2).get.asInstanceOf[String]
     val value = expression.lift(3).get
     //val actionId = expression.lift(4).get.asInstanceOf[BigInt]
 
-    var params: Map[ParamName, ParamValue] = null
+    var params: Map[ParamName, ParamValue] = Map()
 
     factType match {
       case "alternative text" =>
         params = Map(
-          new ParamName("textInput") -> new StringInput(value.asInstanceOf[String]),
-          new ParamName("text") -> new UnionValueSelected("textInput")
+          ParamName("textInput") -> StringInput(value.asInstanceOf[String]),
+          ParamName("text") -> UnionValueSelected("textInput")
         )
       case "text fact" =>
         params = Map(
-          new ParamName("stringFactValue") -> new ParamValue.StringFact(new FactId(value.asInstanceOf[BigInt])),
-          new ParamName("text") -> new UnionValueSelected("stringFactValue")
+          ParamName("stringFactValue") -> ParamValue.StringFact(FactId(value.asInstanceOf[BigInt])),
+          ParamName("text") -> UnionValueSelected("stringFactValue")
         )
       case "number fact" =>
         params = Map(
-          new ParamName("NumberFactValue") -> new ParamValue.IntegerFact(new FactId(value.asInstanceOf[BigInt])),
-          new ParamName("text") -> new UnionValueSelected("NumberFactValue")
+          ParamName("NumberFactValue") -> ParamValue.IntegerFact(FactId(value.asInstanceOf[BigInt])),
+          ParamName("text") -> UnionValueSelected("NumberFactValue")
         )
     }
 
-    new Action(new ActionType("UpdateText"), params)
+    Action(ActionType("UpdateText"), params)
   }
 
-  def processSetValue(expression: List[Any], parentRuleId: BigInt): Action = {
+  /**
+   * Processes the tokens for the set-value! action
+   *
+   * @param expression   The combination of tokens that make up an expression
+   * @param parentRuleId The parent rule identifier
+   * @return The created action
+   */
+  private def processSetValue(expression: List[Any], parentRuleId: BigInt): Action = {
     val factId = expression.lift(2).get.asInstanceOf[BigInt]
     val value = expression.lift(3).get.asInstanceOf[String]
 
     val params = Map(
-      new ParamName("fact") -> new ParamValue.StringFact(new FactId(factId)),
-      new ParamName("value") -> new StringInput(value)
+      ParamName("fact") -> ParamValue.StringFact(FactId(factId)),
+      ParamName("value") -> StringInput(value)
     )
 
-    new Action(new ActionType("UpdateStringFact"), params)
+    Action(ActionType("UpdateStringFact"), params)
   }
 
-  def processCreateAction(i: Iterator[Any]): Unit = {
+  /**
+   * Processes the tokens for the create-action rule
+   *
+   * @param i           The token iterator
+   * @param currentNode The latest node processed
+   * @return The modified node
+   */
+  private def processCreateAction(i: Iterator[Any], currentNode: Option[Node]): Option[Node] = {
     //val actionName =
     i.next().asInstanceOf[String]
     val actionType = i.next().asInstanceOf[List[Any]].lift(1).get.asInstanceOf[String]
@@ -368,118 +465,144 @@ object SchemeParser extends JavaTokenParsers {
       case "clicked-link" =>
         val linkActionType = expression.lift(1).get.asInstanceOf[List[Any]].lift(1).get.asInstanceOf[String]
 
-        var action: Action = null
+        var actionOption = Option.empty[Action]
 
         linkActionType match {
-          case "follow-link" => processFollowLink(expression, parentRuleId)
-          case "assert" => val boolValue = true; action = processActionSetFact(expression, parentRuleId, boolValue)
-          case "retract" => val boolValue = false; action = processActionSetFact(expression, parentRuleId, boolValue)
-          case "set-number-fact" => action = processSetNumberFact(expression, parentRuleId)
-          case "anywhere-check" => action = processAnywhereCheck(expression, parentRuleId)
-          case "set-value!" => action = processSetValue(expression, parentRuleId)
+          case "follow-link" =>
+            return processFollowLink(expression, parentRuleId, currentNode)
+          case "assert" =>
+            val boolValue = true
+            actionOption = Option(processActionSetFact(expression, parentRuleId, boolValue))
+          case "retract" =>
+            val boolValue = false
+            actionOption = Option(processActionSetFact(expression, parentRuleId, boolValue))
+          case "set-number-fact" => actionOption = Option(processSetNumberFact(expression, parentRuleId))
+          case "anywhere-check" => actionOption = Option(processAnywhereCheck(expression, parentRuleId))
+          case "set-value!" => actionOption = Option(processSetValue(expression, parentRuleId))
           case _ => //Console.println("Link Action: " + linkActionType + " " + expression)
         }
 
-        if (action != null) {
-          val node = latestNode
+        if (actionOption.nonEmpty) {
+          val action = actionOption.get
 
-          if (node != null) {
+          if (currentNode.nonEmpty) {
+            val node = currentNode.get
             node.content.rulesets.foreach(ruleSet => {
-              ruleSet.rules.filter(_.id == new RuleId(parentRuleId)).foreach(rule => {
+              ruleSet.rules.filter(_.id == RuleId(parentRuleId)).foreach(rule => {
 
                 val newActions = rule.actions.:+(action)
-                val newRule = rule.copy(rule.id, rule.name, rule.stopIfTrue, rule.conditionsOp, rule.conditions, newActions)
+                val newRule = rule.copy(
+                  rule.id,
+                  rule.name,
+                  rule.stopIfTrue,
+                  rule.conditionsOp,
+                  rule.conditions, newActions
+                )
                 val newRules: List[Rule] = ruleSet.rules.map { i => if (i == rule) newRule else i }
                 val newSet: Ruleset = ruleSet.copy(ruleSet.id, ruleSet.name, ruleSet.indexes, newRules)
                 val newFullSet: List[Ruleset] = node.content.rulesets.map(i => if (i == ruleSet) newSet else i)
                 val newContent = node.content.copy(node.content.text, newFullSet)
                 val newNode = node.copy(node.id, node.name, newContent, node.isStartNode, node.rules)
 
-                nodes.remove(node.id)
-                nodes.put(newNode.id, newNode)
-                latestNode = newNode
+                return Option(newNode)
               })
             })
           }
         }
       case "entered-node" =>
         val linkActionType = expression.lift(1).get.asInstanceOf[List[Any]].lift(1).get.asInstanceOf[String]
-        var action: Action = null
+        var action = Option.empty[Action]
         linkActionType match {
-          case "retract" => val boolValue = false; action = processActionSetFact(expression, parentRuleId, boolValue)
-          case "assert" => val boolValue = true; action = processActionSetFact(expression, parentRuleId, boolValue)
-          case "set-number-fact" => action = processSetNumberFact(expression, parentRuleId)
-          case "anywhere-check" => action = processAnywhereCheck(expression, parentRuleId)
-          case "set-value!" => action = processSetValue(expression, parentRuleId)
+          case "retract" =>
+            val boolValue = false
+            action = Option(processActionSetFact(expression, parentRuleId, boolValue))
+          case "assert" =>
+            val boolValue = true
+            action = Option(processActionSetFact(expression, parentRuleId, boolValue))
+          case "set-number-fact" => action = Option(processSetNumberFact(expression, parentRuleId))
+          case "anywhere-check" => action = Option(processAnywhereCheck(expression, parentRuleId))
+          case "set-value!" => action = Option(processSetValue(expression, parentRuleId))
           case _ => //Console.println("Link Action: " + linkActionType + " " + expression)
         }
 
-        if (action != null) {
-          val node = latestNode
-
-          if (node != null) {
-            node.rules.filter(_.id == new RuleId(parentRuleId)).foreach(rule => {
-              val newActions = rule.actions.:+(action)
-              val newRule = rule.copy(rule.id, rule.name, rule.stopIfTrue, rule.conditionsOp, rule.conditions, newActions)
+        if (action.nonEmpty) {
+          if (currentNode.nonEmpty) {
+            val node = currentNode.get
+            node.rules.filter(_.id == RuleId(parentRuleId)).foreach(rule => {
+              val newActions = rule.actions.:+(action.get)
+              val newRule = rule.copy(
+                rule.id,
+                rule.name,
+                rule.stopIfTrue,
+                rule.conditionsOp,
+                rule.conditions,
+                newActions
+              )
               val newRules: List[Rule] = node.rules.map { i => if (i == rule) newRule else i }
               val newNode = node.copy(node.id, node.name, node.content, node.isStartNode, newRules)
 
-              nodes.remove(node.id)
-              nodes.put(newNode.id, newNode)
-              latestNode = newNode
+              return Option(newNode)
             })
           }
         }
       case "anywhere-check" =>
         val action = processAnywhereCheck(expression, parentRuleId)
 
-        if (action != null) {
-          val node = latestNode
+        if (currentNode.nonEmpty) {
+          val node = currentNode.get
+          node.rules.filter(_.id == RuleId(parentRuleId)).foreach(rule => {
+            val newActions = rule.actions.:+(action)
+            val newRule = rule.copy(rule.id, rule.name, rule.stopIfTrue, rule.conditionsOp, rule.conditions, newActions)
+            val newRules: List[Rule] = node.rules.map { i => if (i == rule) newRule else i }
+            val newNode = node.copy(node.id, node.name, node.content, node.isStartNode, newRules)
 
-          if (node != null) {
-            node.rules.filter(_.id == new RuleId(parentRuleId)).foreach(rule => {
-              val newActions = rule.actions.:+(action)
-              val newRule = rule.copy(rule.id, rule.name, rule.stopIfTrue, rule.conditionsOp, rule.conditions, newActions)
-              val newRules: List[Rule] = node.rules.map { i => if (i == rule) newRule else i }
-              val newNode = node.copy(node.id, node.name, node.content, node.isStartNode, newRules)
-
-              nodes.remove(node.id)
-              nodes.put(newNode.id, newNode)
-              latestNode = newNode
-            })
-          }
+            return Option(newNode)
+          })
         }
       case "displayed-node" =>
         val action = processDisplayedNode(expression, parentRuleId)
 
-        if (action != null) {
-          val node = latestNode
+        if (currentNode.nonEmpty) {
+          val node = currentNode.get
+          node.content.rulesets.foreach(ruleSet => {
+            ruleSet.rules.filter(_.id == RuleId(parentRuleId)).foreach(rule => {
 
-          if (node != null) {
-            node.content.rulesets.foreach(ruleSet => {
-              ruleSet.rules.filter(_.id == new RuleId(parentRuleId)).foreach(rule => {
+              val newActions = rule.actions.:+(action)
+              val newRule = rule.copy(
+                rule.id,
+                rule.name,
+                rule.stopIfTrue,
+                rule.conditionsOp,
+                rule.conditions,
+                newActions
+              )
+              val newRules: List[Rule] = ruleSet.rules.map { i => if (i == rule) newRule else i }
+              val newSet: Ruleset = ruleSet.copy(ruleSet.id, ruleSet.name, ruleSet.indexes, newRules)
+              val newFullSet: List[Ruleset] = node.content.rulesets.map(i => if (i == ruleSet) newSet else i)
+              val newContent = node.content.copy(node.content.text, newFullSet)
+              val newNode = node.copy(node.id, node.name, newContent, node.isStartNode, node.rules)
 
-                val newActions = rule.actions.:+(action)
-                val newRule = rule.copy(rule.id, rule.name, rule.stopIfTrue, rule.conditionsOp, rule.conditions, newActions)
-                val newRules: List[Rule] = ruleSet.rules.map { i => if (i == rule) newRule else i }
-                val newSet: Ruleset = ruleSet.copy(ruleSet.id, ruleSet.name, ruleSet.indexes, newRules)
-                val newFullSet: List[Ruleset] = node.content.rulesets.map(i => if (i == ruleSet) newSet else i)
-                val newContent = node.content.copy(node.content.text, newFullSet)
-                val newNode = node.copy(node.id, node.name, newContent, node.isStartNode, node.rules)
-
-                nodes.remove(node.id)
-                nodes.put(newNode.id, newNode)
-                latestNode = newNode
-              })
+              return Option(newNode)
             })
-          }
+          })
         }
-      case _ => //Console.println("Action: " + actionType + " " + expression)
+      case _ =>
     }
 
+    Option.empty[Node]
   }
 
-  def processCreateTypedCondition2(i: Iterator[Any]): Unit = {
+  /**
+   * Process the tokens for create-typed-condition-2 rule
+   *
+   * @param i            The token iterator
+   * @param currentNode  The latest node processed
+   * @param isWithinNode Flag that determines if the rule resides at the Node or Fragment level
+   * @return The modified node
+   */
+  private def processCreateTypedCondition2(i: Iterator[Any],
+                                           currentNode: Option[Node],
+                                           isWithinNode: Boolean): Option[Node] = {
     //val conditionName =
     i.next().asInstanceOf[String]
     val conditionType = i.next().asInstanceOf[BigInt]
@@ -507,36 +630,126 @@ object SchemeParser extends JavaTokenParsers {
     i.next().asInstanceOf[String]
     val numFactArgs = i.next()
 
-    val node = latestNode
-    if (node != null) {
+
+    if (currentNode.nonEmpty) {
+      val node = currentNode.get
+
       if (isWithinNode) {
-        node.rules.foreach(rule => {
-          if (rule.id == new RuleId(ruleId)) {
-            val definitions = ConditionDefinitions.apply()
+        node.rules.filter(_.id == RuleId(ruleId)).foreach(rule => {
+          val definitions = ConditionDefinitions()
+          definitions.foreach(definition => {
+            if (definition.conditionType == ConditionType(newConditionType)) {
+              var params: Map[ParamName, ParamValue] = Map()
+              newConditionType match {
+                case "NodeCondition" =>
+                  params = Map(
+                    ParamName("node") -> ParamValue.Node(NodeId(targetId)),
+                    ParamName("status") -> SelectedListValue(
+                      status.asInstanceOf[BigInt].toInt match {
+                        case 0 => "not visited";
+                        case 1 => "visited";
+                        case 2 => "is previous";
+                        case 3 => "is not previous";
+                        case 4 => "current"
+                      }
+                    )
+                  )
+
+                case "LinkCondition" =>
+                  params = Map(
+                    ParamName("link") -> ParamValue.Link(RulesetId(targetId)),
+                    ParamName("status") -> SelectedListValue(
+                      if (status.asInstanceOf[BigInt] == BigInt(1)) "followed" else "not followed"
+                    )
+                  )
+
+                case "BooleanFactValue" =>
+
+                  if (status.isInstanceOf[BigInt]) {
+                    status = if (status == BigInt(1)) true else false
+                  }
+                  params = Map(
+                    ParamName("fact") -> ParamValue.BooleanFact(FactId(targetId)),
+                    ParamName("state") ->
+                      SelectedListValue(if (status.asInstanceOf[Boolean]) "true" else "false")
+                  )
+
+                case "IntegerFactComparison" =>
+                  val numFactArguments = numFactArgs.asInstanceOf[List[Any]].iterator
+                  //val listString =
+                  numFactArguments.next().asInstanceOf[String]
+                  val operator = numFactArguments.next().asInstanceOf[String]
+                  val mode = numFactArguments.next().asInstanceOf[String]
+                  val value = numFactArguments.next().asInstanceOf[String]
+
+                  val paramV =
+                    if (mode == "Fact")
+                      ParamValue.IntegerFact(FactId(BigInt(value)))
+                    else
+                      ParamValue.IntegerInput(BigInt(value))
+
+                  params = Map(
+                    ParamName("fact") -> ParamValue.IntegerFact(FactId(targetId)),
+                    ParamName(if (mode == "Fact") "otherFact" else "input") -> paramV,
+                    ParamName("operator") -> SelectedListValue(operator),
+                    ParamName("comparisonValue") ->
+                      UnionValueSelected(if (mode == "Fact") "otherFact" else "input")
+                  )
+
+                case _ =>
+              }
+
+              val newCondition = Condition(ConditionType(newConditionType), params)
+              val newConditions = newCondition :: rule.conditions
+              val newRule = rule
+                .copy(rule.id, rule.name, rule.stopIfTrue, rule.conditionsOp, newConditions, rule.actions)
+              val newRules = node.rules.map { i => if (i == rule) newRule else i }
+
+              val newNode = node.copy(node.id, node.name, node.content, node.isStartNode, newRules)
+
+              return Option(newNode)
+            }
+          })
+        })
+      } else {
+        node.content.rulesets.foreach(ruleSet => {
+          ruleSet.rules.filter(_.id == RuleId(ruleId)).foreach(rule => {
+            val definitions = ConditionDefinitions()
+
             definitions.foreach(definition => {
-              if (definition.conditionType == new ConditionType(newConditionType)) {
+              if (definition.conditionType == ConditionType(newConditionType)) {
                 var params: Map[ParamName, ParamValue] = Map()
                 newConditionType match {
                   case "NodeCondition" =>
                     params = Map(
-                      new ParamName("node") -> new ParamValue.Node(new NodeId(targetId)),
-                      new ParamName("status") -> new SelectedListValue(status.asInstanceOf[BigInt].toInt match { case 0 => "not visited"; case 1 => "visited"; case 2 => "is previous"; case 3 => "is not previous"; case 4 => "current" })
+                      ParamName("node") -> ParamValue.Node(NodeId(targetId)),
+                      ParamName("status") -> SelectedListValue(status.asInstanceOf[BigInt].toInt match {
+                        case 0 => "not visited";
+                        case 1 => "visited";
+                        case 2 => "is previous";
+                        case 3 => "is not previous";
+                        case 4 => "current"
+                      })
                     )
 
                   case "LinkCondition" =>
                     params = Map(
-                      new ParamName("link") -> new ParamValue.Link(new RulesetId(targetId)),
-                      new ParamName("status") -> new SelectedListValue(if (status.asInstanceOf[BigInt] == BigInt.apply(1)) "followed" else "not followed")
+                      ParamName("link") -> ParamValue.Link(RulesetId(targetId)),
+                      ParamName("status") -> SelectedListValue(
+                        if (status.asInstanceOf[BigInt] == BigInt(1)) "followed" else "not followed"
+                      )
                     )
 
                   case "BooleanFactValue" =>
 
                     if (status.isInstanceOf[BigInt]) {
-                      status = if (status == BigInt.apply(1)) true else false
+                      status = if (status == BigInt(1)) true else false
                     }
+
                     params = Map(
-                      new ParamName("fact") -> new ParamValue.BooleanFact(new FactId(targetId)),
-                      new ParamName("state") -> new SelectedListValue(if (status.asInstanceOf[Boolean]) "true" else "false")
+                      ParamName("fact") -> ParamValue.BooleanFact(FactId(targetId)),
+                      ParamName("state") ->
+                        SelectedListValue(if (status.asInstanceOf[Boolean]) "true" else "false")
                     )
 
                   case "IntegerFactComparison" =>
@@ -546,105 +759,63 @@ object SchemeParser extends JavaTokenParsers {
                     val operator = numFactArguments.next().asInstanceOf[String]
                     val mode = numFactArguments.next().asInstanceOf[String]
                     val value = numFactArguments.next().asInstanceOf[String]
-                    val paramV = if (mode == "Fact") new ParamValue.IntegerFact(new FactId(BigInt.apply(value))) else new ParamValue.IntegerInput(BigInt.apply(value))
+
+                    val paramV =
+                      if (mode == "Fact")
+                        ParamValue.IntegerFact(FactId(BigInt(value)))
+                      else
+                        ParamValue.IntegerInput(BigInt(value))
+
                     params = Map(
-                      new ParamName("fact") -> new ParamValue.IntegerFact(new FactId(targetId)),
-                      new ParamName(if (mode == "Fact") "otherFact" else "input") -> paramV,
-                      new ParamName("operator") -> new SelectedListValue(operator),
-                      new ParamName("comparisonValue") -> new UnionValueSelected(if (mode == "Fact") "otherFact" else "input")
+                      ParamName("fact") -> ParamValue.IntegerFact(FactId(targetId)),
+                      ParamName(if (mode == "Fact") "otherFact" else "input") -> paramV,
+                      ParamName("operator") -> SelectedListValue(operator),
+                      ParamName("comparisonValue") ->
+                        UnionValueSelected(if (mode == "Fact") "otherFact" else "input")
                     )
 
                   case _ =>
                 }
 
-                val newCondition = new Condition(new ConditionType(newConditionType), params)
-                val newConditions = newCondition :: rule.conditions
-                val newRule = rule.copy(rule.id, rule.name, rule.stopIfTrue, rule.conditionsOp, newConditions, rule.actions)
-                val newRules = node.rules.map { i => if (i == rule) newRule else i }
+                val newCondition = Condition(ConditionType(newConditionType), params)
+                val newConditions: List[Condition] = newCondition :: rule.conditions
+                val newRule = rule.copy(
+                  rule.id,
+                  rule.name,
+                  rule.stopIfTrue,
+                  rule.conditionsOp,
+                  newConditions,
+                  rule.actions
+                )
+                val newRules: List[Rule] = ruleSet.rules.map { i => if (i == rule) newRule else i }
+                val newSet: Ruleset = ruleSet.copy(ruleSet.id, ruleSet.name, ruleSet.indexes, newRules)
+                val newFullSet: List[Ruleset] = node.content.rulesets.map(i => if (i == ruleSet) newSet else i)
+                val newContent = node.content.copy(node.content.text, newFullSet)
+                val newNode = node.copy(node.id, node.name, newContent, node.isStartNode, node.rules)
 
-                val newNode = node.copy(node.id, node.name, node.content, node.isStartNode, newRules)
-
-                nodes.remove(node.id)
-                nodes.put(newNode.id, newNode)
-                latestNode = newNode
+                return Option(newNode)
               }
             })
-          }
-        })
-      } else {
-        node.content.rulesets.foreach(ruleSet => {
-          ruleSet.rules.foreach(rule => {
-            if (rule.id == new RuleId(ruleId)) {
-              val definitions = ConditionDefinitions.apply()
-
-              definitions.foreach(definition => {
-                if (definition.conditionType == new ConditionType(newConditionType)) {
-                  var params: Map[ParamName, ParamValue] = Map()
-                  newConditionType match {
-                    case "NodeCondition" =>
-                      params = Map(
-                        new ParamName("node") -> new ParamValue.Node(new NodeId(targetId)),
-                        new ParamName("status") -> new SelectedListValue(status.asInstanceOf[BigInt].toInt match { case 0 => "not visited"; case 1 => "visited"; case 2 => "is previous"; case 3 => "is not previous"; case 4 => "current" })
-                      )
-
-                    case "LinkCondition" =>
-                      params = Map(
-                        new ParamName("link") -> new ParamValue.Link(new RulesetId(targetId)),
-                        new ParamName("status") -> new SelectedListValue(if (status.asInstanceOf[BigInt] == BigInt.apply(1)) "followed" else "not followed")
-                      )
-
-                    case "BooleanFactValue" =>
-
-                      if (status.isInstanceOf[BigInt]) {
-                        status = if (status == BigInt.apply(1)) true else false
-                      }
-
-                      params = Map(
-                        new ParamName("fact") -> new ParamValue.BooleanFact(new FactId(targetId)),
-                        new ParamName("state") -> new SelectedListValue(if (status.asInstanceOf[Boolean]) "true" else "false")
-                      )
-
-                    case "IntegerFactComparison" =>
-                      val numFactArguments = numFactArgs.asInstanceOf[List[Any]].iterator
-                      //val listString =
-                      numFactArguments.next().asInstanceOf[String]
-                      val operator = numFactArguments.next().asInstanceOf[String]
-                      val mode = numFactArguments.next().asInstanceOf[String]
-                      val value = numFactArguments.next().asInstanceOf[String]
-                      val paramV = if (mode == "Fact") new ParamValue.IntegerFact(new FactId(BigInt.apply(value))) else new ParamValue.IntegerInput(BigInt.apply(value))
-                      params = Map(
-                        new ParamName("fact") -> new ParamValue.IntegerFact(new FactId(targetId)),
-                        new ParamName(if (mode == "Fact") "otherFact" else "input") -> paramV,
-                        new ParamName("operator") -> new SelectedListValue(operator),
-                        new ParamName("comparisonValue") -> new UnionValueSelected(if (mode == "Fact") "otherFact" else "input")
-                      )
-
-                    case _ =>
-                  }
-
-                  val newCondition = new Condition(new ConditionType(newConditionType), params)
-                  val newConditions: List[Condition] = newCondition :: rule.conditions
-                  val newRule = rule.copy(rule.id, rule.name, rule.stopIfTrue, rule.conditionsOp, newConditions, rule.actions)
-                  val newRules: List[Rule] = ruleSet.rules.map { i => if (i == rule) newRule else i }
-
-                  val newSet: Ruleset = ruleSet.copy(ruleSet.id, ruleSet.name, ruleSet.indexes, newRules)
-                  val newFullSet: List[Ruleset] = node.content.rulesets.map(i => if (i == ruleSet) newSet else i)
-                  val newContent = node.content.copy(node.content.text, newFullSet)
-                  val newNode = node.copy(node.id, node.name, newContent, node.isStartNode, node.rules)
-
-                  nodes.remove(node.id)
-                  nodes.put(newNode.id, newNode)
-                  latestNode = newNode
-                }
-              })
-            }
           })
         })
       }
     }
+
+    Option.empty[Node]
   }
 
-  def processSubSection(iterator: Iterator[Any]): Unit = {
+  /**
+   * Processes the second level of tokens
+   *
+   * @param iterator     The token iterator
+   * @param currentNode  The latest node to be processed
+   * @param isWithinNode Flag indicating if the action should occur at the Node level or Fragment level
+   */
+  private def processSecondLevel(iterator: Iterator[Any],
+                                 currentNode: Option[Node],
+                                 isWithinNode: Boolean): Option[Node] = {
+    var newCurrentNode = currentNode
+
     while (iterator.hasNext) {
       val current = iterator.next()
       current match {
@@ -655,17 +826,29 @@ object SchemeParser extends JavaTokenParsers {
             case str: String =>
               val instruction = firstToken.asInstanceOf[String]
               instruction match {
-                case "create-typed-rule3" => processCreateTypedRule3(i)
-                case "create-action" => processCreateAction(i)
-                case "create-typed-condition2" => processCreateTypedCondition2(i)
+                case "create-typed-rule3" =>
+                  newCurrentNode = processCreateTypedRule3(i, newCurrentNode, isWithinNode)
+                case "create-action" =>
+                  newCurrentNode = processCreateAction(i, newCurrentNode)
+                case "create-typed-condition2" =>
+                  newCurrentNode = processCreateTypedCondition2(i, newCurrentNode, isWithinNode)
                 case _ =>
               }
           }
       }
     }
+
+    newCurrentNode
   }
 
-  def processCreateLink(i: Iterator[Any]): Unit = {
+  /**
+   * Processes the link creation tokens
+   *
+   * @param i The token iterator
+   * @return The updated story containing the node with the created link
+   */
+  private def processCreateLink(i: Iterator[Any], story: Story): Option[Node] = {
+
     val linkName = i.next().asInstanceOf[String]
     val fromNodeID = i.next().asInstanceOf[BigInt]
     //val toNodeID =
@@ -686,21 +869,31 @@ object SchemeParser extends JavaTokenParsers {
     i.next().asInstanceOf[Boolean]
     val linkId = i.next().asInstanceOf[BigInt]
 
-    val node = nodes.get(new NodeId(fromNodeID)).get
+    story.nodes.filter(_.id == NodeId(fromNodeID)).foreach(node => {
 
-    if (node != null) {
-      val newSet = new Ruleset(new RulesetId(linkId), linkName, new RulesetIndexes(new TextIndex(startIndex), new TextIndex(endIndex)), List())
+      val newSet = Ruleset(
+        RulesetId(linkId),
+        linkName,
+        RulesetIndexes(TextIndex(startIndex), TextIndex(endIndex)),
+        List()
+      )
+
       val newContent = node.content.copy(node.content.text, node.content.rulesets.:+(newSet))
       val newNode = node.copy(node.id, node.name, newContent, node.isStartNode, node.rules)
 
-      nodes.remove(node.id)
-      nodes.put(newNode.id, newNode)
+      return Option(newNode)
+    })
 
-      latestNode = newNode
-    }
+    Option.empty[Node]
   }
 
-  def processCreateNode(i: Iterator[Any]): Unit = {
+  /**
+   * Processes node creation tokens
+   *
+   * @param i The token iterator
+   * @return The created node
+   */
+  private def processCreateNode(i: Iterator[Any]): Node = {
     val nameValue = i.next().asInstanceOf[String]
     val contentText = i.next().asInstanceOf[String]
     var next = i.next()
@@ -720,36 +913,67 @@ object SchemeParser extends JavaTokenParsers {
     val nodeId = i.next().asInstanceOf[BigInt]
 
     val ruleSet: List[Rule] = List()
+    val isStartNode = false
 
-    val node = new Node(new NodeId(nodeId), nameValue, new NodeContent(contentText, List()), if (nodeId == startNode) true else false, ruleSet)
+    val node = Node(
+      NodeId(nodeId),
+      nameValue,
+      NodeContent(contentText, List()),
+      isStartNode,
+      ruleSet
+    )
 
-    nodes.put(node.id, node)
-    nodesX.put(node.id, x)
-    nodesY.put(node.id, y)
+    val newPosMap = AstMap("id" -> AstInteger(node.id.value), "x" -> AstFloat(x), "y" -> AstFloat(y))
+    val newElems = nodePositions.toList.::(newPosMap)
+    nodePositions = AstList(newElems: _*)
 
-    latestNode = node
+    node
   }
 
-  def processCreateFact(i: Iterator[Any]) = {
+  /**
+   * Process the tokens for create-fact action
+   *
+   * @param i     The token iterator
+   * @param story The existing story to process the tokens into
+   * @return The updated story
+   */
+  private def processCreateFact(i: Iterator[Any], story: Story): Story = {
+
+    var newStory = story
+
     while (i.hasNext) {
       val factName = i.next().asInstanceOf[String]
       val factType = i.next().asInstanceOf[List[Any]].lift(1).get.asInstanceOf[String]
-      val factId = new FactId(i.next().asInstanceOf[BigInt])
+      val factId = FactId(i.next().asInstanceOf[BigInt])
 
-      var fact: Fact = null
+      var fact = Option.empty[Fact]
 
       factType match {
-        case "boolean" => val boolValue = false; fact = BooleanFact.apply(factId, factName, boolValue)
-        case "string" => fact = StringFact.apply(factId, factName, "")
-        case "number" => fact = IntegerFact.apply(factId, factName, 0)
+        case "boolean" => val boolValue = false; fact = Option(BooleanFact(factId, factName, boolValue))
+        case "string" => fact = Option(StringFact(factId, factName, ""))
+        case "number" => fact = Option(IntegerFact(factId, factName, 0))
       }
 
-      story = story.addFact(fact)
+      newStory = newStory.addFact(fact.get)
     }
+
+    newStory
   }
 
-  def processSection(iterator: Iterator[Any]): Unit = {
+  /**
+   * Processes the first level of tokens
+   *
+   * @param iterator The token iterator
+   * @param story    The existing story to process the tokens into
+   * @return The updated story
+   */
+  private def processFirstLevel(iterator: Iterator[Any], story: Story): Story = {
+
+    var newStory = story
+    var startNode = BigInt(-1)
+
     val headers = new scala.collection.mutable.Queue[List[Any]]
+
     while (iterator.hasNext) {
       val current = iterator.next()
       current match {
@@ -759,16 +983,34 @@ object SchemeParser extends JavaTokenParsers {
           firstToken match {
             case instruction: String =>
               instruction match {
-                case "make-hypertext" => processHeader(i)
-                case "set-story-title!" => story = story.copy(i.next().asInstanceOf[String])
-                case "set-author-name!" => story = story.changeAuthor(i.next().asInstanceOf[String])
-                case "set-story-comment!" => story = story.updateMetadata(story.metadata.copy(i.next().asInstanceOf[String]))
-                case "set-disable-back-button!" => story = story.updateMetadata(story.metadata.copy(story.metadata.comments, story.metadata.readerStyle, i.next().asInstanceOf[Boolean]))
-                case "set-disable-restart-button!" => story = story.updateMetadata(story.metadata.copy(story.metadata.comments, story.metadata.readerStyle, story.metadata.isBackButtonDisabled, i.next().asInstanceOf[Boolean]))
+                case "make-hypertext" => newStory = processHeader(i, newStory)
+                case "set-story-title!" => newStory = newStory.copy(i.next().asInstanceOf[String])
+                case "set-author-name!" => newStory = newStory.changeAuthor(i.next().asInstanceOf[String])
+                case "set-story-comment!" =>
+                  newStory = newStory.updateMetadata(newStory.metadata.copy(i.next().asInstanceOf[String]))
+                case "set-disable-back-button!" =>
+                  newStory =
+                    newStory.updateMetadata(
+                      newStory.metadata.copy(
+                        newStory.metadata.comments,
+                        newStory.metadata.readerStyle,
+                        i.next().asInstanceOf[Boolean]
+                      )
+                    )
+                case "set-disable-restart-button!" =>
+                  newStory =
+                    newStory.updateMetadata(
+                      newStory.metadata.copy(
+                        newStory.metadata.comments,
+                        newStory.metadata.readerStyle,
+                        newStory.metadata.isBackButtonDisabled,
+                        i.next().asInstanceOf[Boolean]
+                      )
+                    )
                 case "set-start-node!" => startNode = i.next().asInstanceOf[BigInt]
-                case "create-fact" => processCreateFact(i)
+                case "create-fact" => newStory = processCreateFact(i, newStory)
                 case "begin" => headers.enqueue(current.asInstanceOf[List[Any]])
-                case _ => //Console.println("Base: " + instruction)
+                case _ => // Console.println("Base: " + instruction)
               }
           }
       }
@@ -776,7 +1018,16 @@ object SchemeParser extends JavaTokenParsers {
 
     while (headers.nonEmpty) {
       val i = headers.dequeue().iterator
-      processHeader(i)
+      newStory = processHeader(i, newStory)
     }
+
+    newStory.nodes.filter(_.id == NodeId(startNode)).foreach(node => {
+      val isStartNode = true
+      val newNode = node.copy(node.id, node.name, node.content, isStartNode, node.rules)
+      newStory = newStory.removeNode(node)
+      newStory = newStory.addNode(newNode)
+    })
+
+    newStory
   }
 }

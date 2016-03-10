@@ -118,8 +118,6 @@ object EventBus {
   val CreateStoryEvents = eventBus collect { case e: CreateStory => e }
   val UpdateStoryPropertiesEvents = eventBus collect { case e: UpdateStoryProperties => e }
 
-  val MoveNodeEvents = eventBus collect { case e: MoveNode => e }
-
   /**
    * Event stream of all `Completion`s
    */

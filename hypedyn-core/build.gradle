@@ -5,6 +5,8 @@ dependencies {
     // For serialisation to JSON (save/load/export)
     compile "org.json4s:json4s-native_${rootProject.majorScalaVersion}:3.3.0"
 
+    compile "com.lihaoyi:fastparse_2.11:0.3.6"
+
     compile "commons-io:commons-io:2.4"
 
     compile "org.fxmisc.easybind:easybind:1.0.3"

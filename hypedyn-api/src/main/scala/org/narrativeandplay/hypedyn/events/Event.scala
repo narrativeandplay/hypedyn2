@@ -142,7 +142,6 @@ sealed case class RedoResponse(src: String) extends Response
 sealed trait Action extends Event
 sealed case class CreateNode(node: Nodal, src: String) extends Action
 sealed case class UpdateNode(node: Nodal, updatedNode: Nodal, src: String) extends Action
-sealed case class MoveNode(node: Nodal, x:Double, y:Double, src: String) extends Action
 sealed case class DestroyNode(node: Nodal, src: String) extends Action
 
 sealed case class CreateFact(fact: Fact, src: String) extends Action

@@ -1,6 +1,7 @@
 package org.narrativeandplay.hypedyn.events
 
 import java.io.File
+import javafx.stage.FileChooser
 
 import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
@@ -95,7 +96,11 @@ object UiEventDispatcher {
   }
 
   EventBus.ImportResponses foreach { evt =>
-    val fileToImport = Main.legacyFileDialog.showOpenFileDialog()
+    val dialog = Main.fileDialog
+    dialog.setTitle("Import")
+    dialog.getExtensionFilters.removeAll(dialog.getExtensionFilters)
+    dialog.getExtensionFilters.add(new FileChooser.ExtensionFilter("HypeDyn 1 Story", "*.dyn"))
+    val fileToImport = dialog.showOpenFileDialog()
 
     fileToImport foreach { f =>
       EventBus.send(ImportFromFile(f, UiEventSourceIdentity))

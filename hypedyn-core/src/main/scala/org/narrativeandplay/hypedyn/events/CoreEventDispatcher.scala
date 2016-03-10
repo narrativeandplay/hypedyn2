@@ -12,7 +12,6 @@ import org.narrativeandplay.hypedyn.story.internal.Story
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, ConditionDefinitions, Fact}
 import org.narrativeandplay.hypedyn.undo._
 import org.narrativeandplay.hypedyn.utils.parsing.SchemeParser
-
 /**
  * Main event dispatcher for the core
  */
@@ -189,7 +188,11 @@ object CoreEventDispatcher {
 
   EventBus.ImportFromFileEvents foreach { evt =>
     val dataToImport = IoController read evt.file
-    val story:Story = SchemeParser.parse(dataToImport)
+    val parseResult = SchemeParser.parse(dataToImport)
+    val story = parseResult("story").asInstanceOf[Story]
+    val pluginData = parseResult("plugins").asInstanceOf[AstMap]
+
+    Console.println(pluginData.toString)
 
     StoryController.load(story)
 
@@ -199,6 +202,7 @@ object CoreEventDispatcher {
     UndoController.markCurrentPosition()
 
     EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
+    EventBus.send(DataLoaded(pluginData.toMap, CoreEventSourceIdentity))
     EventBus.send(FileLoaded(loadedFile, CoreEventSourceIdentity))
   }
 
