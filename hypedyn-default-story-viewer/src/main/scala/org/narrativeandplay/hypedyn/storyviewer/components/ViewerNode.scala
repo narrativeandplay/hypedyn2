@@ -85,7 +85,9 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
   onMouseClicked = { me =>
     toFront()
     me.clickCount match {
-      case 2 => pluginEventDispatcher.requestNodeEdit(id)
+      case 2 =>
+        select()
+        pluginEventDispatcher.requestNodeEdit(id)
       case _ =>
     }
   }
