@@ -76,6 +76,8 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
 
       relocate(scaledFactor * topLeft.x, scaledFactor * topLeft.y)
     }
+
+    storyViewer.sizeToChildren()
   }
 
   skin = new ViewerNodeSkin(this)
