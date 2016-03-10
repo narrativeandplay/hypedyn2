@@ -47,7 +47,7 @@ object Main extends JFXApp {
       case e => e
     }
 
-    Logger.error("", actualThrowable)
+    Logger.error("Unhandled Exception:", actualThrowable)
   })
 
   private val icon = new Image(getClass.getResourceAsStream("hypedyn-icon.jpg"))
