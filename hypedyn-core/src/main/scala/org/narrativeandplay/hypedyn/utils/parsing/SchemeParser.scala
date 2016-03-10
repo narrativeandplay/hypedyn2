@@ -1,7 +1,5 @@
 package org.narrativeandplay.hypedyn.utils.parsing
 
-import scala.collection.mutable
-
 import fastparse.all._
 
 import org.narrativeandplay.hypedyn.serialisation._
@@ -51,11 +49,9 @@ object SchemeParser {
     lazy val expressionValue: P[Any] = P(spaceValue ~
       P(listValue | booleanValue | doubleValue | digitValue | identifier | stringLiteralValue) ~ spaceValue)
 
-    var story = Story()
-
     val list: List[Any] = expressionValue.parse(s).get.value.asInstanceOf[List[Any]]
 
-    story = process(list, story)
+    val story = process(list, Story())
 
     val mapFields: AstMap = AstMap("zoomLevel" -> AstFloat(1.0), "nodes" -> nodePositions)
     val pluginData: AstElement = AstMap("Default Story Viewer" -> mapFields)
@@ -270,7 +266,7 @@ object SchemeParser {
     val factId = expression.lift(2).get.asInstanceOf[BigInt]
     val setOption = expression.lift(3).get.asInstanceOf[String] // Input, Random, Fact, Math
 
-    val params = new mutable.ListMap[ParamName, ParamValue]()
+    var params:Map[ParamName, ParamValue] = Map()
 
     setOption match {
       case "Input" =>
@@ -278,9 +274,9 @@ object SchemeParser {
         //val setFactMode = expression.lift(3).get.asInstanceOf[String]
         val setFactValue = expression.lift(4).get.asInstanceOf[String]
 
-        params += (ParamName("updateValue") -> ParamValue.UnionValueSelected("inputValue"))
-        params += (ParamName("fact") -> ParamValue.IntegerFact(FactId(setFactId)))
-        params += (ParamName("inputValue") -> ParamValue.IntegerInput(BigInt(setFactValue)))
+        params = params.+ (ParamName("updateValue") -> ParamValue.UnionValueSelected("inputValue"))
+        params = params.+ (ParamName("fact") -> ParamValue.IntegerFact(FactId(setFactId)))
+        params = params.+ (ParamName("inputValue") -> ParamValue.IntegerInput(BigInt(setFactValue)))
       case "Math" =>
         val optionExpression = expression.lift(4).get.asInstanceOf[List[Any]]
         val eOperator = optionExpression.lift(1).get.asInstanceOf[String]
@@ -295,28 +291,28 @@ object SchemeParser {
         val operand1 = if (operand1IsFact) "factOperand1" else "userOperand1"
         val operand2 = if (operand2IsFact) "factOperand2" else "userOperand2"
 
-        params += (ParamName("fact") -> ParamValue.IntegerFact(FactId(factId)))
-        params += (ParamName("updateValue") -> ParamValue.UnionValueSelected("computation"))
-        params += (ParamName("operand1") -> ParamValue.UnionValueSelected(operand1))
+        params = params.+ (ParamName("fact") -> ParamValue.IntegerFact(FactId(factId)))
+        params = params.+ (ParamName("updateValue") -> ParamValue.UnionValueSelected("computation"))
+        params = params.+ (ParamName("operand1") -> ParamValue.UnionValueSelected(operand1))
         if (operand1IsFact) {
-          params += (ParamName(operand1) -> ParamValue.IntegerFact(FactId(BigInt(value1))))
+          params = params.+ (ParamName(operand1) -> ParamValue.IntegerFact(FactId(BigInt(value1))))
         } else {
-          params += (ParamName(operand1) -> ParamValue.IntegerInput(BigInt(value1)))
+          params = params.+ (ParamName(operand1) -> ParamValue.IntegerInput(BigInt(value1)))
         }
-        params += (ParamName("operator") -> ParamValue.SelectedListValue(eOperator))
-        params += (ParamName("operand2") -> ParamValue.UnionValueSelected(operand2))
+        params = params.+ (ParamName("operator") -> ParamValue.SelectedListValue(eOperator))
+        params = params.+ (ParamName("operand2") -> ParamValue.UnionValueSelected(operand2))
         if (operand2IsFact) {
-          params += (ParamName(operand2) -> ParamValue.IntegerFact(FactId(BigInt(value2))))
+          params = params.+ (ParamName(operand2) -> ParamValue.IntegerFact(FactId(BigInt(value2))))
         } else {
-          params += (ParamName(operand2) -> ParamValue.IntegerInput(BigInt(value2)))
+          params = params.+ (ParamName(operand2) -> ParamValue.IntegerInput(BigInt(value2)))
         }
-        params += (ParamName("computation") -> ParamValue.ProductValue(List("operand1", "operator", "operand2")))
+        params = params.+ (ParamName("computation") -> ParamValue.ProductValue(List("operand1", "operator", "operand2")))
       case "Fact" =>
         val setFromFactId = expression.lift(2).get.asInstanceOf[BigInt]
         val setToFactId = expression.lift(4).get.asInstanceOf[BigInt]
-        params += (ParamName("updateValue") -> ParamValue.UnionValueSelected("integerFactValue"))
-        params += (ParamName("fact") -> ParamValue.IntegerFact(FactId(setFromFactId)))
-        params += (ParamName("integerFactValue") -> ParamValue.IntegerFact(FactId(setToFactId)))
+        params = params.+ (ParamName("updateValue") -> ParamValue.UnionValueSelected("integerFactValue"))
+        params = params.+ (ParamName("fact") -> ParamValue.IntegerFact(FactId(setFromFactId)))
+        params = params.+ (ParamName("integerFactValue") -> ParamValue.IntegerFact(FactId(setToFactId)))
 
       case "Random" =>
         val optionExpression = expression.lift(4).get.asInstanceOf[List[Any]]
@@ -331,26 +327,26 @@ object SchemeParser {
         val operand1 = if (operand1IsFact) "startFact" else "startInput"
         val operand2 = if (operand2IsFact) "endFact" else "endInput"
 
-        params += (ParamName("randomValue") -> ParamValue.ProductValue(List("start", "end")))
-        params += (ParamName("updateValue") -> ParamValue.UnionValueSelected("randomValue"))
-        params += (ParamName("fact") -> ParamValue.IntegerFact(FactId(factId)))
+        params = params.+ (ParamName("randomValue") -> ParamValue.ProductValue(List("start", "end")))
+        params = params.+ (ParamName("updateValue") -> ParamValue.UnionValueSelected("randomValue"))
+        params = params.+ (ParamName("fact") -> ParamValue.IntegerFact(FactId(factId)))
 
-        params += (ParamName("start") -> ParamValue.UnionValueSelected(operand1))
+        params = params.+ (ParamName("start") -> ParamValue.UnionValueSelected(operand1))
         if (operand1IsFact) {
-          params += (ParamName(operand1) -> ParamValue.IntegerFact(FactId(BigInt(value1))))
+          params = params.+ (ParamName(operand1) -> ParamValue.IntegerFact(FactId(BigInt(value1))))
         } else {
-          params += (ParamName(operand1) -> ParamValue.IntegerInput(BigInt(value1)))
+          params = params.+ (ParamName(operand1) -> ParamValue.IntegerInput(BigInt(value1)))
         }
 
-        params += (ParamName("end") -> ParamValue.UnionValueSelected(operand2))
+        params = params.+ (ParamName("end") -> ParamValue.UnionValueSelected(operand2))
         if (operand2IsFact) {
-          params += (ParamName(operand2) -> ParamValue.IntegerFact(FactId(BigInt(value2))))
+          params = params.+ (ParamName(operand2) -> ParamValue.IntegerFact(FactId(BigInt(value2))))
         } else {
-          params += (ParamName(operand2) -> ParamValue.IntegerInput(BigInt(value2)))
+          params = params.+ (ParamName(operand2) -> ParamValue.IntegerInput(BigInt(value2)))
         }
     }
 
-    val action = Action(ActionType("UpdateIntegerFacts"), params.toMap)
+    val action = Action(ActionType("UpdateIntegerFacts"), params)
 
     action
   }
@@ -637,7 +633,7 @@ object SchemeParser {
       if (isWithinNode) {
         node.rules.filter(_.id == RuleId(ruleId)).foreach(rule => {
           val definitions = ConditionDefinitions()
-          definitions.foreach(definition => {
+          definitions.foreach(f = definition => {
             if (definition.conditionType == ConditionType(newConditionType)) {
               var params: Map[ParamName, ParamValue] = Map()
               newConditionType match {
