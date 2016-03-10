@@ -270,7 +270,7 @@ object SchemeParser {
     val factId = expression.lift(2).get.asInstanceOf[BigInt]
     val setOption = expression.lift(3).get.asInstanceOf[String] // Input, Random, Fact, Math
 
-    var params = new mutable.ListMap[ParamName, ParamValue]()
+    val params = new mutable.ListMap[ParamName, ParamValue]()
 
     setOption match {
       case "Input" =>
