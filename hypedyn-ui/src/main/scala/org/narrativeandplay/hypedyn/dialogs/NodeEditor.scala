@@ -590,9 +590,12 @@ object NodeEditor {
      * Returns all the style spans in the text
      */
     def styleSpans = {
-      val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
-      getStyleSpans(0, getText.length) forEach { styleSpan => spans += styleSpan }
-      spans.toList
+      import scala.collection.JavaConverters._
+
+      // `getStyleSpans` returns a `StyleSpans[S]` which is a Java
+      // `Iterable[S]`, so we convert that into a Scala `Iterable[S]`
+      // and finally convert that into a `List[S]`
+      getStyleSpans(0, getText.length).asScala.toList
     }
 
     /**
@@ -601,9 +604,12 @@ object NodeEditor {
      * @param indexRange The range of text for which to get the style spans
      */
     def styleSpansAt(indexRange: IndexRange) = {
-      val spans = ObservableBuffer.empty[StyleSpan[NodeEditor.LinkStyleInfo]]
-      getStyleSpans(indexRange) forEach { styleSpan => spans += styleSpan }
-      spans.toList
+      import scala.collection.JavaConverters._
+
+      // `getStyleSpans` returns a `StyleSpans[S]` which is a Java
+      // `Iterable[S]`, so we convert that into a Scala `Iterable[S]`
+      // and finally convert that into a `List[S]`
+      getStyleSpans(indexRange).asScala.toList
     }
 
     def styleAt(position: Int) = getStyleAtPosition(position)
