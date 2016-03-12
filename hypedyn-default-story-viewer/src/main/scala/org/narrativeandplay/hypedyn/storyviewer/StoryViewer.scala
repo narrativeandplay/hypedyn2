@@ -176,9 +176,17 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
     EventBus.send(UiNodeDeselected(id, StoryViewerEventSourceIdentity))
   }
 
-  private def serialise(n: ViewerNode) = AstMap("id" -> AstInteger(n.id.value),
-                                                "x" -> AstFloat(n.layoutX),
-                                                "y" -> AstFloat(n.layoutY))
+  private def serialise(n: ViewerNode) = {
+    val unscaledX = n.layoutX / zoomLevel()
+    val unscaledY = n.layoutY / zoomLevel()
+
+    AstMap(
+      "id" -> AstInteger(n.id.value),
+      "x" -> AstFloat(unscaledX),
+      "y" -> AstFloat(unscaledY)
+    )
+  }
+
   private def deserialise(nodeData: AstMap) = {
     val id = nodeData("id").asInstanceOf[AstInteger].i
     val x = nodeData("x").asInstanceOf[AstFloat].f
