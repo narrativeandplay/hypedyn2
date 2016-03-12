@@ -215,8 +215,11 @@ class NodeEditor private (dialogTitle: String,
         val selectedSpan = foldedStyleSpans.head
 
         selectedSpan.getStyle.ruleset match {
-          case Some(r) => selectionModel().select(r)
-          case None => selectionModel().clearSelection()
+          case Some(r) =>
+            selectionModel().select(r)
+            scrollTo(r)
+          case None =>
+            selectionModel().clearSelection()
         }
       }
       else selectionModel().clearSelection()
