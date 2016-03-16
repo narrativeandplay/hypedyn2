@@ -59,6 +59,6 @@ All code contributions must follow the code style as set out in the [style guide
 
 ## License
 
-Copyright (C) 2015  National University of Singapore
+Copyright &copy; 2015-2016  National University of Singapore
 
 Licensed under the GNU General Public License v3. See LICENSE for details.
