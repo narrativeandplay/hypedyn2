@@ -59,11 +59,12 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
   /**
     * A property determining if this node's content should be shown
     */
-  val showContent = BooleanProperty(true)
+  val showContent = storyViewer.zoomLevel >= storyViewer.showContentLimit
+
   /**
     * A property determining if this node's name should be shown
     */
-  val showName = BooleanProperty(true)
+  val showName = storyViewer.zoomLevel >= storyViewer.showLabelsLimit
 
 
   /**
@@ -86,9 +87,6 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
 
       relocate(scaledFactor * topLeft.x, scaledFactor * topLeft.y)
     }
-
-    showContent() = (newZoom >= storyViewer.showContentLimit)
-    showName() = (newZoom >= storyViewer.showLabelsLimit)
 
     storyViewer.sizeToChildren()
   }
