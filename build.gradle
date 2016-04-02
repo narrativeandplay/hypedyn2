@@ -45,8 +45,6 @@ allprojects {
 
     tasks.withType(ScalaCompile) {
         scalaCompileOptions.with {
-            useAnt = false
-            useCompileDaemon = true
             additionalParameters = [
                     "-Xexperimental", // for Single Abstract Method conversion support without needing implicits
                     "-Xlint:-nullary-unit,_",
