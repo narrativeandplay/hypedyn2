@@ -22,7 +22,7 @@ class ViewerNodeSkin(viewerNode: ViewerNode) extends Skin[ViewerNode] {
   // The -1 is for the rectangle to look nicer
   private val headingBarRect = new Rectangle {
     width <== viewerNode.widthProperty() - 1
-    height = HeadingHeight
+    height <== when (viewerNode.showContent) choose HeadingHeight otherwise viewerNode.heightProperty() //min(HeadingHeight, viewerNode.heightProperty())
     fill <== when (viewerNode.isAnywhere) choose Color.Silver otherwise Color.LightGrey
     stroke = Color.Black
   }
@@ -31,6 +31,8 @@ class ViewerNodeSkin(viewerNode: ViewerNode) extends Skin[ViewerNode] {
     height <== viewerNode.heightProperty()
     fill = Color.White
     stroke = Color.Black
+
+    visible <== viewerNode.showContent
   }
   private val selectRect = new Rectangle {
     width <== viewerNode.widthProperty() + 2 * SelectionOutlineWidth
@@ -43,7 +45,7 @@ class ViewerNodeSkin(viewerNode: ViewerNode) extends Skin[ViewerNode] {
   }
 
   private val nodeName = new Label {
-    wrapText = true
+    wrapText = false
     alignment = Pos.Center
     textAlignment = TextAlignment.Center
 
@@ -51,6 +53,8 @@ class ViewerNodeSkin(viewerNode: ViewerNode) extends Skin[ViewerNode] {
     maxHeight = ViewerNodeSkin.HeadingHeight
 
     text <== viewerNode.nodeName
+
+    visible <== viewerNode.showName
   }
   private val nodeContent = new Label {
     translateX = TextPadding
@@ -64,6 +68,8 @@ class ViewerNodeSkin(viewerNode: ViewerNode) extends Skin[ViewerNode] {
     maxHeight <== viewerNode.heightProperty() - 2 * TextPadding - HeadingHeight
 
     text <== viewerNode.contentText
+
+    visible <== viewerNode.showContent
   }
 
   private val contentBox = new Pane {
