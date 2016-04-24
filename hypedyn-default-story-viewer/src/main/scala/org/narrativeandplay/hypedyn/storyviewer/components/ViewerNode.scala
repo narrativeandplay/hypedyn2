@@ -57,6 +57,17 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
   val selected = BooleanProperty(false)
 
   /**
+    * A property determining if this node's content should be shown
+    */
+  val showContent = storyViewer.zoomLevel >= storyViewer.showContentLimit
+
+  /**
+    * A property determining if this node's name should be shown
+    */
+  val showName = storyViewer.zoomLevel >= storyViewer.showLabelsLimit
+
+
+  /**
    * A boolean expression for determining if this node is an anywhere node
    */
   val isAnywhere = BooleanExpression.booleanExpression(EasyBind map (_node, { n: Nodal => Boolean box n.isAnywhere }))
@@ -76,6 +87,8 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
 
       relocate(scaledFactor * topLeft.x, scaledFactor * topLeft.y)
     }
+
+    storyViewer.sizeToChildren()
   }
 
   skin = new ViewerNodeSkin(this)
@@ -85,7 +98,9 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
   onMouseClicked = { me =>
     toFront()
     me.clickCount match {
-      case 2 => pluginEventDispatcher.requestNodeEdit(id)
+      case 2 =>
+        select()
+        pluginEventDispatcher.requestNodeEdit(id)
       case _ =>
     }
   }

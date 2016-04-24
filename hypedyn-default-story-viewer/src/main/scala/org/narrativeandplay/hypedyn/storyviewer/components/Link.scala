@@ -55,12 +55,16 @@ class Link(val from: ViewerNode,
     wrapText = true
 
     text <== name
+
+    visible <== from.showName
   }
 
   private val labelBackground = new Rectangle {
     width <== linkLabel.width
     height = Link.LabelHeight
     fill = Link.DefaultBackgroundColour
+
+    visible <== from.showName
   }
 
   private def endPoints = {

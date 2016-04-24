@@ -31,12 +31,13 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   fitToHeight = true
   fitToWidth = true
 
-  val minZoom = 0.5
+  val minZoom = 0.1
   val maxZoom = 2.0
+  val showContentLimit = 0.45
+  val showLabelsLimit = 0.15
 
   val nodeLocations = mutable.Map.empty[NodeId, Vector2[Double]]
   val zoomLevel = DoubleProperty(1.0)
-  zoomLevel onChange { sizeToChildren() }
 
   val StoryViewerEventSourceIdentity = s"Plugin - $name"
   val viewer = new StoryViewerContent(this)
@@ -113,6 +114,8 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
    * @param data The saved data
    */
   override def onLoad(data: AstElement): Unit = {
+    zoomLevel() = 1.0
+
     val properData = data.asInstanceOf[AstMap]
     val nodes = properData("nodes").asInstanceOf[AstList].elems
     nodes foreach { n =>
@@ -177,9 +180,17 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
     EventBus.send(UiNodeDeselected(id, StoryViewerEventSourceIdentity))
   }
 
-  private def serialise(n: ViewerNode) = AstMap("id" -> AstInteger(n.id.value),
-                                                "x" -> AstFloat(n.layoutX),
-                                                "y" -> AstFloat(n.layoutY))
+  private def serialise(n: ViewerNode) = {
+    val unscaledX = n.layoutX / zoomLevel()
+    val unscaledY = n.layoutY / zoomLevel()
+
+    AstMap(
+      "id" -> AstInteger(n.id.value),
+      "x" -> AstFloat(unscaledX),
+      "y" -> AstFloat(unscaledY)
+    )
+  }
+
   private def deserialise(nodeData: AstMap) = {
     val id = nodeData("id").asInstanceOf[AstInteger].i
     val x = nodeData("x").asInstanceOf[AstFloat].f
