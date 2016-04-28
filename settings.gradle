@@ -21,3 +21,5 @@ include 'hypedyn-api'
 include 'hypedyn-core'
 include 'hypedyn-default-story-viewer'
 include 'hypedyn-ui'
+include 'hypedyn-reader'
+

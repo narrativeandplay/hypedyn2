@@ -10,6 +10,7 @@ dependencies {
     compile "org.fxmisc.easybind:easybind:1.0.3"
 
     compile project(':hypedyn-api')
+    compile project(':hypedyn-reader')
 }
 
 sourceSets {
