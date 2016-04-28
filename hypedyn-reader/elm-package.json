@@ -1,0 +1,14 @@
+{
+    "version": "1.0.0",
+    "summary": "Reader for HypeDyn2",
+    "repository": "https://github.com/narrativeandplay/hypedyn2.git",
+    "license": "GPL-3.0",
+    "source-directories": [
+        "src/main/elm"
+    ],
+    "exposed-modules": [],
+    "dependencies": {
+        "elm-lang/core": "3.0.0 <= v < 4.0.0"
+    },
+    "elm-version": "0.16.0 <= v < 0.17.0"
+}

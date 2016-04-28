@@ -1,0 +1,31 @@
+{
+  "name": "hypedyn-reader",
+  "version": "1.0.0",
+  "description": "Reader for HypeDyn 2",
+  "repository": "https://github.com/narrativeandplay/hypedyn2",
+  "main": "index.js",
+  "scripts": {
+    "setup": "gem install sass slim && elm package install -y && npm install && bower install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Benedict Lee",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "bower": "^1.7.9",
+    "coffee-script": "^1.10.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.0",
+    "gulp-bower": "0.0.13",
+    "gulp-clean": "^0.3.2",
+    "gulp-concat": "^2.6.0",
+    "gulp-debug": "^2.1.2",
+    "gulp-elm": "^0.4.1",
+    "gulp-filter": "^4.0.0",
+    "gulp-load-plugins": "^1.2.0",
+    "gulp-namespace": "^1.0.2",
+    "gulp-ruby-sass": "^2.0.6",
+    "gulp-slim": "^0.3.0",
+    "gulp-uglify": "^1.5.3",
+    "main-bower-files": "^2.11.1"
+  }
+}

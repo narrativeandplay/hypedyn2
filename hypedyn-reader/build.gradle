@@ -1,0 +1,77 @@
+plugins {
+    id "com.moowork.node" version "0.12"
+    id "com.moowork.gulp" version "0.12"
+}
+
+ext {
+    readerBuildDir = file("src/main/resources/org/narrativeandplay/hypedyn/reader/")
+}
+
+task bowerInstall(type: Exec) {
+    dependsOn npmInstall
+
+    inputs.file file("bower.json")
+    outputs.dir file("bower_components")
+
+    commandLine "bower", "install"
+}
+
+task elmPackageInstall(type: Exec) {
+    inputs.file file("elm-package.json")
+    outputs.dir file("elm_stuff")
+
+    commandLine "elm", "package", "install", "-y"
+}
+
+task compileElm(type: GulpTask) {
+    args = ["elm:compile"]
+
+    inputs.dir file("src/main/elm")
+    outputs.file new File(readerBuildDir, "application.js")
+
+    dependsOn elmPackageInstall
+}
+
+task compileSass(type: GulpTask) {
+    args = ["sass:compile"]
+
+    inputs.dir file("src/main/sass")
+    outputs.file new File(readerBuildDir, "application.css")
+}
+
+task compileSlim(type: GulpTask) {
+    args = ["slim:compile"]
+
+    inputs.dir file("src/main/slim")
+    outputs.file new File(readerBuildDir, "index.html")
+}
+
+task compileBower(type: GulpTask) {
+    args = ["bower:compile"]
+
+    inputs.file file("bower.json")
+    outputs.file new File(readerBuildDir, "vendor.js")
+
+    dependsOn bowerInstall
+}
+
+task copyFonts(type: Copy) {
+    ext.fontDir = "bower_components/foundation-icon-fonts"
+
+    from fontDir
+    into readerBuildDir
+    include "*.eot", "*.woff", "*.svg", "*.ttf"
+
+    inputs.dir fontDir
+    outputs.dir readerBuildDir
+
+    dependsOn bowerInstall
+}
+
+processResources {
+    dependsOn compileElm, compileSass, compileSlim, compileBower, copyFonts
+}
+
+clean {
+    dependsOn cleanCompileElm, cleanCompileSass, cleanCompileSlim, cleanCompileBower, cleanCopyFonts
+}
