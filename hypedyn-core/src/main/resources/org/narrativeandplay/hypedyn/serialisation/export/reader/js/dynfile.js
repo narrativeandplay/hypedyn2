@@ -165,6 +165,16 @@ function createActions(rulesetID, ruleID, actions, isNodeRules) {
 				//createAction("anywhereCheck", 67, addAnywhereLink, [66], 68);
 				createAction("anywhereCheck", ruleID, addAnywhereLink, [rulesetID], l);
 				break;
+			case "EnableThematicLinkToHere":
+				// hack to set anywhere flag in the node
+				var node = nodelist[rulesetID];
+				if(node!=null) {
+					node.anywhere=true;
+				}
+
+				//createAction("anywhereCheck", 67, addAnywhereLink, [66], 68);
+				createAction("thematicAnywhereCheck", ruleID, addThematicAnywhereLink, [rulesetID], l);
+				break;
 			case "ShowDisabledAnywhereLink":
 				//createAction("disabledAnywhereCheck", 2, addInactiveAnywhereLink, [1], 3);
 				createAction("disabledAnywhereCheck", ruleID, addInactiveAnywhereLink, [rulesetID], l);

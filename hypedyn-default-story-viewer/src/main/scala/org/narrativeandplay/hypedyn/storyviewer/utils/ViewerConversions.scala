@@ -30,6 +30,7 @@ object ViewerConversions {
       val actionTypes = nodal.rules flatMap (_.actions) map (_.actionType)
 
       (actionTypes contains ActionType("EnableAnywhereLinkToHere")) ||
+        (actionTypes contains ActionType("EnableThematicLinkToHere")) ||
         (actionTypes contains ActionType("ShowDisabledAnywhereLink"))
     }
   }
