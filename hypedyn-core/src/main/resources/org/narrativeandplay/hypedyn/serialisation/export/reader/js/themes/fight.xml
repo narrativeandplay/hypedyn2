@@ -1,0 +1,12 @@
+<motif name="fight">
+	<features>
+		<feature>fight</feature>
+		<feature>violent argument</feature>
+		<feature>attack</feature>
+		<feature>fist</feature>
+		<feature>punch</feature>
+		<feature>kick</feature>
+		<feature>headbut</feature>
+		<feature>assault</feature>	
+	</features>
+</motif>

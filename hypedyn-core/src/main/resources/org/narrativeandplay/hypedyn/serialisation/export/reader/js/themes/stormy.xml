@@ -1,0 +1,13 @@
+<motif name="stormy">
+    <features>
+        <feature>blustery</feature>
+        <feature>squally</feature>
+        <feature>tempestuous</feature>
+        <feature>turbulent</feature>
+        <feature>windy</feature>
+        <feature>wind</feature>
+        <feature>gusty</feature>
+        <feature>gust</feature>
+        <feature>gusts</feature>
+    </features>
+</motif>

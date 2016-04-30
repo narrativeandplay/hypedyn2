@@ -1,0 +1,10 @@
+<theme name="weather">
+	<required>
+	</required>
+	<optional>
+		<motif-component>sunny</motif-component>
+		<motif-component>stormy</motif-component>
+		<motif-component>cold</motif-component>
+		<motif-component>rainy</motif-component>
+	</optional>
+</theme>

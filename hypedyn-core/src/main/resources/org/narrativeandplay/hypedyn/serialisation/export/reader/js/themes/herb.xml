@@ -1,0 +1,9 @@
+<motif name="herb">
+	<features>
+		<feature>basil</feature>
+		<feature>rosemary</feature>
+		<feature>mint</feature>
+		<feature>oregano</feature>
+		<feature>thyme</feature>
+	</features>
+</motif>

@@ -1,0 +1,13 @@
+<theme name="death">
+	<required>
+	</required>
+	<optional>
+		<motif-component>grave</motif-component>
+		<motif-component>skull</motif-component>
+		<motif-component>dark</motif-component>
+		<theme-component>murder</theme-component>
+		<motif-component>religioussymbol</motif-component>
+		<motif-component>corpse</motif-component>
+		<motif-component>victim</motif-component>
+	</optional>
+</theme>

@@ -1,0 +1,14 @@
+<motif name="musician">
+	<features>
+		<feature>musician</feature>
+		<feature>concert</feature>
+		<feature>music festival</feature>
+		<feature>guitarist</feature>
+		<feature>bassist</feature>
+		<feature>drummer</feature>
+		<feature>instrument</feature>
+		<feature>stage</feature>
+		<feature>musical artist</feature>
+		<feature>song writer</feature>		
+	</features>
+</motif>

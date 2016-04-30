@@ -1,0 +1,11 @@
+<theme name='companionship'>
+	<required>		
+	</required>
+	<optional>
+		<motif-component>friend</motif-component>
+		<motif-component>gift</motif-component>
+		<motif-component>embrace</motif-component>
+		<motif-component>greeting</motif-component>
+		<motif-component>job</motif-component>
+	</optional>
+</theme>

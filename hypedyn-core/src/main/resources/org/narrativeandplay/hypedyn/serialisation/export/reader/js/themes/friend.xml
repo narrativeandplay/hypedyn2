@@ -1,0 +1,15 @@
+<motif name="friend">
+	<features>
+		<feature>friend</feature>
+		<feature>friends</feature>
+		<feature>mate</feature>
+		<feature>mates</feature>
+		<feature>buddy</feature>
+		<feature>buddies</feature>
+		<feature>girlfriend</feature>
+		<feature>boyfriend</feature>
+		<feature>chum</feature>
+		<feature>chums</feature>
+		<feature>colleague</feature>
+	</features>
+</motif>

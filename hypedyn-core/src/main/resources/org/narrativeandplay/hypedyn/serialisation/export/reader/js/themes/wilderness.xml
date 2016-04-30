@@ -1,0 +1,10 @@
+<theme name="wilderness">
+	<required>
+	</required>
+	<optional>
+		<motif-component>forest</motif-component>
+		<motif-component>desert</motif-component>
+		<motif-component>tundra</motif-component>
+		<motif-component>plains</motif-component>
+	</optional>
+</theme>

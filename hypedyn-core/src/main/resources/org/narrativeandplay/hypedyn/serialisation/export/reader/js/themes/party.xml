@@ -1,0 +1,15 @@
+<motif name="Party">
+	<features>
+		<feature>party</feature>
+		<feature>celebration</feature>
+		<feature>box social</feature>
+		<feature>gathering</feature>
+		<feature>gig</feature>
+		<feature>rave</feature>
+		<feature>dinner party</feature>
+		<feature>birthday party</feature>
+		<feature>christmas party</feature>
+		<feature>festival</feature>
+		<feature>kegger</feature>
+	</features>
+</motif>

@@ -1,0 +1,10 @@
+<motif name="desert">
+    <features>
+        <feature>desert</feature>
+        <feature>deserts</feature>
+        <feature>wasteland</feature>
+        <feature>wilderness</feature>
+        <feature>wilds</feature>
+        <feature>barren lands</feature>
+    </features>
+</motif>

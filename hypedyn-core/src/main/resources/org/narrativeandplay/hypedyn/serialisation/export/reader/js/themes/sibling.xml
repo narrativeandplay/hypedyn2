@@ -1,0 +1,7 @@
+<motif name="sibling">
+	<features>
+		<feature>Brother</feature>
+		<feature>Sister</feature>
+		<feature>Sibling</feature>
+	</features>
+</motif>

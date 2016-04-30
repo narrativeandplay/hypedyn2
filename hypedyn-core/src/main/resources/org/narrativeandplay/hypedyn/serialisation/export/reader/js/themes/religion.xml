@@ -1,0 +1,9 @@
+<theme name='religion'>
+	<required>
+		<motif-component>religioussymbol</motif-component>
+	</required>
+	<optional>
+		<motif-component>church</motif-component>
+		<motif-component>priest</motif-component>		
+	</optional>
+</theme>

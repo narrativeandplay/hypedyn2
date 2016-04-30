@@ -1,0 +1,9 @@
+<motif name="cold">
+	<features>
+		<feature>snow</feature>
+		<feature>ice</feature>
+		<feature>cold</feature>
+		<feature>freezing</feature>
+		<feature>chilled</feature>
+	</features>
+</motif>

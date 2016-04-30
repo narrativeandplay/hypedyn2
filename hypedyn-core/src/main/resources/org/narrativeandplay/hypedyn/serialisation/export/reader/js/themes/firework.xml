@@ -1,0 +1,11 @@
+<motif name="firework">
+	<features>
+		<feature>firework</feature>
+		<feature>fireworks</feature>
+		<feature>boom</feature>
+		<feature>rocket</feature>
+		<feature>catherine wheel</feature>
+		<feature>roman candle</feature>
+		<feature>bonfire</feature>
+	</features>
+</motif>

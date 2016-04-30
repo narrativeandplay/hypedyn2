@@ -1,0 +1,12 @@
+<motif name="accident">
+	<features>
+		<feature>accident</feature>
+		<feature>road accident</feature>
+		<feature>disaster</feature>
+		<feature>dangerous mistake</feature>
+		<feature>careless</feature>
+		<feature>crash</feature>
+		<feature>collision</feature>
+		<feature>fell off</feature>
+	</features>
+</motif>

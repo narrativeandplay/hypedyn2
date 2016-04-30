@@ -1,0 +1,10 @@
+<motif name="fish">
+	<features>
+		<feature>fish</feature>
+		<feature>cod</feature>
+		<feature>haddok</feature>
+		<feature>salmon</feature>
+		<feature>tuna</feature>
+		<feature>shark</feature>
+	</features>
+</motif>

@@ -1,0 +1,9 @@
+<motif name="tundra">
+    <features>
+        <feature>tundra</feature>
+        <feature>tundras</feature>
+        <feature>steppe</feature>
+        <feature>heath</feature>
+        <feature>praire</feature>
+    </features>
+</motif>

@@ -1,0 +1,12 @@
+<theme name='fireworks night'>
+	<required>
+	</required>
+	<optional>
+		<motif-component>decoration</motif-component>
+		<motif-component>party</motif-component>
+		<motif-component>food</motif-component>
+		<motif-component>firework</motif-component>
+		<motif-component>bonfire</motif-component>
+		<motif-component>guy fawkes</motif-component>
+	</optional>
+</theme>

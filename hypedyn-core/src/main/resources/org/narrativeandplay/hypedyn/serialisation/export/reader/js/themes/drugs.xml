@@ -1,0 +1,15 @@
+<motif name="drugs">
+	<features>
+		<feature>cannabis</feature>
+		<feature>drugs</feature>
+		<feature>drug</feature>
+		<feature>ectasy</feature>
+		<feature>cocaine</feature>
+		<feature>nicotine</feature>
+		<feature>heroin</feature>
+		<feature>smoking</feature>
+		<feature>alcahol</feature>
+		<feature>booze</feature>
+		<feature>tripping</feature>
+	</features>
+</motif>

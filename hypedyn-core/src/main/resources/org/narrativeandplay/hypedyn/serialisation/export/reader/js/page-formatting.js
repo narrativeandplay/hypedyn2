@@ -233,18 +233,18 @@ function node_to_html( node, activated_anywhere_nodes, inactive_anywhere_nodes, 
 		br_tg.end_tag = "";
 		anywhere_tg_arr.push( br_tg );
 		
-		disp("active anywhere nodes "+active_anywhere_nodes);
-		disp("len "+ active_anywhere_nodes.length);
-		disp("null? "+ ( active_anywhere_nodes === null));
+		//disp("active anywhere nodes "+active_anywhere_nodes);
+		//disp("len "+ active_anywhere_nodes.length);
+		//disp("null? "+ ( active_anywhere_nodes === null));
 		
-		disp("inactive anywhere nodes "+inactive_anywhere_nodes);
-		disp("len "+ inactive_anywhere_nodes.length);
-		disp("null? "+ ( inactive_anywhere_nodes === null));
+		//disp("inactive anywhere nodes "+inactive_anywhere_nodes);
+		//disp("len "+ inactive_anywhere_nodes.length);
+		//disp("null? "+ ( inactive_anywhere_nodes === null));
 		
 		// active
 		for ( var j in active_anywhere_nodes ) {
 			var anywherenode = active_anywhere_nodes[j];
-			disp("anywhere node "+anywherenode);
+			//disp("anywhere node "+anywherenode);
 			var anywhere_tg = [];
             // need to escape the content in case name contains special characters
 			anywhere_tg.content = escape_special(anywherenode.label); //escape_special(anywherenode.name);
@@ -257,7 +257,7 @@ function node_to_html( node, activated_anywhere_nodes, inactive_anywhere_nodes, 
 		// inactive
 		for ( var j in inactive_anywhere_nodes ) {
 			var anywherenode = inactive_anywhere_nodes[j];
-			disp("anywhere node "+anywherenode);
+			//disp("anywhere node "+anywherenode);
 			var anywhere_tg = [];
             // need to escape the content in case name contains special characters
 			anywhere_tg.content = escape_special(anywherenode.label); //escape_special(anywherenode.name);

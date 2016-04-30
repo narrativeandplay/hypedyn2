@@ -1,0 +1,7 @@
+<theme name='romance'>
+    <optional>
+        <motif-component>flower</motif-component>
+        <motif-component>dance</motif-component>
+        <motif-component>kiss</motif-component>
+    </optional>
+</theme>

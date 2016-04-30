@@ -1,0 +1,9 @@
+<motif name="fruit">
+	<features>
+		<feature>orange</feature>
+		<feature>apple</feature>
+		<feature>strawberry</feature>
+		<feature>blueberry</feature>
+		<feature>grapefruit</feature>
+	</features>
+</motif>

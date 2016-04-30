@@ -1,0 +1,14 @@
+<motif name="flower">
+	<features>
+		<feature>flower</feature>
+		<feature>flowers</feature>
+		<feature>tulip</feature>
+		<feature>rose</feature>
+		<feature>lily</feature>
+		<feature>daisy</feature>
+		<feature>daffodil</feature>
+		<feature>sunflower</feature>
+		<feature>marygold</feature>
+		<feature>chrysanthemum</feature>
+	</features>
+</motif>

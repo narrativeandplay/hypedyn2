@@ -1,0 +1,22 @@
+<motif name="weapon">
+	<features>
+		<feature>knife</feature>
+		<feature>weapon</feature>
+		<feature>gun</feature>
+		<feature>pistol</feature>
+		<feature>firearm</feature>
+		<feature>shiv</feature>
+		<feature>offsensive weapon</feature>
+		<feature>shotgun</feature>
+		<feature>rifle</feature>
+		<feature>revolver</feature>
+		<feature>machine gun</feature>
+		<feature>bomb</feature>
+		<feature>submachine gun</feature>
+		<feature>rocket</feature>
+		<feature>missile</feature>
+		<feature>sword</feature>
+		<feature>axe</feature>
+		<feature>baton</feature>
+	</features>
+</motif>

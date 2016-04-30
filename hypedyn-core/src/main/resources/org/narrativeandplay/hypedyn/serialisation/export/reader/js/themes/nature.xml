@@ -1,0 +1,11 @@
+<theme name="nature">
+	<required>
+		<theme-component>animal</theme-component>
+		<theme-component>plant</theme-component>
+	</required>
+	<optional>
+		<theme-component>wilderness</theme-component>
+		<motif-component>river</motif-component>
+		<theme-component>weather</theme-component>
+	</optional>
+</theme>

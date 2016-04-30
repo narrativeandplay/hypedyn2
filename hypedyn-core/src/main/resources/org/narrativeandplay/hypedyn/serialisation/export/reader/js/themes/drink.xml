@@ -1,0 +1,15 @@
+<motif name="drink">
+	<features>
+		<feature>drink</feature>
+		<feature>beer</feature>
+		<feature>wine</feature>
+		<feature>spirits</feature>
+		<feature>vodka</feature>
+		<feature>rum</feature>
+		<feature>cocktail</feature>
+		<feature>alcohol</feature>
+		<feature>booze</feature>
+		<feature>bottle</feature>
+		<feature>glass</feature>
+	</features>
+</motif>

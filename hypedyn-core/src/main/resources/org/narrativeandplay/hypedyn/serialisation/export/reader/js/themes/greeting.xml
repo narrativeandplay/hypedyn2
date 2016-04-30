@@ -1,0 +1,9 @@
+<motif name="greeting">
+	<features>
+		<feature>greeting</feature>
+		<feature>welcome</feature>
+		<feature>hello</feature>
+		<feature>hi</feature>	
+		<feature>wave</feature>
+	</features>
+</motif>

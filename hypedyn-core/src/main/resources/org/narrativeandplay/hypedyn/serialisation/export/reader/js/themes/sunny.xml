@@ -1,0 +1,9 @@
+<motif name="sunny">
+    <features>
+        <feature>sunny</feature>
+        <feature>clear</feature>
+        <feature>brilliant</feature>
+        <feature>fine</feature>
+        <feature>fair</feature>
+    </features>
+</motif>

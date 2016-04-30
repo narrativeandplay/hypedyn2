@@ -1,0 +1,9 @@
+<motif name="grave">
+	<features>
+		<feature>grave</feature>
+		<feature>graves</feature>
+		<feature>graveyard</feature>
+		<feature>headstone</feature>
+		<feature>tomb</feature>
+	</features>
+</motif>

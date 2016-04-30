@@ -1,0 +1,10 @@
+<motif name="thanksgiving symbol">
+    <features>
+        <feature>turkey</feature>
+        <feature>corn</feature>
+        <feature>pumpkin</feature>
+        <feature>cranberry</feature>
+        <feature>beans</feature>
+        <feature>cornucopia</feature>
+    </features>
+</motif>

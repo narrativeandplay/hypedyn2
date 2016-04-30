@@ -1,0 +1,16 @@
+<theme name='wedding'>
+	<required>
+	</required>
+	<optional>
+
+		<motif-component>party</motif-component>
+		<motif-component>bride</motif-component>
+		<motif-component>food</motif-component>
+		<motif-component>FormalDress</motif-component>
+		<motif-component>religioussymbol</motif-component>
+		<motif-component>church</motif-component>
+		<motif-component>priest</motif-component>
+		<motif-component>kiss</motif-component>
+		<motif-component>marriage</motif-component>
+	</optional>
+</theme>

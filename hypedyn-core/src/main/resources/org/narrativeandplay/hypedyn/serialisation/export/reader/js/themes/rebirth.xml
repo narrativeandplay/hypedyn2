@@ -1,0 +1,12 @@
+<theme name='rebirth'>
+	<required>
+	</required>
+	<optional>
+		<theme-component>Easter</theme-component>
+		<motif-component>bunny</motif-component>
+		<motif-component>duckling</motif-component>
+		<motif-component>child</motif-component>
+		<motif-component>flower</motif-component>
+		<motif-component>egg</motif-component>
+	</optional>
+</theme>

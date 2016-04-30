@@ -1,0 +1,9 @@
+<motif name="Child">
+	<features>
+		<feature>child</feature>
+		<feature>son</feature>
+		<feature>daughter</feature>
+		<feature>baby</feature>
+		<feature>kid</feature>
+	</features>
+</motif>

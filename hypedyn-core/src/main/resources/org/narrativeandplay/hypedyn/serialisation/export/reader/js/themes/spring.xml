@@ -1,0 +1,10 @@
+<theme name='spring'>
+	<required>
+		<theme-component>Rebirth</theme-component>
+		<motif-component>sun</motif-component>
+	</required>
+	<optional>
+		<theme-component>Easter</theme-component>
+		<motif-component>flower</motif-component>
+	</optional>
+</theme>

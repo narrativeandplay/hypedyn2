@@ -1,0 +1,10 @@
+<motif name="corpse">
+    <features>
+        <feature>corpse</feature>
+        <feature>corpses</feature>
+        <feature>body</feature>
+        <feature>bodies</feature>
+        <feature>cadaver</feature>
+        <feature>cadavers</feature>
+    </features>
+</motif>

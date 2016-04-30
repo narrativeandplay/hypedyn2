@@ -1,0 +1,11 @@
+<motif name="dance">
+	<features>
+		<feature>dance</feature>
+		<feature>dancer</feature>
+		<feature>dancing</feature>
+		<feature>club</feature>
+		<feature>music</feature>
+		<feature>gig</feature>
+		<feature>dance floor</feature>
+	</features>
+</motif>

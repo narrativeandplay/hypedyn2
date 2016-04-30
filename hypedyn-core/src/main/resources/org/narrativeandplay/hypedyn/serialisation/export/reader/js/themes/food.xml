@@ -1,0 +1,24 @@
+<motif name="Food">
+	<features>
+		<feature>cake</feature>
+		<feature>chocolates</feature>
+		<feature>roast chicken</feature>
+		<feature>beef</feature>
+		<feature>food</feature>
+		<feature>meal</feature>
+		<feature>pork</feature>
+		<feature>cereal</feature>
+		<feature>meat</feature>
+		<feature>vegetables</feature>
+		<feature>pantry</feature>
+		<feature>cooking</feature>
+		<feature>pasta</feature>
+		<feature>curry</feature>
+		<feature>appatisers</feature>
+		<feature>main course</feature>
+		<feature>dinner</feature>
+		<feature>lunch</feature>
+		<feature>breakfast</feature>
+		<feature>supper</feature>
+	</features>
+</motif>

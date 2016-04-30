@@ -1,0 +1,11 @@
+<motif name="dark">
+	<features>
+		<feature>dark</feature>
+		<feature>night</feature>
+		<feature>dusk</feature>
+		<feature>bleak</feature>
+		<feature>black</feature>
+		<feature>darkness</feature>
+		<feature>twilight</feature>
+	</features>
+</motif>

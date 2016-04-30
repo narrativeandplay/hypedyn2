@@ -1,0 +1,8 @@
+<motif name="fat">
+	<features>
+		<feature>fat</feature>
+		<feature>fatty</feature>
+		<feature>obese</feature>
+		<feature>full</feature>
+	</features>
+</motif>

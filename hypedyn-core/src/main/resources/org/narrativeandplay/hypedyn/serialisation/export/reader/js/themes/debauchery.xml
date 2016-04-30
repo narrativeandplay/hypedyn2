@@ -1,0 +1,8 @@
+<theme name="Debauchery">
+	<required>
+		<theme-component>excess</theme-component>
+		<theme-component>hedonism</theme-component>
+	</required>
+	<optional>
+	</optional>
+</theme>

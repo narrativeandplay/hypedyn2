@@ -1,0 +1,15 @@
+<motif name="sound system">
+	<features>
+		<feature>stereo</feature>
+		<feature>radio</feature>
+		<feature>cd player</feature>
+		<feature>speaker</feature>
+		<feature>hi fi</feature>
+		<feature>mp3 player</feature>
+		<feature>record player</feature>
+		<feature>decks</feature>
+		<feature>sound system</feature>
+		<feature>music system</feature>
+		<feature>amp</feature>		
+	</features>
+</motif>

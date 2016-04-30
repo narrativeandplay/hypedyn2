@@ -1,0 +1,11 @@
+<theme name="plant">
+	<required>
+	</required>
+	<optional>
+		<motif-component>vegetable</motif-component>
+		<motif-component>fruit</motif-component>
+		<motif-component>herb</motif-component>
+		<motif-component>flower</motif-component>
+		<motif-component>tree</motif-component>
+	</optional>
+</theme>

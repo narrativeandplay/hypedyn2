@@ -1,0 +1,9 @@
+<motif name="rainy">
+    <features>
+        <feature>rainy</feature>
+        <feature>wet</feature>
+        <feature>showery</feature>
+        <feature>drizzly</feature>
+        <feature>inclement</feature>
+    </features>
+</motif>

@@ -1,0 +1,13 @@
+<motif name="bird">
+	<features>
+		<feature>bird</feature>
+		<feature>sparrow</feature>
+		<feature>black bird</feature>
+		<feature>magpie</feature>
+		<feature>hawk</feature>
+		<feature>eagle</feature>
+		<feature>swallow</feature>
+		<feature>duck</feature>
+		<feature>swan</feature>
+	</features>
+</motif>

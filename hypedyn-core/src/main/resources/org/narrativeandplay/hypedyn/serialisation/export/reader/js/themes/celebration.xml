@@ -1,0 +1,20 @@
+<theme name='celebration'>
+	<required>
+		<theme-component>music</theme-component>
+		<theme-component>friendship</theme-component>
+		<motif-component>party</motif-component>
+		<motif-component>food</motif-component>
+	</required>
+	<optional>
+		<theme-component>family</theme-component>
+		<theme-component>birthday</theme-component>
+		<theme-component>wedding</theme-component>
+		<theme-component>easter</theme-component>
+		<theme-component>christmas</theme-component>
+		<theme-component>halloween</theme-component>
+		<theme-component>fireworksnight</theme-component>
+		<theme-component>hedonism</theme-component>
+		<motif-component>drink</motif-component>
+		<motif-component>decoration</motif-component>
+	</optional>
+</theme>

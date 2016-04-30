@@ -1,0 +1,11 @@
+<theme name='birthday'>
+	<required>
+		<motif-component>party</motif-component>
+		<motif-component>food</motif-component>
+	</required>
+	<optional>
+		<motif-component>decoration</motif-component>		
+		<motif-component>gift</motif-component>
+		<motif-component>time</motif-component>
+	</optional>
+</theme>

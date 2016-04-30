@@ -1,0 +1,11 @@
+<theme name='thanks giving'>
+	<required>
+	</required>
+	<optional>
+		<motif-component>Decoration</motif-component>
+		<motif-component>party</motif-component>
+		<motif-component>food</motif-component>
+		<motif-component>gift</motif-component>
+		<motif-component>thanksgivingsymbol</motif-component>
+	</optional>
+</theme>

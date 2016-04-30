@@ -1,0 +1,15 @@
+<motif name="band">
+	<features>
+		<feature>band</feature>
+		<feature>concert</feature>
+		<feature>music festival</feature>
+		<feature>guitarist</feature>
+		<feature>singer</feature>
+		<feature>bassist</feature>
+		<feature>drummer</feature>
+		<feature>band member</feature>
+		<feature>stage</feature>
+		<feature>gig</feature>
+		<feature>amp</feature>		
+	</features>
+</motif>

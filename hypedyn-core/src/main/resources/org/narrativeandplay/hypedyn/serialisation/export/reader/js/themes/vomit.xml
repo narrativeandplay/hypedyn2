@@ -1,0 +1,9 @@
+<motif name="vomit">
+	<features>
+		<feature>vomit</feature>
+		<feature>vomiting</feature>
+		<feature>sick</feature>
+		<feature>puke</feature>
+		<feature>throw up</feature>
+	</features>
+</motif>

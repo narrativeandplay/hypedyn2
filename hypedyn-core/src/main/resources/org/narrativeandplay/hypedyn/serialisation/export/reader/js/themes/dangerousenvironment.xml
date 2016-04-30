@@ -1,0 +1,18 @@
+<motif name="dangerous environment">
+	<features>
+		<feature>dangerous fire</feature>
+		<feature>burning house</feature>
+		<feature>burning building</feature>
+		<feature>damaged electrics</feature>
+		<feature>chemicals</feature>
+		<feature>dangerous chemicals</feature>
+		<feature>flood</feature>
+		<feature>flooding</feature>
+		<feature>tidal wave</feature>
+		<feature>burning</feature>
+		<feature>hazardous</feature>
+		<feature>contaminated</feature>
+		<feature>dangerous machinery</feature>
+		<feature>dangerous enviroment</feature>
+	</features>
+</motif>

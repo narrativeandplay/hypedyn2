@@ -1,0 +1,9 @@
+<motif name="Formal Dress">
+	<features>
+		<feature>Suit</feature>
+		<feature>Formal Dress</feature>
+		<feature>Dress</feature>
+		<feature>tie</feature>
+		<feature>tuxedo</feature>
+	</features>
+</motif>

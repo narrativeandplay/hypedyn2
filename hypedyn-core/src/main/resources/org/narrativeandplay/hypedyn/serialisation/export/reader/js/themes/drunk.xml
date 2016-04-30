@@ -1,0 +1,10 @@
+<motif name="drunk">
+	<features>
+		<feature>drunk</feature>
+		<feature>tipsy</feature>
+		<feature>pissed</feature>
+		<feature>booze</feature>
+		<feature>alcahol</feature>
+		<feature>staggering</feature>
+	</features>
+</motif>

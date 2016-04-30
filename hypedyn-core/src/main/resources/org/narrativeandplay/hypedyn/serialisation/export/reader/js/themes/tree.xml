@@ -1,0 +1,8 @@
+<motif name="tree">
+	<features>
+		<feature>conifer</feature>
+		<feature>pine</feature>
+		<feature>evergreen</feature>
+		<feature>birch</feature>
+	</features>
+</motif>

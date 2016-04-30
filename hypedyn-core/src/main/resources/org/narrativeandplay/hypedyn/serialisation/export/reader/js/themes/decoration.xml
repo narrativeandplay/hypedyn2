@@ -1,0 +1,8 @@
+<motif name="decoration">
+	<features>
+		<feature>decoration</feature>
+		<feature>banner</feature>
+		<feature>flag</feature>
+		<feature>sign</feature>
+	</features>
+</motif>

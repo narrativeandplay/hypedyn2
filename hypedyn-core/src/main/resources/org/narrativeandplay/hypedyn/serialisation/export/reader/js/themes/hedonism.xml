@@ -1,0 +1,11 @@
+<theme name="Hedonism">
+	<required>
+		<theme-component>Pleasure</theme-component>
+	</required>
+	<optional>
+		<motif-component>sex</motif-component>	
+		<motif-component>drink</motif-component>
+		<motif-component>food</motif-component>
+		<motif-component>drugs</motif-component>
+	</optional>
+</theme>

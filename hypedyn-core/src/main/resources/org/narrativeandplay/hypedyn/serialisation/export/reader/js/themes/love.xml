@@ -1,0 +1,15 @@
+<theme name='love'>
+	<required>
+		<motif-component>lover</motif-component>
+	</required>
+	<optional>
+		<theme-component>friendship</theme-component>
+		<theme-component>wedding</theme-component>
+		<theme-component>romance</theme-component>
+		<motif-component>sex</motif-component>
+		<motif-component>embrace</motif-component>
+		<motif-component>greeting</motif-component>
+		<motif-component>goodbye</motif-component>
+		<motif-component>kiss</motif-component>
+	</optional>
+</theme>

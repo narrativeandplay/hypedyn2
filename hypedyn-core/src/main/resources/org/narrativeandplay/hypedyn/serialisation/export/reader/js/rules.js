@@ -82,8 +82,8 @@ function ruleRelevant(eventType, rule) {
 	var result = false;
 	for (var i in rule.actions) {
 		if (rule.actions[i].eventType == eventType) {
-			//console.log("action tyep "+ rule.actions[i].eventType);
-			//console.log(" in type "+ eventType);
+			//disp("action tyep "+ rule.actions[i].eventType);
+			//disp(" in type "+ eventType);
 			result = true;
 			break;
 		}
@@ -110,9 +110,9 @@ function ruleRelevant(eventType, rule) {
 	newaction.args = args; // array of to be passed to the function
 	newaction.doaction = function (evtType) {
 		//debug
-		if (func == setNumberFact) {
-			disp("[set num fact] fired");
-		}
+		//if (func == setNumberFact) {
+			//disp("[set num fact] fired");
+		//}
 	
 		if (func == undefined)
 			func = function () {}
@@ -145,7 +145,7 @@ function ruleRelevant(eventType, rule) {
  // eventType can be one of these ["clicked-links" "entered-node"]
  // goes through all the rules in this obj
  function eventTrigger( eventType, obj ) {
-	disp("[event trigger] "+eventType );
+	//disp("[event trigger] "+eventType );
     // we don't want to fire irrelevant rules
 	// but this does throw away blocking information
 	//var firing_candidates = filter_for_relevant( obj.rules, eventType );
@@ -202,7 +202,7 @@ function fall_through_till_relevant( eventType, rules ) {
 	
 	// fireable = filter_out_empty_rules( fireable );
 	
-	//console.log("FIREABLE len "+fireable.length);
+	//disp("FIREABLE len "+fireable.length);
 	//return ( fireable.length != 0 );
 	
 	// if ready, we're looking for clickable links
@@ -210,7 +210,7 @@ function fall_through_till_relevant( eventType, rules ) {
 	    // find a firable rule with condition satisfied
 		var fall_through_check = fall_through_till_relevant( "clickedLink", link.rules );
 		
-		disp( "fall through check "+fall_through_check );
+		//disp( "fall through check "+fall_through_check );
 		// clickable rule found
 		if ( fall_through_check )
 			return true;
@@ -221,7 +221,7 @@ function fall_through_till_relevant( eventType, rules ) {
 	// (link can be possibly dormant links or already active)
 	
 	} else {
-		disp("CHECKING FOR DORMANT");
+		//disp("CHECKING FOR DORMANT");
 		var relevant_rules = filter_for_relevant( link.rules, "clickedLink" );
 		
 		if (relevant_rules.length > 0)
@@ -348,9 +348,9 @@ function filter_out_empty_rules( rules ) {
 		comparator = "==";
 		
 	var left_operand = getFact( factID ).value.toString();
-	 disp(" evaluating "+left_operand + comparator + right_operand);
+	 //disp(" evaluating "+left_operand + comparator + right_operand);
 	 var result = eval( left_operand + comparator + right_operand )
-	 disp("compareNumFact result "+result);
+	 //disp("compareNumFact result "+result);
 	return result;
  }
  
@@ -422,8 +422,8 @@ function filter_out_empty_rules( rules ) {
 			break;
 	} // end of and_or switch
 	
-	disp("Check condition "+rule.id);
-	disp(" result "+result);
+	//disp("Check condition "+rule.id);
+	//disp(" result "+result);
 	
 	// negation if not
 	switch (rule.if_not) {

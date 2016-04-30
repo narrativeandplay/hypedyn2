@@ -1,0 +1,17 @@
+<motif name="dangerous animal">
+	<features>
+		<feature>lion</feature>
+		<feature>tiger</feature>
+		<feature>dangerous dog</feature>
+		<feature>beware of the dog</feature>
+		<feature>bear</feature>
+		<feature>wolf</feature>
+		<feature>wild animal</feature>
+		<feature>dangerous animal</feature>
+		<feature>posionous animal</feature>
+		<feature>snake</feature>
+		<feature>crocodile</feature>
+		<feature>big cat</feature>
+		<feature>dangerous insect</feature>
+	</features>
+</motif>

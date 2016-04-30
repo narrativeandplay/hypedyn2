@@ -1,0 +1,8 @@
+<motif name="gore">
+	<features>
+		<feature>gore</feature>
+		<feature>blood</feature>
+		<feature>viscera</feature>
+		<feature>guts</feature>
+	</features>
+</motif>

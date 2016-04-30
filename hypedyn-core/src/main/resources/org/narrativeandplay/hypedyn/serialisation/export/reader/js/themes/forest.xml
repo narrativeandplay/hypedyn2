@@ -1,0 +1,9 @@
+<motif name="forest">
+    <features>
+        <feature>forest</feature>
+        <feature>forests</feature>
+        <feature>woodlands</feature>
+        <feature>greenwood</feature>
+        <feature>hold</feature>
+    </features>
+</motif>

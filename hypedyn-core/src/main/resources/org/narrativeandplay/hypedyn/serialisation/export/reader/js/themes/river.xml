@@ -1,0 +1,10 @@
+<motif name="river">
+	<features>
+		<feature>river</feature>
+		<feature>rivers</feature>
+		<feature>waterway</feature>
+		<feature>brook</feature>
+		<feature>stream</feature>
+		<feature>tributary</feature>
+	</features>
+</motif>

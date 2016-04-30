@@ -1,0 +1,8 @@
+<motif name="church">
+    <features>
+        <feature>church</feature>
+        <feature>temple</feature>
+        <feature>abbey</feature>
+        <feature>cathedral</feature>
+    </features>
+</motif>

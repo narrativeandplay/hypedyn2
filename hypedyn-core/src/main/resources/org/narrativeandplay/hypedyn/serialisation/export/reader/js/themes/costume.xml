@@ -1,0 +1,9 @@
+<motif name="costume">
+	<features>
+		<feature>costume</feature>
+		<feature>mask</feature>
+		<feature>wig</feature>
+		<feature>outfit</feature>
+		<feature>suit</feature>
+	</features>
+</motif>

@@ -1,0 +1,12 @@
+<motif name="warning">
+	<features>
+		<feature>warning sign</feature>
+
+		<feature>hazard</feature>
+		<feature>warning symbols</feature>
+		<feature>alert</feature>
+		<feature>red alert</feature>
+		<feature>siren</feature>
+		<feature>danger sign</feature>
+	</features>
+</motif>

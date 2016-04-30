@@ -1,0 +1,14 @@
+<motif name="happy">
+	<features>
+		<feature>happy</feature>
+		<feature>smiling</feature>
+		<feature>smile</feature>
+		<feature>pleasure</feature>
+		<feature>joy</feature>
+		<feature>pleased</feature>
+		<feature>laughter</feature>
+		<feature>laughing</feature>
+		<feature>grin</feature>
+		<feature>happyness</feature>
+	</features>
+</motif>

@@ -1,0 +1,9 @@
+<motif name="priest">
+    <features>
+        <feature>priest</feature>
+        <feature>priests</feature>
+        <feature>vicar</feature>
+        <feature>bishop</feature>
+        <feature>deacon</feature>
+    </features>
+</motif>

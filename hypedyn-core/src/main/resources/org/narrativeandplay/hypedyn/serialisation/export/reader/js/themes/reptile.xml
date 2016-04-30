@@ -1,0 +1,10 @@
+<motif name="reptile">
+	<features>
+		<feature>lizard</feature>
+		<feature>reptile</feature>
+		<feature>gecko</feature>
+		<feature>crocodile</feature>
+		<feature>snake</feature>
+		<feature>aligator</feature>
+	</features>
+</motif>

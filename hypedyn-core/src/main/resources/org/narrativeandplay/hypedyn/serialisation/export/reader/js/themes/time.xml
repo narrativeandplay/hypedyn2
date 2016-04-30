@@ -1,0 +1,12 @@
+<motif name="time">
+	<features>
+		<feature>time</feature>
+		<feature>period</feature>
+		<feature>age</feature>
+		<feature>clock</feature>
+		<feature>watch</feature>
+		<feature>history</feature>
+		<feature>aging</feature>
+		<feature>timeline</feature>
+	</features>
+</motif>

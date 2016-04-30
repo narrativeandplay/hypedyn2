@@ -1,0 +1,17 @@
+<motif name="instrument">
+	<features>
+		<feature>instrument</feature>
+		<feature>guitar</feature>
+		<feature>bass</feature>
+		<feature>drums</feature>
+		<feature>violin</feature>
+		<feature>trumpet</feature>
+		<feature>trombone</feature>#
+		<feature>piano</feature>
+		<feature>keyboard</feature>
+		<feature>flute</feature>
+		<feature>horn</feature>
+		<feature>clarinette</feature>
+		<feature>synthesizer</feature>
+	</features>
+</motif>

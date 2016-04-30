@@ -1,0 +1,9 @@
+<theme name="pleasure">
+	<required>
+	</required>
+	<optional>
+		<motif-component>happy</motif-component>
+		<motif-component>party</motif-component>
+		<motif-component>sex</motif-component>
+	</optional>
+</theme>

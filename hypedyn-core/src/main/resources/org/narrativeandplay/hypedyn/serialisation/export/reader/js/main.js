@@ -41,6 +41,8 @@ var startNodeID;
 var currNodeID;
 var prev_read_nodes = [];
 
+var themeThreshold = 0.2;
+
 var myScroll = null;
 
 function get_device_dimension() {
@@ -158,15 +160,15 @@ function findReplaceText(linkID) {
 					result = factlist[text_to_replace[i][2]].value; 
 					break;
 				case "number fact":
-					disp("fact ID "+text_to_replace[i][2]);
-					disp("fact value "+ factlist[text_to_replace[i][2]].value);
-					disp("null test " + (factlist[text_to_replace[i][2]].value === null));
-					disp("null test negate " + (! (factlist[text_to_replace[i][2]].value === null) ));
+					//disp("fact ID "+text_to_replace[i][2]);
+					//disp("fact value "+ factlist[text_to_replace[i][2]].value);
+					//disp("null test " + (factlist[text_to_replace[i][2]].value === null));
+					//disp("null test negate " + (! (factlist[text_to_replace[i][2]].value === null) ));
 					if (! (factlist[text_to_replace[i][2]].value === null) ) {
-						disp("setting value "+ factlist[text_to_replace[i][2]].value.toString() );
+						//disp("setting value "+ factlist[text_to_replace[i][2]].value.toString() );
 						result = factlist[text_to_replace[i][2]].value.toString(); 
 					} else {
-						disp("setting null ");
+						//disp("setting null ");
 						result = "null";
 					}
 					break;
@@ -178,6 +180,7 @@ function findReplaceText(linkID) {
 
 var activated_anywhere_nodes = [];
 var inactive_anywhere_nodes = [];
+var thematic_anywhere_nodes = [];
 var activated_anywhere_buttons = [];
 function get_activated_anywhere_node ( nodeID ) {
 	function hasMatchingID ( node ) {
@@ -187,7 +190,7 @@ function get_activated_anywhere_node ( nodeID ) {
 }
 
 
-// anywhere link stub TODO:
+// anywhere link
 function addAnywhereLink(anywhereNodeID) {
 	if (anywhereNodeID == currNodeID)
 		return; // don't add this node when we're already there
@@ -197,8 +200,24 @@ function addAnywhereLink(anywhereNodeID) {
 		}
 	}
 	
-	disp("pushing anywhere node "+ nodelist[anywhereNodeID] );
+	//disp("pushing anywhere node "+ nodelist[anywhereNodeID] );
 	activated_anywhere_nodes.push( nodelist[anywhereNodeID] );
+}
+
+// thematic anywhere link
+function addThematicAnywhereLink(anywhereNodeID) {
+	if (anywhereNodeID == currNodeID)
+		return; // don't add this node when we're already there
+
+	// add to list of potential thematic anywhere nodes
+	for ( i in thematic_anywhere_nodes) {
+		if (thematic_anywhere_nodes[i].id == anywhereNodeID) {
+			return; // break to prevent last line from running
+		}
+	}
+
+	//disp("pushing thematic anywhere node "+ nodelist[anywhereNodeID] );
+	thematic_anywhere_nodes.push( nodelist[anywhereNodeID] );
 }
 
 // show inactive anywhere nodes if necessary
@@ -216,7 +235,7 @@ function addInactiveAnywhereLink(anywhereNodeID) {
 		}
 	}
 	
-	disp("pushing inactive anywhere node "+ nodelist[anywhereNodeID] );
+	//disp("pushing inactive anywhere node "+ nodelist[anywhereNodeID] );
 	inactive_anywhere_nodes.push( nodelist[anywhereNodeID] );
 }
 
@@ -257,6 +276,28 @@ function update_anywhere_visibility () {
 		if (nodelist[i].anywhere == true)
 			// triggering the rule with the showDisabledAnywhereLink action to fire if condition true
 			eventTrigger("disabledAnywhereCheck", nodelist[i]); 
+	}
+
+	// for thematic anywhere nodes, first compile the list, then find the best match based on current thematic context
+	thematic_anywhere_nodes = [];  // reset
+	for ( i in nodelist ) {
+		if (nodelist[i].anywhere == true)
+		// triggering the rule with the showDisabledAnywhereLink action to fire if condition true
+			eventTrigger("thematicAnywhereCheck", nodelist[i]);
+	}
+	var recommended_nodes = recommend(nodelist[currNodeID].content, thematic_anywhere_nodes, themeThreshold); // recommend 3 nodes (for now)
+	for(i in recommended_nodes) {
+		//disp("recommend node id: " + recommended_nodes[i].id)
+		//disp("recommend node hits: " + recommended_nodes[i].hits.length)
+		//disp("recommend node score: " + recommended_nodes[i].score)
+
+		//for( var j in recommended_nodes[i].hits ) {
+			//disp( 'hits [' + i + '] theme name: ' + recommended_nodes[i].hits[j].name );
+			//disp( 'hits [' + i + '] theme hit count: ' + recommended_nodes[i].hits[j].hit_count );
+		//}
+
+		var recommended_nodeID = recommended_nodes[i].id;
+		activated_anywhere_nodes.push(nodelist[recommended_nodeID]);
 	}
 }
 
@@ -438,7 +479,7 @@ function gotoNode(nodeID) {
         // remember current nodeID
 		currNodeID = nodeID;
 
-		disp("goto node enter node ");
+		//disp("goto node enter node ");
         // trigger enteredNode events on the node
 		eventTrigger("enteredNode", node);
 
@@ -456,6 +497,22 @@ function gotoNode(nodeID) {
         // note: do this here, rather than in refreshNode, so that updates
         // to facts which force a refresh don't trigger unnecessary scrolling
         window.scrollTo(0, 0);
+	}
+}
+
+/* goto node with closest thematic match;
+   nodeID is current node, to be excluded,
+   linkText is the text to match against */
+function gotoNodeByTheme(nodeID, linkText) {
+	//disp("**** gotoNodeByTheme");
+
+	var destNodeList = recommend(linkText, nodelist, themeThreshold);
+	//disp("**** after recommend");
+	if(destNodeList.length>0) {
+		var destNode = last(destNodeList);
+		var destNodeID = destNode.id;
+		//disp("goto node: " + destNodeID);
+		gotoNode(destNodeID);
 	}
 }
 
@@ -531,14 +588,13 @@ window.onload = function() {
 	init_event_listeners();
 	
 	loadStory(); // defined in dynfile.js (the story data file)
-
-	// move all of this to loadStory as json file is loaded asynchronously
-	/*
 	read_config_flag();
+
+	// load thematic data
+	load_all_xml();
 	
 	runhypedyn(); // entrance point of the story logic
 	setTimeout('window.scrollTo(0, 0)', 1000); // for mobile to hide the url
 	
 	nonpageflip_init();
-	*/
 }

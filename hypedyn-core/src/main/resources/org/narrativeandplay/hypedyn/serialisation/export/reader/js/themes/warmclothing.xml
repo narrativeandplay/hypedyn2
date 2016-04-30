@@ -1,0 +1,9 @@
+<motif name="warm clothing">
+	<features>
+		<feature>warm clothing</feature>
+		<feature>coat</feature>
+		<feature>gloves</feature>
+		<feature>scarf</feature>
+		<feature>warm hat</feature>
+	</features>
+</motif>

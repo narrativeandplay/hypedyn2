@@ -1,0 +1,10 @@
+<theme name="animal">
+	<required>
+	</required>
+	<optional>
+		<motif-component>mammal</motif-component>
+		<motif-component>reptile</motif-component>
+		<motif-component>fish</motif-component>
+		<motif-component>bird</motif-component>
+	</optional>
+</theme>

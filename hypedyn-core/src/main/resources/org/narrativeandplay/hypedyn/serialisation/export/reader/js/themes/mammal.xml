@@ -1,0 +1,18 @@
+<motif name="mammal">
+	<features>
+		<feature>dog</feature>
+		<feature>cat</feature>
+		<feature>rabbit</feature>
+		<feature>mouse</feature>
+		<feature>hamster</feature>
+		<feature>horse</feature>
+		<feature>cow</feature>
+		<feature>pig</feature>
+		<feature>sheep</feature>
+		<feature>wolf</feature>
+		<feature>bear</feature>
+		<feature>lion</feature>
+		<feature>tiger</feature>
+		<feature>deer</feature>
+	</features>
+</motif>

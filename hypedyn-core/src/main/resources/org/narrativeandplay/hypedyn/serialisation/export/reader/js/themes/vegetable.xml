@@ -1,0 +1,9 @@
+<motif name="vegetable">
+	<features>
+		<feature>carrot</feature>
+		<feature>cucumber</feature>
+		<feature>broccoli</feature>
+		<feature>potato</feature>
+		<feature>eggplant</feature>
+	</features>
+</motif>

@@ -1,0 +1,11 @@
+<theme name="murder">
+    <required>
+    </required>
+    <optional>
+        <motif-component>killer</motif-component>
+        <motif-component>victim</motif-component>
+        <motif-component>weapon</motif-component>
+        <motif-component>motive</motif-component>
+        <theme-component>violence</theme-component>
+    </optional>
+</theme>

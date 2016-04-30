@@ -1,0 +1,9 @@
+<theme name="excess">
+	<required>
+	</required>
+	<optional>
+		<motif-component>fat</motif-component>
+		<motif-component>vomit</motif-component>
+		<motif-component>drunk</motif-component>
+	</optional>
+</theme>

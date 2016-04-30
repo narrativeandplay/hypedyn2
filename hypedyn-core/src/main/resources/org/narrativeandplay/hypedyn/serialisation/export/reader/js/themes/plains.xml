@@ -1,0 +1,10 @@
+<motif name="plains">
+    <features>
+        <feature>plains</feature>
+        <feature>grassland</feature>
+        <feature>flatland</feature>
+        <feature>lowland</feature>
+        <feature>pasture</feature>
+        <feature>meadowland</feature>
+    </features>
+</motif>

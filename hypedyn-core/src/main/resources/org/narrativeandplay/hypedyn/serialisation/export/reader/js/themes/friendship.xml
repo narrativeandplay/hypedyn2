@@ -1,0 +1,11 @@
+<theme name='friendship'>
+	<required>
+		<motif-component>friend</motif-component>
+	</required>
+	<optional>
+		<motif-component>gift</motif-component>
+		<motif-component>embrace</motif-component>
+		<motif-component>greeting</motif-component>
+		<motif-component>goodbye</motif-component>
+	</optional>
+</theme>

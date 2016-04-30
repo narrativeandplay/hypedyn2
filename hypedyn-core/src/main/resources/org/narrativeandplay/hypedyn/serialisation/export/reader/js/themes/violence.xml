@@ -1,0 +1,9 @@
+<theme name="violence">
+	<required>
+	</required>
+	<optional>
+		<motif-component>weapon</motif-component>
+		<motif-component>gore</motif-component>
+		<motif-component>fight</motif-component>
+	</optional>
+</theme>
