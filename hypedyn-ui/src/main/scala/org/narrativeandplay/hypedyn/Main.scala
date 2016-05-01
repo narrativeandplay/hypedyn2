@@ -254,37 +254,13 @@ object Main extends JFXApp {
   // needed for the future flatMap/onComplete in the end
   implicit val executionContext = system.dispatcher
 
-  def completeWithUnmatchedPath(inFilePath: String) =
+  // not sure if this is a security risk
+  val route =
     extractUnmatchedPath { p =>
       get {
-        getFromFile(storyPath+inFilePath+p.toString)
+        getFromFile(storyPath+p.toString)
       }
-//      complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>"+inHeading+"</h1>"+p.toString))
     }
-
-  val route =
-    path("index.html") {
-      get {
-        getFromFile(storyPath+"/index.html")
-      }
-    } ~
-    path("story.js") {
-      get {
-        getFromFile(storyPath+"/story.js")
-      }
-    } ~
-      pathPrefix("js") {
-            completeWithUnmatchedPath("/js")
-      } ~
-        pathPrefix("themes") {
-          completeWithUnmatchedPath("/themes")
-        } ~
-          pathPrefix("css"){
-            completeWithUnmatchedPath("/css")
-          } ~
-            pathPrefix("images"){
-              completeWithUnmatchedPath("/images")
-            }
 
   val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 
