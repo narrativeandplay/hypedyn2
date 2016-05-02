@@ -588,13 +588,4 @@ window.onload = function() {
 	init_event_listeners();
 	
 	loadStory(); // defined in dynfile.js (the story data file)
-	read_config_flag();
-
-	// load thematic data
-	load_all_xml();
-	
-	runhypedyn(); // entrance point of the story logic
-	setTimeout('window.scrollTo(0, 0)', 1000); // for mobile to hide the url
-	
-	nonpageflip_init();
 }

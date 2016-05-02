@@ -310,6 +310,9 @@ function loadStory() {
 		// all of this was originally in window.onload
 		read_config_flag();
 
+		// load thematic data
+		load_all_xml();
+
 		runhypedyn(); // entrance point of the story logic
 		setTimeout('window.scrollTo(0, 0)', 1000); // for mobile to hide the url
 
