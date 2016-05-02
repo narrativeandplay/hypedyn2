@@ -264,5 +264,13 @@ object Main extends JFXApp {
 
   val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 
-  Logger.info("Server online at http://localhost:8080/\n")
+  bindingFuture.onFailure {
+    case ex: Exception =>
+      Logger.error("Server failed to bind to localhost:8080", ex)
+  }
+
+  bindingFuture.onSuccess {
+    case x:Http.ServerBinding =>
+      Logger.info("Server online at http://localhost:8080")
+  }
 }
