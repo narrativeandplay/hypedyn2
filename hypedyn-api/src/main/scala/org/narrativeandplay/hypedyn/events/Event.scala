@@ -119,7 +119,7 @@ sealed case class SaveAsResponse(src: String) extends Response
 sealed case class LoadResponse(src: String) extends Response
 
 sealed case class ExportResponse(src: String) extends Response
-sealed case class RunResponse(fileToRun: File, src: String) extends Response
+sealed case class RunResponse(filePath: File, fileToRun: String, src: String) extends Response
 
 sealed case class CutNodeResponse(node: Nodal, src: String) extends Response
 sealed case class CopyNodeResponse(node: Nodal, src: String) extends Response
@@ -151,7 +151,7 @@ sealed case class SaveToFile(file: File, src: String) extends Action
 sealed case class LoadFromFile(file: File, src: String) extends Action
 
 sealed case class ExportToFile(dir: File, filename: String, src: String) extends Action
-sealed case class RunStory(fileToRun: File, src: String) extends Action
+sealed case class RunStory(filePath: File, fileToRun: String, src: String) extends Action
 
 sealed case class CreateStory(title: String = "Untitled",
                               author: String = "",

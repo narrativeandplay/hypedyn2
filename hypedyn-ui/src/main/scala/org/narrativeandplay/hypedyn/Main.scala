@@ -29,6 +29,12 @@ import org.narrativeandplay.hypedyn.undo.UndoController
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 import org.narrativeandplay.hypedyn.utils.{System => Sys}
 
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.server.Directives._
+import akka.stream.ActorMaterializer
+import akka.http.scaladsl.model.{HttpEntity, ContentTypes}
+
 /**
  * Entry point for the application
  */
@@ -145,18 +151,21 @@ object Main extends JFXApp {
   def loadedFileName_=(newFilename: String): Unit = loadedFilename() = newFilename
   def loadedFileName = loadedFilename()
 
-  def runInBrowser(file: File): Unit = {
+  var storyPath:String = null
+
+  def runInBrowser(filePath: File, fileToRun: String): Unit = {
     val runtime = Runtime.getRuntime
-    val filePath = file.getAbsolutePath
+    val fileToLoad = new File("http://localhost:8080/",fileToRun)
+    storyPath = filePath.getAbsolutePath
 
     if (Sys.isWindows) {
-      runtime.exec(s"rundll32 url.dll,FileProtocolHandler $filePath")
+      runtime.exec(s"rundll32 url.dll,FileProtocolHandler $fileToLoad")
     }
     else if (Sys.isMac) {
-      runtime.exec(s"open $filePath")
+      runtime.exec(s"open $fileToLoad")
     }
     else {
-      runtime.exec(s"xdg-open $filePath")
+      runtime.exec(s"xdg-open $fileToLoad")
     }
   }
 
@@ -172,6 +181,10 @@ object Main extends JFXApp {
       UiEventDispatcher requestExit { exit =>
         if (exit) {
           Logger.info("Exiting HypeDyn 2 via main window close")
+          // shutdown web server
+          bindingFuture
+            .flatMap(_.unbind()) // trigger unbinding from the port
+            .onComplete(_ ⇒ webserver.terminate()) // and shutdown when done
           Platform.exit()
         }
         else {
@@ -219,6 +232,10 @@ object Main extends JFXApp {
       UiEventDispatcher requestExit { exit =>
         if (exit) {
           Logger.info("Exiting HypeDyn 2 via Cmd-Q")
+          // shutdown web server
+          bindingFuture
+            .flatMap(_.unbind()) // trigger unbinding from the port
+            .onComplete(_ ⇒ webserver.terminate()) // and shutdown when done
           Platform.exit()
         }
         else {
@@ -227,4 +244,33 @@ object Main extends JFXApp {
       }
     }
   })
+
+  //
+  // web server
+  //
+
+  implicit val webserver = ActorSystem("my-system")
+  implicit val materializer = ActorMaterializer()
+  // needed for the future flatMap/onComplete in the end
+  implicit val executionContext = webserver.dispatcher
+
+  // not sure if this is a security risk
+  val route =
+    extractUnmatchedPath { p =>
+      get {
+        getFromFile(storyPath+p.toString)
+      }
+    }
+
+  val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
+
+  bindingFuture.onFailure {
+    case ex: Exception =>
+      Logger.error("Server failed to bind to localhost:8080", ex)
+  }
+
+  bindingFuture.onSuccess {
+    case x:Http.ServerBinding =>
+      Logger.info("Server online at http://localhost:8080")
+  }
 }

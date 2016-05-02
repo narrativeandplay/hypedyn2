@@ -104,9 +104,9 @@ object UiEventDispatcher {
     dirToSaveTo foreach { d => EventBus.send(ExportToFile(d, Main.loadedFileName, UiEventSourceIdentity)) }
   }
   // actually run the story
-  EventBus.RunResponses foreach { evt => EventBus.send(RunStory(evt.fileToRun, UiEventSourceIdentity)) }
+  EventBus.RunResponses foreach { evt => EventBus.send(RunStory(evt.filePath, evt.fileToRun, UiEventSourceIdentity)) }
   EventBus.RunStoryEvents foreach { evt =>
-    Main.runInBrowser(evt.fileToRun)
+    Main.runInBrowser(evt.filePath, evt.fileToRun)
 
     EventBus.send(StoryRan(UiEventSourceIdentity))
   }
