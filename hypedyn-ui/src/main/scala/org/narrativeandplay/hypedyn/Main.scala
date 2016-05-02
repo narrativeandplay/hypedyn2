@@ -155,7 +155,7 @@ object Main extends JFXApp {
 
   def runInBrowser(filePath: File, fileToRun: String): Unit = {
     val runtime = Runtime.getRuntime
-    val fileToLoad = new File("http://localhost:8080/",fileToRun)
+    val fileToLoad = "http://"+hostname+":"+port+"/"+fileToRun
     storyPath = filePath.getAbsolutePath
 
     if (Sys.isWindows) {
@@ -249,6 +249,8 @@ object Main extends JFXApp {
   // web server
   //
 
+  private val hostname = "localhost"
+  private val port = 8080;
   implicit val webserver = ActorSystem("my-system")
   implicit val materializer = ActorMaterializer()
   // needed for the future flatMap/onComplete in the end
@@ -262,15 +264,15 @@ object Main extends JFXApp {
       }
     }
 
-  val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
+  val bindingFuture = Http().bindAndHandle(route, hostname, port)
 
   bindingFuture.onFailure {
     case ex: Exception =>
-      Logger.error("Server failed to bind to localhost:8080", ex)
+      Logger.error("Server failed to bind to "+hostname+":"+port, ex)
   }
 
   bindingFuture.onSuccess {
     case x:Http.ServerBinding =>
-      Logger.info("Server online at http://localhost:8080")
+      Logger.info("Server online at http://"+hostname+":"+port)
   }
 }
