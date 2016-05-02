@@ -184,7 +184,7 @@ object Main extends JFXApp {
           // shutdown web server
           bindingFuture
             .flatMap(_.unbind()) // trigger unbinding from the port
-            .onComplete(_ ⇒ system.terminate()) // and shutdown when done
+            .onComplete(_ ⇒ webserver.terminate()) // and shutdown when done
           Platform.exit()
         }
         else {
@@ -235,7 +235,7 @@ object Main extends JFXApp {
           // shutdown web server
           bindingFuture
             .flatMap(_.unbind()) // trigger unbinding from the port
-            .onComplete(_ ⇒ system.terminate()) // and shutdown when done
+            .onComplete(_ ⇒ webserver.terminate()) // and shutdown when done
           Platform.exit()
         }
         else {
@@ -249,10 +249,10 @@ object Main extends JFXApp {
   // web server
   //
 
-  implicit val system = ActorSystem("my-system")
+  implicit val webserver = ActorSystem("my-system")
   implicit val materializer = ActorMaterializer()
   // needed for the future flatMap/onComplete in the end
-  implicit val executionContext = system.dispatcher
+  implicit val executionContext = webserver.dispatcher
 
   // not sure if this is a security risk
   val route =
@@ -264,5 +264,5 @@ object Main extends JFXApp {
 
   val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 
-  println(s"Server online at http://localhost:8080/\n")
+  Logger.info("Server online at http://localhost:8080/\n")
 }
