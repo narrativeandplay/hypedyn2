@@ -229,80 +229,74 @@ function createFacts(facts) {
 }
 
 function loadStory() {
-	//var data = getStoryData();
-	// try to avoid not-well-formed error (not working)
-	jQuery.ajaxSetup({ scriptCharset: "utf-8" , contentType: "application/json; charset=utf-8"});
+	var data = getStoryData();
+	var story = data.story;
+	var author = story.author; // unused
+	var description = story.description; // unused
+	var nodes = story.nodes;
+	var facts = story.facts;
 
-	// get the JSON file and parse it
-	jQuery.getJSON( "story.dyn", function( data ) {
-		var story = data.story;
-		var author = story.author; // unused
-		var description = story.description; // unused
-		var nodes = story.nodes;
-		var facts = story.facts;
+	// iterate through nodes and create
+	for (var i = 0; i < nodes.length; i++) {
+		var thisNode = nodes[i];
+		if (thisNode != null) {
+			var id = thisNode.id; 			// id of the node
+			var name = thisNode.name; 		// name of the node
+			var content = thisNode.content; 	// node content
+			var nodeRules = thisNode.rules; 		// node rules - do this later
 
-		// iterate through nodes and create
-		for (var i = 0; i < nodes.length; i++) {
-			var thisNode = nodes[i];
-			if (thisNode != null) {
-				var id = thisNode.id; 			// id of the node
-				var name = thisNode.name; 		// name of the node
-				var content = thisNode.content; 	// node content
-				var nodeRules = thisNode.rules; 		// node rules - do this later
+			// create the node
+			createNode(name, content.text, false, id); // third param is isAnywhere??? check...
 
-				// create the node
-				createNode(name, content.text, false, id); // third param is isAnywhere??? check...
+			// now create the links (if any)
+			var links = content.rulesets;
+			if (links != null) {
+				for (var j = 0; j < links.length; j++) {
+					var thisRuleset = links[j];				// this link ("ruleset")
+					var start = thisRuleset.start;			// start offset of the link
+					var end = thisRuleset.end;				// end offset of the link
+					var rulesetID = thisRuleset.id;			// id of the link
+					var rulesetName = thisRuleset.name;		// name of this link
+					var rules = thisRuleset.rules;			// rules in this ruleset
 
-				// now create the links (if any)
-				var links = content.rulesets;
-				if (links != null) {
-					for (var j = 0; j < links.length; j++) {
-						var thisRuleset = links[j];				// this link ("ruleset")
-						var start = thisRuleset.start;			// start offset of the link
-						var end = thisRuleset.end;				// end offset of the link
-						var rulesetID = thisRuleset.id;			// id of the link
-						var rulesetName = thisRuleset.name;		// name of this link
-						var rules = thisRuleset.rules;			// rules in this ruleset
+					// create the link
+					createLink(id, start, end, rulesetID);
 
-						// create the link
-						createLink(id, start, end, rulesetID);
-
-						// now create rules (if any)
-						if (rules != null) {
-							createRules(rulesetID, "link", rules, false);
-						}
+					// now create rules (if any)
+					if (rules != null) {
+						createRules(rulesetID, "link", rules, false);
 					}
 				}
+			}
 
-				// now create the node rules (if any)
-				if (nodeRules != null) {
-					createRules(id, "node", nodeRules, true);
-				}
+			// now create the node rules (if any)
+			if (nodeRules != null) {
+				createRules(id, "node", nodeRules, true);
+			}
 
-				// set start node if necessary
-				if (thisNode.isStart) {
-					setStartNode(id);
-				}
+			// set start node if necessary
+			if (thisNode.isStart) {
+				setStartNode(id);
 			}
 		}
+	}
 
-		// add facts
-		if (facts != null) {
-			createFacts(facts);
-		}
+	// add facts
+	if (facts != null) {
+		createFacts(facts);
+	}
 
-		// write config flags
-		write_config_flag('back_button_flag', !story.metadata.backDisabled);
-		write_config_flag('restart_button_flag', !story.metadata.restartDisabled);
-		write_config_flag('page_flipping_mode', true);
-		write_config_flag('window_resize_flag', true);
+	// write config flags
+	write_config_flag('back_button_flag', !story.metadata.backDisabled);
+	write_config_flag('restart_button_flag', !story.metadata.restartDisabled);
+	write_config_flag('page_flipping_mode', true);
+	write_config_flag('window_resize_flag', true);
 
-		// all of this was originally in window.onload
-		read_config_flag();
+	// all of this was originally in window.onload
+	read_config_flag();
 
-		runhypedyn(); // entrance point of the story logic
-		setTimeout('window.scrollTo(0, 0)', 1000); // for mobile to hide the url
+	runhypedyn(); // entrance point of the story logic
+	setTimeout('window.scrollTo(0, 0)', 1000); // for mobile to hide the url
 
-		nonpageflip_init();
-	});
+	nonpageflip_init();
 }
