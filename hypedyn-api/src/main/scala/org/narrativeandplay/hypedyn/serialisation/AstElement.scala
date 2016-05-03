@@ -29,12 +29,25 @@ case object AstNothing extends AstElement
  * Collection types
  */
 
+/**
+ * A class representing a list of AST elements
+ *
+ * @param elems The elements in the list
+ */
 sealed case class AstList(elems: AstElement*) extends AstElement{
   /**
    * Converts an `AstList` to a Scala `List`
    */
   def toList = elems.toList
 }
+
+/**
+ * A collection of key-value pairs of AST elements, with values being the AST element
+ *
+ * For reasons of sanity, all keys are `String`s
+ *
+ * @param fields The key-value pairs of the map
+ */
 sealed case class AstMap(fields: AstField*) extends AstElement {
   /**
    * Retrieves an element from the Map
@@ -46,7 +59,7 @@ sealed case class AstMap(fields: AstField*) extends AstElement {
   def apply(key: String): AstElement =
     fields find { case (k, _) => k == key } match {
       case Some((k, v)) => v
-      case None => throw new NoSuchElementException("No value found for the given key")
+      case None => throw new NoSuchElementException(s"No value found for the given key: $key")
     }
 
   /**

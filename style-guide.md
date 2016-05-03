@@ -63,6 +63,10 @@ package object mypackage {
 
 Limit the number of public methods in your class to 30.
 
+## Case Classes
+
+Do not use `new` to construct new instances of case classes.
+
 # Imports
 
 ## Ordering
@@ -78,9 +82,9 @@ scala
 ___blank line___
 scalafx
 ___blank line___
-org.narrativeandplay.hypedyn
-___blank line___
 all other imports
+___blank line___
+org.narrativeandplay.hypedyn
 ```
 
 You should also regularly run IntelliJ's Optimize Imports (Code > Optimize Imports) against
@@ -125,6 +129,22 @@ object. It is automatically imported for you, so it's redundant to manually
 Use `val` by default. `var`s should be limited to local variables or `private` class variables. Their usage
 should be well documented.
 
+`null`s are not allowed anywhere in `hypedyn-core` or `hypedyn-api`. These modules make it a point to be completely
+type safe, and `null`s are a hole in the type system that violates this invariant.
+ 
+`null`s are to be used sparingly in `hypedyn-ui` and `hypedyn-default-story-viewer` when needed to interface with 
+Java code that requires a null for correct operation. When receiving potentially nullable values from Java code, 
+wrap it in an `Option` to make the nullability of the received value obvious.
+
+Do **not** return, or set a value to `null` unless it is absolutely required by the API, even in `hypedyn-ui` and 
+`hypedyn-default-story-viewer`.
+
+`Any` should almost never be used or inferred for the type of any value. If there is a case where `Any` is returned,
+it must be explicitly noted, with an accompanying explanation for its use.
+
+Refrain from the use of `.asInstanceOf` to type cast values to the expected type. There are cases where this is
+required (especially in interfacing with Java code), but do not use them otherwise.
+
 ## Modifiers
 
 Optional variable modifiers should be declared in the following order: `override access (private|protected) final implicit lazy`.
@@ -134,6 +154,27 @@ For example,
 ```scala
 private implicit lazy val someSetting = ...
 ```
+
+## Type Annotations
+
+Prefer type inference to explicit type annotations whenever possible, especially when the type is obvious from the
+declaration.
+
+Do
+```scala
+val lst = List.empty[Int]
+```
+
+Not
+```scala
+val lst: List[Int] = List.empty[Int]
+```
+
+In the same vein, use the `empty` methods of collections to get an empty collection.
+
+For example, use `val lst = List.empty[Int]` instead of `val lst = Nil`.
+
+Always put a space after `:` characters in type annotations, if an annotation is necessary.
 
 # Functions
 
@@ -242,6 +283,22 @@ aLongMethodNameThatReturnsAFuture(
 ) map { res =>
   ...
 }
+```
+
+When calling `.apply` methods, do not explicitly invoke `.apply`. This is a standard Scala convention, and it makes no
+sense to explicitly invoke `.apply` as it conveys no information to the reader about the method call that is not
+already obvious from conventions.
+
+For example, use:
+
+```scala
+Option(1)
+```
+
+instead of:
+
+```
+Option.apply(1)
 ```
 
 ## Anonymous functions
@@ -420,6 +477,23 @@ Option(123) map stuff getOrElse 0
 You should enforce expected type signatures, as `match` does not guarantee consistent types between match outcomes
 (e.g. the `None` case could return `Int`, while the `Some` case could return `String`).
 
+Use `Option.empty` to obtain an empty `Option` for a declaration instead of `None`, i.e.
+```scala
+var intOption = Option.empty[Int]
+```
+
+instead of
+```scala
+var intOption: Option[Int] = None
+```
+
+This allows type inference to work so that the type of the declaration can be inferred, and reduces code clutter.
+`None` should still be used in other cases.
+
+`.get` is banned because it explicitly bypasses the point of using `Option` to make explicit the nullability
+of the value in the `Option`. If a value must be retrieved from an `Option`, use `getOrElse`, or perform a
+pattern match.
+
 ## For Comprehension
 
 Scala has the ability to represent for-comprehensions with more than one generator (usually, more than one <- symbol). 
@@ -472,6 +546,21 @@ TODO
 
 All classes, objects, traits, and methods should be documented. Generally, follow the documentation guidelines
 provided by the Scala Documentation Style Guide on [ScalaDoc](http://docs.scala-lang.org/style/scaladoc.html).
+
+The only deviation from ScalaDoc style is the style of documentation blocks. Documentation blocks use JavaDoc
+comment style instead of ScalaDoc style. I.e.,
+
+```scala
+/**
+ *
+ */
+```
+instead of
+```scala
+/**
+  *
+  */
+```
 
 Rules:
 

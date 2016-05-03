@@ -2,24 +2,31 @@ package org.narrativeandplay.hypedyn.undo
 
 import com.github.benedictleejh.scala.math.vector.Vector2
 
-import org.narrativeandplay.hypedyn.plugins.storyviewer.StoryViewerContent
 import org.narrativeandplay.hypedyn.story.NodeId
+import org.narrativeandplay.hypedyn.storyviewer.StoryViewer
 
-class NodeMovedChange(val nodeContainer: StoryViewerContent,
-                      val nodeId: NodeId,
-                      val initialPos: Vector2[Double],
-                      val finalPos: Vector2[Double]) extends Undoable {
-  override def undo(): Unit = {
-    nodeContainer.nodes find (_.id == nodeId) foreach (_.relocate(initialPos.x, initialPos.y))
-  }
+/**
+ * Change reprenting a node having been moved
+ *
+ * @param eventHandler The event dispatcher allowed to send events
+ * @param nodeId The ID of the node moved
+ * @param initialPos The initial position of the node
+ * @param finalPos The final position of the node
+ */
+case class NodeMovedChange(eventHandler: StoryViewer,
+                           nodeId: NodeId,
+                           initialPos: Vector2[Double],
+                           finalPos: Vector2[Double]) extends Undoable {
+  override def undo(): NodeMovedChange = NodeMovedChange(eventHandler, nodeId, finalPos, initialPos)
 
   override def redo(): Unit = {
-    nodeContainer.nodes find (_.id == nodeId) foreach (_.relocate(finalPos.x, finalPos.y))
+    eventHandler.moveNode(nodeId, finalPos)
+    eventHandler.notifyNodeMove(nodeId, initialPos, finalPos)
   }
 
   override def merge(other: Undoable): Option[Undoable] = other match {
     case c: NodeMovedChange =>
-      if (nodeId == c.nodeId) Some(new NodeMovedChange(nodeContainer, nodeId, initialPos, c.finalPos)) else None
+      if (nodeId == c.nodeId) Some(new NodeMovedChange(eventHandler, nodeId, initialPos, c.finalPos)) else None
     case _ => None
   }
 }

@@ -1,51 +1,71 @@
 package org.narrativeandplay.hypedyn.story.rules
 
+import org.narrativeandplay.hypedyn.story.rules.ParameterValues._
+
+/**
+ * Object holding action definitions
+ */
 object ActionDefinitions {
+  import Actionable.ActionType
+  import ActionLocationType.{NodeContentAction, NodeAction, StoryAction}
+
   private val definitions = List(
-    ActionDefinition("LinkTo", "Link to", List(NodeContentAction),
+    ActionDefinition(ActionType("LinkTo"), "Follow link to", List(NodeContentAction),
+                     true,
                      List(RuleParameter("node", Nodes))),
-    ActionDefinition("ShowPopupNode", "Show node in popup", List(NodeContentAction),
+    ActionDefinition(ActionType("ShowPopupNode"), "Show node in popup", List(NodeContentAction),
+                     true,
                      List(RuleParameter("node", Nodes))),
-    ActionDefinition("UpdateText", "Update text", List(NodeContentAction),
-                     List(RuleParameter("text", UserInput))),
-    ActionDefinition("UpdateBooleanFact", "Update true/false fact", List(NodeContentAction, NodeAction, StoryAction),
+    ActionDefinition(ActionType("UpdateText"), "Update fragment text", List(NodeContentAction),
+                     false,
+                     List(RuleParameter("text", Union(Map(
+                      "Input" -> RuleParameter("textInput", UserInputString),
+                      "String Fact" -> RuleParameter("stringFactValue", StringFacts),
+                      "Number Fact" -> RuleParameter("NumberFactValue", IntegerFacts)
+                     ))))),
+    ActionDefinition(ActionType("UpdateBooleanFact"), "Update true/false fact", List(NodeContentAction, NodeAction, StoryAction),
+                     true,
                      List(RuleParameter("fact", BooleanFacts),
                           RuleParameter("value", ListOfValues("true", "false")))),
-    ActionDefinition("UpdateStringFact", "Update text fact", List(NodeContentAction, NodeAction, StoryAction),
+    ActionDefinition(ActionType("UpdateStringFact"), "Update text fact", List(NodeContentAction, NodeAction, StoryAction),
+                     true,
                      List(RuleParameter("fact", StringFacts),
-                          RuleParameter("value", UserInput))),
-    ActionDefinition("EnableAnywhereLinkToHere", "Enable anywhere link to here", List(NodeAction),
+                          RuleParameter("value", UserInputString))),
+    ActionDefinition(ActionType("EnableAnywhereLinkToHere"), "Enable anywhere link to here", List(NodeAction),
+                     false,
                      List()),
-    ActionDefinition("ShowDisabledAnywhereLink", "Show disabled anywhere link", List(NodeAction),
+    ActionDefinition(ActionType("ShowDisabledAnywhereLink"), "Show disabled anywhere link", List(NodeAction),
+                     false,
                      List()),
-    ActionDefinition("UpdateIntegerFacts", "Update number fact", List(NodeAction, NodeContentAction, StoryAction),
+    ActionDefinition(ActionType("UpdateIntegerFacts"), "Update number fact", List(NodeAction, NodeContentAction, StoryAction),
+                     true,
                      List(
-                      RuleParameter("fact", IntegerFacts),
-                      RuleParameter("updateValue", Union(List(
-                        RuleParameter("inputValue", UserInput),
-                        RuleParameter("integerFactValue", IntegerFacts),
-                        RuleParameter("randomValue", Product(List(
-                          RuleParameter("start", Union(List(
-                            RuleParameter("startInput", UserInput),
-                            RuleParameter("startFact", IntegerFacts)
-                          ))),
-                          RuleParameter("end", Union(List(
-                            RuleParameter("endInput", UserInput),
-                            RuleParameter("endFact", IntegerFacts)
-                          )))
-                        ))),
-                        RuleParameter("computation", Product(List(
-                          RuleParameter("operator", ListOfValues("+", "-", "x", "/", "%")),
-                          RuleParameter("operand1", Union(List(
-                            RuleParameter("factOperand1", IntegerFacts),
-                            RuleParameter("userOperand1", UserInput)
-                          ))),
-                          RuleParameter("operand2", Union(List(
-                            RuleParameter("factOperand1", IntegerFacts),
-                            RuleParameter("userOperand2", UserInput)
-                          )))
-                        )))
-                      )))
+                       RuleParameter("fact", IntegerFacts),
+                       RuleParameter("updateValue", Union(Map(
+                         "Input" -> RuleParameter("inputValue", UserInputInteger),
+                         "Fact" -> RuleParameter("integerFactValue", IntegerFacts),
+                         "Random" -> RuleParameter("randomValue", Product(List(
+                           RuleParameter("start", Union(Map(
+                             "Input" -> RuleParameter("startInput", UserInputInteger),
+                             "Fact" -> RuleParameter("startFact", IntegerFacts)
+                           ))),
+                           RuleParameter("end", Union(Map(
+                             "Input" -> RuleParameter("endInput", UserInputInteger),
+                             "Fact" -> RuleParameter("endFact", IntegerFacts)
+                           )))
+                         ))),
+                         "Math" -> RuleParameter("computation", Product(List(
+                           RuleParameter("operand1", Union(Map(
+                             "Fact" -> RuleParameter("factOperand1", IntegerFacts),
+                             "Input" -> RuleParameter("userOperand1", UserInputInteger)
+                           ))),
+                           RuleParameter("operator", ListOfValues("+", "-", "x", "/", "%")),
+                           RuleParameter("operand2", Union(Map(
+                             "Fact" -> RuleParameter("factOperand2", IntegerFacts),
+                             "Input" -> RuleParameter("userOperand2", UserInputInteger)
+                           )))
+                         )))
+                       )))
                      ))
   )
 

@@ -1,21 +1,55 @@
 package org.narrativeandplay.hypedyn.serialisation
 
-import org.narrativeandplay.hypedyn.story.NodeId
-import org.narrativeandplay.hypedyn.story.internal.{NodeContent, Story, Node}
+import org.narrativeandplay.hypedyn.story.Narrative.ReaderStyle
+import org.narrativeandplay.hypedyn.story.NodalContent.RulesetId
+import org.narrativeandplay.hypedyn.story.internal.NodeContent.Ruleset
+import org.narrativeandplay.hypedyn.story.internal.Story.Metadata
+import org.narrativeandplay.hypedyn.story.internal.{Node, NodeContent, Story}
+import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.{And, Or}
+import org.narrativeandplay.hypedyn.story.rules.RuleLike.ParamValue
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.rules.internal.{Action, Condition, Rule}
+import org.narrativeandplay.hypedyn.story.{Narrative, NodalContent, NodeId}
+
+import scala.reflect.ClassTag
 
 package object serialisers {
+
+  /**
+   * Downcasts `AstElement`s to the specified instance of `AstElement`. Throws a `DeserialisationException`, which is more
+   * useful than simply throwing a `ClassCastException`
+   *
+   * @param astElement The `AstElement` to cast
+   * @param deserialisationTarget A string denoting what is being deserialised, for more descriptive exceptions
+   * @param ev The `ClassTag` of the result type
+   * @tparam T The `AstElement` subtype to cast to
+   * @throws DeserialisationException When the object being cast is not of the specified type `T`
+   * @return The downcasted `AstElement`
+   */
+  @throws(classOf[DeserialisationException])
+  private def safeCast[T <: AstElement](astElement: AstElement, deserialisationTarget: String)
+                                       (implicit ev: ClassTag[T]): T = astElement match {
+    case elem: T => elem
+    case err => throw DeserialisationException(
+      s"Expected ${ev.runtimeClass.toString} when deserialising $deserialisationTarget, " +
+        s"received ${err.getClass.getSimpleName} instead.")
+  }
+
+  /**
+   * Typeclass instance for serialising Nodes
+   */
   implicit object NodeSerialiser extends Serialisable[Node] {
     /**
      * Returns the serialised representation of an object
      *
      * @param node The object to serialise
      */
-    override def serialise(node: Node): AstElement = AstMap("id" -> AstInteger(node.id.value),
-                                                         "name" -> AstString(node.name),
-                                                         "content" -> NodeContentSerialiser.serialise(node.content),
-                                                         "isStart" -> AstBoolean(node.isStartNode))
+    override def serialise(node: Node): AstElement =
+      AstMap("id" -> AstInteger(node.id.value),
+             "name" -> AstString(node.name),
+             "content" -> NodeContentSerialiser.serialise(node.content),
+             "isStart" -> AstBoolean(node.isStartNode),
+             "rules" -> AstList((node.rules map RuleSerialiser.serialise).toSeq: _*))
 
     /**
      * Returns an object given it's serialised representation
@@ -23,20 +57,31 @@ package object serialisers {
      * @param serialised The serialised form of the object
      */
     override def deserialise(serialised: AstElement): Node = {
-      val data = serialised.asInstanceOf[AstMap]
-      val id = data("id").asInstanceOf[AstInteger].i
-      val name = data("name").asInstanceOf[AstString].s
-      val content = NodeContentSerialiser.deserialise(data("content"))
-      val isStart = data("isStart").asInstanceOf[AstBoolean].boolean
+      def safeCastNode[T <: AstElement](astElement: AstElement)(implicit ev: ClassTag[T]) = safeCast[T](astElement, "node")
 
-      new Node(NodeId(id), name, content, isStart)
+      val data = safeCastNode[AstMap](serialised)
+      val id = safeCastNode[AstInteger](data("id")).i
+      val name = safeCastNode[AstString](data("name")).s
+      val content = NodeContentSerialiser.deserialise(data("content"))
+      val isStart = safeCastNode[AstBoolean](data("isStart")).boolean
+      val rules = safeCastNode[AstList](data("rules")).toList map RuleSerialiser.deserialise
+
+      new Node(NodeId(id), name, content, isStart, rules)
     }
   }
 
+  /**
+   * Implicit class to allow the use of `node.serialise`
+   *
+   * @param node The node to extend
+   */
   implicit class SerialisableNode(node: Node) {
     def serialise = NodeSerialiser.serialise(node)
   }
 
+  /**
+   * Typeclass instance for serialising stories
+   */
   implicit object StorySerialiser extends Serialisable[Story] {
     /**
      * Returns the serialised representation of an object
@@ -47,6 +92,7 @@ package object serialisers {
       AstMap("title" -> AstString(story.title),
              "author" -> AstString(story.author),
              "description" -> AstString(story.description),
+             "metadata" -> StoryMetadataSerialiser.serialise(story.metadata),
              "nodes" -> AstList(story.nodes map NodeSerialiser.serialise: _*),
              "facts" -> AstList(story.facts map FactSerialiser.serialise: _*),
              "rules" -> AstList(story.rules map RuleSerialiser.serialise: _*))
@@ -57,22 +103,33 @@ package object serialisers {
      * @param serialised The serialised form of the object
      */
     override def deserialise(serialised: AstElement): Story = {
-      val data = serialised.asInstanceOf[AstMap]
-      val title = data("title").asInstanceOf[AstString].s
-      val author = data("author").asInstanceOf[AstString].s
-      val description = data("description").asInstanceOf[AstString].s
-      val nodes = data("nodes").asInstanceOf[AstList].toList map NodeSerialiser.deserialise
-      val facts = data("facts").asInstanceOf[AstList].toList map FactSerialiser.deserialise
-      val rules = data("rules").asInstanceOf[AstList].toList map RuleSerialiser.deserialise
+      def safeCastStory[T <: AstElement](astElement: AstElement)(implicit ev: ClassTag[T]) = safeCast[T](astElement, "story")
 
-      new Story(title, author, description, nodes, facts, rules)
+      val data = safeCastStory[AstMap](serialised)
+      val title = safeCastStory[AstString](data("title")).s
+      val author = safeCastStory[AstString](data("author")).s
+      val description = safeCastStory[AstString](data("description")).s
+      val metadata = StoryMetadataSerialiser.deserialise(data("metadata"))
+      val nodes = safeCastStory[AstList](data("nodes")).toList map NodeSerialiser.deserialise
+      val facts = safeCastStory[AstList](data("facts")).toList map FactSerialiser.deserialise
+      val rules = safeCastStory[AstList](data("rules")).toList map RuleSerialiser.deserialise
+
+      new Story(title, author, description, metadata, nodes, facts, rules)
     }
   }
 
+  /**
+   * Implicit class to allow `story.serialise`
+   *
+   * @param story The story to extend
+   */
   implicit class SerialisableStory(story: Story) {
     def serialise = StorySerialiser.serialise(story)
   }
 
+  /**
+   * Typeclass instance for serialising node content
+   */
   implicit object NodeContentSerialiser extends Serialisable[NodeContent] {
     /**
      * Returns the serialised representation of an object
@@ -81,9 +138,7 @@ package object serialisers {
      */
     override def serialise(nodeContent: NodeContent): AstElement =
       AstMap("text" -> AstString(nodeContent.text),
-             "rulesets" -> AstMap((nodeContent.rulesets map { case (k, v) =>
-                s"${k.startIndex.index}:${k.endIndex.index}" -> (RuleSerialiser serialise v)
-             }).toSeq: _*))
+             "rulesets" -> AstList(nodeContent.rulesets map RulesetSerialiser.serialise: _*))
 
     /**
      * Returns an object given it's serialised representation
@@ -91,23 +146,57 @@ package object serialisers {
      * @param serialised The serialised form of the object
      */
     override def deserialise(serialised: AstElement): NodeContent = {
-      val data = serialised.asInstanceOf[AstMap]
-      val text = data("text").asInstanceOf[AstString].s
-      val rulesets = data("rulesets").asInstanceOf[AstMap].toMap map { case (k, v) =>
-          val (start, end) = k split ':' map (_.toInt) match {
-            case Array(s, e) => (s, e)
-            case unknown =>
-              throw DeserialisationException(s"Expected exactly 2 numbers for ruleset indexes, got: $unknown")
-          }
+      def safeCastNodeContent[T <: AstElement](astElement: AstElement)(implicit ev: ClassTag[T]) =
+        safeCast[T](astElement, "node content")
 
-          import org.narrativeandplay.hypedyn.story.NodalContent._
-          RulesetIndexes(TextIndex(start), TextIndex(end)) -> (RuleSerialiser deserialise v)
-      }
+      val data = safeCastNodeContent[AstMap](serialised)
+      val text = safeCastNodeContent[AstString](data("text")).s
+      val rulesets = safeCastNodeContent[AstList](data("rulesets")).toList map RulesetSerialiser.deserialise
 
       NodeContent(text, rulesets)
     }
   }
 
+  /**
+   * Typeclass instance for serialising rulesets
+   */
+  implicit object RulesetSerialiser extends Serialisable[NodeContent.Ruleset] {
+    /**
+     * Returns the serialised representation of an object
+     *
+     * @param ruleset The object to serialise
+     */
+    override def serialise(ruleset: Ruleset): AstElement =
+      AstMap("id" -> AstInteger(ruleset.id.value),
+             "name" -> AstString(ruleset.name),
+             "start" -> AstInteger(ruleset.indexes.startIndex.index),
+             "end" -> AstInteger(ruleset.indexes.endIndex.index),
+             "rules" -> AstList(ruleset.rules map RuleSerialiser.serialise: _*))
+
+    /**
+     * Returns an object given it's serialised representation
+     *
+     * @param serialised The serialised form of the object
+     */
+    override def deserialise(serialised: AstElement): Ruleset = {
+      def safeCastRuleset[T <: AstElement](astElement: AstElement)(implicit ev: ClassTag[T]) =
+        safeCast[T](astElement, "ruleset")
+
+      import NodalContent._
+      val data = safeCastRuleset[AstMap](serialised)
+      val id = RulesetId(safeCastRuleset[AstInteger](data("id")).i)
+      val name = safeCastRuleset[AstString](data("name")).s
+      val indexes = RulesetIndexes(TextIndex(safeCastRuleset[AstInteger](data("start")).i),
+                                   TextIndex(safeCastRuleset[AstInteger](data("end")).i))
+      val rules = safeCastRuleset[AstList](data("rules")).toList map RuleSerialiser.deserialise
+
+      Ruleset(id, name, indexes, rules)
+    }
+  }
+
+  /**
+   * Typeclass instance for serialising rules
+   */
   implicit object RuleSerialiser extends Serialisable[Rule] {
     /**
      * Returns the serialised representation of an object
@@ -117,6 +206,7 @@ package object serialisers {
     override def serialise(rule: Rule): AstElement =
       AstMap("id" -> AstInteger(rule.id.value),
              "name" -> AstString(rule.name),
+             "stopIfTrue" -> AstBoolean(rule.stopIfTrue),
              "conditionsOp" -> AstString(rule.conditionsOp match {
                                            case And => "and"
                                            case Or => "or"
@@ -130,21 +220,81 @@ package object serialisers {
      * @param serialised The serialised form of the object
      */
     override def deserialise(serialised: AstElement): Rule = {
-      val data = serialised.asInstanceOf[AstMap]
-      val id = RuleId(data("id").asInstanceOf[AstInteger].i)
-      val name = data("name").asInstanceOf[AstString].s
-      val conditionsOp = data("conditionsOp").asInstanceOf[AstString].s match {
+      def safeCastRule[T <: AstElement](astElement: AstElement)(implicit ev: ClassTag[T]) =
+        safeCast[T](astElement, "rule")
+
+      val data = safeCastRule[AstMap](serialised)
+      val id = RuleId(safeCastRule[AstInteger](data("id")).i)
+      val name = safeCastRule[AstString](data("name")).s
+      val stopIfTrue = safeCastRule[AstBoolean](data("stopIfTrue")).boolean
+      val conditionsOp = safeCastRule[AstString](data("conditionsOp")).s match {
         case "and" => And
         case "or" => Or
         case unknown => throw DeserialisationException(s"Unknown operator for conditons: $unknown")
       }
-      val conditions = data("conditions").asInstanceOf[AstList].toList map ConditionSerialiser.deserialise
-      val actions = data("actions").asInstanceOf[AstList].toList map ActionSerialiser.deserialise
+      val conditions = safeCastRule[AstList](data("conditions")).toList map ConditionSerialiser.deserialise
+      val actions = safeCastRule[AstList](data("actions")).toList map ActionSerialiser.deserialise
 
-      Rule(id, name, conditionsOp, conditions, actions)
+      Rule(id, name, stopIfTrue, conditionsOp, conditions, actions)
     }
   }
 
+  private def paramValueToAstMap(paramValue: ParamValue): AstMap =  {
+    import ParamValue._
+    paramValue match {
+      case ParamValue.Node(n) => AstMap("type" -> AstString("node"),
+                                        "value" -> AstInteger(n.value))
+      case Link(l) => AstMap("type" -> AstString("link"),
+                             "value" -> AstInteger(l.value))
+      case IntegerFact(f) => AstMap("type" -> AstString("integerFact"),
+                                    "value" -> AstInteger(f.value))
+      case BooleanFact(f) => AstMap("type" -> AstString("booleanFact"),
+                                    "value" -> AstInteger(f.value))
+      case StringFact(f) => AstMap("type" -> AstString("stringFact"),
+                                   "value" -> AstInteger(f.value))
+      case StringInput(s) => AstMap("type" -> AstString("string"),
+                                    "value" -> AstString(s))
+      case IntegerInput(i) => AstMap("type" -> AstString("integer"),
+                                     "value" -> AstInteger(i))
+      case SelectedListValue(s) => AstMap("type" -> AstString("selectedListValue"),
+                                          "value" -> AstString(s))
+      case UnionValueSelected(p) => AstMap("type" -> AstString("union"),
+                                           "value" -> AstString(p))
+      case ProductValue(ns) => AstMap("type" -> AstString("product"),
+                                      "value" -> AstString(ns mkString ":"))
+    }
+  }
+
+  private def astMapToParamValue(astMap: AstMap): ParamValue = {
+    def safeCastParamValue[T <: AstElement](astElement: AstElement)(implicit ev: ClassTag[T]) =
+      safeCast[T](astElement, "param value")
+
+    val m = astMap.toMap
+
+    // Sanity check
+    assert(m.size == 2)
+    assert(m contains "type")
+    assert(m contains "value")
+
+    import ParamValue._
+    safeCastParamValue[AstString](m("type")).s match {
+      case "node" => ParamValue.Node(NodeId(safeCastParamValue[AstInteger](m("value")).i))
+      case "link" => Link(RulesetId(safeCastParamValue[AstInteger](m("value")).i))
+      case "integerFact" => IntegerFact(FactId(safeCastParamValue[AstInteger](m("value")).i))
+      case "booleanFact" => BooleanFact(FactId(safeCastParamValue[AstInteger](m("value")).i))
+      case "stringFact" => StringFact(FactId(safeCastParamValue[AstInteger](m("value")).i))
+      case "string" => StringInput(safeCastParamValue[AstString](m("value")).s)
+      case "integer" => IntegerInput(safeCastParamValue[AstInteger](m("value")).i)
+      case "selectedListValue" => SelectedListValue(safeCastParamValue[AstString](m("value")).s)
+      case "union" => UnionValueSelected(safeCastParamValue[AstString](m("value")).s)
+      case "product" => ProductValue((safeCastParamValue[AstString](m("value")).s split ":").toList)
+      case unknown => throw DeserialisationException(s"Invalid type for ParamValue: $unknown")
+    }
+  }
+
+  /**
+   * Typeclass instance for serialsing conditions
+   */
   implicit object ConditionSerialiser extends Serialisable[Condition] {
     /**
      * Returns the serialised representation of an object
@@ -152,9 +302,9 @@ package object serialisers {
      * @param condition The object to serialise
      */
     override def serialise(condition: Condition): AstElement =
-      AstMap("actionType" -> AstString(condition.conditionType),
+      AstMap("conditionType" -> AstString(condition.conditionType.value),
              "params" -> AstMap((condition.params map { case (k, v) =>
-               k -> AstString(v)
+               k.value -> paramValueToAstMap(v)
              }).toSeq: _*))
 
     /**
@@ -163,26 +313,35 @@ package object serialisers {
      * @param serialised The serialised form of the object
      */
     override def deserialise(serialised: AstElement): Condition = {
-      val data = serialised.asInstanceOf[AstMap]
-      val conditionType = data("conditionType").asInstanceOf[AstString].s
-      val params = data("params").asInstanceOf[AstMap].toMap map { case (k, v) =>
-        k -> v.asInstanceOf[AstString].s
+      def safeCastCondition[T <: AstElement](astElement: AstElement)(implicit ev: ClassTag[T]) =
+        safeCast[T](astElement, "condition")
+
+      val data = safeCastCondition[AstMap](serialised)
+      val conditionType = safeCastCondition[AstString](data("conditionType")).s
+      val params = safeCastCondition[AstMap](data("params")).toMap map { case (k, v) =>
+        k -> astMapToParamValue(safeCastCondition[AstMap](v))
       }
 
-      Condition(conditionType, params)
+      Condition(Conditional.ConditionType(conditionType), params map { case (k, v) =>
+        RuleLike.ParamName(k) -> v
+      })
     }
   }
-  
+
+  /**
+   * Typeclass instance for serialising actions
+   */
   implicit object ActionSerialiser extends Serialisable[Action] {
     /**
      * Returns the serialised representation of an object
      *
      * @param action The object to serialise
      */
-    override def serialise(action: Action): AstElement = AstMap("actionType" -> AstString(action.actionType),
-                                                                "params" -> AstMap((action.params map { case (k, v) =>
-                                                                    k -> AstString(v)
-                                                                }).toSeq: _*))
+    override def serialise(action: Action): AstElement =
+      AstMap("actionType" -> AstString(action.actionType.value),
+             "params" -> AstMap((action.params map { case (k, v) =>
+               k.value -> paramValueToAstMap(v)
+             }).toSeq: _*))
 
     /**
      * Returns an object given it's serialised representation
@@ -190,16 +349,24 @@ package object serialisers {
      * @param serialised The serialised form of the object
      */
     override def deserialise(serialised: AstElement): Action = {
-      val data = serialised.asInstanceOf[AstMap]
-      val actionType = data("actionType").asInstanceOf[AstString].s
-      val params = data("params").asInstanceOf[AstMap].toMap map { case (k, v) =>
-          k -> v.asInstanceOf[AstString].s
+      def safeCastAction[T <: AstElement](astElement: AstElement)(implicit ev: ClassTag[T]) =
+        safeCast[T](astElement, "action")
+
+      val data = safeCastAction[AstMap](serialised)
+      val actionType = safeCastAction[AstString](data("actionType")).s
+      val params = safeCastAction[AstMap](data("params")).toMap map { case (k, v) =>
+          k -> astMapToParamValue(v.asInstanceOf[AstMap])
       }
 
-      Action(actionType, params)
+      Action(Actionable.ActionType(actionType), params map { case (k, v) =>
+        RuleLike.ParamName(k) -> v
+      })
     }
   }
-  
+
+  /**
+   * Typeclass instance for serialising facts
+   */
   implicit object FactSerialiser extends Serialisable[Fact] {
     /**
      * Returns the serialised representation of an object
@@ -237,25 +404,97 @@ package object serialisers {
      * @param serialised The serialised form of the object
      */
     override def deserialise(serialised: AstElement): Fact = {
-      val data = serialised.asInstanceOf[AstMap]
-      val id = FactId(data("id").asInstanceOf[AstInteger].i)
-      val name = data("name").asInstanceOf[AstString].s
+      def safeCastFact[T <: AstElement](astElement: AstElement)(implicit ev: ClassTag[T]) =
+        safeCast[T](astElement, "fact")
 
-      (data("type").asInstanceOf[AstString].s, data("initialValue")) match {
-        case ("int", value) => IntegerFact(id, name, value.asInstanceOf[AstInteger].i)
-        case ("string", value) => StringFact(id, name, value.asInstanceOf[AstString].s)
-        case ("bool", value) => BooleanFact(id, name, value.asInstanceOf[AstBoolean].boolean)
+      val data = safeCastFact[AstMap](serialised)
+      val id = FactId(safeCastFact[AstInteger](data("id")).i)
+      val name = safeCastFact[AstString](data("name")).s
+
+      (safeCastFact[AstString](data("type")).s, data("initialValue")) match {
+        case ("int", value) => IntegerFact(id, name, safeCastFact[AstInteger](value).i)
+        case ("string", value) => StringFact(id, name, safeCastFact[AstString](value).s)
+        case ("bool", value) => BooleanFact(id, name, safeCastFact[AstBoolean](value).boolean)
         case ("int list", value) =>
-          IntegerFactList(id, name,
-                          value.asInstanceOf[AstList].toList map deserialise map (_.asInstanceOf[IntegerFact]))
+          IntegerFactList(
+            id,
+            name,
+            safeCastFact[AstList](value).toList map deserialise map (_.asInstanceOf[IntegerFact]))
         case ("string list", value) =>
-          StringFactList(id, name,
-                         value.asInstanceOf[AstList].toList map deserialise map (_.asInstanceOf[StringFact]))
+          StringFactList(
+            id,
+            name,
+            safeCastFact[AstList](value).toList map deserialise map (_.asInstanceOf[StringFact]))
         case ("bool list", value) =>
-          BooleanFactList(id, name,
-                          value.asInstanceOf[AstList].toList map deserialise map (_.asInstanceOf[BooleanFact]))
+          BooleanFactList(
+            id,
+            name,
+            safeCastFact[AstList](value).toList map deserialise map (_.asInstanceOf[BooleanFact]))
         case (factType, value) => throw DeserialisationException(s"Unknown fact type: $factType with value: $value")
       }
     }
+  }
+
+  /**
+   * Typeclass instance for serialising story metadata
+   */
+  implicit object StoryMetadataSerialiser extends Serialisable[Story.Metadata] {
+    /**
+     * Returns the serialised representation of an object
+     *
+     * @param t The object to serialise
+     */
+    override def serialise(t: Metadata): AstElement = AstMap("comments" -> AstString(t.comments),
+                                                             "readerStyle" -> ReaderStyleSerialiser.serialise(t.readerStyle),
+                                                             "backDisabled" -> AstBoolean(t.isBackButtonDisabled),
+                                                             "restartDisabled" -> AstBoolean(t.isRestartButtonDisabled))
+
+    /**
+     * Returns an object given it's serialised representation
+     *
+     * @param serialised The serialised form of the object
+     */
+    override def deserialise(serialised: AstElement): Metadata = {
+      def safeCastStoryMetadata[T <: AstElement](astElement: AstElement)(implicit ev: ClassTag[T]) =
+        safeCast[T](astElement, "fact")
+
+      val data = safeCastStoryMetadata[AstMap](serialised)
+      val comments = safeCastStoryMetadata[AstString](data("comments")).s
+      val readerStyle = ReaderStyleSerialiser deserialise data("readerStyle")
+      val backDisabled = safeCastStoryMetadata[AstBoolean](data("backDisabled")).boolean
+      val restartDisabled = safeCastStoryMetadata[AstBoolean](data("restartDisabled")).boolean
+
+      Story.Metadata(comments, readerStyle, backDisabled, restartDisabled)
+    }
+  }
+
+  /**
+   * Typeclass instance for serialising the reader style information
+   */
+  implicit object ReaderStyleSerialiser extends Serialisable[ReaderStyle] {
+    import Narrative.ReaderStyle._
+
+    /**
+     * Returns the serialised representation of an object
+     *
+     * @param t The object to serialise
+     */
+    override def serialise(t: ReaderStyle): AstElement = t match {
+      case Standard => AstString("standard")
+      case Fancy => AstString("fancy")
+      case Custom(file) => AstString(file)
+    }
+
+    /**
+     * Returns an object given it's serialised representation
+     *
+     * @param serialised The serialised form of the object
+     */
+    override def deserialise(serialised: AstElement): ReaderStyle =
+      safeCast[AstString](serialised, "reader style").s match {
+        case "standard" => Standard
+        case "fancy" => Fancy
+        case file => Custom(file)
+      }
   }
 }

@@ -2,10 +2,17 @@ package org.narrativeandplay.hypedyn.undo
 
 import org.reactfx.{EventStream, EventSource}
 
+/**
+ * Stream of undoable changes
+ *
+ * This is the source of all changes to the undo manager
+ */
 object UndoableStream {
   private val _changes = new EventSource[Undoable]
 
-
+  /**
+   * The changes of the stream
+   */
   val changes: EventStream[Undoable] = _changes
 
   /**

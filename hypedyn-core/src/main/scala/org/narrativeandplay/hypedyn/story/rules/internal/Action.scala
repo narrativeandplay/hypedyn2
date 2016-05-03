@@ -1,5 +1,12 @@
 package org.narrativeandplay.hypedyn.story.rules.internal
 
-import org.narrativeandplay.hypedyn.story.rules.Actionable
+import org.narrativeandplay.hypedyn.story.rules.{RuleLike, Actionable}
 
-case class Action(actionType: String, params: Map[String, String]) extends Actionable
+/**
+ * Class for representing an action instance
+ *
+ * @param actionType The type of the instanced action
+ * @param params The parameters and values of those parameters for the instanced action
+ */
+case class Action(actionType: Actionable.ActionType,
+                  params: Map[RuleLike.ParamName, RuleLike.ParamValue]) extends Actionable
