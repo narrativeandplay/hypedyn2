@@ -4,13 +4,13 @@ import java.io.File
 import javafx.beans.value.ObservableValue
 
 import scalafx.Includes._
-import scalafx.application.{Platform, JFXApp}
+import scalafx.application.{JFXApp, Platform}
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.beans.property.StringProperty
 import scalafx.scene.Scene
-import scalafx.scene.control.{ButtonType, Alert}
-import scalafx.scene.image.{ImageView, Image}
-import scalafx.scene.layout.{VBox, BorderPane}
+import scalafx.scene.control.{Alert, ButtonType}
+import scalafx.scene.image.{Image, ImageView}
+import scalafx.scene.layout.{BorderPane, VBox}
 
 import com.sun.glass.ui
 import com.sun.glass.ui.Application.EventHandler
@@ -21,19 +21,19 @@ import org.narrativeandplay.hypedyn.dialogs._
 import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.plugins.PluginsController
-import org.narrativeandplay.hypedyn.serialisation.serialisers.DeserialisationException
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition, Fact}
 import org.narrativeandplay.hypedyn.uicomponents._
 import org.narrativeandplay.hypedyn.undo.UndoController
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 import org.narrativeandplay.hypedyn.utils.{System => Sys}
-
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-import akka.http.scaladsl.model.{HttpEntity, ContentTypes}
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
+
+import org.narrativeandplay.hypedyn.serialisation.DeserialisationException
 
 /**
  * Entry point for the application
