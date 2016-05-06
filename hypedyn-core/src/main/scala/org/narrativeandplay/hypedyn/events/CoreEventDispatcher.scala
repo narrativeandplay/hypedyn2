@@ -141,7 +141,7 @@ object CoreEventDispatcher {
     // wrap the JSON in a .js file to allow to avoid cross origin request error running localling in Chrome
     IoController.write("function getStoryData(){\nreturn" + (Serialiser toString saveData) + ";\n};", new File(tmpDir, "story.js"))
 
-    EventBus.send(RunResponse(new File(tmpDir, "index.html"), CoreEventSourceIdentity))
+    EventBus.send(RunResponse(tmpDir, "index.html", CoreEventSourceIdentity))
   }
 
   EventBus.SaveDataEvents tumbling PluginsController.plugins.size zip EventBus.SaveToFileEvents foreach {
@@ -205,7 +205,7 @@ object CoreEventDispatcher {
     // save current story to export directory
     val storyData = Serialiser serialise StoryController.story
     val saveData = AstMap("story" -> storyData)
-    IoController.write(Serialiser toString saveData, new File(exportDirectory, "story.dyn"))
+    IoController.write("function getStoryData(){\nreturn" + (Serialiser toString saveData) + ";\n};", new File(exportDirectory, "story.js"))
 
     // send completion (we're done!)
     EventBus.send(StoryExported(CoreEventSourceIdentity))
