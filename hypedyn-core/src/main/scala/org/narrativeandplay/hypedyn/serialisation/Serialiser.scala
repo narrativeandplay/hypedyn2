@@ -21,11 +21,11 @@ object Serialiser {
    * Deserialises a serialisable object
    *
    * @param data The serialised data to deserialise
-   * @param serialiser The typeclass instance implementing Serialisable for the type T
+   * @param deserialiser The typeclass instance implementing Serialisable for the type T
    * @tparam T The type of the object to deserialise
    * @return The deserialised object
    */
-  def deserialise[T](data: AstElement)(implicit serialiser: Serialisable[T]) = serialiser.deserialise(data)
+  def deserialise[T](data: AstElement)(implicit deserialiser: Deserialisable[T]) = deserialiser.deserialise(data)
 
   /**
    * Ast <-> String Serialisers
