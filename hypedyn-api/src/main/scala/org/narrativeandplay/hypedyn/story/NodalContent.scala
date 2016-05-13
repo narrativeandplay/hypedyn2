@@ -15,6 +15,11 @@ trait NodalContent extends NarrativeElement[NodalContent] {
    * Returns the list of text rules of the node
    */
   def rulesets: List[NodalContent.RulesetLike]
+
+  /**
+   * Returns the list of segments of the node
+   */
+  def segments: List[(String, Option[NodalContent.RulesetLike])]
 }
 
 object NodalContent {
