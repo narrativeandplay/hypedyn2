@@ -264,26 +264,27 @@ class NodeEditor private (dialogTitle: String,
       override def getName: String = "link-style-info"
 
       override def encode(os: DataOutputStream, t: LinkStyleInfo): Unit = {
-        import org.narrativeandplay.hypedyn.serialisation.serialisers.RulesetSerialiser
-        import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions.rulesetLike2Ruleset
+        import org.narrativeandplay.hypedyn.serialisation.newserialisers.serialisers.RulesetLikeSerialiser
         import org.narrativeandplay.hypedyn.serialisation.serialisers.JsonSerialiser
 
         t.ruleset match {
           case Some(r) =>
             os.writeBoolean(true)
-            os.writeUTF(JsonSerialiser.serialise(RulesetSerialiser.serialise(r)))
+            os.writeUTF(JsonSerialiser.serialise(RulesetLikeSerialiser.serialise(r)))
           case None =>
             os.writeBoolean(false)
         }
       }
 
       override def decode(is: DataInputStream): LinkStyleInfo = {
-        import org.narrativeandplay.hypedyn.serialisation.serialisers.RulesetSerialiser
+        import org.narrativeandplay.hypedyn.serialisation.newserialisers.deserialisers.RulesetLikeDeserialiser
+        import org.narrativeandplay.hypedyn.story.internal.NodeContent.Ruleset
+        import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions.rulesetLike2Ruleset
         import org.narrativeandplay.hypedyn.serialisation.serialisers.JsonSerialiser
 
         is.readBoolean() match {
           case true =>
-            val ruleset = RulesetSerialiser.deserialise(JsonSerialiser.deserialise(is.readUTF()))
+            val ruleset: Ruleset = RulesetLikeDeserialiser.deserialise(JsonSerialiser.deserialise(is.readUTF()))
             val copiedRules = ruleset.rules map (_.copy(id = RuleId(-1)))
             val copiedRuleset = ruleset.copy(id = firstUnusedRulesetId, rules = copiedRules)
             firstUnusedRulesetId = firstUnusedRulesetId.dec

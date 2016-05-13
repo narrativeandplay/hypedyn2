@@ -3,22 +3,26 @@ package org.narrativeandplay.hypedyn.events
 import java.io.File
 import java.nio.file.Files
 
+import scala.util.control.NonFatal
+
 import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.plugins.PluginsController
-import org.narrativeandplay.hypedyn.serialisation.serialisers._
-import org.narrativeandplay.hypedyn.serialisation.{AstElement, AstMap, IoController, Serialiser}
-import org.narrativeandplay.hypedyn.story.StoryController
+import org.narrativeandplay.hypedyn.serialisation._
+import org.narrativeandplay.hypedyn.serialisation.newserialisers.serialisers._
+import org.narrativeandplay.hypedyn.serialisation.newserialisers.deserialisers._
+import org.narrativeandplay.hypedyn.serialisation.serialisers.deprecated._
 import org.narrativeandplay.hypedyn.story.internal.Story
+import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions._
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, ConditionDefinitions, Fact}
+import org.narrativeandplay.hypedyn.story.{Narrative, StoryController}
 import org.narrativeandplay.hypedyn.undo._
-
-import scala.util.control.NonFatal
 
 /**
  * Main event dispatcher for the core
  */
 object CoreEventDispatcher {
   val CoreEventSourceIdentity = "Core"
+  private val FileFormatVersion = "2.0.0"
 
   /**
    * Keeps track of whether there is a story loaded via a file load
@@ -152,7 +156,11 @@ object CoreEventDispatcher {
         AstMap(pluginSaveDataMap.toSeq: _*)
       } foreach { pluginSaveDataAstMap =>
         val storyData = Serialiser serialise StoryController.story
-        val saveData = AstMap("story" -> storyData, "plugins" -> pluginSaveDataAstMap)
+        val saveData = AstMap(
+          "version" -> AstString(FileFormatVersion),
+          "story" -> storyData,
+          "plugins" -> pluginSaveDataAstMap
+        )
 
         IoController.write(Serialiser toString saveData, saveFileEvt.file)
 
@@ -173,12 +181,27 @@ object CoreEventDispatcher {
         case e => throw DeserialisationException(s"Expected AstMap in deserialising story, received $e")
       }
 
+      val fileFormatVersion = dataAst get "version" match {
+        case Some(AstString(s)) =>
+          s
+
+        case Some(invalid) =>
+          throw DeserialisationException(s"Expected AstString in deserialising version, received $invalid")
+
+        case None =>
+          "1.0.0"
+      }
+
       val pluginData = dataAst("plugins") match {
         case d: AstMap => d.toMap
         case e => throw DeserialisationException(s"Expected AstMap in deserialising plugin data, received $e")
       }
 
-      val story = Serialiser.deserialise[Story](dataAst("story"))
+      val story = if (fileFormatVersion == FileFormatVersion) {
+        Serialiser deserialise[Narrative] dataAst("story")
+      } else {
+        Serialiser deserialise[Story] dataAst("story")
+      }
       StoryController load story
 
       loadedFile = Some(evt.file)
