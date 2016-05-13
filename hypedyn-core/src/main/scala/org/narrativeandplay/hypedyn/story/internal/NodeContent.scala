@@ -1,6 +1,5 @@
 package org.narrativeandplay.hypedyn.story.internal
 
-import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.story.NodalContent
 import org.narrativeandplay.hypedyn.story.rules.internal.Rule
 

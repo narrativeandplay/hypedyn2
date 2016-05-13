@@ -9,7 +9,7 @@ import org.narrativeandplay.hypedyn.story.rules.{FactId, RuleId}
 object Logger {
   private val logger = grizzled.slf4j.Logger[this.type]
 
-  private val prettyPrinter = new PrettyPrinter {
+  private object prettyPrinter extends PrettyPrinter {
     override val defaultIndent = 2
 
     override def any (a : Any) : Doc =
