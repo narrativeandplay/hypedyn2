@@ -1,6 +1,7 @@
 package org.narrativeandplay.hypedyn.story
 
 import org.narrativeandplay.hypedyn.story.rules.{Fact, RuleLike}
+import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThemeLike}
 
 /**
  * An interface for a story
@@ -40,6 +41,16 @@ trait Narrative extends NarrativeElement[Narrative] {
    * Returns the story-level rules
    */
   def rules: List[RuleLike]
+
+  /**
+    * Returns the themes contained in the story
+    */
+  def themes: List[ThemeLike]
+
+  /**
+    * Returns the motifs contained in the story
+    */
+  def motifs: List[MotifLike]
 }
 
 object Narrative {
@@ -89,7 +100,8 @@ object Narrative {
 
     /**
      * A custom reader style
-     * @param cssFilePath The absolute file path to the custom stylesheet
+      *
+      * @param cssFilePath The absolute file path to the custom stylesheet
      */
     case class Custom(cssFilePath: String) extends ReaderStyle
   }

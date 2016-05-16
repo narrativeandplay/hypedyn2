@@ -3,10 +3,10 @@ package org.narrativeandplay.hypedyn.story
 import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, ObjectProperty, StringProperty}
 import scalafx.collections.ObservableBuffer
-
 import org.narrativeandplay.hypedyn.story.Narrative.{Metadata, ReaderStyle}
 import org.narrativeandplay.hypedyn.story.rules.Actionable.ActionType
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, Fact}
+import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThemeLike}
 
 /**
  * UI implementation for Narrative
@@ -18,6 +18,8 @@ import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, Fact}
  * @param initFacts The initial facts of the story
  * @param initNodes The initial list of nodes of the story
  * @param initRules The initial list of story-level rules
+ * @param initThemes The initial themes of the story
+ * @param initMotifs The initial motifs of the story
  */
 class UiStory(initTitle: String,
               initDescription: String,
@@ -25,7 +27,9 @@ class UiStory(initTitle: String,
               initMetadata: UiStory.UiStoryMetadata,
               initFacts: List[Fact],
               initNodes: List[UiNode],
-              initRules: List[UiRule]) extends Narrative {
+              initRules: List[UiRule],
+              initThemes: List[ThemeLike],
+              initMotifs: List[MotifLike]) extends Narrative {
   /**
    * Backing property for the title
    */
@@ -62,6 +66,16 @@ class UiStory(initTitle: String,
   val rulesProperty = ObjectProperty(ObservableBuffer(initRules))
 
   /**
+    * Backing property for the list of themes
+    */
+  val themesProperty = ObjectProperty(ObservableBuffer(initThemes))
+
+  /**
+    * Backing property for the list of motifs
+    */
+  val motifsProperty = ObjectProperty(ObservableBuffer(initMotifs))
+
+  /**
    * Returns the title of the story
    */
   override def title: String = titleProperty()
@@ -95,6 +109,16 @@ class UiStory(initTitle: String,
    * Returns the story-level rules
    */
   override def rules: List[UiRule] = rulesProperty().toList
+
+  /**
+    * Returns the list of themes of the story
+    */
+  override def themes: List[ThemeLike] = themesProperty().toList
+
+  /**
+    * Returns the list of motifs of the story
+    */
+  override def motifs: List[MotifLike] = motifsProperty().toList
 
   /**
    * Returns an observable buffer (why not a list?) of rulesets that can be activated (usually by clicking)

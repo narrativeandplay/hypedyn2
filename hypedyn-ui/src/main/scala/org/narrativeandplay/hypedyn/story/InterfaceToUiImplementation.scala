@@ -50,5 +50,7 @@ object InterfaceToUiImplementation {
                                                                               narrative.metadata,
                                                                               narrative.facts,
                                                                               narrative.nodes,
-                                                                              narrative.rules)
+                                                                              narrative.rules,
+                                                                              narrative.themes,
+                                                                              narrative.motifs)
 }

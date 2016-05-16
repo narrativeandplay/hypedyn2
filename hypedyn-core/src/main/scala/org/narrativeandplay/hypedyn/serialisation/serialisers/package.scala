@@ -9,6 +9,8 @@ import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.{And, Or}
 import org.narrativeandplay.hypedyn.story.rules.RuleLike.ParamValue
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.rules.internal.{Action, Condition, Rule}
+import org.narrativeandplay.hypedyn.story.themes.internal.{Motif, Theme}
+import org.narrativeandplay.hypedyn.story.themes.{ElementID, MotifLike, ThemeLike}
 import org.narrativeandplay.hypedyn.story.{Narrative, NodalContent, NodeId}
 
 import scala.reflect.ClassTag
@@ -95,7 +97,9 @@ package object serialisers {
              "metadata" -> StoryMetadataSerialiser.serialise(story.metadata),
              "nodes" -> AstList(story.nodes map NodeSerialiser.serialise: _*),
              "facts" -> AstList(story.facts map FactSerialiser.serialise: _*),
-             "rules" -> AstList(story.rules map RuleSerialiser.serialise: _*))
+             "rules" -> AstList(story.rules map RuleSerialiser.serialise: _*),
+             "themes" -> AstList(story.themes map ThemeSerialiser.serialise: _*),
+             "motifs" -> AstList(story.motifs map MotifSerialiser.serialise: _*))
 
     /**
      * Returns an object given it's serialised representation
@@ -113,6 +117,8 @@ package object serialisers {
       val nodes = safeCastStory[AstList](data("nodes")).toList map NodeSerialiser.deserialise
       val facts = safeCastStory[AstList](data("facts")).toList map FactSerialiser.deserialise
       val rules = safeCastStory[AstList](data("rules")).toList map RuleSerialiser.deserialise
+      val themes = safeCastStory[AstList](data("themes")).toList map ThemeSerialiser.deserialise
+      val motifs = safeCastStory[AstList](data("motifs")).toList map MotifSerialiser.deserialise
 
       new Story(title, author, description, metadata, nodes, facts, rules)
     }
@@ -432,6 +438,74 @@ package object serialisers {
             safeCastFact[AstList](value).toList map deserialise map (_.asInstanceOf[BooleanFact]))
         case (factType, value) => throw DeserialisationException(s"Unknown fact type: $factType with value: $value")
       }
+    }
+  }
+
+  /**
+    * Typeclass instance for serialising themes
+    */
+  implicit object ThemeSerialiser extends Serialisable[ThemeLike] {
+    /**
+      * Returns the serialised representation of an object
+      *
+      * @param theme The object to serialise
+      */
+    override def serialise(theme: ThemeLike): AstElement =
+      AstMap("id" -> AstInteger(theme.id.value),
+        "name" -> AstString(theme.name),
+        "subthemes" -> AstList((theme.subthemes map {st => AstInteger(st.value)}).toSeq: _*), // should be a shortform for this...
+        "motifs" -> AstList((theme.motifs map {m => AstInteger(m.value)}).toSeq: _*)
+      )
+
+    /**
+      * Returns an object given it's serialised representation
+      *
+      * @param serialised The serialised form of the object
+      */
+    override def deserialise(serialised: AstElement): ThemeLike = {
+      def safeCastTheme[T <: AstElement](astElement: AstElement)(implicit ev: ClassTag[T]) =
+        safeCast[T](astElement, "theme")
+
+      val data = safeCastTheme[AstMap](serialised)
+      val id = ElementID(safeCastTheme[AstInteger](data("id")).i)
+      val name = safeCastTheme[AstString](data("name")).s
+      val subthemes = safeCastTheme[AstList](data("subthemes")).toList map {st => ElementID(safeCastTheme[AstInteger](st).i)}
+      val motifs = safeCastTheme[AstList](data("motifs")).toList map {m => ElementID(safeCastTheme[AstInteger](m).i)}
+
+      Theme(id, name, subthemes, motifs)
+    }
+  }
+
+  /**
+    * Typeclass instance for serialising motifs
+    */
+  implicit object MotifSerialiser extends Serialisable[MotifLike] {
+    /**
+      * Returns the serialised representation of an object
+      *
+      * @param motif The object to serialise
+      */
+    override def serialise(motif: MotifLike): AstElement =
+      AstMap("id" -> AstInteger(motif.id.value),
+        "name" -> AstString(motif.name),
+        "features" -> AstList((motif.features map {f => AstString(f)}).toSeq: _*) // think this is wrong
+      )
+
+    /**
+      * Returns an object given it's serialised representation
+      *
+      * @param serialised The serialised form of the object
+      */
+    override def deserialise(serialised: AstElement): Motif = {
+      def safeCastMotif[T <: AstElement](astElement: AstElement)(implicit ev: ClassTag[T]) =
+        safeCast[T](astElement, "theme")
+
+      val data = safeCastMotif[AstMap](serialised)
+      val id = ElementID(safeCastMotif[AstInteger](data("id")).i)
+      val name = safeCastMotif[AstString](data("name")).s
+      val features = safeCastMotif[AstList](data("features")).toList map {f => safeCastMotif(f)} // think this is wrong
+
+      Motif(id, name, features)
     }
   }
 
