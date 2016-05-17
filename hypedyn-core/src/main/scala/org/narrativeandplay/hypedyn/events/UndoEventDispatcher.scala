@@ -1,9 +1,9 @@
 package org.narrativeandplay.hypedyn.events
 
 import scalafx.Includes._
-
 import org.narrativeandplay.hypedyn.story.internal.Node
 import org.narrativeandplay.hypedyn.story.rules.Fact
+import org.narrativeandplay.hypedyn.story.themes.internal.{Motif, Theme}
 import org.narrativeandplay.hypedyn.undo._
 
 /**
@@ -88,4 +88,59 @@ object UndoEventDispatcher {
   def destroyFact(fact: Fact): Unit = {
     EventBus.send(DestroyFact(fact, UndoEventSourceIdentity))
   }
-}
+
+  /**
+    * Sends an event to create a theme
+    *
+    * @param theme The theme to create
+    */
+  def createTheme(theme: Theme): Unit = {
+    EventBus.send(CreateTheme(theme, UndoEventSourceIdentity))
+  }
+
+  /**
+    * Sends an event to update a theme
+    *
+    * @param theme The theme to update
+    * @param updatedTheme The updated version of the same theme
+    */
+  def updateTheme(theme: Theme, updatedTheme: Theme): Unit = {
+    EventBus.send(UpdateTheme(theme, updatedTheme, UndoEventSourceIdentity))
+  }
+
+  /**
+    * Sends an event to destroy a theme
+    *
+    * @param theme The theme to destroy
+    */
+  def destroyTheme(theme: Theme): Unit = {
+    EventBus.send(DestroyTheme(theme, UndoEventSourceIdentity))
+  }
+
+  /**
+    * Sends an event to create a motif
+    *
+    * @param motif The motif to create
+    */
+  def createMotif(motif: Motif): Unit = {
+    EventBus.send(CreateMotif(motif, UndoEventSourceIdentity))
+  }
+
+  /**
+    * Sends an event to update a motif
+    *
+    * @param motif The motif to update
+    * @param updatedMotif The updated version of the same motif
+    */
+  def updateMotif(motif: Motif, updatedMotif: Motif): Unit = {
+    EventBus.send(UpdateMotif(motif, updatedMotif, UndoEventSourceIdentity))
+  }
+
+  /**
+    * Sends an event to destroy a motif
+    *
+    * @param motif The motif to destroy
+    */
+  def destroyMotif(motif: Motif): Unit = {
+    EventBus.send(DestroyMotif(motif, UndoEventSourceIdentity))
+  }}

@@ -148,7 +148,7 @@ object CoreEventDispatcher {
   EventBus.CreateThemeEvents foreach { evt =>
     val created = StoryController.create(evt.theme)
 
-    //UndoableStream.send(new ThemeCreatedChange(created)) // undo
+    UndoableStream.send(new ThemeCreatedChange(created)) // undo
 
     EventBus.send(ThemeCreated(created, CoreEventSourceIdentity))
     EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
@@ -157,7 +157,7 @@ object CoreEventDispatcher {
     val updatedUnupdatedPair = StoryController.update(evt.theme, evt.updatedTheme)
 
     updatedUnupdatedPair foreach { case (unupdated, updated) =>
-      //UndoableStream.send(new FactUpdatedChange(unupdated, updated)) // undo
+      UndoableStream.send(new ThemeUpdatedChange(unupdated, updated)) // undo
 
       EventBus.send(ThemeUpdated(unupdated, updated, CoreEventSourceIdentity))
       EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
@@ -167,7 +167,7 @@ object CoreEventDispatcher {
     val destroyed = StoryController.destroy(evt.theme)
 
     destroyed foreach { t =>
-      //UndoableStream.send(new FactDestroyedChange(t)) // undo
+      UndoableStream.send(new ThemeDestroyedChange(t)) // undo
 
       EventBus.send(ThemeDestroyed(t, CoreEventSourceIdentity))
       EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
@@ -177,7 +177,7 @@ object CoreEventDispatcher {
   EventBus.CreateMotifEvents foreach { evt =>
     val created = StoryController.create(evt.motif)
 
-    //UndoableStream.send(new MotifCreatedChange(created)) // undo
+    UndoableStream.send(new MotifCreatedChange(created)) // undo
 
     EventBus.send(MotifCreated(created, CoreEventSourceIdentity))
     EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
@@ -186,7 +186,7 @@ object CoreEventDispatcher {
     val updatedUnupdatedPair = StoryController.update(evt.motif, evt.updatedMotif)
 
     updatedUnupdatedPair foreach { case (unupdated, updated) =>
-      //UndoableStream.send(new MotifUpdatedChange(unupdated, updated)) // undo
+      UndoableStream.send(new MotifUpdatedChange(unupdated, updated)) // undo
 
       EventBus.send(MotifUpdated(unupdated, updated, CoreEventSourceIdentity))
       EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
@@ -196,7 +196,7 @@ object CoreEventDispatcher {
     val destroyed = StoryController.destroy(evt.motif)
 
     destroyed foreach { m =>
-      //UndoableStream.send(new MotifDestroyedChange(m)) // undo
+      UndoableStream.send(new MotifDestroyedChange(m)) // undo
 
       EventBus.send(MotifDestroyed(m, CoreEventSourceIdentity))
       EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
