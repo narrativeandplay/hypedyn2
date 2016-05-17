@@ -73,14 +73,14 @@ object Toolbar extends ToolBar {
       UiEventDispatcher.requestDeleteTheme()
     }
 
-    //disable <== FactViewer.selectionModel().selectedItem.isNull
+    disable <== EasyBind monadic UiEventDispatcher.selectedTheme map[lang.Boolean] (_.isEmpty)
   }
   private lazy val editTheme = new Button("Edit Theme") {
     onAction = { _ =>
       UiEventDispatcher.requestEditTheme()
     }
 
-    //disable <== FactViewer.selectionModel().selectedItem.isNull
+    disable <== EasyBind monadic UiEventDispatcher.selectedTheme map[lang.Boolean] (_.isEmpty)
   }
 
   private lazy val newMotif = new Button("New Motif") {

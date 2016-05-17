@@ -36,6 +36,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     val pt = new Point2D(event.getX, event.getY)
 
     nodes foreach { n => if (!(n.bounds contains pt)) n.deselect() }
+    themes foreach { t => if (!(t.bounds contains pt)) t.deselect() }
     links foreach { l => if (!(l contains pt)) l.deselect() }
     requestLayout()
 
@@ -66,6 +67,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
    */
   def clear(): Unit = {
     nodes foreach (children -= _)
+    themes foreach (children -= _)
 
     linkGroups.clear()
     nodes.clear()

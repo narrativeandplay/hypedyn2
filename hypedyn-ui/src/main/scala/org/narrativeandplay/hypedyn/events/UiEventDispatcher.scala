@@ -13,7 +13,7 @@ import org.narrativeandplay.hypedyn.dialogs.NodeEditor
 import org.narrativeandplay.hypedyn.story.{Nodal, NodeId}
 import org.narrativeandplay.hypedyn.uicomponents.FactViewer
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
-import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThemeLike}
+import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThematicElementID, ThemeLike}
 import org.narrativeandplay.hypedyn.utils.HypedynPreferences
 
 /**
@@ -24,6 +24,7 @@ import org.narrativeandplay.hypedyn.utils.HypedynPreferences
 object UiEventDispatcher {
   val UiEventSourceIdentity = "UI"
   val selectedNode = ObjectProperty(Option.empty[NodeId])
+  val selectedTheme = ObjectProperty(Option.empty[ThematicElementID])
   private val openedNodeEditors = ArrayBuffer.empty[NodeEditor]
   val isStoryEdited = BooleanProperty(false)
   val undoAvailable = BooleanProperty(false)
@@ -177,6 +178,9 @@ object UiEventDispatcher {
   EventBus.UiNodeSelectedEvents foreach { evt => selectedNode() = Some(evt.id) }
   EventBus.UiNodeDeselectedEvents foreach { _ => selectedNode() = None }
 
+  EventBus.UiThemeSelectedEvents foreach { evt => selectedTheme() = Some(evt.id) }
+  EventBus.UiThemeDeselectedEvents foreach { _ => selectedTheme() = None }
+
   EventBus.FactCreatedEvents foreach { evt => FactViewer.add(evt.fact) }
   EventBus.FactUpdatedEvents foreach { evt => FactViewer.update(evt.fact, evt.updatedFact) }
   EventBus.FactDestroyedEvents foreach { evt => FactViewer.remove(evt.fact) }
@@ -236,19 +240,13 @@ object UiEventDispatcher {
     EventBus.send(NewThemeRequest(UiEventSourceIdentity))
   }
   def requestEditTheme(): Unit = {
-    // need to change to get selected theme from story viewer
-//    Option(FactViewer.selectionModel().selectedItem()) foreach { t =>
-//      EventBus.send(EditThemeRequest(t.id, UiEventSourceIdentity))
-//    }
+    selectedTheme() foreach { id => EventBus.send(EditThemeRequest(id, UiEventSourceIdentity)) }
   }
   def requestEditTheme(theme: ThemeLike): Unit = {
     EventBus.send(EditThemeRequest(theme.id, UiEventSourceIdentity))
   }
   def requestDeleteTheme(): Unit = {
-    // need to change to get selected theme from story viewer
-//    Option(FactViewer.selectionModel().selectedItem()) foreach { t =>
-//      EventBus.send(DeleteThemeRequest(t.id, UiEventSourceIdentity))
-//    }
+    selectedTheme() foreach { id => EventBus.send(DeleteThemeRequest(id, UiEventSourceIdentity)) }
   }
 
   def requestNewMotif(): Unit = {

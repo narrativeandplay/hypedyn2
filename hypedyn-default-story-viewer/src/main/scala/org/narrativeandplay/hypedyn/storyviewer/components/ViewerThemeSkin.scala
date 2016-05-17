@@ -22,7 +22,7 @@ class ViewerThemeSkin(viewerTheme: ViewerTheme) extends Skin[ViewerTheme] {
   // The -1 is for the rectangle to look nicer
   private val headingBarRect = new Rectangle {
     width <== viewerTheme.widthProperty() - 1
-    height <== when (viewerTheme.showContent) choose HeadingHeight otherwise viewerTheme.heightProperty() //min(HeadingHeight, viewerNode.heightProperty())
+    height = HeadingHeight
     fill = Color.LightGrey
     stroke = Color.Black
   }
@@ -36,7 +36,7 @@ class ViewerThemeSkin(viewerTheme: ViewerTheme) extends Skin[ViewerTheme] {
   }
   private val selectRect = new Rectangle {
     width <== viewerTheme.widthProperty() + 2 * SelectionOutlineWidth
-    height <== viewerTheme.heightProperty() + 2 * SelectionOutlineWidth
+    height <== HeadingHeight + 2 * SelectionOutlineWidth
     fill = Color.Red
     translateX = -SelectionOutlineWidth
     translateY = -SelectionOutlineWidth
@@ -56,26 +56,6 @@ class ViewerThemeSkin(viewerTheme: ViewerTheme) extends Skin[ViewerTheme] {
 
     visible <== viewerTheme.showName
   }
-  private val nodeContent = new Label {
-    translateX = TextPadding
-    translateY = TextPadding + HeadingHeight
-
-    wrapText = true
-    alignment = Pos.TopLeft
-    //textOverrun = OverrunStyle.WordEllipsis
-
-    maxWidth <== viewerTheme.widthProperty() - 2 * TextPadding
-    maxHeight <== viewerTheme.heightProperty() - 2 * TextPadding - HeadingHeight
-
-    text = "This is a theme..."
-
-    visible <== viewerTheme.showContent
-  }
-
-  private val contentBox = new Pane {
-    children += contentRect
-    children += nodeContent
-  }
 
   private val headingBar = new StackPane {
     children += headingBarRect
@@ -84,7 +64,6 @@ class ViewerThemeSkin(viewerTheme: ViewerTheme) extends Skin[ViewerTheme] {
 
   private val root = new Pane {
     children += selectRect
-    children += contentBox
     children += headingBar
   }
 
