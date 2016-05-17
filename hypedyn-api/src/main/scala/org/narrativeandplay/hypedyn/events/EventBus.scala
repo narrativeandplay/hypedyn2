@@ -177,6 +177,9 @@ object EventBus {
   val UiNodeSelectedEvents = eventBus collect { case e: UiNodeSelected => e }
   val UiNodeDeselectedEvents = eventBus collect { case e: UiNodeDeselected => e }
 
+  val UiThemeSelectedEvents = eventBus collect { case e: UiThemeSelected => e }
+  val UiThemeDeselectedEvents = eventBus collect { case e: UiThemeDeselected => e }
+
 
   /**
    * Event stream of all notifications

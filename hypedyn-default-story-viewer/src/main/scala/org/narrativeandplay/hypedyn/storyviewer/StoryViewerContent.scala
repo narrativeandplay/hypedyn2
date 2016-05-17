@@ -2,23 +2,22 @@ package org.narrativeandplay.hypedyn.storyviewer
 
 import javafx.{event => jfxe}
 import javafx.event.EventHandler
-import javafx.scene.control.{Control => JfxControl, Skin}
+import javafx.scene.control.{Skin, Control => JfxControl}
 import javafx.scene.{input => jfxsi}
 
 import org.narrativeandplay.hypedyn.story.rules.RuleLike
 
 import scala.collection.mutable.ArrayBuffer
-
 import scalafx.Includes._
 import scalafx.event.Event
 import scalafx.geometry.Point2D
-import scalafx.scene.input.{ScrollEvent, MouseEvent}
-
+import scalafx.scene.input.{MouseEvent, ScrollEvent}
 import org.narrativeandplay.hypedyn.storyviewer.utils.UnorderedPair
-import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamValue, ParamName}
+import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
 import org.narrativeandplay.hypedyn.story.rules.Actionable.ActionType
+import org.narrativeandplay.hypedyn.story.themes.ThemeLike
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
-import org.narrativeandplay.hypedyn.storyviewer.components.{ViewerNode, LinkGroup}
+import org.narrativeandplay.hypedyn.storyviewer.components.{LinkGroup, ViewerNode, ViewerTheme}
 import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
 
 /**
@@ -29,6 +28,7 @@ import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
 class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends JfxControl {
   val nodes = ArrayBuffer.empty[ViewerNode]
   val linkGroups = ArrayBuffer.empty[LinkGroup]
+  val themes = ArrayBuffer.empty[ViewerTheme]
 
   skin = new StoryViewerContentSkin(this)
 
@@ -62,13 +62,14 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   def links = (linkGroups flatMap (_.links)).toList
 
   /**
-   * Remove all nodes and links
+   * Remove all nodes and links and themes
    */
   def clear(): Unit = {
     nodes foreach (children -= _)
 
     linkGroups.clear()
     nodes.clear()
+    themes.clear()
   }
 
   /**
@@ -123,6 +124,57 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   }
 
   /**
+    * Add a theme
+    *
+    * @param theme The data of the theme to add
+    * @return The added theme
+    */
+  def addTheme(theme: ThemeLike): ViewerTheme = {
+    val t = makeTheme(theme)
+
+    //makeAllLinks(n)
+
+    t
+  }
+
+  /**
+    * Update a theme
+    * @param theme The data of the theme to update
+    * @param updatedTheme The updated theme of the node
+    */
+  def updateTheme(theme: ThemeLike, updatedTheme: ThemeLike): Unit = {
+    val viewerThemeOption = themes find (_.id == theme.id)
+
+    viewerThemeOption foreach { viewerTheme =>
+      viewerTheme.theme = updatedTheme
+
+//      linkGroups filter (_.endPoints contains viewerNode) foreach { grp =>
+//        val linksToRemove = grp.links filter (_.from == viewerNode)
+//        grp.removeAll(linksToRemove)
+//      }
+//
+//      makeAllLinks(viewerNode)
+    }
+
+    requestLayout()
+  }
+
+  /**
+    * Remove a theme
+    *
+    * @param theme The theme to remove
+    */
+  def removeTheme(theme: ThemeLike): Unit = {
+    val themeToRemoveOption = themes find (_.id == theme.id)
+
+    themeToRemoveOption foreach { themeToRemove =>
+      children -= themeToRemove
+      //linkGroups --= linkGroups filter (_.endPoints contains themeToRemove)
+      themes -= themeToRemove
+    }
+  }
+
+  /**
    * Creates the visual representation of the loaded story
    *
    * @param story The story to load
@@ -130,6 +182,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   def loadStory(story: Narrative): Unit = {
     val ns = story.nodes map makeNode
     ns foreach makeAllLinks
+    val ts = story.themes map makeTheme
   }
 
   /**
@@ -183,6 +236,20 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
         linkGroup.insert(viewerNode, to, link)
       }
     }
+  }
+
+  /**
+    * Creates a theme in the viewer
+    *
+    * @param themelike The data of the theme to create
+    * @return The created theme in the viewer
+    */
+  private def makeTheme(themelike: ThemeLike): ViewerTheme = {
+    val theme = new ViewerTheme(themelike, pluginEventDispatcher)
+    themes += theme
+    children += theme
+
+    theme
   }
 
   // <editor-fold desc="Utility Methods for a Scala-like access pattern">

@@ -4,22 +4,20 @@ import javafx.scene.{input => jfxsi}
 
 import scala.collection.mutable
 import scala.util.Try
-
 import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.scene.control.{Control, ScrollPane}
 import scalafx.scene.input.{KeyCode, KeyEvent}
-
 import com.github.benedictleejh.scala.math.vector.Vector2
-
-import org.narrativeandplay.hypedyn.events.{UiNodeDeselected, UiNodeSelected, EditNodeRequest, EventBus}
-import org.narrativeandplay.hypedyn.plugins.{Saveable, Plugin}
+import org.narrativeandplay.hypedyn.events._
+import org.narrativeandplay.hypedyn.plugins.{Plugin, Saveable}
 import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
 import org.narrativeandplay.hypedyn.serialisation._
+import org.narrativeandplay.hypedyn.story.themes.{ThematicElementID, ThemeLike}
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal, NodeId}
-import org.narrativeandplay.hypedyn.storyviewer.components.ViewerNode
+import org.narrativeandplay.hypedyn.storyviewer.components.{ViewerNode, ViewerTheme}
 import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils
-import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoableStream}
+import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, ThemeMovedChange, UndoableStream}
 
 /**
  * StoryViewer implementation class
@@ -37,6 +35,7 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   val showLabelsLimit = 0.15
 
   val nodeLocations = mutable.Map.empty[NodeId, Vector2[Double]]
+  val themeLocations = mutable.Map.empty[ThematicElementID, Vector2[Double]]
   val zoomLevel = DoubleProperty(1.0)
 
   val StoryViewerEventSourceIdentity = s"Plugin - $name"
@@ -109,6 +108,32 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   override def onNodeDestroyed(node: Nodal): Unit = viewer.removeNode(node)
 
   /**
+    * Defines what to do when a theme is created
+    *
+    * @param theme The created theme
+    */
+  override def onThemeCreated(theme: ThemeLike): Unit = {
+    val createdTheme = viewer.addTheme(theme)
+
+    themeLocations get createdTheme.id foreach (moveTheme(createdTheme.id, _))
+  }
+
+  /**
+    * Defines what to do when a theme is updated
+    *
+    * @param theme The theme to be updated
+    * @param updatedTheme The same theme with the updates already applied
+    */
+  override def onThemeUpdated(theme: ThemeLike, updatedTheme: ThemeLike): Unit = viewer.updateTheme(theme, updatedTheme)
+
+  /**
+    * Defines what to do when a theme is destroyed
+    *
+    * @param theme The theme to be destroyed
+    */
+  override def onThemeDestroyed(theme: ThemeLike): Unit = viewer.removeTheme(theme)
+
+  /**
    * Restore the state of this Saveable that was saved
    *
    * @param data The saved data
@@ -120,9 +145,16 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
     val nodes = properData("nodes").asInstanceOf[AstList].elems
     nodes foreach { n =>
       val nodeData = n.asInstanceOf[AstMap]
-      val (id, x, y) = deserialise(nodeData)
+      val (id, x, y) = deserialiseNode(nodeData)
 
       moveNode(id, Vector2(x, y))
+    }
+    val themes = properData("themes").asInstanceOf[AstList].elems
+    themes foreach { t =>
+      val themeData = t.asInstanceOf[AstMap]
+      val (id, x, y) = deserialiseTheme(themeData)
+
+      moveTheme(id, Vector2(x, y))
     }
 
     zoomLevel() = properData get "zoomLevel" map (_.asInstanceOf[AstFloat].f) getOrElse 1.0
@@ -134,13 +166,14 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
    * Returns the data that this Saveable would like saved
    */
   override def onSave(): AstElement = AstMap("zoomLevel" -> AstFloat(zoomLevel()),
-                                             "nodes" -> AstList(viewer.nodes.toList map serialise: _*))
+                                             "nodes" -> AstList(viewer.nodes.toList map serialiseNode: _*),
+                                             "themes" -> AstList(viewer.themes.toList map serialiseTheme: _*))
 
   /**
    * Resizes the content control to ensure all nodes are shown
    */
   def sizeToChildren(): Unit = {
-    val allBounds = (viewer.nodes map (_.bounds)).toList
+    val allBounds = (viewer.nodes map (_.bounds)).toList ::: (viewer.themes map (_.bounds)).toList
     val maxX = Try((allBounds map (_.maxX)).max) getOrElse 0d
     val maxY = Try((allBounds map (_.maxY)).max) getOrElse 0d
 
@@ -180,7 +213,7 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
     EventBus.send(UiNodeDeselected(id, StoryViewerEventSourceIdentity))
   }
 
-  private def serialise(n: ViewerNode) = {
+  private def serialiseNode(n: ViewerNode) = {
     val unscaledX = n.layoutX / zoomLevel()
     val unscaledY = n.layoutY / zoomLevel()
 
@@ -191,11 +224,64 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
     )
   }
 
-  private def deserialise(nodeData: AstMap) = {
+  private def deserialiseNode(nodeData: AstMap) = {
     val id = nodeData("id").asInstanceOf[AstInteger].i
     val x = nodeData("x").asInstanceOf[AstFloat].f
     val y = nodeData("y").asInstanceOf[AstFloat].f
 
     (NodeId(id), x, y)
+  }
+
+  // note: much of this is a direct copy of above, should refactor out common code
+
+  /**
+    * Moves a theme
+    *
+    * @param themeID The ID of the theme to move
+    * @param position The position to move it to
+    */
+  def moveTheme(themeID: ThematicElementID, position: Vector2[Double]): Unit = {
+    themeLocations += themeID -> position
+
+    viewer.themes find (_.id == themeID) foreach (_.relocate(position.x, position.y))
+
+    sizeToChildren()
+  }
+
+  def requestThemeEdit(id: ThematicElementID): Unit = {
+    EventBus.send(EditThemeRequest(id, StoryViewerEventSourceIdentity))
+  }
+
+  def notifyThemeMove(id: ThematicElementID, initialPos: Vector2[Double], finalPos: Vector2[Double]): Unit = {
+    themeLocations += id -> finalPos
+
+    UndoableStream.send(new ThemeMovedChange(this, id, initialPos, finalPos))
+  }
+
+  def notifyThemeSelection(id: ThematicElementID): Unit = {
+    EventBus.send(UiThemeSelected(id, StoryViewerEventSourceIdentity))
+  }
+
+  def notifyThemeDeselection(id: ThematicElementID): Unit = {
+    EventBus.send(UiThemeDeselected(id, StoryViewerEventSourceIdentity))
+  }
+
+  private def serialiseTheme(t: ViewerTheme) = {
+    val unscaledX = t.layoutX / zoomLevel()
+    val unscaledY = t.layoutY / zoomLevel()
+
+    AstMap(
+      "id" -> AstInteger(t.id.value),
+      "x" -> AstFloat(unscaledX),
+      "y" -> AstFloat(unscaledY)
+    )
+  }
+
+  private def deserialiseTheme(themeData: AstMap) = {
+    val id = themeData("id").asInstanceOf[AstInteger].i
+    val x = themeData("x").asInstanceOf[AstFloat].f
+    val y = themeData("y").asInstanceOf[AstFloat].f
+
+    (ThematicElementID(id), x, y)
   }
 }
