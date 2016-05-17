@@ -3,11 +3,11 @@ package org.narrativeandplay.hypedyn.story.themes
 /**
   * An element is either a motif or a theme. Elements connote themes.
   */
-trait Element {
+trait ThematicElement {
   /**
     * Returns the ID of the element
     */
-  def id: ElementID
+  def id: ThematicElementID
 
   /**
     * Returns the name of the element
@@ -20,13 +20,13 @@ trait Element {
   *
   * @param value The integer value of the ID
   */
-case class ElementID(value: BigInt) extends AnyVal with Ordered[ElementID] {
-  override def compare(that: ElementID): Int = value compare that.value
+case class ThematicElementID(value: BigInt) extends AnyVal with Ordered[ThematicElementID] {
+  override def compare(that: ThematicElementID): Int = value compare that.value
 
   /**
     * Returns a ElementID which has it's value incremented by one from the original
     */
-  def increment = new ElementID(value + 1)
+  def increment = new ThematicElementID(value + 1)
 
   /**
     * An alias for `increment`
@@ -36,7 +36,7 @@ case class ElementID(value: BigInt) extends AnyVal with Ordered[ElementID] {
   /**
     * Returns a ElementID which has it's value decremented by one from the original
     */
-  def decrement = new ElementID(value - 1)
+  def decrement = new ThematicElementID(value - 1)
 
   /**
     * An alias for `decrement`

@@ -5,7 +5,7 @@ import org.narrativeandplay.hypedyn.story.Narrative.ReaderStyle
 import org.narrativeandplay.hypedyn.story.Narrative.ReaderStyle.Standard
 import org.narrativeandplay.hypedyn.story.rules.internal.Rule
 import org.narrativeandplay.hypedyn.story.rules.Fact
-import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThemeLike}
+import org.narrativeandplay.hypedyn.story.themes.internal.{Motif, Theme}
 
 /**
  * Class representing a story. The story class is immutable, and all operations on the story return a new copy
@@ -27,8 +27,8 @@ case class Story(title: String = "Untitled",
                  nodes: List[Node] = Nil,
                  facts: List[Fact] = Nil,
                  rules: List[Rule] = Nil,
-                 themes: List[ThemeLike] = Nil,
-                 motifs: List[MotifLike] = Nil) extends Narrative {
+                 themes: List[Theme] = Nil,
+                 motifs: List[Motif] = Nil) extends Narrative {
   /**
    * Changes the title of the story
    *
@@ -150,7 +150,7 @@ case class Story(title: String = "Untitled",
     * @param theme The theme to add
     * @return A new story with the specified theme added
     */
-  def addTheme(theme: ThemeLike) = new Story(title, author, description, metadata, nodes, facts, rules, theme :: themes, motifs)
+  def addTheme(theme: Theme) = new Story(title, author, description, metadata, nodes, facts, rules, theme :: themes, motifs)
 
   /**
     * Updates a theme of the story
@@ -159,24 +159,24 @@ case class Story(title: String = "Untitled",
     * @param newTheme The updated version of the theme
     * @return A new story with the specified theme updated
     */
-  def updateTheme(theme: ThemeLike, newTheme: ThemeLike) = new Story(title, author, description, metadata, nodes,
+  def updateTheme(theme: Theme, newTheme: Theme) = new Story(title, author, description, metadata, nodes,
     facts, rules, newTheme :: (themes filter (_ != theme)), motifs)
 
   /**
-    * Removes a motif from the story
+    * Removes a theme from the story
     *
-    * @param motif The motif to remove
+    * @param theme The theme to remove
     * @return A new story with the specified theme removed
     */
-  def removeMotif(motif: MotifLike) = new Story(title, author, description, metadata, nodes, facts, rules, themes, motifs filter (_ != motif))
+  def removeTheme(theme: Theme) = new Story(title, author, description, metadata, nodes, facts, rules, themes filter (_ != theme))
 
   /**
     * Adds a motif to the story
     *
     * @param motif The motif to add
-    * @return A new story with the specified theme added
+    * @return A new story with the specified motif added
     */
-  def addMotif(motif: MotifLike) = new Story(title, author, description, metadata, nodes, facts, rules, themes, motif :: motifs)
+  def addMotif(motif: Motif) = new Story(title, author, description, metadata, nodes, facts, rules, themes, motif :: motifs)
 
   /**
     * Updates a motif of the story
@@ -185,16 +185,16 @@ case class Story(title: String = "Untitled",
     * @param newMotif The updated version of the motif
     * @return A new story with the specified motif updated
     */
-  def updateTheme(motif: MotifLike, newMotif: MotifLike) = new Story(title, author, description, metadata, nodes,
+  def updateMotif(motif: Motif, newMotif: Motif) = new Story(title, author, description, metadata, nodes,
     facts, rules, themes, newMotif :: (motifs filter (_ != motif)))
 
   /**
-    * Removes a theme from the story
+    * Removes a motif from the story
     *
-    * @param theme The theme to remove
-    * @return A new story with the specified theme removed
+    * @param motif The motif to remove
+    * @return A new story with the specified motif removed
     */
-  def removeTheme(theme: ThemeLike) = new Story(title, author, description, metadata, nodes, facts, rules, themes filter (_ != theme))
+  def removeMotif(motif: Motif) = new Story(title, author, description, metadata, nodes, facts, rules, themes, motifs filter (_ != motif))
 
   /**
    * Returns the start node of the story if it has one, or None if the start node has not yet been set

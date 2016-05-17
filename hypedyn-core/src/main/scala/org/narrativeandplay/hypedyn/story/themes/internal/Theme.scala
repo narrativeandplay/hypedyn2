@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.story.themes.internal
 
-import org.narrativeandplay.hypedyn.story.themes.{ElementID, ThemeLike}
+import org.narrativeandplay.hypedyn.story.themes.{ThematicElementID, ThemeLike}
 
 /**
   * Class representing a theme
@@ -10,7 +10,7 @@ import org.narrativeandplay.hypedyn.story.themes.{ElementID, ThemeLike}
   * @param subthemes The subthemes that connote this theme
   * @param motifs The motifs that connote this theme
   */
-case class Theme(id: ElementID,
-                name: String,
-                subthemes: List[ElementID],
-                motifs: List[ElementID]) extends ThemeLike
+case class Theme(id: ThematicElementID,
+                 name: String,
+                 subthemes: List[ThematicElementID],
+                 motifs: List[ThematicElementID]) extends ThemeLike

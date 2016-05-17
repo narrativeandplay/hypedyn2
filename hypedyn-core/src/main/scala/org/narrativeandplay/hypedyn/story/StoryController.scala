@@ -2,11 +2,13 @@ package org.narrativeandplay.hypedyn.story
 
 import org.narrativeandplay.hypedyn.story.internal.NodeContent.Ruleset
 import org.narrativeandplay.hypedyn.story.internal.Story.Metadata
-import org.narrativeandplay.hypedyn.story.internal.{NodeContent, Node, Story}
+import org.narrativeandplay.hypedyn.story.internal.{Node, NodeContent, Story}
 import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions._
-import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamValue, ParamName}
+import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.rules.internal.Rule
+import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThematicElementID, ThemeLike}
+import org.narrativeandplay.hypedyn.story.themes.internal.{Motif, Theme}
 
 /**
  * Controller for handling story-related actions
@@ -19,6 +21,7 @@ object StoryController {
   private var firstUnusedFactId = FactId(0)
   private var firstUnusedRuleId = RuleId(0)
   private var firstUnusedRulesetId = NodalContent.RulesetId(0)
+  private var firstUnusedThemeticElementId = ThematicElementID(0)
 
   /**
    * Returns the story currently being edited
@@ -72,14 +75,6 @@ object StoryController {
    * @return An option containing the found node, or None if no node with the given ID exists
    */
   def findNode(nodeId: NodeId) = currentStory.nodes find (_.id == nodeId)
-
-  /**
-   * Finds a fact given a fact ID
-   *
-   * @param factId The ID of the fact to find
-   * @return An option containing the found node or None if no fact with the given ID exists
-   */
-  def findFact(factId: FactId) = currentStory.facts find (_.id == factId)
 
   /**
    * Create a node
@@ -238,6 +233,14 @@ object StoryController {
   }
 
   /**
+    * Finds a fact given a fact ID
+    *
+    * @param factId The ID of the fact to find
+    * @return An option containing the found node or None if no fact with the given ID exists
+    */
+  def findFact(factId: FactId) = currentStory.facts find (_.id == factId)
+
+  /**
    * Create a new fact in the story
    *
    * @param fact The new fact
@@ -319,6 +322,140 @@ object StoryController {
     firstUnusedFactId = firstUnusedFactId max factInstance.id.inc
 
     factInstance
+  }
+
+  /**
+    * Finds a theme given a theme ID
+    *
+    * @param themeId The ID of the theme to find
+    * @return An option containing the found theme or None if no theme with the given ID exists
+    */
+  def findTheme(themeId: ThematicElementID) = currentStory.themes find (_.id == themeId)
+
+  /**
+    * Create a new theme in the story
+    *
+    * @param theme The new theme
+    * @return The created theme
+    */
+  def create(theme: ThemeLike): Theme = {
+    val newTheme = instantiateTheme(theme)
+
+    currentStory = currentStory addTheme newTheme
+
+    newTheme
+  }
+
+  /**
+    * Update a theme
+    *
+    * @param theme The theme to update
+    * @param editedTheme The updated theme data
+    * @return An option containing the unupdated and updated versions of the theme, or None if the theme to update
+    *         does not exist
+    */
+  def update(theme: ThemeLike, editedTheme: ThemeLike): Option[(Theme, Theme)] = {
+    val toUpdate = findTheme(theme.id)
+    val updated = instantiateTheme(editedTheme)
+
+    toUpdate foreach { t => currentStory = currentStory updateTheme (t, updated) }
+
+    toUpdate map ((_, updated))
+  }
+
+  /**
+    * Destroy a theme
+    *
+    * @param theme The theme to destroy
+    * @return An option containing the destroyed theme, or None if the theme to destroy does not exist
+    */
+  def destroy(theme: ThemeLike): Option[Theme] = {
+    val toDestroy = findTheme(theme.id)
+
+    toDestroy foreach { t => currentStory = currentStory removeTheme t }
+
+    toDestroy
+  }
+
+  /**
+    * Instantiates a theme, i.e., provides a theme with a valid ID
+    *
+    * @param theme The theme to instantiate
+    * @return The instantiated theme
+    */
+  private def instantiateTheme(theme: ThemeLike): Theme = {
+    val themeInstance = Theme(theme.id, theme.name, theme.subthemes, theme.motifs)
+
+    firstUnusedThemeticElementId = firstUnusedThemeticElementId max themeInstance.id.inc
+
+    themeInstance
+  }
+
+  /**
+    * Finds a motif given a motif ID
+    *
+    * @param motifId The ID of the motif to find
+    * @return An option containing the found motif or None if no motif with the given ID exists
+    */
+  def findMotif(motifId: ThematicElementID) = currentStory.motifs find (_.id == motifId)
+
+  /**
+    * Create a new motif in the story
+    *
+    * @param motif The new motif
+    * @return The created motif
+    */
+  def create(motif: MotifLike): Motif = {
+    val newMotif = instantiateMotif(motif)
+
+    currentStory = currentStory addMotif newMotif
+
+    newMotif
+  }
+
+  /**
+    * Update a motif
+    *
+    * @param motif The motif to update
+    * @param editedMotif The updated motif data
+    * @return An option containing the unupdated and updated versions of the motif, or None if the motif to update
+    *         does not exist
+    */
+  def update(motif: MotifLike, editedMotif: MotifLike): Option[(Motif, Motif)] = {
+    val toUpdate = findMotif(motif.id)
+    val updated = instantiateMotif(editedMotif)
+
+    toUpdate foreach { m => currentStory = currentStory updateMotif (m, updated) }
+
+    toUpdate map ((_, updated))
+  }
+
+  /**
+    * Destroy a motif
+    *
+    * @param motif The motif to destroy
+    * @return An option containing the destroyed motif, or None if the motif to destroy does not exist
+    */
+  def destroy(motif: MotifLike): Option[Motif] = {
+    val toDestroy = findMotif(motif.id)
+
+    toDestroy foreach { m => currentStory = currentStory removeMotif m }
+
+    toDestroy
+  }
+
+  /**
+    * Instantiates a motif, i.e., provides a motif with a valid ID
+    *
+    * @param motif The motif to instantiate
+    * @return The instantiated motif
+    */
+  private def instantiateMotif(motif: MotifLike): Motif = {
+    val motifInstance = Motif(motif.id, motif.name, motif.features)
+
+    firstUnusedThemeticElementId = firstUnusedThemeticElementId max motifInstance.id.inc
+
+    motifInstance
   }
 
 }

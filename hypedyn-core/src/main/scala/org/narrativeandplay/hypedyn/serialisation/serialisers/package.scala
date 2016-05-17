@@ -10,7 +10,7 @@ import org.narrativeandplay.hypedyn.story.rules.RuleLike.ParamValue
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.rules.internal.{Action, Condition, Rule}
 import org.narrativeandplay.hypedyn.story.themes.internal.{Motif, Theme}
-import org.narrativeandplay.hypedyn.story.themes.{ElementID, MotifLike, ThemeLike}
+import org.narrativeandplay.hypedyn.story.themes.{ThematicElementID, MotifLike, ThemeLike}
 import org.narrativeandplay.hypedyn.story.{Narrative, NodalContent, NodeId}
 
 import scala.reflect.ClassTag
@@ -467,10 +467,10 @@ package object serialisers {
         safeCast[T](astElement, "theme")
 
       val data = safeCastTheme[AstMap](serialised)
-      val id = ElementID(safeCastTheme[AstInteger](data("id")).i)
+      val id = ThematicElementID(safeCastTheme[AstInteger](data("id")).i)
       val name = safeCastTheme[AstString](data("name")).s
-      val subthemes = safeCastTheme[AstList](data("subthemes")).toList map {st => ElementID(safeCastTheme[AstInteger](st).i)}
-      val motifs = safeCastTheme[AstList](data("motifs")).toList map {m => ElementID(safeCastTheme[AstInteger](m).i)}
+      val subthemes = safeCastTheme[AstList](data("subthemes")).toList map {st => ThematicElementID(safeCastTheme[AstInteger](st).i)}
+      val motifs = safeCastTheme[AstList](data("motifs")).toList map {m => ThematicElementID(safeCastTheme[AstInteger](m).i)}
 
       Theme(id, name, subthemes, motifs)
     }
@@ -501,7 +501,7 @@ package object serialisers {
         safeCast[T](astElement, "theme")
 
       val data = safeCastMotif[AstMap](serialised)
-      val id = ElementID(safeCastMotif[AstInteger](data("id")).i)
+      val id = ThematicElementID(safeCastMotif[AstInteger](data("id")).i)
       val name = safeCastMotif[AstString](data("name")).s
       val features = safeCastMotif[AstList](data("features")).toList map {f => safeCastMotif(f)} // think this is wrong
 
