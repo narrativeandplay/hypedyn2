@@ -384,7 +384,7 @@ object StoryController {
     * @return The instantiated theme
     */
   private def instantiateTheme(theme: ThemeLike): Theme = {
-    val themeInstance = Theme(theme.id, theme.name, theme.subthemes, theme.motifs)
+    val themeInstance = Theme(if (theme.id.isValid) theme.id else firstUnusedThemeticElementId, theme.name, theme.subthemes, theme.motifs)
 
     firstUnusedThemeticElementId = firstUnusedThemeticElementId max themeInstance.id.inc
 
@@ -451,7 +451,7 @@ object StoryController {
     * @return The instantiated motif
     */
   private def instantiateMotif(motif: MotifLike): Motif = {
-    val motifInstance = Motif(motif.id, motif.name, motif.features)
+    val motifInstance = Motif(if (motif.id.isValid) motif.id else firstUnusedThemeticElementId, motif.name, motif.features)
 
     firstUnusedThemeticElementId = firstUnusedThemeticElementId max motifInstance.id.inc
 

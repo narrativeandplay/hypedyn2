@@ -45,6 +45,14 @@ object EventBus {
   val EditFactRequests = eventBus collect { case e: EditFactRequest => e }
   val DeleteFactRequests = eventBus collect { case e: DeleteFactRequest => e }
 
+  val NewThemeRequests = eventBus collect { case e: NewThemeRequest => e }
+  val EditThemeRequests = eventBus collect { case e: EditThemeRequest => e }
+  val DeleteThemeRequests = eventBus collect { case e: DeleteThemeRequest => e }
+
+  val NewMotifRequests = eventBus collect { case e: NewMotifRequest => e }
+  val EditMotifRequests = eventBus collect { case e: EditMotifRequest => e }
+  val DeleteMotifRequests = eventBus collect { case e: DeleteMotifRequest => e }
+
   val SaveRequests = eventBus collect { case e: SaveRequest => e }
   val SaveAsRequests = eventBus collect { case e: SaveAsRequest => e }
   val LoadRequests = eventBus collect { case e: LoadRequest => e }
@@ -75,6 +83,14 @@ object EventBus {
   val NewFactResponses = eventBus collect { case e: NewFactResponse => e }
   val EditFactResponses = eventBus collect { case e: EditFactResponse => e }
   val DeleteFactResponses = eventBus collect { case e: DeleteFactResponse => e }
+
+  val NewThemeResponses = eventBus collect { case e: NewThemeResponse => e }
+  val EditThemeResponses = eventBus collect { case e: EditThemeResponse => e }
+  val DeleteThemeResponses = eventBus collect { case e: DeleteThemeResponse => e }
+
+  val NewMotifResponses = eventBus collect { case e: NewMotifResponse => e }
+  val EditMotifResponses = eventBus collect { case e: EditMotifResponse => e }
+  val DeleteMotifResponses = eventBus collect { case e: DeleteMotifResponse => e }
 
   val SaveResponses = eventBus collect { case e: SaveResponse => e }
   val SaveAsResponses = eventBus collect { case e: SaveAsResponse => e }
@@ -107,6 +123,14 @@ object EventBus {
   val UpdateFactEvents = eventBus collect { case e: UpdateFact => e }
   val DestroyFactEvents = eventBus collect { case e: DestroyFact => e }
 
+  val CreateThemeEvents = eventBus collect { case e: CreateTheme => e }
+  val UpdateThemeEvents = eventBus collect { case e: UpdateTheme => e }
+  val DestroyThemeEvents = eventBus collect { case e: DestroyTheme => e }
+
+  val CreateMotifEvents = eventBus collect { case e: CreateMotif => e }
+  val UpdateMotifEvents = eventBus collect { case e: UpdateMotif => e }
+  val DestroyMotifEvents = eventBus collect { case e: DestroyMotif => e }
+
   val SaveDataEvents = eventBus collect { case e: SaveData => e }
   val SaveToFileEvents = eventBus collect { case e: SaveToFile => e }
   val LoadFromFileEvents = eventBus collect { case e: LoadFromFile => e }
@@ -130,6 +154,14 @@ object EventBus {
   val FactCreatedEvents = eventBus collect { case e: FactCreated => e }
   val FactUpdatedEvents = eventBus collect { case e: FactUpdated => e }
   val FactDestroyedEvents = eventBus collect { case e: FactDestroyed => e }
+
+  val ThemeCreatedEvents = eventBus collect { case e: ThemeCreated => e }
+  val ThemeUpdatedEvents = eventBus collect { case e: ThemeUpdated => e }
+  val ThemeDestroyedEvents = eventBus collect { case e: ThemeDestroyed => e }
+
+  val MotifCreatedEvents = eventBus collect { case e: MotifCreated => e }
+  val MotifUpdatedEvents = eventBus collect { case e: MotifUpdated => e }
+  val MotifDestroyedEvents = eventBus collect { case e: MotifDestroyed => e }
 
   val StorySavedEvents = eventBus collect { case e: StorySaved => e }
   val StoryUpdatedEvents = eventBus collect { case e: StoryUpdated => e }

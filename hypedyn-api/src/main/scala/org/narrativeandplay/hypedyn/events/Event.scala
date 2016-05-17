@@ -3,11 +3,11 @@ package org.narrativeandplay.hypedyn.events
 import java.io.File
 
 import org.kiama.output.PrettyPrinter
-
 import org.narrativeandplay.hypedyn.serialisation.AstElement
 import org.narrativeandplay.hypedyn.story.NodalContent.RulesetId
 import org.narrativeandplay.hypedyn.story.rules._
-import org.narrativeandplay.hypedyn.story.{NodeId, Narrative, Nodal}
+import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThematicElementID, ThemeLike}
+import org.narrativeandplay.hypedyn.story.{Narrative, Nodal, NodeId}
 
 /**
  * A generic trait representing an event in the HypeDyn event system
@@ -47,6 +47,7 @@ sealed trait Event extends PrettyPrinter {
         case FactId(id)    => s"FactId ($id)"
         case RuleId(id)    => s"RuleId ($id)"
         case RulesetId(id) => s"RulesetId ($id)"
+        case ThematicElementID(id)    => s"ThematicElementId ($id)"
         case p : Product   =>
           val fields = p.getClass.getDeclaredFields map (_.getName) zip p.productIterator.to
           if (fields.length == 0) {
@@ -81,6 +82,14 @@ sealed case class NewFactRequest(src: String) extends Request
 sealed case class EditFactRequest(id: FactId, src: String) extends Request
 sealed case class DeleteFactRequest(id: FactId, src: String) extends Request
 
+sealed case class NewThemeRequest(src: String) extends Request
+sealed case class EditThemeRequest(id: ThematicElementID, src: String) extends Request
+sealed case class DeleteThemeRequest(id: ThematicElementID, src: String) extends Request
+
+sealed case class NewMotifRequest(src: String) extends Request
+sealed case class EditMotifRequest(id: ThematicElementID, src: String) extends Request
+sealed case class DeleteMotifRequest(id: ThematicElementID, src: String) extends Request
+
 sealed case class SaveRequest(src: String) extends Request
 sealed case class SaveAsRequest(src: String) extends Request
 sealed case class LoadRequest(src: String) extends Request
@@ -114,6 +123,14 @@ sealed case class NewFactResponse(factTypes: List[String], src: String) extends 
 sealed case class EditFactResponse(fact: Fact, factTypes: List[String], src: String) extends Response
 sealed case class DeleteFactResponse(fact: Fact, src: String) extends Response
 
+sealed case class NewThemeResponse(src: String) extends Response
+sealed case class EditThemeResponse(theme: ThemeLike, src: String) extends Response
+sealed case class DeleteThemeResponse(theme: ThemeLike, src: String) extends Response
+
+sealed case class NewMotifResponse(src: String) extends Response
+sealed case class EditMotifResponse(motif: MotifLike, src: String) extends Response
+sealed case class DeleteMotifResponse(motif: MotifLike, src: String) extends Response
+
 sealed case class SaveResponse(loadedFile: Option[File], src: String) extends Response
 sealed case class SaveAsResponse(src: String) extends Response
 sealed case class LoadResponse(src: String) extends Response
@@ -146,6 +163,14 @@ sealed case class CreateFact(fact: Fact, src: String) extends Action
 sealed case class UpdateFact(fact: Fact, updatedFact: Fact, src: String) extends Action
 sealed case class DestroyFact(fact: Fact, src: String) extends Action
 
+sealed case class CreateTheme(theme: ThemeLike, src: String) extends Action
+sealed case class UpdateTheme(theme: ThemeLike, updatedTheme: ThemeLike, src: String) extends Action
+sealed case class DestroyTheme(theme: ThemeLike, src: String) extends Action
+
+sealed case class CreateMotif(motif: MotifLike, src: String) extends Action
+sealed case class UpdateMotif(motif: MotifLike, updatedMotif: MotifLike, src: String) extends Action
+sealed case class DestroyMotif(motif: MotifLike, src: String) extends Action
+
 sealed case class SaveData(pluginName: String, data: AstElement, src: String) extends Action
 sealed case class SaveToFile(file: File, src: String) extends Action
 sealed case class LoadFromFile(file: File, src: String) extends Action
@@ -177,6 +202,14 @@ sealed case class NodeDestroyed(node: Nodal, src: String) extends Completion
 sealed case class FactCreated(fact: Fact, src: String) extends Completion
 sealed case class FactUpdated(fact: Fact, updatedFact: Fact, src: String) extends Completion
 sealed case class FactDestroyed(fact: Fact, src: String) extends Completion
+
+sealed case class ThemeCreated(theme: ThemeLike, src: String) extends Completion
+sealed case class ThemeUpdated(theme: ThemeLike, updatedTheme: ThemeLike, src: String) extends Completion
+sealed case class ThemeDestroyed(theme: ThemeLike, src: String) extends Completion
+
+sealed case class MotifCreated(motif: MotifLike, src: String) extends Completion
+sealed case class MotifUpdated(motif: MotifLike, updatedMotif: MotifLike, src: String) extends Completion
+sealed case class MotifDestroyed(motif: MotifLike, src: String) extends Completion
 
 sealed case class StorySaved(story: Narrative, src: String) extends Completion
 sealed case class StoryLoaded(story: Narrative, src: String) extends Completion

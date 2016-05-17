@@ -4,19 +4,17 @@ import java.io.File
 import javafx.beans.value.ObservableValue
 
 import scalafx.Includes._
-import scalafx.application.{Platform, JFXApp}
+import scalafx.application.{JFXApp, Platform}
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.beans.property.StringProperty
 import scalafx.scene.Scene
-import scalafx.scene.control.{ButtonType, Alert}
-import scalafx.scene.image.{ImageView, Image}
-import scalafx.scene.layout.{VBox, BorderPane}
-
+import scalafx.scene.control.{Alert, ButtonType}
+import scalafx.scene.image.{Image, ImageView}
+import scalafx.scene.layout.{BorderPane, VBox}
 import com.sun.glass.ui
 import com.sun.glass.ui.Application.EventHandler
 import org.fxmisc.easybind.EasyBind
 import rx.lang.scala.subjects.{PublishSubject, SerializedSubject}
-
 import org.narrativeandplay.hypedyn.dialogs._
 import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.logging.Logger
@@ -28,12 +26,12 @@ import org.narrativeandplay.hypedyn.uicomponents._
 import org.narrativeandplay.hypedyn.undo.UndoController
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 import org.narrativeandplay.hypedyn.utils.{System => Sys}
-
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-import akka.http.scaladsl.model.{HttpEntity, ContentTypes}
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
+import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThematicElementID, ThemeLike}
 
 /**
  * Entry point for the application
@@ -128,6 +126,44 @@ object Main extends JFXApp {
    */
   def factEditor(dialogTitle: String, availableFactTypes: List[String]) =
     new FactEditor(dialogTitle, availableFactTypes, stage)
+
+  /**
+    * Creates a new theme editor for editing a theme
+    *
+    * @param dialogTitle The title of the theme editor dialog
+    * @param themeToEdit The theme to edit
+    * @return A new theme editor for editing the given theme
+    */
+  def themeEditor(dialogTitle: String, themeToEdit: ThemeLike) =
+    new ThemeEditor(dialogTitle, themeToEdit, stage)
+
+  /**
+    * Creates a new theme editor for creating a new theme
+    *
+    * @param dialogTitle The title of the theme editor dialog
+    * @return A new theme editor for creating a new theme
+    */
+  def themeEditor(dialogTitle: String) =
+    new ThemeEditor(dialogTitle, stage)
+
+  /**
+    * Creates a new motif editor for editing a motif
+    *
+    * @param dialogTitle The title of the motif editor dialog
+    * @param motifToEdit The motif to edit
+    * @return A new motif editor for editing the given motif
+    */
+  def motifEditor(dialogTitle: String, motifToEdit: MotifLike) =
+    new MotifEditor(dialogTitle, motifToEdit, stage)
+
+  /**
+    * Creates a new motif editor for creating a new motif
+    *
+    * @param dialogTitle The title of the motif editor dialog
+    * @return A new motif editor for creating a new motif
+    */
+  def motifEditor(dialogTitle: String) =
+    new MotifEditor(dialogTitle, stage)
 
   /**
    * Creates a new story properties editor

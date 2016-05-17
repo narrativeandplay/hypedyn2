@@ -1,11 +1,12 @@
 package org.narrativeandplay.hypedyn.story
 
 import scala.language.implicitConversions
-
 import org.narrativeandplay.hypedyn.story.internal.Story.Metadata
-import org.narrativeandplay.hypedyn.story.internal.{Story, NodeContent, Node}
-import org.narrativeandplay.hypedyn.story.rules.{Conditional, Actionable, RuleLike}
-import org.narrativeandplay.hypedyn.story.rules.internal.{Condition, Action, Rule}
+import org.narrativeandplay.hypedyn.story.internal.{Node, NodeContent, Story}
+import org.narrativeandplay.hypedyn.story.rules.{Actionable, Conditional, RuleLike}
+import org.narrativeandplay.hypedyn.story.rules.internal.{Action, Condition, Rule}
+import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThemeLike}
+import org.narrativeandplay.hypedyn.story.themes.internal.{Motif, Theme}
 
 /**
  * Implicit conversions for converting interface types into concrete types used by
@@ -29,6 +30,13 @@ object InterfaceToImplementationConversions {
   implicit def rulesetLike2Ruleset(rulesetLike: NodalContent.RulesetLike): NodeContent.Ruleset =
     NodeContent.Ruleset(rulesetLike.id, rulesetLike.name, rulesetLike.indexes, rulesetLike.rules map ruleLike2Rule)
 
+  implicit def themeLike2Theme(themeLike: ThemeLike): Theme = Theme(themeLike.id,
+    themeLike.name,
+    themeLike.subthemes,
+    themeLike.motifs)
+  implicit def motifLike2Motif(motifLike: MotifLike): Motif = Motif(motifLike.id,
+    motifLike.name,
+    motifLike.features)
   implicit def nodalContent2NodeContent(nodalContent: NodalContent): NodeContent =
     NodeContent(nodalContent.text, nodalContent.rulesets map rulesetLike2Ruleset)
   implicit def nodal2Node(nodal: Nodal): Node = Node(nodal.id,
@@ -44,6 +52,8 @@ object InterfaceToImplementationConversions {
                                                                     narrative.metadata,
                                                                     narrative.nodes map nodal2Node,
                                                                     narrative.facts,
-                                                                    narrative.rules map ruleLike2Rule)
+                                                                    narrative.rules map ruleLike2Rule,
+                                                                    narrative.themes map themeLike2Theme,
+                                                                    narrative.motifs map motifLike2Motif)
 
 }

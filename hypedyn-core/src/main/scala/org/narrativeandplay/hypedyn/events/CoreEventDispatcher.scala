@@ -53,6 +53,34 @@ object CoreEventDispatcher {
     }
   }
 
+  // is this round trip necessary?
+  EventBus.NewThemeRequests foreach { _ =>
+    EventBus.send(NewThemeResponse(CoreEventSourceIdentity))
+  }
+  EventBus.EditThemeRequests foreach { evt =>
+    StoryController findTheme evt.id foreach { t =>
+      EventBus.send(EditThemeResponse(t, CoreEventSourceIdentity))
+    }
+  }
+  EventBus.DeleteThemeRequests foreach { evt =>
+    StoryController findTheme evt.id foreach { t =>
+      EventBus.send(DeleteThemeResponse(t, CoreEventSourceIdentity))
+    }
+  }
+  // is this round trip necessary?
+  EventBus.NewMotifRequests foreach { _ =>
+    EventBus.send(NewMotifResponse(CoreEventSourceIdentity))
+  }
+  EventBus.EditMotifRequests foreach { evt =>
+    StoryController findMotif evt.id foreach { m =>
+      EventBus.send(EditMotifResponse(m, CoreEventSourceIdentity))
+    }
+  }
+  EventBus.DeleteMotifRequests foreach { evt =>
+    StoryController findMotif evt.id foreach { m =>
+      EventBus.send(DeleteMotifResponse(m, CoreEventSourceIdentity))
+    }
+  }
   EventBus.CreateNodeEvents foreach { evt =>
     val created = StoryController.create(evt.node)
 
@@ -113,6 +141,64 @@ object CoreEventDispatcher {
       UndoableStream.send(new FactDestroyedChange(f))
 
       EventBus.send(FactDestroyed(f, CoreEventSourceIdentity))
+      EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
+    }
+  }
+
+  EventBus.CreateThemeEvents foreach { evt =>
+    val created = StoryController.create(evt.theme)
+
+    //UndoableStream.send(new ThemeCreatedChange(created)) // undo
+
+    EventBus.send(ThemeCreated(created, CoreEventSourceIdentity))
+    EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
+  }
+  EventBus.UpdateThemeEvents foreach { evt =>
+    val updatedUnupdatedPair = StoryController.update(evt.theme, evt.updatedTheme)
+
+    updatedUnupdatedPair foreach { case (unupdated, updated) =>
+      //UndoableStream.send(new FactUpdatedChange(unupdated, updated)) // undo
+
+      EventBus.send(ThemeUpdated(unupdated, updated, CoreEventSourceIdentity))
+      EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
+    }
+  }
+  EventBus.DestroyThemeEvents foreach { evt =>
+    val destroyed = StoryController.destroy(evt.theme)
+
+    destroyed foreach { t =>
+      //UndoableStream.send(new FactDestroyedChange(t)) // undo
+
+      EventBus.send(ThemeDestroyed(t, CoreEventSourceIdentity))
+      EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
+    }
+  }
+
+  EventBus.CreateMotifEvents foreach { evt =>
+    val created = StoryController.create(evt.motif)
+
+    //UndoableStream.send(new MotifCreatedChange(created)) // undo
+
+    EventBus.send(MotifCreated(created, CoreEventSourceIdentity))
+    EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
+  }
+  EventBus.UpdateMotifEvents foreach { evt =>
+    val updatedUnupdatedPair = StoryController.update(evt.motif, evt.updatedMotif)
+
+    updatedUnupdatedPair foreach { case (unupdated, updated) =>
+      //UndoableStream.send(new MotifUpdatedChange(unupdated, updated)) // undo
+
+      EventBus.send(MotifUpdated(unupdated, updated, CoreEventSourceIdentity))
+      EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
+    }
+  }
+  EventBus.DestroyMotifEvents foreach { evt =>
+    val destroyed = StoryController.destroy(evt.motif)
+
+    destroyed foreach { m =>
+      //UndoableStream.send(new MotifDestroyedChange(m)) // undo
+
+      EventBus.send(MotifDestroyed(m, CoreEventSourceIdentity))
       EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
     }
   }

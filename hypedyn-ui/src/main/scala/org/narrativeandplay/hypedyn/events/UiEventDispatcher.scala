@@ -3,19 +3,17 @@ package org.narrativeandplay.hypedyn.events
 import java.io.File
 
 import scala.collection.mutable.ArrayBuffer
-
 import scalafx.Includes._
-import scalafx.beans.property.{ObjectProperty, BooleanProperty}
-import scalafx.scene.control.{ButtonType, Alert}
-
+import scalafx.beans.property.{BooleanProperty, ObjectProperty}
+import scalafx.scene.control.{Alert, ButtonType}
 import rx.lang.scala.Observable
-
 import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
 import org.narrativeandplay.hypedyn.story.{Nodal, NodeId}
 import org.narrativeandplay.hypedyn.uicomponents.FactViewer
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
+import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThemeLike}
 import org.narrativeandplay.hypedyn.utils.HypedynPreferences
 
 /**
@@ -68,6 +66,30 @@ object UiEventDispatcher {
     editedFact foreach { f => EventBus.send(UpdateFact(res.fact, f, UiEventSourceIdentity)) }
   }
   EventBus.DeleteFactResponses foreach { res => EventBus.send(DestroyFact(res.fact, UiEventSourceIdentity)) }
+
+  EventBus.NewThemeResponses foreach { res =>
+    val newTheme = Main.themeEditor("New Theme").showAndWait()
+
+    newTheme foreach { t => EventBus.send(CreateTheme(t, UiEventSourceIdentity)) }
+  }
+  EventBus.EditThemeResponses foreach { res =>
+    val editedTheme = Main.themeEditor("Edit Theme", res.theme).showAndWait()
+
+    editedTheme foreach { t => EventBus.send(UpdateTheme(res.theme, t, UiEventSourceIdentity)) }
+  }
+  EventBus.DeleteThemeResponses foreach { res => EventBus.send(DestroyTheme(res.theme, UiEventSourceIdentity)) }
+
+  EventBus.NewMotifResponses foreach { res =>
+    val newMotif = Main.motifEditor("New Motif").showAndWait()
+
+    newMotif foreach { m => EventBus.send(CreateMotif(m, UiEventSourceIdentity)) }
+  }
+  EventBus.EditMotifResponses foreach { res =>
+    val editedMotif = Main.motifEditor("Edit Motif", res.motif).showAndWait()
+
+    editedMotif foreach { m => EventBus.send(UpdateMotif(res.motif, m, UiEventSourceIdentity)) }
+  }
+  EventBus.DeleteMotifResponses foreach { res => EventBus.send(DestroyMotif(res.motif, UiEventSourceIdentity)) }
 
   EventBus.SaveResponses foreach { evt =>
     evt.loadedFile match {
@@ -159,6 +181,15 @@ object UiEventDispatcher {
   EventBus.FactUpdatedEvents foreach { evt => FactViewer.update(evt.fact, evt.updatedFact) }
   EventBus.FactDestroyedEvents foreach { evt => FactViewer.remove(evt.fact) }
 
+  // may not need these? should be handled by the story viewer?
+//  EventBus.ThemeCreatedEvents foreach { evt => FactViewer.add(evt.fact) }
+//  EventBus.ThemeUpdatedEvents foreach { evt => FactViewer.update(evt.fact, evt.updatedFact) }
+//  EventBus.ThemeDestroyedEvents foreach { evt => FactViewer.remove(evt.fact) }
+//
+//  EventBus.MotifCreatedEvents foreach { evt => FactViewer.add(evt.fact) }
+//  EventBus.MotifUpdatedEvents foreach { evt => FactViewer.update(evt.fact, evt.updatedFact) }
+//  EventBus.MotifDestroyedEvents foreach { evt => FactViewer.remove(evt.fact) }
+
   EventBus.FileStatusEvents foreach { evt =>
     isStoryEdited() = evt.isChanged
   }
@@ -199,6 +230,44 @@ object UiEventDispatcher {
     Option(FactViewer.selectionModel().selectedItem()) foreach { f =>
       EventBus.send(DeleteFactRequest(f.id, UiEventSourceIdentity))
     }
+  }
+
+  def requestNewTheme(): Unit = {
+    EventBus.send(NewThemeRequest(UiEventSourceIdentity))
+  }
+  def requestEditTheme(): Unit = {
+    // need to change to get selected theme from story viewer
+//    Option(FactViewer.selectionModel().selectedItem()) foreach { t =>
+//      EventBus.send(EditThemeRequest(t.id, UiEventSourceIdentity))
+//    }
+  }
+  def requestEditTheme(theme: ThemeLike): Unit = {
+    EventBus.send(EditThemeRequest(theme.id, UiEventSourceIdentity))
+  }
+  def requestDeleteTheme(): Unit = {
+    // need to change to get selected theme from story viewer
+//    Option(FactViewer.selectionModel().selectedItem()) foreach { t =>
+//      EventBus.send(DeleteThemeRequest(t.id, UiEventSourceIdentity))
+//    }
+  }
+
+  def requestNewMotif(): Unit = {
+    EventBus.send(NewMotifRequest(UiEventSourceIdentity))
+  }
+  def requestEditMotif(): Unit = {
+    // need to change to get selected motif from story viewer
+//    Option(FactViewer.selectionModel().selectedItem()) foreach { m =>
+//      EventBus.send(EditMotifRequest(m.id, UiEventSourceIdentity))
+//    }
+  }
+  def requestEditMotif(motif: MotifLike): Unit = {
+    EventBus.send(EditMotifRequest(motif.id, UiEventSourceIdentity))
+  }
+  def requestDeleteMotif(): Unit = {
+    // need to change to get selected motif from story viewer
+//    Option(FactViewer.selectionModel().selectedItem()) foreach { m =>
+//      EventBus.send(DeleteMotifRequest(m.id, UiEventSourceIdentity))
+//    }
   }
 
   def requestNewStory(): Unit = {
