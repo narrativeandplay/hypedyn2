@@ -13,11 +13,11 @@ import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.plugins.{Plugin, Saveable}
 import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
 import org.narrativeandplay.hypedyn.serialisation._
-import org.narrativeandplay.hypedyn.story.themes.{ThematicElementID, ThemeLike}
+import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThematicElementID, ThemeLike}
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal, NodeId}
-import org.narrativeandplay.hypedyn.storyviewer.components.{ViewerNode, ViewerTheme}
+import org.narrativeandplay.hypedyn.storyviewer.components.{ViewerMotif, ViewerNode, ViewerTheme}
 import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils
-import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, ThemeMovedChange, UndoableStream}
+import org.narrativeandplay.hypedyn.undo.{MotifMovedChange, NodeMovedChange, ThemeMovedChange, UndoableStream}
 
 /**
  * StoryViewer implementation class
@@ -36,6 +36,7 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
 
   val nodeLocations = mutable.Map.empty[NodeId, Vector2[Double]]
   val themeLocations = mutable.Map.empty[ThematicElementID, Vector2[Double]]
+  val motifLocations = mutable.Map.empty[ThematicElementID, Vector2[Double]]
   val zoomLevel = DoubleProperty(1.0)
 
   val StoryViewerEventSourceIdentity = s"Plugin - $name"
@@ -134,6 +135,32 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   override def onThemeDestroyed(theme: ThemeLike): Unit = viewer.removeTheme(theme)
 
   /**
+    * Defines what to do when a motif is created
+    *
+    * @param motif The created motif
+    */
+  override def onMotifCreated(motif: MotifLike): Unit = {
+    val createdMotif = viewer.addMotif(motif)
+
+    motifLocations get createdMotif.id foreach (moveTheme(createdMotif.id, _))
+  }
+
+  /**
+    * Defines what to do when a motif is updated
+    *
+    * @param motif The motif to be updated
+    * @param updatedMotif The same motif with the updates already applied
+    */
+  override def onMotifUpdated(motif: MotifLike, updatedMotif: MotifLike): Unit = viewer.updateMotif(motif, updatedMotif)
+
+  /**
+    * Defines what to do when a motif is destroyed
+    *
+    * @param motif The motif to be destroyed
+    */
+  override def onMotifDestroyed(motif: MotifLike): Unit = viewer.removeMotif(motif)
+
+  /**
    * Restore the state of this Saveable that was saved
    *
    * @param data The saved data
@@ -156,6 +183,13 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
 
       moveTheme(id, Vector2(x, y))
     }
+    val motifs = properData("motifs").asInstanceOf[AstList].elems
+    motifs foreach { t =>
+      val motifData = t.asInstanceOf[AstMap]
+      val (id, x, y) = deserialiseMotif(motifData)
+
+      moveTheme(id, Vector2(x, y))
+    }
 
     zoomLevel() = properData get "zoomLevel" map (_.asInstanceOf[AstFloat].f) getOrElse 1.0
 
@@ -167,13 +201,14 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
    */
   override def onSave(): AstElement = AstMap("zoomLevel" -> AstFloat(zoomLevel()),
                                              "nodes" -> AstList(viewer.nodes.toList map serialiseNode: _*),
-                                             "themes" -> AstList(viewer.themes.toList map serialiseTheme: _*))
+                                             "themes" -> AstList(viewer.themes.toList map serialiseTheme: _*),
+                                             "motifs" -> AstList(viewer.motifs.toList map serialiseMotif: _*))
 
   /**
    * Resizes the content control to ensure all nodes are shown
    */
   def sizeToChildren(): Unit = {
-    val allBounds = (viewer.nodes map (_.bounds)).toList ::: (viewer.themes map (_.bounds)).toList
+    val allBounds = (viewer.nodes map (_.bounds)).toList ::: (viewer.themes map (_.bounds)).toList ::: (viewer.motifs map (_.bounds)).toList
     val maxX = Try((allBounds map (_.maxX)).max) getOrElse 0d
     val maxY = Try((allBounds map (_.maxY)).max) getOrElse 0d
 
@@ -281,6 +316,57 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
     val id = themeData("id").asInstanceOf[AstInteger].i
     val x = themeData("x").asInstanceOf[AstFloat].f
     val y = themeData("y").asInstanceOf[AstFloat].f
+
+    (ThematicElementID(id), x, y)
+  }
+
+  /**
+    * Moves a motif
+    *
+    * @param motifID The ID of the motif to move
+    * @param position The position to move it to
+    */
+  def moveMotif(motifID: ThematicElementID, position: Vector2[Double]): Unit = {
+    motifLocations += motifID -> position
+
+    viewer.motifs find (_.id == motifID) foreach (_.relocate(position.x, position.y))
+
+    sizeToChildren()
+  }
+
+  def requestMotifEdit(id: ThematicElementID): Unit = {
+    EventBus.send(EditMotifRequest(id, StoryViewerEventSourceIdentity))
+  }
+
+  def notifyMotifMove(id: ThematicElementID, initialPos: Vector2[Double], finalPos: Vector2[Double]): Unit = {
+    motifLocations += id -> finalPos
+
+    UndoableStream.send(new MotifMovedChange(this, id, initialPos, finalPos))
+  }
+
+  def notifyMotifSelection(id: ThematicElementID): Unit = {
+    EventBus.send(UiMotifSelected(id, StoryViewerEventSourceIdentity))
+  }
+
+  def notifyMotifDeselection(id: ThematicElementID): Unit = {
+    EventBus.send(UiMotifDeselected(id, StoryViewerEventSourceIdentity))
+  }
+
+  private def serialiseMotif(m: ViewerMotif) = {
+    val unscaledX = m.layoutX / zoomLevel()
+    val unscaledY = m.layoutY / zoomLevel()
+
+    AstMap(
+      "id" -> AstInteger(m.id.value),
+      "x" -> AstFloat(unscaledX),
+      "y" -> AstFloat(unscaledY)
+    )
+  }
+
+  private def deserialiseMotif(motifData: AstMap) = {
+    val id = motifData("id").asInstanceOf[AstInteger].i
+    val x = motifData("x").asInstanceOf[AstFloat].f
+    val y = motifData("y").asInstanceOf[AstFloat].f
 
     (ThematicElementID(id), x, y)
   }

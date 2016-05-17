@@ -39,6 +39,4 @@ class StoryViewerContentSkin(storyViewerContent: StoryViewerContent) extends Ski
 
     root
   }
-
-  // not sure what I need to do for themes here: this "Node" is a JavaFX node, not our node
 }

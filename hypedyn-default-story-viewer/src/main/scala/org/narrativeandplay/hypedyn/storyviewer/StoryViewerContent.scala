@@ -15,9 +15,9 @@ import scalafx.scene.input.{MouseEvent, ScrollEvent}
 import org.narrativeandplay.hypedyn.storyviewer.utils.UnorderedPair
 import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
 import org.narrativeandplay.hypedyn.story.rules.Actionable.ActionType
-import org.narrativeandplay.hypedyn.story.themes.ThemeLike
+import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThemeLike}
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
-import org.narrativeandplay.hypedyn.storyviewer.components.{LinkGroup, ViewerNode, ViewerTheme}
+import org.narrativeandplay.hypedyn.storyviewer.components.{LinkGroup, ViewerMotif, ViewerNode, ViewerTheme}
 import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
 
 /**
@@ -29,6 +29,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   val nodes = ArrayBuffer.empty[ViewerNode]
   val linkGroups = ArrayBuffer.empty[LinkGroup]
   val themes = ArrayBuffer.empty[ViewerTheme]
+  val motifs = ArrayBuffer.empty[ViewerMotif]
 
   skin = new StoryViewerContentSkin(this)
 
@@ -37,6 +38,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
 
     nodes foreach { n => if (!(n.bounds contains pt)) n.deselect() }
     themes foreach { t => if (!(t.bounds contains pt)) t.deselect() }
+    motifs foreach { m => if (!(m.bounds contains pt)) m.deselect() }
     links foreach { l => if (!(l contains pt)) l.deselect() }
     requestLayout()
 
@@ -68,10 +70,12 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   def clear(): Unit = {
     nodes foreach (children -= _)
     themes foreach (children -= _)
+    motifs foreach (children -= _)
 
     linkGroups.clear()
     nodes.clear()
     themes.clear()
+    motifs.clear()
   }
 
   /**
@@ -142,20 +146,13 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   /**
     * Update a theme
     * @param theme The data of the theme to update
-    * @param updatedTheme The updated theme of the node
+    * @param updatedTheme The updated data of the theme
     */
   def updateTheme(theme: ThemeLike, updatedTheme: ThemeLike): Unit = {
     val viewerThemeOption = themes find (_.id == theme.id)
 
     viewerThemeOption foreach { viewerTheme =>
       viewerTheme.theme = updatedTheme
-
-//      linkGroups filter (_.endPoints contains viewerNode) foreach { grp =>
-//        val linksToRemove = grp.links filter (_.from == viewerNode)
-//        grp.removeAll(linksToRemove)
-//      }
-//
-//      makeAllLinks(viewerNode)
     }
 
     requestLayout()
@@ -171,8 +168,50 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
 
     themeToRemoveOption foreach { themeToRemove =>
       children -= themeToRemove
-      //linkGroups --= linkGroups filter (_.endPoints contains themeToRemove)
       themes -= themeToRemove
+    }
+  }
+
+  /**
+    * Add a motif
+    *
+    * @param motif The data of the motif to add
+    * @return The added motif
+    */
+  def addMotif(motif: MotifLike): ViewerMotif = {
+    val t = makeMotif(motif)
+
+    //makeAllLinks(n)
+
+    t
+  }
+
+  /**
+    * Update a motif
+    * @param motif The data of the motif to update
+    * @param updatedMotif The updated data of the motif
+    */
+  def updateMotif(motif: MotifLike, updatedMotif: MotifLike): Unit = {
+    val viewerMotifOption = motifs find (_.id == motif.id)
+
+    viewerMotifOption foreach { viewerMotif =>
+      viewerMotif.motif = updatedMotif
+    }
+
+    requestLayout()
+  }
+
+  /**
+    * Remove a motif
+    *
+    * @param motif The motif to remove
+    */
+  def removeMotif(motif: MotifLike): Unit = {
+    val motifToRemoveOption = motifs find (_.id == motif.id)
+
+    motifToRemoveOption foreach { motifToRemove =>
+      children -= motifToRemove
+      motifs -= motifToRemove
     }
   }
 
@@ -185,6 +224,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     val ns = story.nodes map makeNode
     ns foreach makeAllLinks
     val ts = story.themes map makeTheme
+    val ms = story.motifs map makeMotif
   }
 
   /**
@@ -252,6 +292,20 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     children += theme
 
     theme
+  }
+
+  /**
+    * Creates a motif in the viewer
+    *
+    * @param motiflike The data of the motif to create
+    * @return The created motif in the viewer
+    */
+  private def makeMotif(motiflike: MotifLike): ViewerMotif = {
+    val motif = new ViewerMotif(motiflike, pluginEventDispatcher)
+    motifs += motif
+    children += motif
+
+    motif
   }
 
   // <editor-fold desc="Utility Methods for a Scala-like access pattern">

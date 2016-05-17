@@ -12,46 +12,46 @@ import scalafx.scene.shape.Rectangle
 import scalafx.scene.text.TextAlignment
 
 /**
-  * View (as in an MVC view) for the visual representation of a theme
+  * View (as in an MVC view) for the visual representation of a motif
   *
-  * @param viewerTheme
+  * @param viewerMotif
   */
-class ViewerThemeSkin(viewerTheme: ViewerTheme) extends Skin[ViewerTheme] {
-  import ViewerThemeSkin._
+class ViewerMotifSkin(viewerMotif: ViewerMotif) extends Skin[ViewerMotif] {
+  import ViewerMotifSkin._
 
   // The -1 is for the rectangle to look nicer
   private val headingBarRect = new Rectangle {
-    width <== viewerTheme.widthProperty() - 1
-    height <== viewerTheme.heightProperty()
-    fill = Color.GhostWhite
+    width <== viewerMotif.widthProperty() - 1
+    height <== viewerMotif.heightProperty()
+    fill = Color.Ivory
     stroke = Color.Black
   }
   private val selectRect = new Rectangle {
-    width <== viewerTheme.widthProperty() + 2 * SelectionOutlineWidth
-    height <== viewerTheme.heightProperty() + 2 * SelectionOutlineWidth
+    width <== viewerMotif.widthProperty() + 2 * SelectionOutlineWidth
+    height <== viewerMotif.heightProperty() + 2 * SelectionOutlineWidth
     fill = Color.Red
     translateX = -SelectionOutlineWidth
     translateY = -SelectionOutlineWidth
 
-    visible <== viewerTheme.selected
+    visible <== viewerMotif.selected
   }
 
-  private val themeName = new Label {
+  private val motifName = new Label {
     wrapText = false
     alignment = Pos.Center
     textAlignment = TextAlignment.Center
 
-    maxWidth <== viewerTheme.widthProperty()
-    maxHeight <== viewerTheme.heightProperty()
+    maxWidth <== viewerMotif.widthProperty()
+    maxHeight <== viewerMotif.heightProperty()
 
-    text <== viewerTheme.themeName
+    text <== viewerMotif.motifName
 
-    visible <== viewerTheme.showName
+    visible <== viewerMotif.showName
   }
 
   private val headingBar = new StackPane {
     children += headingBarRect
-    children += themeName
+    children += motifName
   }
 
   private val root = new Pane {
@@ -61,12 +61,12 @@ class ViewerThemeSkin(viewerTheme: ViewerTheme) extends Skin[ViewerTheme] {
 
   override def dispose(): Unit = {}
 
-  override def getSkinnable: ViewerTheme = viewerTheme
+  override def getSkinnable: ViewerMotif = viewerMotif
 
   override def getNode: Node = root
 }
 
-object ViewerThemeSkin {
+object ViewerMotifSkin {
   private val TextPadding = 10
   private val SelectionOutlineWidth = 5
 }

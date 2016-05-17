@@ -228,6 +228,9 @@ sealed case class UiNodeDeselected(id: NodeId, src: String) extends Completion
 sealed case class UiThemeSelected(id: ThematicElementID, src: String) extends Completion
 sealed case class UiThemeDeselected(id: ThematicElementID, src: String) extends Completion
 
+sealed case class UiMotifSelected(id: ThematicElementID, src: String) extends Completion
+sealed case class UiMotifDeselected(id: ThematicElementID, src: String) extends Completion
+
 
 sealed trait Notification extends Event
 sealed case class FileStatus(isChanged: Boolean, src: String) extends Notification
