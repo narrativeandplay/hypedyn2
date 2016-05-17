@@ -93,13 +93,13 @@ object Toolbar extends ToolBar {
       UiEventDispatcher.requestDeleteMotif()
     }
 
-    //disable <== FactViewer.selectionModel().selectedItem.isNull
+    disable <== EasyBind monadic UiEventDispatcher.selectedMotif map[lang.Boolean] (_.isEmpty)
   }
   private lazy val editMotif = new Button("Edit Motif") {
     onAction = { _ =>
       UiEventDispatcher.requestEditMotif()
     }
 
-    //disable <== FactViewer.selectionModel().selectedItem.isNull
+    disable <== EasyBind monadic UiEventDispatcher.selectedMotif map[lang.Boolean] (_.isEmpty)
   }
 }

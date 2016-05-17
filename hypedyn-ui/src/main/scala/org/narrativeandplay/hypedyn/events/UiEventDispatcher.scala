@@ -25,6 +25,7 @@ object UiEventDispatcher {
   val UiEventSourceIdentity = "UI"
   val selectedNode = ObjectProperty(Option.empty[NodeId])
   val selectedTheme = ObjectProperty(Option.empty[ThematicElementID])
+  val selectedMotif = ObjectProperty(Option.empty[ThematicElementID])
   private val openedNodeEditors = ArrayBuffer.empty[NodeEditor]
   val isStoryEdited = BooleanProperty(false)
   val undoAvailable = BooleanProperty(false)
@@ -181,6 +182,9 @@ object UiEventDispatcher {
   EventBus.UiThemeSelectedEvents foreach { evt => selectedTheme() = Some(evt.id) }
   EventBus.UiThemeDeselectedEvents foreach { _ => selectedTheme() = None }
 
+  EventBus.UiMotifSelectedEvents foreach { evt => selectedMotif() = Some(evt.id) }
+  EventBus.UiMotifDeselectedEvents foreach { _ => selectedMotif() = None }
+
   EventBus.FactCreatedEvents foreach { evt => FactViewer.add(evt.fact) }
   EventBus.FactUpdatedEvents foreach { evt => FactViewer.update(evt.fact, evt.updatedFact) }
   EventBus.FactDestroyedEvents foreach { evt => FactViewer.remove(evt.fact) }
@@ -253,19 +257,13 @@ object UiEventDispatcher {
     EventBus.send(NewMotifRequest(UiEventSourceIdentity))
   }
   def requestEditMotif(): Unit = {
-    // need to change to get selected motif from story viewer
-//    Option(FactViewer.selectionModel().selectedItem()) foreach { m =>
-//      EventBus.send(EditMotifRequest(m.id, UiEventSourceIdentity))
-//    }
+    selectedMotif() foreach { id => EventBus.send(EditMotifRequest(id, UiEventSourceIdentity)) }
   }
   def requestEditMotif(motif: MotifLike): Unit = {
     EventBus.send(EditMotifRequest(motif.id, UiEventSourceIdentity))
   }
   def requestDeleteMotif(): Unit = {
-    // need to change to get selected motif from story viewer
-//    Option(FactViewer.selectionModel().selectedItem()) foreach { m =>
-//      EventBus.send(DeleteMotifRequest(m.id, UiEventSourceIdentity))
-//    }
+    selectedMotif() foreach { id => EventBus.send(DeleteMotifRequest(id, UiEventSourceIdentity)) }
   }
 
   def requestNewStory(): Unit = {
