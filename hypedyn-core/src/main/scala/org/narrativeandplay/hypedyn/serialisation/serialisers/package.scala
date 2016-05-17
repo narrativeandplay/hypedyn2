@@ -10,7 +10,7 @@ import org.narrativeandplay.hypedyn.story.rules.RuleLike.ParamValue
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.rules.internal.{Action, Condition, Rule}
 import org.narrativeandplay.hypedyn.story.themes.internal.{Motif, Theme}
-import org.narrativeandplay.hypedyn.story.themes.{ThematicElementID, MotifLike, ThemeLike}
+import org.narrativeandplay.hypedyn.story.themes.{ThematicElementID}
 import org.narrativeandplay.hypedyn.story.{Narrative, NodalContent, NodeId}
 
 import scala.reflect.ClassTag
@@ -120,7 +120,7 @@ package object serialisers {
       val themes = safeCastStory[AstList](data("themes")).toList map ThemeSerialiser.deserialise
       val motifs = safeCastStory[AstList](data("motifs")).toList map MotifSerialiser.deserialise
 
-      new Story(title, author, description, metadata, nodes, facts, rules)
+      new Story(title, author, description, metadata, nodes, facts, rules, themes, motifs)
     }
   }
 
@@ -444,13 +444,13 @@ package object serialisers {
   /**
     * Typeclass instance for serialising themes
     */
-  implicit object ThemeSerialiser extends Serialisable[ThemeLike] {
+  implicit object ThemeSerialiser extends Serialisable[Theme] {
     /**
       * Returns the serialised representation of an object
       *
       * @param theme The object to serialise
       */
-    override def serialise(theme: ThemeLike): AstElement =
+    override def serialise(theme: Theme): AstElement =
       AstMap("id" -> AstInteger(theme.id.value),
         "name" -> AstString(theme.name),
         "subthemes" -> AstList((theme.subthemes map {st => AstInteger(st.value)}).toSeq: _*), // should be a shortform for this...
@@ -462,7 +462,7 @@ package object serialisers {
       *
       * @param serialised The serialised form of the object
       */
-    override def deserialise(serialised: AstElement): ThemeLike = {
+    override def deserialise(serialised: AstElement): Theme = {
       def safeCastTheme[T <: AstElement](astElement: AstElement)(implicit ev: ClassTag[T]) =
         safeCast[T](astElement, "theme")
 
@@ -479,13 +479,13 @@ package object serialisers {
   /**
     * Typeclass instance for serialising motifs
     */
-  implicit object MotifSerialiser extends Serialisable[MotifLike] {
+  implicit object MotifSerialiser extends Serialisable[Motif] {
     /**
       * Returns the serialised representation of an object
       *
       * @param motif The object to serialise
       */
-    override def serialise(motif: MotifLike): AstElement =
+    override def serialise(motif: Motif): AstElement =
       AstMap("id" -> AstInteger(motif.id.value),
         "name" -> AstString(motif.name),
         "features" -> AstList((motif.features map {f => AstString(f)}).toSeq: _*) // think this is wrong
