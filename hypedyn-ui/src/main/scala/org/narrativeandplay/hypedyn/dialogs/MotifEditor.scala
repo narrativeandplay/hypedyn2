@@ -1,46 +1,24 @@
 package org.narrativeandplay.hypedyn.dialogs
 
-import java.io.{DataOutputStream, DataInputStream}
 import javafx.collections.ObservableList
-import javafx.{event => jfxe}
-import javafx.event.{ActionEvent => JfxActionEvent, EventHandler}
+import javafx.event.{ActionEvent => JfxActionEvent}
 import javafx.scene.control.{IndexRange => JfxIndexRange}
-import javafx.scene.{input => jfxsi}
 import javafx.scene.input.{KeyEvent => JfxKeyEvent}
-
-import scalafx.Includes._
-import scalafx.beans.property.ObjectProperty
-import scalafx.collections.ObservableBuffer
-import scalafx.event.{Event, ActionEvent}
-import scalafx.geometry.{Pos, Insets, Orientation}
-import scalafx.scene.control._
-import scalafx.scene.input.{MouseEvent, KeyEvent}
-import scalafx.scene.layout._
-import scalafx.stage.{Modality, Window}
-import scalafx.scene.Parent.sfxParent2jfx
-import scalafx.scene.control.Tab.sfxTab2jfx
-
-import javafx.collections.ObservableList
-import javafx.scene.control.IndexRange
-import javafx.scene.{control => jfxsc}
+import javafx.scene.{control => jfxsc, input => jfxsi}
+import javafx.{event => jfxe}
 
 import org.fxmisc.easybind.EasyBind
+import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.story.UIMotif
-import org.narrativeandplay.hypedyn.story.themes.internal.Motif
 import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThematicElementID}
 
-import scala.util.Try
 import scalafx.Includes._
-import scalafx.collections.ObservableBuffer
-import scalafx.scene.control._
-import scalafx.stage.{Modality, Window}
-import scalafx.util.StringConverter
-import scalafx.util.StringConverter.sfxStringConverter2jfx
-import org.tbee.javafx.scene.layout.MigPane
-
 import scalafx.beans.property.ObjectProperty
 import scalafx.geometry.{Insets, Pos}
-import scalafx.scene.layout.{HBox, Priority, VBox}
+import scalafx.scene.Parent.sfxParent2jfx
+import scalafx.scene.control._
+import scalafx.scene.layout.{HBox, Priority, VBox, _}
+import scalafx.stage.{Modality, Window}
 
 /**
   * Dialog for editing themes
@@ -83,19 +61,21 @@ class MotifEditor private (dialogTitle: String,
 
   private val motifNameField = new TextField()
 
-  // create properties to observe changes (not sure how yet)
-  //private val motif: ObjectProperty[UIMotif] = ObjectProperty(motifToEdit getOrElse UIMotif(ThematicElementID(-1),motifNameField.text(),
-  //  List[String]()))
-  //private[this] val monadicMotif = EasyBind monadic motif
+  private val motif: ObjectProperty[UIMotif] = ObjectProperty(motifToEdit match {
+    case Some(motifToEdit) =>
+      UIMotif(motifToEdit.id, motifToEdit.name, motifToEdit.features)
+    case None =>
+      UIMotif(ThematicElementID(-1),"", List[String]())
+  })
 
-  val featuresList = new ListView[String] {
+  val featuresList = new ListView[ObjectProperty[String]] {
     cellFactory = { _ =>
-      new ListCell[String] {
+      new ListCell[ObjectProperty[String]] {
         item onChange { (_, _, nullableFeature) =>
           Option(nullableFeature) match {
             case Some(feature) =>
               val nameField = new TextField {
-                //text <==> feature
+                text <==> feature
 
                 focused onChange { (_, _, nullableIsFocused) =>
                   Option(nullableIsFocused) foreach { isFocused =>
@@ -107,7 +87,8 @@ class MotifEditor private (dialogTitle: String,
               }
               val removeButton = new Button("−") {
                 onAction = { _ =>
-                  //motif().featuresProperty() -= feature
+                  items() -= feature
+                  motif().featuresProperty() -= feature
                 }
               }
 
@@ -128,7 +109,8 @@ class MotifEditor private (dialogTitle: String,
     motifNameField.focused onChange { (_, _, focus) => if (focus) selectionModel().clearSelection() }
 
     // add the items?
-    //items <== monadicMotif flatMap[String] (_.featuresProperty) //flatMap[ObservableList[String]] (_.featuresProperty)
+    motif().featuresProperty().map(items() += ObjectProperty(_).apply()) // adds but doesn't observe
+    //items() = motif().featuresProperty().map[ObservableList[ObjectProperty[String]]](_:String => _)
   }
 
   val featuresListVBox = new VBox {
@@ -138,9 +120,11 @@ class MotifEditor private (dialogTitle: String,
       children += new Button("Add feature") {
 
         onAction = { _ =>
-          //val newFeature = "new feature"
-          //motif().featuresProperty() += newFeature
-          //featuresList.selectionModel().select(newFeature)
+          Logger.info("**** new feature ****")
+          val newFeature = ObjectProperty("new feature")
+          motif().featuresProperty() += newFeature
+          featuresList.items()+=newFeature
+          featuresList.selectionModel().select(newFeature)
         }
       }
     }
@@ -167,17 +151,16 @@ class MotifEditor private (dialogTitle: String,
   }
   dialogPane().content = contentPane
 
-  motifToEdit foreach { m =>
-    motifNameField.text = m.name
-  }
+  motifNameField.text <==> motif().nameProperty
 
   okButton.disable <== motifNameField.text.isEmpty
 
   resultConverter = {
     case ButtonType.OK =>
+      motif()
       // temporarily pass in empty lists, eventually will get from the dialog
-      UIMotif(motifToEdit map (_.id) getOrElse ThematicElementID(-1),motifNameField.text(),
-        List[String]())
+      //UIMotif(motifToEdit map (_.id) getOrElse ThematicElementID(-1),motifNameField.text(),
+      //  List[String]())
     case _ => null
   }
 

@@ -2,8 +2,12 @@ package org.narrativeandplay.hypedyn.story.themes
 
 /**
   * An element is either a motif or a theme. Elements connote themes.
+  *
+  * @tparam T The type of story element being implemented
   */
-trait ThematicElement {
+trait ThematicElement[T <: ThematicElement[T]] {
+  self: T =>
+
   /**
     * Returns the ID of the element
     */

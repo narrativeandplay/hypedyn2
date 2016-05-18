@@ -498,12 +498,12 @@ package object serialisers {
       */
     override def deserialise(serialised: AstElement): Motif = {
       def safeCastMotif[T <: AstElement](astElement: AstElement)(implicit ev: ClassTag[T]) =
-        safeCast[T](astElement, "theme")
+        safeCast[T](astElement, "motif")
 
       val data = safeCastMotif[AstMap](serialised)
       val id = ThematicElementID(safeCastMotif[AstInteger](data("id")).i)
       val name = safeCastMotif[AstString](data("name")).s
-      val features = safeCastMotif[AstList](data("features")).toList map {f => safeCastMotif(f)} // think this is wrong
+      val features = safeCastMotif[AstList](data("features")).toList map {f => safeCastMotif[AstString](f).s} // think this is wrong
 
       Motif(id, name, features)
     }

@@ -26,7 +26,7 @@ class UIMotif(initId: ThematicElementID,
   /**
     * Backing property for the list of features
     */
-  val featuresProperty = ObjectProperty(ObservableBuffer(initFeatures: _*))
+  val featuresProperty = ObjectProperty(ObservableBuffer(initFeatures.map(ObjectProperty(_))))
 
   /**
     * The name of the motif
@@ -41,7 +41,7 @@ class UIMotif(initId: ThematicElementID,
   /**
     * The list of rules of the node
     */
-  override def features: List[String] = featuresProperty().toList
+  override def features: List[String] = featuresProperty().toList.map(_.apply())
 
   override def toString: String = {
     val featuresString = features match {
@@ -49,7 +49,7 @@ class UIMotif(initId: ThematicElementID,
       case _ => s"""List(
                     |    ${features map (_.toString) mkString ",\n        "})"""
     }
-    s"""UiNode(
+    s"""UiMotif(
         |  id = $id,
         |  name = $name,
         |  rules = $featuresString""".stripMargin
@@ -62,4 +62,10 @@ object UIMotif {
   def apply(id: ThematicElementID,
             initName: String,
             initFeatures: List[String]) = new UIMotif(id, initName, initFeatures)
+}
+
+class UIFeature(initText: String) {
+  val textProperty = StringProperty(initText)
+
+  def text: String = textProperty()
 }
