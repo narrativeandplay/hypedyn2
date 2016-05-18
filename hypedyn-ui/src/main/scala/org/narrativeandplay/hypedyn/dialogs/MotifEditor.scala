@@ -83,6 +83,7 @@ class MotifEditor private (dialogTitle: String,
 
   private val motifNameField = new TextField()
 
+  // create properties to observe changes (not sure how yet)
   //private val motif: ObjectProperty[UIMotif] = ObjectProperty(motifToEdit getOrElse UIMotif(ThematicElementID(-1),motifNameField.text(),
   //  List[String]()))
   //private[this] val monadicMotif = EasyBind monadic motif

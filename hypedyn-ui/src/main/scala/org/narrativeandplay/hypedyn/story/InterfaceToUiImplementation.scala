@@ -6,7 +6,7 @@ import org.narrativeandplay.hypedyn.story.NodalContent.RulesetLike
 import org.narrativeandplay.hypedyn.story.UiNodeContent.UiRuleset
 import org.narrativeandplay.hypedyn.story.UiStory.UiStoryMetadata
 import org.narrativeandplay.hypedyn.story.rules.{Actionable, Conditional, RuleLike}
-import org.narrativeandplay.hypedyn.story.themes.MotifLike
+import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThemeLike}
 
 /**
  * Implicit conversions for interfaces to UI classes, to simplify conversions
@@ -42,6 +42,7 @@ object InterfaceToUiImplementation {
   implicit def nodalList2UiNodeList(nodals: List[Nodal]): List[UiNode] = nodals map nodal2UiNode
 
   implicit def motifLike2UIMotif(motifLike: MotifLike): UIMotif = new UIMotif(motifLike.id, motifLike.name, motifLike.features)
+  implicit def themeLike2UITheme(themeLike: ThemeLike): UITheme = new UITheme(themeLike.id, themeLike.name, themeLike.subthemes, themeLike.motifs)
 
   implicit def narrativeMetadata2UiStoryMetadata(metadata: Metadata): UiStory.UiStoryMetadata =
     new UiStoryMetadata(metadata.comments, metadata.readerStyle, metadata.isBackButtonDisabled, metadata.isRestartButtonDisabled)
