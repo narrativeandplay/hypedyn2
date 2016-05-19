@@ -15,9 +15,9 @@ import scalafx.scene.input.{MouseEvent, ScrollEvent}
 import org.narrativeandplay.hypedyn.storyviewer.utils.UnorderedPair
 import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
 import org.narrativeandplay.hypedyn.story.rules.Actionable.ActionType
-import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThemeLike}
+import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThematicElementID, ThemeLike}
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
-import org.narrativeandplay.hypedyn.storyviewer.components.{LinkGroup, ViewerMotif, ViewerNode, ViewerTheme}
+import org.narrativeandplay.hypedyn.storyviewer.components._
 import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
 
 /**
@@ -30,6 +30,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   val linkGroups = ArrayBuffer.empty[LinkGroup]
   val themes = ArrayBuffer.empty[ViewerTheme]
   val motifs = ArrayBuffer.empty[ViewerMotif]
+  val themesubthemelinkGroups = ArrayBuffer.empty[ThemeSubthemeLinkGroup]
 
   skin = new StoryViewerContentSkin(this)
 
@@ -65,6 +66,11 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   def links = (linkGroups flatMap (_.links)).toList
 
   /**
+    * Returns all the theme-subtheme link representations for the story
+    */
+  def themesubthemelinks = (themesubthemelinkGroups flatMap (_.links)).toList
+
+  /**
    * Remove all nodes and links and themes
    */
   def clear(): Unit = {
@@ -74,6 +80,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
 
     linkGroups.clear()
     nodes.clear()
+    themesubthemelinkGroups.clear()
     themes.clear()
     motifs.clear()
   }
@@ -138,7 +145,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   def addTheme(theme: ThemeLike): ViewerTheme = {
     val t = makeTheme(theme)
 
-    //makeAllLinks(n)
+    makeAllLinks(t)
 
     t
   }
@@ -153,6 +160,13 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
 
     viewerThemeOption foreach { viewerTheme =>
       viewerTheme.theme = updatedTheme
+
+      themesubthemelinkGroups filter (_.endPoints contains viewerTheme) foreach { grp =>
+        val linksToRemove = grp.links filter (_.from == viewerTheme)
+        grp.removeAll(linksToRemove)
+      }
+
+      makeAllLinks(viewerTheme)
     }
 
     requestLayout()
@@ -168,6 +182,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
 
     themeToRemoveOption foreach { themeToRemove =>
       children -= themeToRemove
+      themesubthemelinkGroups --= themesubthemelinkGroups filter (_.endPoints contains themeToRemove)
       themes -= themeToRemove
     }
   }
@@ -225,6 +240,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     ns foreach makeAllLinks
     val ts = story.themes map makeTheme
     val ms = story.motifs map makeMotif
+    ts foreach makeAllLinks
   }
 
   /**
@@ -292,6 +308,40 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     children += theme
 
     theme
+  }
+
+  /**
+    * creates "connoted" links for a given theme
+    *
+    * @param viewerTheme The theme to create links for
+    *
+    */
+  private def makeAllLinks(viewerTheme: ViewerTheme): Unit = {
+    makeLinks(viewerTheme, viewerTheme.theme().subthemes)
+  }
+
+  /**
+    * Creates the links for a given theme
+    *
+    * @param viewerTheme The theme to create links for
+    * @param subthemes list of subthemes
+    */
+  private def makeLinks(viewerTheme: ViewerTheme, subthemes: List[ThematicElementID]): Unit = {
+    subthemes foreach { subthemeID =>
+      val subtheme = themes find (_.id == subthemeID)
+
+      subtheme foreach { to =>
+        val linkGroup = themesubthemelinkGroups find (_.endPoints == UnorderedPair(to, viewerTheme)) match {
+          case Some(grp) => grp
+          case None =>
+            val grp = new ThemeSubthemeLinkGroup(to, viewerTheme)
+            themesubthemelinkGroups += grp
+            grp
+        }
+
+        linkGroup.insert(to, viewerTheme)
+      }
+    }
   }
 
   /**

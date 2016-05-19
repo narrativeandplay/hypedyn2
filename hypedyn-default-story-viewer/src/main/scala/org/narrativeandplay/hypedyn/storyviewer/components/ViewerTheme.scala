@@ -24,9 +24,9 @@ import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
 import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils._
 
 /**
-  * Visual representation of a node. More accurately, the model (MVC model) for the visual representation of a node
+  * Visual representation of a theme. More accurately, the model (MVC model) for the visual representation of a theme
   *
-  * @param themelike The underlying data for the node
+  * @param themelike The underlying data for the theme
   * @param pluginEventDispatcher The event dispatcher that is allowed to send events
   */
 class ViewerTheme(themelike: ThemeLike, private val pluginEventDispatcher: StoryViewer) extends JfxControl {
