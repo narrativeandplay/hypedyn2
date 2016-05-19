@@ -24,7 +24,7 @@ import javafx.scene.{control => jfxsc}
 import org.fxmisc.easybind.EasyBind
 import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.story.rules.RuleLike.ParamName
-import org.narrativeandplay.hypedyn.story.{Narrative, UITheme, UiStory}
+import org.narrativeandplay.hypedyn.story.{Narrative, UIMotif, UITheme, UiStory}
 
 import scala.util.Try
 import scalafx.Includes._
@@ -108,7 +108,7 @@ class ThemeEditor private (dialogTitle: String,
         item onChange { (_, _, nullableSubtheme) =>
           Option(nullableSubtheme) match {
             case Some(subtheme) =>
-              val comboBox = new ThemeComboBox(story)
+              val comboBox = new ThemeComboBox(subtheme, story)
 
               val removeButton = new Button("−") {
                 onAction = { _ =>
@@ -134,8 +134,7 @@ class ThemeEditor private (dialogTitle: String,
     themeNameField.focused onChange { (_, _, focus) => if (focus) selectionModel().clearSelection() }
 
     // add the items?
-    theme().subthemesProperty().map(items() += ObjectProperty(_).apply()) // adds but doesn't observe
-    // items <== monadicTheme flatMap[String] (_.featuresProperty) //flatMap[ObservableList[String]] (_.featuresProperty)
+    theme().subthemesProperty().map(items() += _) // adds but doesn't observe
   }
 
   val subthemesListVBox = new VBox {
@@ -164,7 +163,7 @@ class ThemeEditor private (dialogTitle: String,
         item onChange { (_, _, nullableMotif) =>
           Option(nullableMotif) match {
             case Some(motif) =>
-              val comboBox = new MotifComboBox(story)
+              val comboBox = new MotifComboBox(motif, story)
 
               val removeButton = new Button("−") {
                 onAction = { _ =>
@@ -190,7 +189,7 @@ class ThemeEditor private (dialogTitle: String,
     themeNameField.focused onChange { (_, _, focus) => if (focus) selectionModel().clearSelection() }
 
     // add the items?
-    theme().motifsProperty().map(items() += ObjectProperty(_).apply()) // adds but doesn't observe
+    theme().motifsProperty().map(items() += _) // adds but doesn't observe
   }
 
   val motifsListVBox = new VBox {
@@ -253,6 +252,10 @@ class ThemeEditor private (dialogTitle: String,
     case _ => null
   }
 
+  onShown = { _ =>
+    themeNameField.requestFocus()
+  }
+
   /**
     * Shows a blocking theme editor dialog
     *
@@ -268,7 +271,7 @@ class ThemeEditor private (dialogTitle: String,
   }
 }
 
-class ThemeComboBox (story: Narrative) extends ComboBox[ThemeLike] {
+class ThemeComboBox (subtheme: ObjectProperty[ThematicElementID], story: Narrative) extends ComboBox[ThemeLike] {
   cellFactory = { _ =>
     new JfxListCell[ThemeLike] {
       override def updateItem(item: ThemeLike, empty: Boolean): Unit = {
@@ -281,7 +284,6 @@ class ThemeComboBox (story: Narrative) extends ComboBox[ThemeLike] {
     }
   }
 
-  // is this safe? what if 2 themes have the same name?
   converter = new StringConverter[ThemeLike] {
     override def fromString(string: String): ThemeLike = (story.themes find (_.name == string)).get
 
@@ -290,14 +292,17 @@ class ThemeComboBox (story: Narrative) extends ComboBox[ThemeLike] {
 
   onAction = { _ =>
     Logger.info("**** onAction ****")
+    Option(value()) foreach { v => Logger.info("ThemeID: " + v.id.toString)
+                                   subtheme()=v.id
+    }
   }
 
-  items onChange {
-    Logger.info("**** onChange ****")
-  }
+  value() = (story.themes find (_.id == subtheme())).getOrElse(new UITheme(ThematicElementID(-1),"", List[ThematicElementID](), List[ThematicElementID]()))
+
+  story.themes.map(items() += _)
 }
 
-class MotifComboBox (story: Narrative) extends ComboBox[MotifLike] {
+class MotifComboBox (motif: ObjectProperty[ThematicElementID], story: Narrative) extends ComboBox[MotifLike] {
   cellFactory = { _ =>
     new JfxListCell[MotifLike] {
       override def updateItem(item: MotifLike, empty: Boolean): Unit = {
@@ -310,7 +315,6 @@ class MotifComboBox (story: Narrative) extends ComboBox[MotifLike] {
     }
   }
 
-  // is this safe? what if 2 themes have the same name?
   converter = new StringConverter[MotifLike] {
     override def fromString(string: String): MotifLike = (story.motifs find (_.name == string)).get
 
@@ -319,9 +323,12 @@ class MotifComboBox (story: Narrative) extends ComboBox[MotifLike] {
 
   onAction = { _ =>
     Logger.info("**** onAction ****")
+    Option(value()) foreach { v => Logger.info("MotifID: " + v.id.toString)
+      motif()=v.id
+    }
   }
 
-  items onChange {
-    Logger.info("**** onChange ****")
-  }
+  value() = (story.motifs find (_.id == motif())).getOrElse(new UIMotif(ThematicElementID(-1),"", List[String]()))
+
+  story.motifs.map(items() += _)
 }

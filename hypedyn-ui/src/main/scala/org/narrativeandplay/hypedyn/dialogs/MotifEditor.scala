@@ -164,6 +164,10 @@ class MotifEditor private (dialogTitle: String,
     case _ => null
   }
 
+  onShown = { _ =>
+    motifNameField.requestFocus()
+  }
+
   /**
     * Shows a blocking motif editor dialog
     *
