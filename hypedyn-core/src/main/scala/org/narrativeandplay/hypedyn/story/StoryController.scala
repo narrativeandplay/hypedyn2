@@ -36,7 +36,7 @@ object StoryController {
    * @param description The description of the new story
    */
   def newStory(title: String, author: String, description: String): Unit = {
-    currentStory = new Story(title, author, description)
+    load(new Story(title, author, description))
   }
 
   /**
