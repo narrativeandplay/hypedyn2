@@ -197,6 +197,11 @@ case class Story(title: String = "Untitled",
   def removeMotif(motif: Motif) = new Story(title, author, description, metadata, nodes, facts, rules, themes, motifs filter (_ != motif))
 
   /**
+    * Returns all the thematic elements in the story (themes and motifs)
+    */
+  def allThematicElements = themes ++ motifs
+
+  /**
    * Returns the start node of the story if it has one, or None if the start node has not yet been set
    */
   def startNode = nodes find (_.isStartNode)

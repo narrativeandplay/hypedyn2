@@ -188,7 +188,7 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
       val motifData = t.asInstanceOf[AstMap]
       val (id, x, y) = deserialiseMotif(motifData)
 
-      moveTheme(id, Vector2(x, y))
+      moveMotif(id, Vector2(x, y))
     }
 
     zoomLevel() = properData get "zoomLevel" map (_.asInstanceOf[AstFloat].f) getOrElse 1.0

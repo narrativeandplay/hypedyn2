@@ -53,6 +53,8 @@ class MotifEditor private (dialogTitle: String,
 
   title = dialogTitle
   headerText = None
+  resizable = true
+  dialogPane().setPrefSize(400, 300)
 
   initOwner(ownerWindow)
 

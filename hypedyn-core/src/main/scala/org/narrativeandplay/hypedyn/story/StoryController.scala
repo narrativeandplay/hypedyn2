@@ -66,6 +66,7 @@ object StoryController {
     firstUnusedFactId = story.facts map (_.id) reduceOption (_ max _) map (_.inc) getOrElse FactId(0)
     firstUnusedRuleId = story.allRules map (_.id) reduceOption (_ max _) map (_.inc) getOrElse RuleId(0)
     firstUnusedRulesetId = story.nodes flatMap (_.content.rulesets) map (_.id) reduceOption (_ max _) map (_.inc) getOrElse NodalContent.RulesetId(0)
+    firstUnusedThemeticElementId = story.allThematicElements map (_.id) reduceOption (_ max _) map (_.inc) getOrElse ThematicElementID(0)
   }
 
   /**
