@@ -53,6 +53,22 @@ class StoryViewerContentSkin(storyViewerContent: StoryViewerContent) extends Ski
       }
     }
 
+    storyViewerContent.thememotiflinks foreach { link =>
+      link.draw match {
+        case (path, Some(highlight), Some(label), Some(labelBg), arrowhead) =>
+          root.children.addAll(highlight, path)
+          root.children += arrowhead
+          root.children.addAll(labelBg, label)
+        case (path, None, Some(label), Some(labelBg), arrowhead) =>
+          root.children.addAll(path)
+          root.children += arrowhead
+          root.children.addAll(labelBg, label)
+        case (path, _, _, _, arrowhead) =>
+          root.children.addAll(path)
+          root.children += arrowhead
+      }
+    }
+
     root
   }
 }

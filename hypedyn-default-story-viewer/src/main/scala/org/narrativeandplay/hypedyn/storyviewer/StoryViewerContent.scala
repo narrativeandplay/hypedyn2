@@ -31,6 +31,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   val themes = ArrayBuffer.empty[ViewerTheme]
   val motifs = ArrayBuffer.empty[ViewerMotif]
   val themesubthemelinkGroups = ArrayBuffer.empty[ThemeSubthemeLinkGroup]
+  val thememotiflinkGroups = ArrayBuffer.empty[ThemeMotifLinkGroup]
 
   skin = new StoryViewerContentSkin(this)
 
@@ -71,6 +72,11 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   def themesubthemelinks = (themesubthemelinkGroups flatMap (_.links)).toList
 
   /**
+    * Returns all the theme-motif link representations for the story
+    */
+  def thememotiflinks = (thememotiflinkGroups flatMap (_.links)).toList
+
+  /**
    * Remove all nodes and links and themes
    */
   def clear(): Unit = {
@@ -79,8 +85,9 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     motifs foreach (children -= _)
 
     linkGroups.clear()
-    nodes.clear()
     themesubthemelinkGroups.clear()
+    thememotiflinkGroups.clear()
+    nodes.clear()
     themes.clear()
     motifs.clear()
   }
@@ -194,11 +201,9 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     * @return The added motif
     */
   def addMotif(motif: MotifLike): ViewerMotif = {
-    val t = makeMotif(motif)
+    val m = makeMotif(motif)
 
-    //makeAllLinks(n)
-
-    t
+    m
   }
 
   /**
@@ -211,6 +216,11 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
 
     viewerMotifOption foreach { viewerMotif =>
       viewerMotif.motif = updatedMotif
+
+      thememotiflinkGroups filter (_.themotif == viewerMotif) foreach { grp =>
+        val linksToRemove = grp.links filter (_.from == viewerMotif)
+        grp.removeAll(linksToRemove)
+      }
     }
 
     requestLayout()
@@ -226,6 +236,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
 
     motifToRemoveOption foreach { motifToRemove =>
       children -= motifToRemove
+      thememotiflinkGroups --= thememotiflinkGroups filter (_.themotif == motifToRemove)
       motifs -= motifToRemove
     }
   }
@@ -311,13 +322,14 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   }
 
   /**
-    * creates "connoted" links for a given theme
+    * creates "connoted" links for a given theme (both subthemes and motifs)
     *
     * @param viewerTheme The theme to create links for
     *
     */
   private def makeAllLinks(viewerTheme: ViewerTheme): Unit = {
-    makeLinks(viewerTheme, viewerTheme.theme().subthemes)
+    makeSubthemeLinks(viewerTheme, viewerTheme.theme().subthemes)
+    makeMotifLinks(viewerTheme, viewerTheme.theme().motifs)
   }
 
   /**
@@ -326,7 +338,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     * @param viewerTheme The theme to create links for
     * @param subthemes list of subthemes
     */
-  private def makeLinks(viewerTheme: ViewerTheme, subthemes: List[ThematicElementID]): Unit = {
+  private def makeSubthemeLinks(viewerTheme: ViewerTheme, subthemes: List[ThematicElementID]): Unit = {
     subthemes foreach { subthemeID =>
       val subtheme = themes find (_.id == subthemeID)
 
@@ -336,6 +348,24 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
           case None =>
             val grp = new ThemeSubthemeLinkGroup(to, viewerTheme)
             themesubthemelinkGroups += grp
+            grp
+        }
+
+        linkGroup.insert(to, viewerTheme)
+      }
+    }
+  }
+
+  private def makeMotifLinks(viewerTheme: ViewerTheme, themotifs: List[ThematicElementID]): Unit = {
+    themotifs foreach { motifId =>
+      val motif = motifs find (_.id == motifId)
+
+      motif foreach { to =>
+        val linkGroup = thememotiflinkGroups find (_.themotif == to) find (_.thetheme == viewerTheme) match {
+          case Some(grp) => grp
+          case None =>
+            val grp = new ThemeMotifLinkGroup(to, viewerTheme)
+            thememotiflinkGroups += grp
             grp
         }
 
