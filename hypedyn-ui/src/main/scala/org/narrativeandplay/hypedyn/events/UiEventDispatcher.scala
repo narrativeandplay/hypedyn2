@@ -70,12 +70,12 @@ object UiEventDispatcher {
   EventBus.DeleteFactResponses foreach { res => EventBus.send(DestroyFact(res.fact, UiEventSourceIdentity)) }
 
   EventBus.NewThemeResponses foreach { res =>
-    val newTheme = Main.themeEditor("New Theme").showAndWait()
+    val newTheme = Main.themeEditor("New Theme", res.story).showAndWait()
 
     newTheme foreach { t => EventBus.send(CreateTheme(t, UiEventSourceIdentity)) }
   }
   EventBus.EditThemeResponses foreach { res =>
-    val editedTheme = Main.themeEditor("Edit Theme", res.theme).showAndWait()
+    val editedTheme = Main.themeEditor("Edit Theme", res.theme, res.story).showAndWait()
 
     editedTheme foreach { t => EventBus.send(UpdateTheme(res.theme, t, UiEventSourceIdentity)) }
   }

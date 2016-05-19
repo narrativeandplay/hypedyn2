@@ -55,11 +55,11 @@ object CoreEventDispatcher {
 
   // is this round trip necessary?
   EventBus.NewThemeRequests foreach { _ =>
-    EventBus.send(NewThemeResponse(CoreEventSourceIdentity))
+    EventBus.send(NewThemeResponse(StoryController.story, CoreEventSourceIdentity))
   }
   EventBus.EditThemeRequests foreach { evt =>
     StoryController findTheme evt.id foreach { t =>
-      EventBus.send(EditThemeResponse(t, CoreEventSourceIdentity))
+      EventBus.send(EditThemeResponse(t, StoryController.story, CoreEventSourceIdentity))
     }
   }
   EventBus.DeleteThemeRequests foreach { evt =>

@@ -123,8 +123,8 @@ sealed case class NewFactResponse(factTypes: List[String], src: String) extends 
 sealed case class EditFactResponse(fact: Fact, factTypes: List[String], src: String) extends Response
 sealed case class DeleteFactResponse(fact: Fact, src: String) extends Response
 
-sealed case class NewThemeResponse(src: String) extends Response
-sealed case class EditThemeResponse(theme: ThemeLike, src: String) extends Response
+sealed case class NewThemeResponse(story: Narrative, src: String) extends Response
+sealed case class EditThemeResponse(theme: ThemeLike, story: Narrative, src: String) extends Response
 sealed case class DeleteThemeResponse(theme: ThemeLike, src: String) extends Response
 
 sealed case class NewMotifResponse(src: String) extends Response

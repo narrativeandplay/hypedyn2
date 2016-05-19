@@ -54,6 +54,6 @@ object InterfaceToUiImplementation {
                                                                               narrative.facts,
                                                                               narrative.nodes,
                                                                               narrative.rules,
-                                                                              narrative.themes,
-                                                                              narrative.motifs)
+                                                                              narrative.themes map themeLike2UITheme,
+                                                                              narrative.motifs map motifLike2UIMotif)
 }

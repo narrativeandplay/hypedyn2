@@ -1,30 +1,31 @@
 package org.narrativeandplay.hypedyn.dialogs
 
 import javafx.scene.{control => jfxsc}
-
-import java.io.{DataOutputStream, DataInputStream}
+import java.io.{DataInputStream, DataOutputStream}
 import javafx.collections.ObservableList
 import javafx.{event => jfxe}
-import javafx.event.{ActionEvent => JfxActionEvent, EventHandler}
-import javafx.scene.control.{IndexRange => JfxIndexRange}
+import javafx.event.{EventHandler, ActionEvent => JfxActionEvent}
 import javafx.scene.{input => jfxsi}
 import javafx.scene.input.{KeyEvent => JfxKeyEvent}
+import javafx.scene.control.{IndexRange => JfxIndexRange, ListCell => JfxListCell, SpinnerValueFactory => JfxSpinnerValueFactory}
 
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
-import scalafx.collections.ObservableBuffer
-import scalafx.event.{Event, ActionEvent}
-import scalafx.geometry.{Pos, Insets, Orientation}
+import scalafx.collections.{ObservableBuffer, ObservableMap}
 import scalafx.scene.control._
-import scalafx.scene.input.{MouseEvent, KeyEvent}
+import scalafx.scene.input.{KeyEvent, MouseEvent}
 import scalafx.scene.layout._
 import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
 import scalafx.scene.control.Tab.sfxTab2jfx
-
 import javafx.collections.ObservableList
-import javafx.scene.control.IndexRange
 import javafx.scene.{control => jfxsc}
+
+import org.fxmisc.easybind.EasyBind
+import org.narrativeandplay.hypedyn.logging.Logger
+import org.narrativeandplay.hypedyn.story.rules.RuleLike.ParamName
+import org.narrativeandplay.hypedyn.story.{Narrative, UITheme, UiStory}
+
 import scala.util.Try
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
@@ -33,8 +34,7 @@ import scalafx.stage.{Modality, Window}
 import scalafx.util.StringConverter
 import scalafx.util.StringConverter.sfxStringConverter2jfx
 import org.tbee.javafx.scene.layout.MigPane
-
-import org.narrativeandplay.hypedyn.story.themes.{ThematicElementID, ThemeLike}
+import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThematicElementID, ThemeLike}
 import org.narrativeandplay.hypedyn.story.themes.internal.Theme
 
 import scala.util.Try
@@ -55,31 +55,35 @@ import scalafx.scene.layout.{HBox, Priority, VBox}
   *
   * @param dialogTitle The title of the dialog
   * @param themeToEdit An option containing the theme to edit, or None if a new theme is to be created
+  * @param story The parent story of the theme
   * @param ownerWindow The parent window of the dialog, for inheriting icons
   */
 class ThemeEditor private (dialogTitle: String,
-                          themeToEdit: Option[ThemeLike],
-                          ownerWindow: Window) extends Dialog[ThemeLike] {
+                           themeToEdit: Option[ThemeLike],
+                           story: Narrative,
+                           ownerWindow: Window) extends Dialog[ThemeLike] {
   /**
     * Creates a new dialog for creating a theme
     *
     * @param dialogTitle The title of the dialog
+    * @param story The parent story of the theme
     * @param ownerWindow The parent window of the dialog, for inheriting icons
     * @return A new fact dialog
     */
-  def this(dialogTitle: String, ownerWindow: Window) =
-    this(dialogTitle, None, ownerWindow)
+  def this(dialogTitle: String, story: Narrative, ownerWindow: Window) =
+    this(dialogTitle, None, story, ownerWindow)
 
   /**
     * Creates a new dialog for editing a theme
     *
     * @param dialogTitle The title of the dialog
     * @param themeToEdit The theme to edit
+    * @param story The parent story of the theme
     * @param ownerWindow The parent window of the dialog, for inheriting icons
     * @return A new theme dialog
     */
-  def this(dialogTitle: String, themeToEdit: ThemeLike, ownerWindow: Window) =
-    this(dialogTitle, Some(themeToEdit), ownerWindow)
+  def this(dialogTitle: String, themeToEdit: ThemeLike, story: Narrative, ownerWindow: Window) =
+    this(dialogTitle, Some(themeToEdit), story, ownerWindow)
 
   title = dialogTitle
   headerText = None
@@ -91,35 +95,29 @@ class ThemeEditor private (dialogTitle: String,
 
   private val themeNameField = new TextField()
 
-  // create properties to observe changes (not sure how yet)
-  //private val theme: ObjectProperty[UITheme] = ObjectProperty(themeToEdit getOrElse UITheme(ThematicElementID(-1),themeNameField.text(),
-  //  List[ThematicElementID](),List[ThematicElementID]()))
-  //private[this] val monadicTheme = EasyBind monadic theme
+  private val theme: ObjectProperty[UITheme] = ObjectProperty(themeToEdit match {
+    case Some(themeToEdit) =>
+      UITheme(themeToEdit.id, themeToEdit.name, themeToEdit.subthemes, themeToEdit.motifs)
+    case None =>
+      UITheme(ThematicElementID(-1),"", List[ThematicElementID](),List[ThematicElementID]())
+  })
 
-  val subthemesList = new ListView[ThematicElementID] {
+  val subthemesList = new ListView[ObjectProperty[ThematicElementID]] {
     cellFactory = { _ =>
-      new ListCell[ThematicElementID] {
+      new ListCell[ObjectProperty[ThematicElementID]] {
         item onChange { (_, _, nullableSubtheme) =>
           Option(nullableSubtheme) match {
             case Some(subtheme) =>
-              val nameField = new TextField {
-                //text <==> subtheme.value.toString()
+              val comboBox = new ThemeComboBox(story)
 
-                focused onChange { (_, _, nullableIsFocused) =>
-                  Option(nullableIsFocused) foreach { isFocused =>
-                    selectionModel().select(subtheme)
-                  }
-                }
-
-                HBox.setHgrow(this, Priority.Always)
-              }
               val removeButton = new Button("−") {
                 onAction = { _ =>
-                  //motif().featuresProperty() -= subtheme
+                  items() -= subtheme
+                  theme().subthemesProperty() -= subtheme
                 }
               }
 
-              graphic = new HBox(10, removeButton, nameField)
+              graphic = new HBox(10, removeButton, comboBox)
             case None => graphic = null
           }
         }
@@ -128,7 +126,7 @@ class ThemeEditor private (dialogTitle: String,
 
     selectionModel().selectedItemProperty onChange { (_, _, `new`) =>
       Option(`new`) match {
-        case Some(feature) =>
+        case Some(subtheme) =>
         case None =>
       }
     }
@@ -136,7 +134,8 @@ class ThemeEditor private (dialogTitle: String,
     themeNameField.focused onChange { (_, _, focus) => if (focus) selectionModel().clearSelection() }
 
     // add the items?
-    //items <== monadicTheme flatMap[String] (_.featuresProperty) //flatMap[ObservableList[String]] (_.featuresProperty)
+    theme().subthemesProperty().map(items() += ObjectProperty(_).apply()) // adds but doesn't observe
+    // items <== monadicTheme flatMap[String] (_.featuresProperty) //flatMap[ObservableList[String]] (_.featuresProperty)
   }
 
   val subthemesListVBox = new VBox {
@@ -146,6 +145,11 @@ class ThemeEditor private (dialogTitle: String,
       children += new Button("Add subtheme") {
 
         onAction = { _ =>
+          Logger.info("**** new subtheme ****")
+          val newSubtheme = ObjectProperty(new ThematicElementID(-1))
+          theme().subthemesProperty() += newSubtheme
+          subthemesList.items()+=newSubtheme
+          subthemesList.selectionModel().select(newSubtheme)
         }
       }
     }
@@ -154,30 +158,22 @@ class ThemeEditor private (dialogTitle: String,
     VBox.setVgrow(subthemesList, Priority.Always)
   }
 
-  val motifsList = new ListView[ThematicElementID] {
+  val motifsList = new ListView[ObjectProperty[ThematicElementID]] {
     cellFactory = { _ =>
-      new ListCell[ThematicElementID] {
+      new ListCell[ObjectProperty[ThematicElementID]] {
         item onChange { (_, _, nullableMotif) =>
           Option(nullableMotif) match {
             case Some(motif) =>
-              val nameField = new TextField {
-                //text <==> motif
+              val comboBox = new MotifComboBox(story)
 
-                focused onChange { (_, _, nullableIsFocused) =>
-                  Option(nullableIsFocused) foreach { isFocused =>
-                    selectionModel().select(motif)
-                  }
-                }
-
-                HBox.setHgrow(this, Priority.Always)
-              }
               val removeButton = new Button("−") {
                 onAction = { _ =>
-                  //motif().featuresProperty() -= motif
+                  items() -= motif
+                  theme().motifsProperty() -= motif
                 }
               }
 
-              graphic = new HBox(10, removeButton, nameField)
+              graphic = new HBox(10, removeButton, comboBox)
             case None => graphic = null
           }
         }
@@ -186,7 +182,7 @@ class ThemeEditor private (dialogTitle: String,
 
     selectionModel().selectedItemProperty onChange { (_, _, `new`) =>
       Option(`new`) match {
-        case Some(feature) =>
+        case Some(motif) =>
         case None =>
       }
     }
@@ -194,7 +190,7 @@ class ThemeEditor private (dialogTitle: String,
     themeNameField.focused onChange { (_, _, focus) => if (focus) selectionModel().clearSelection() }
 
     // add the items?
-    //items <== monadicTheme flatMap[String] (_.featuresProperty) //flatMap[ObservableList[String]] (_.featuresProperty)
+    theme().motifsProperty().map(items() += ObjectProperty(_).apply()) // adds but doesn't observe
   }
 
   val motifsListVBox = new VBox {
@@ -204,6 +200,11 @@ class ThemeEditor private (dialogTitle: String,
       children += new Button("Add motif") {
 
         onAction = { _ =>
+          Logger.info("**** new motif ****")
+          val newMotif = ObjectProperty(new ThematicElementID(-1))
+          theme().motifsProperty() += newMotif
+          motifsList.items()+=newMotif
+          motifsList.selectionModel().select(newMotif)
         }
       }
     }
@@ -242,17 +243,13 @@ class ThemeEditor private (dialogTitle: String,
   }
   dialogPane().content = contentPane
 
-  themeToEdit foreach { t =>
-    themeNameField.text = t.name
-  }
+  themeNameField.text <==> theme().nameProperty
 
   okButton.disable <== themeNameField.text.isEmpty
 
   resultConverter = {
     case ButtonType.OK =>
-      // temporarily pass in empty lists, eventually will get from the dialog
-      Theme(themeToEdit map (_.id) getOrElse ThematicElementID(-1),themeNameField.text(),
-        List[ThematicElementID](), List[ThematicElementID]())
+      theme()
     case _ => null
   }
 
@@ -268,5 +265,63 @@ class ThemeEditor private (dialogTitle: String,
     val result = delegate.showAndWait()
 
     if (result.isPresent) Some(result.get()) else None
+  }
+}
+
+class ThemeComboBox (story: Narrative) extends ComboBox[ThemeLike] {
+  cellFactory = { _ =>
+    new JfxListCell[ThemeLike] {
+      override def updateItem(item: ThemeLike, empty: Boolean): Unit = {
+        super.updateItem(item, empty)
+
+        if (!empty && item != null) {
+          setText(item.name)
+        }
+      }
+    }
+  }
+
+  // is this safe? what if 2 themes have the same name?
+  converter = new StringConverter[ThemeLike] {
+    override def fromString(string: String): ThemeLike = (story.themes find (_.name == string)).get
+
+    override def toString(t: ThemeLike): String = t.name
+  }
+
+  onAction = { _ =>
+    Logger.info("**** onAction ****")
+  }
+
+  items onChange {
+    Logger.info("**** onChange ****")
+  }
+}
+
+class MotifComboBox (story: Narrative) extends ComboBox[MotifLike] {
+  cellFactory = { _ =>
+    new JfxListCell[MotifLike] {
+      override def updateItem(item: MotifLike, empty: Boolean): Unit = {
+        super.updateItem(item, empty)
+
+        if (!empty && item != null) {
+          setText(item.name)
+        }
+      }
+    }
+  }
+
+  // is this safe? what if 2 themes have the same name?
+  converter = new StringConverter[MotifLike] {
+    override def fromString(string: String): MotifLike = (story.motifs find (_.name == string)).get
+
+    override def toString(t: MotifLike): String = t.name
+  }
+
+  onAction = { _ =>
+    Logger.info("**** onAction ****")
+  }
+
+  items onChange {
+    Logger.info("**** onChange ****")
   }
 }

@@ -63,9 +63,3 @@ object UIMotif {
             initName: String,
             initFeatures: List[String]) = new UIMotif(id, initName, initFeatures)
 }
-
-class UIFeature(initText: String) {
-  val textProperty = StringProperty(initText)
-
-  def text: String = textProperty()
-}

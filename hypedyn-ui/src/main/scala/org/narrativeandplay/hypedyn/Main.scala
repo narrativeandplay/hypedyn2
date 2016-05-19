@@ -134,8 +134,8 @@ object Main extends JFXApp {
     * @param themeToEdit The theme to edit
     * @return A new theme editor for editing the given theme
     */
-  def themeEditor(dialogTitle: String, themeToEdit: ThemeLike) =
-    new ThemeEditor(dialogTitle, themeToEdit, stage)
+  def themeEditor(dialogTitle: String, themeToEdit: ThemeLike, story: Narrative) =
+    new ThemeEditor(dialogTitle, themeToEdit, story, stage)
 
   /**
     * Creates a new theme editor for creating a new theme
@@ -143,8 +143,8 @@ object Main extends JFXApp {
     * @param dialogTitle The title of the theme editor dialog
     * @return A new theme editor for creating a new theme
     */
-  def themeEditor(dialogTitle: String) =
-    new ThemeEditor(dialogTitle, stage)
+  def themeEditor(dialogTitle: String, story: Narrative) =
+    new ThemeEditor(dialogTitle, story, stage)
 
   /**
     * Creates a new motif editor for editing a motif

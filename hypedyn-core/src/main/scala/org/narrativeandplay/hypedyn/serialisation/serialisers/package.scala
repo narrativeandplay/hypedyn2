@@ -488,7 +488,7 @@ package object serialisers {
     override def serialise(motif: Motif): AstElement =
       AstMap("id" -> AstInteger(motif.id.value),
         "name" -> AstString(motif.name),
-        "features" -> AstList((motif.features map {f => AstString(f)}).toSeq: _*) // think this is wrong
+        "features" -> AstList((motif.features map {f => AstString(f)}).toSeq: _*)
       )
 
     /**
@@ -503,7 +503,7 @@ package object serialisers {
       val data = safeCastMotif[AstMap](serialised)
       val id = ThematicElementID(safeCastMotif[AstInteger](data("id")).i)
       val name = safeCastMotif[AstString](data("name")).s
-      val features = safeCastMotif[AstList](data("features")).toList map {f => safeCastMotif[AstString](f).s} // think this is wrong
+      val features = safeCastMotif[AstList](data("features")).toList map {f => safeCastMotif[AstString](f).s}
 
       Motif(id, name, features)
     }

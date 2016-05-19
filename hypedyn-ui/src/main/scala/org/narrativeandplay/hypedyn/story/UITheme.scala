@@ -27,12 +27,12 @@ class UITheme(initId: ThematicElementID,
   /**
     * Backing property for the list of subthemes
     */
-  val subthemesProperty = ObjectProperty(ObservableBuffer(initSubthemes: _*))
+  val subthemesProperty = ObjectProperty(ObservableBuffer(initSubthemes.map(ObjectProperty(_))))
 
   /**
     * Backing property for the list of motifs
     */
-  val motifsProperty = ObjectProperty(ObservableBuffer(initMotifs: _*))
+  val motifsProperty = ObjectProperty(ObservableBuffer(initMotifs.map(ObjectProperty(_))))
 
   /**
     * The name of the theme
@@ -47,12 +47,12 @@ class UITheme(initId: ThematicElementID,
   /**
     * The list of subthemes of the theme
     */
-  override def subthemes: List[ThematicElementID] = subthemesProperty().toList
+  override def subthemes: List[ThematicElementID] = subthemesProperty().toList.map(_.apply())
 
   /**
     * The list of motifs of the theme
     */
-  override def motifs: List[ThematicElementID] = motifsProperty().toList
+  override def motifs: List[ThematicElementID] = motifsProperty().toList.map(_.apply())
 
   override def toString: String = {
     val subthemesString = subthemes match {

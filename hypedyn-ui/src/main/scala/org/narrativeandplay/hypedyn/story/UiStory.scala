@@ -28,8 +28,8 @@ class UiStory(initTitle: String,
               initFacts: List[Fact],
               initNodes: List[UiNode],
               initRules: List[UiRule],
-              initThemes: List[ThemeLike],
-              initMotifs: List[MotifLike]) extends Narrative {
+              initThemes: List[UITheme],
+              initMotifs: List[UIMotif]) extends Narrative {
   /**
    * Backing property for the title
    */
@@ -113,12 +113,12 @@ class UiStory(initTitle: String,
   /**
     * Returns the list of themes of the story
     */
-  override def themes: List[ThemeLike] = themesProperty().toList
+  override def themes: List[UITheme] = themesProperty().toList
 
   /**
     * Returns the list of motifs of the story
     */
-  override def motifs: List[MotifLike] = motifsProperty().toList
+  override def motifs: List[UIMotif] = motifsProperty().toList
 
   /**
    * Returns an observable buffer (why not a list?) of rulesets that can be activated (usually by clicking)
