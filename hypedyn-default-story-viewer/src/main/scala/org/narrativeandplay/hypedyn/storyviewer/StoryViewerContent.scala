@@ -43,10 +43,6 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     motifs foreach { m => if (!(m.bounds contains pt)) m.deselect() }
     links foreach { l => if (!(l contains pt)) l.deselect() }
     requestLayout()
-
-    if (nodes forall (!_.bounds.contains(pt))) {
-      links find (_ contains pt) foreach { l => if (l.selected()) l.deselect() else l.select(pt) }
-    }
   })
 
   private def zoomValueClamp(d: Double) = pluginEventDispatcher.zoomValueClamp(d)

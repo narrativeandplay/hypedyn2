@@ -3,18 +3,16 @@ package org.narrativeandplay.hypedyn.storyviewer.components
 import javafx.beans.binding.BooleanExpression
 import javafx.{event => jfxe}
 import javafx.event.EventHandler
-import javafx.scene.control.{Control => JfxControl, Skin}
+import javafx.scene.control.{Skin, Control => JfxControl}
 import javafx.scene.{input => jfxsi}
 
 import scalafx.Includes.{jfxBounds2sfx, jfxMouseEvent2sfx, jfxReadOnlyDoubleProperty2sfx}
-import scalafx.beans.property.{ReadOnlyDoubleProperty, BooleanProperty, ObjectProperty}
+import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyDoubleProperty}
 import scalafx.event.Event
 import scalafx.geometry.Bounds
 import scalafx.scene.input.MouseEvent
-
 import com.github.benedictleejh.scala.math.vector.Vector2
 import org.fxmisc.easybind.EasyBind
-
 import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 import org.narrativeandplay.hypedyn.story.Nodal
@@ -22,6 +20,8 @@ import org.narrativeandplay.hypedyn.storyviewer.StoryViewer
 import org.narrativeandplay.hypedyn.storyviewer.utils.VectorImplicitConversions._
 import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
 import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils._
+
+import scalafx.scene.paint.Color
 
 /**
  * Visual representation of a node. More accurately, the model (MVC model) for the visual representation of a node
@@ -164,6 +164,12 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
    */
   def select(): Unit = {
     selected() = true
+
+    storyViewer.viewer.linkGroups filter (_.endPoints contains this) foreach { grp =>
+      grp.links filter (_.from == this) foreach { l => l.select(Color.Red) }
+      grp.links filter (_.to == this) foreach { l => l.select(Color.Green) }
+    }
+
     pluginEventDispatcher.notifyNodeSelection(id)
   }
 
