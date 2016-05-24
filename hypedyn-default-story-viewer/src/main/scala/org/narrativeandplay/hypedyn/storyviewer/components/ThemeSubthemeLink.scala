@@ -37,6 +37,11 @@ class ThemeSubthemeLink(val from: ViewerTheme,
     */
   val selected = BooleanProperty(false)
 
+  /**
+    * A property to determine selection colour
+    */
+  val selectionColour = ObjectProperty(Color.Red)
+
   private val linkLabel = new Label {
     prefWidth =  new Text(name).layoutBounds().width
     maxWidth = ThemeSubthemeLink.LabelWidth
@@ -46,7 +51,7 @@ class ThemeSubthemeLink(val from: ViewerTheme,
 
     text = name
 
-    visible <== from.showName
+    visible = false //<== from.showName
   }
 
   private val labelBackground = new Rectangle {
@@ -54,7 +59,7 @@ class ThemeSubthemeLink(val from: ViewerTheme,
     height = ThemeSubthemeLink.LabelHeight
     fill = ThemeSubthemeLink.DefaultBackgroundColour
 
-    visible <== from.showName
+    visible =false //<== from.showName
   }
 
   private def endPoints = {
@@ -89,6 +94,14 @@ class ThemeSubthemeLink(val from: ViewerTheme,
     * @param pt The selection point
     */
   def select(pt: Point2D): Unit = select(pt.x, pt.y)
+
+  /**
+    * Select this link
+    */
+  def select(inSelectionColour: Color): Unit = {
+    selectionColour() = inSelectionColour
+    select(path pointAt 0.5)
+  }
 
   /**
     * Unselect this link
@@ -176,7 +189,7 @@ class ThemeSubthemeLink(val from: ViewerTheme,
 
     val highlight = if (selected()) {
       val h = pathCurve.toFxPath
-      h.stroke = Color.Red
+      h.stroke = selectionColour()
       h.strokeWidth = 5
 
       Some(h)

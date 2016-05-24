@@ -21,6 +21,8 @@ import org.narrativeandplay.hypedyn.storyviewer.utils.VectorImplicitConversions.
 import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
 import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils._
 
+import scalafx.scene.paint.Color
+
 /**
   * Visual representation of a node. More accurately, the model (MVC model) for the visual representation of a node
   *
@@ -152,6 +154,11 @@ class ViewerMotif(motiflike: MotifLike, private val pluginEventDispatcher: Story
     */
   def select(): Unit = {
     selected() = true
+
+    storyViewer.viewer.thememotiflinkGroups filter (_.themotif == this) foreach { grp =>
+      grp.links foreach { l => l.select(Color.Red) }
+    }
+
     pluginEventDispatcher.notifyMotifSelection(id)
   }
 

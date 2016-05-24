@@ -42,6 +42,8 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     themes foreach { t => if (!(t.bounds contains pt)) t.deselect() }
     motifs foreach { m => if (!(m.bounds contains pt)) m.deselect() }
     links foreach { l => if (!(l contains pt)) l.deselect() }
+    themesubthemelinks foreach { l => if (!(l contains pt)) l.deselect() }
+    thememotiflinks foreach { l => if (!(l contains pt)) l.deselect() }
     requestLayout()
   })
 

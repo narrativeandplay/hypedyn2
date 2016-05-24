@@ -37,6 +37,11 @@ class ThemeMotifLink(val from: ViewerMotif,
     */
   val selected = BooleanProperty(false)
 
+  /**
+    * A property to determine selection colour
+    */
+  val selectionColour = ObjectProperty(Color.Red)
+
   private val linkLabel = new Label {
     prefWidth =  new Text(name).layoutBounds().width
     maxWidth = ThemeMotifLink.LabelWidth
@@ -46,7 +51,7 @@ class ThemeMotifLink(val from: ViewerMotif,
 
     text = name
 
-    visible <== from.showName
+    visible = false //<== from.showName
   }
 
   private val labelBackground = new Rectangle {
@@ -54,7 +59,7 @@ class ThemeMotifLink(val from: ViewerMotif,
     height = ThemeMotifLink.LabelHeight
     fill = ThemeMotifLink.DefaultBackgroundColour
 
-    visible <== from.showName
+    visible = false //<== from.showName
   }
 
   private def endPoints = {
@@ -89,6 +94,14 @@ class ThemeMotifLink(val from: ViewerMotif,
     * @param pt The selection point
     */
   def select(pt: Point2D): Unit = select(pt.x, pt.y)
+
+  /**
+    * Select this link
+    */
+  def select(inSelectionColour: Color): Unit = {
+    selectionColour() = inSelectionColour
+    select(path pointAt 0.5)
+  }
 
   /**
     * Unselect this link
@@ -176,7 +189,7 @@ class ThemeMotifLink(val from: ViewerMotif,
 
     val highlight = if (selected()) {
       val h = pathCurve.toFxPath
-      h.stroke = Color.Red
+      h.stroke = selectionColour()
       h.strokeWidth = 5
 
       Some(h)
