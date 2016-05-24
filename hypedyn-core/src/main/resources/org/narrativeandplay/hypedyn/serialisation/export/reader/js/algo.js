@@ -1,5 +1,8 @@
 // thematic recommendation algorithm, adapted from Charlie Hargood's Thematic Model Builder
 
+var motif_data = [];
+var theme_data = [];
+
 // down case and remove trailing spaces, and strip out newlines
 function process_natom( natom_str ) {
 	natom_str = natom_str.toLowerCase();

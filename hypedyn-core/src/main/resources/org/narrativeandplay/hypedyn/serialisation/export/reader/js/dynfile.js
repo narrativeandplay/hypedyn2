@@ -238,6 +238,101 @@ function createFacts(facts) {
 	}
 }
 
+function createThemes(themes) {
+	for(var k=0; k < themes.length; k++) {
+		var thisTheme = themes[k];
+		var themeID = thisTheme.id;
+		var themeName = thisTheme.name;
+		var subthemes = thisTheme.subthemes;
+		var submotifs = thisTheme.motifs;
+
+		// create the theme
+		disp("create theme: " + themeName)
+		var corrected_theme_name = theme_correct_spelling( themeName.toLowerCase() ).toLowerCase();
+		var obj = [];
+		obj.name = corrected_theme_name;
+		obj.id = themeID;
+		obj.motifs = [];
+		obj.subthemesByID = [];
+		obj.subthemes = [];
+
+		// iterate through motif_nodes and put into obj.motifs as strings
+		for ( var i=0; i<submotifs.length; i++ ) {
+			var motif_node = submotifs[i]; // this is an ID
+			function findMotif(a) {
+				return a.id == motif_node;
+			}
+
+			var the_motif = arr_find(motif_data, findMotif);
+			if ( ! undefined_check( the_motif ) ) {
+				var motif_str = the_motif.name;
+				var corrected_motif = correct_spelling( motif_str.toLowerCase() ).toLowerCase();
+				obj.motifs.push( corrected_motif );
+			} else {
+				//disp( motif_node );
+				alert( 'undefined! ');
+			}
+		}
+
+		// iterate through theme_nodes and put into obj.subthemes as ids
+		// do we need to fix names with spaces here?
+		for ( var j=0; j<subthemes.length; j++ ) {
+			var theme_node = subthemes[j]; // this is an ID
+			if ( ! undefined_check( theme_node ) ) {
+				obj.subthemesByID.push( theme_node );
+			}
+		}
+
+		theme_data[ corrected_theme_name ] = obj;
+	}
+
+	// now that all themes are loaded, attach the subthemes by name rather than by ID (to match the old algo)
+	for ( var i in theme_data ) {
+		var this_theme = theme_data[i];
+		for (var j=0; j<this_theme.subthemesByID.length; j++) {
+			var theme_node = this_theme.subthemesByID[j]; // this is an ID
+			function findTheme(a) {
+				thisID = a.id;
+
+				return a.id == theme_node;
+			}
+			var actual_theme = arr_find(theme_data, findTheme);
+			if ( ! undefined_check( actual_theme ) ) {
+				this_theme.subthemes.push( actual_theme.name );
+			} else {
+				//disp( motif_node );
+				alert( 'undefined! ');
+			}
+		}
+	}
+}
+
+function createMotifs(motifs) {
+	for(var k=0; k < motifs.length; k++) {
+		var thisMotif = motifs[k];
+		var motifID = thisMotif.id;
+		var motifName = thisMotif.name;
+		var features = thisMotif.features;
+
+		// create the motif
+		disp("create motif: " + motifName)
+		var corrected_name = correct_spelling( motifName.toLowerCase() ).toLowerCase();
+		var obj = [];
+		obj.name = corrected_name;
+		obj.id = motifID;
+		obj.features = [];
+
+		for (var i=0; i<features.length; i++ ) {
+			var feature = features[i];
+			if ( ! undefined_check( feature ) ) {
+				obj.features.push( feature ); // assume only one component in a feature
+			}
+		}
+
+		motif_data[corrected_name] = obj;
+	}
+}
+
 function loadStory() {
 	var data = getStoryData();
 	var story = data.story;
@@ -245,6 +340,8 @@ function loadStory() {
 	var description = story.description; // unused
 	var nodes = story.nodes;
 	var facts = story.facts;
+	var themes = story.themes;
+	var motifs = story.motifs;
 
 	// iterate through nodes and create
 	for (var i = 0; i < nodes.length; i++) {
@@ -296,6 +393,16 @@ function loadStory() {
 		createFacts(facts);
 	}
 
+	// add motifs
+	if (motifs != null) {
+		createMotifs(motifs);
+	}
+
+	// add themes
+	if (themes != null) {
+		createThemes(themes);
+	}
+
 	// write config flags
 	write_config_flag('back_button_flag', !story.metadata.backDisabled);
 	write_config_flag('restart_button_flag', !story.metadata.restartDisabled);
@@ -306,7 +413,7 @@ function loadStory() {
 	read_config_flag();
 
 	// load thematic data
-	load_all_xml();
+	//load_all_xml();
 
 	runhypedyn(); // entrance point of the story logic
 	setTimeout('window.scrollTo(0, 0)', 1000); // for mobile to hide the url

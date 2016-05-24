@@ -2,9 +2,6 @@ var theme_list = "themes";
 var theme_extension = ".xml";
 var theme_dir = "themes/";
 
-// loaded the xml DOM into an array
-var theme_data = [];
-
 function theme_path( theme_filename ) {
 	return theme_dir + theme_filename + theme_extension;
 }

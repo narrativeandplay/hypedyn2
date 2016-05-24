@@ -2,9 +2,6 @@ var motif_dir = "themes/";
 
 var motif_extension = ".xml";
 
-// loaded the xml DOM into an array
-var motif_data = [];
-
 function motif_path( motif_filename ) {
 	return motif_dir + motif_filename + motif_extension;
 }
