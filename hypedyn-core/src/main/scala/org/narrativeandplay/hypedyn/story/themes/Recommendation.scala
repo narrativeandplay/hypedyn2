@@ -1,5 +1,6 @@
 package org.narrativeandplay.hypedyn.story.themes
 
+import org.narrativeandplay.hypedyn.story.StoryController
 import org.narrativeandplay.hypedyn.story.internal.{Node, Story}
 import org.narrativeandplay.hypedyn.story.themes.internal.{Motif, Theme}
 
@@ -9,6 +10,10 @@ import scala.xml.NodeSeq
   * Calculates a thematic recommendation.
   */
 object Recommendation {
+  def recommendation(text: String) : List[Tuple2[Node, Double]] = {
+    recommendation(text, StoryController.story.nodes, StoryController.story.themes, StoryController.story)
+  }
+
     /**
     * Given a source node and a list of target nodes, recommends a list of nodes from the target list that contain the same themes
     *
@@ -89,11 +94,11 @@ object Recommendation {
     */
   def containedThemes(text: String, allThemes: List[Theme], story: Story): List[Theme] = {
     allThemes filter(theme =>
-      motifsAreCovered(text, getAllMotifs(allThemes, story)))
+      motifsAreCovered(text, getAllMotifs(theme, story, true)))
   }
 
   /**
-    * Helper function to get all motifs in a theme;
+    * Helper function to get all motifs in a list of themes;
     * if recursive is true, then will recursively get motifs for all the subthemes as well
     *
     * @param themes themes from which to retrieve the motifs
@@ -101,8 +106,9 @@ object Recommendation {
     * @param recursive should the motifs be retrieved from subthemes as well? (default is true)
     * @return list of all motifs
     */
-  private def getAllMotifs(themes: List[Theme], story: Story, recursive: Boolean = true): List[Motif] = {
-    (themes flatMap { theme =>
+  private def getAllMotifs(themes: List[Theme], story: Story, recursive: Boolean): List[Motif] = {
+    (
+    themes flatMap { theme =>
       List(
         theme.motifs flatMap (motifID =>
           story.motifs.find(_.id == motifID)),
@@ -113,6 +119,28 @@ object Recommendation {
         }
       )
     }).flatten
+  }
+
+  /**
+    * Helper function to get all motifs in a theme;
+    * if recursive is true, then will recursively get motifs for all the subthemes as well
+    *
+    * @param theme theme from which to retrieve the motifs
+    * @param story the story
+    * @param recursive should the motifs be retrieved from subthemes as well? (default is true)
+    * @return list of all motifs
+    */
+  private def getAllMotifs(theme: Theme, story: Story, recursive: Boolean = false): List[Motif] = {
+    //(
+      //  List(
+      theme.motifs flatMap (motifID =>
+        story.motifs.find(_.id == motifID))
+      //    (recursive, theme.subthemes.nonEmpty) match {
+      //      case (true, true) =>
+      //        getAllMotifs(getAllSubthemes(theme, story), story, recursive)
+      //      case _ => List[Motif]()
+    //  )
+    //}).flatten
   }
 
 
@@ -176,6 +204,17 @@ object Recommendation {
     * @return true if the string contains the phrase
     */
   def stringContainsPhrase(string: String, phrase: String): Boolean = {
-    string.contains(phrase) // this is too simplistic, need to check boundaries to make sure its not a substring
+    string.toLowerCase.trim.indexOf(phrase.toLowerCase.trim) match {
+      case -1 => false
+      case theIndex =>
+        ((theIndex==0)||delimiterCheck(string.substring(theIndex-1, theIndex)))&&
+          ((theIndex+phrase.length==string.length)||delimiterCheck(string.substring(theIndex+phrase.length, theIndex+phrase.length+1)))
+    }
+  }
+
+  private def delimiterCheck(string: String): Boolean = {
+    val delimiters = List(" ",".",",")
+
+    delimiters.exists(string.contains)
   }
 }

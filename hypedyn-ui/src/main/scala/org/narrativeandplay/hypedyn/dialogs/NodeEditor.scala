@@ -1,9 +1,9 @@
 package org.narrativeandplay.hypedyn.dialogs
 
-import java.io.{DataOutputStream, DataInputStream}
+import java.io.{DataInputStream, DataOutputStream}
 import javafx.collections.ObservableList
 import javafx.{event => jfxe}
-import javafx.event.{ActionEvent => JfxActionEvent, EventHandler}
+import javafx.event.{EventHandler, ActionEvent => JfxActionEvent}
 import javafx.scene.control.{IndexRange => JfxIndexRange}
 import javafx.scene.{input => jfxsi}
 import javafx.scene.input.{KeyEvent => JfxKeyEvent}
@@ -11,29 +11,29 @@ import javafx.scene.input.{KeyEvent => JfxKeyEvent}
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
-import scalafx.event.{Event, ActionEvent}
-import scalafx.geometry.{Pos, Insets, Orientation}
+import scalafx.event.{ActionEvent, Event}
+import scalafx.geometry.{Insets, Orientation, Pos}
 import scalafx.scene.control._
-import scalafx.scene.input.{MouseEvent, KeyEvent}
+import scalafx.scene.input.{KeyEvent, MouseEvent}
 import scalafx.scene.layout._
 import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
 import scalafx.scene.control.Tab.sfxTab2jfx
-
 import org.fxmisc.easybind.EasyBind
-import org.fxmisc.richtext.{Codec, StyleSpan, InlineStyleTextArea}
-
-import org.narrativeandplay.hypedyn.dialogs.NodeEditor.{NodeContentTextArea, LinkStyleInfo}
+import org.fxmisc.richtext.{Codec, InlineStyleTextArea, StyleSpan}
+import org.narrativeandplay.hypedyn.dialogs.NodeEditor.{LinkStyleInfo, NodeContentTextArea}
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
-import org.narrativeandplay.hypedyn.story.NodalContent.{RulesetId, TextIndex, RulesetIndexes}
+import org.narrativeandplay.hypedyn.logging.Logger
+import org.narrativeandplay.hypedyn.story.NodalContent.{RulesetId, RulesetIndexes, TextIndex}
 import org.narrativeandplay.hypedyn.story.UiNodeContent.UiRuleset
 import org.narrativeandplay.hypedyn.story._
 import org.narrativeandplay.hypedyn.story.rules.ActionLocationType.{NodeAction, NodeContentAction}
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
+import org.narrativeandplay.hypedyn.story.themes.Recommendation
 import org.narrativeandplay.hypedyn.uicomponents.RulesPane
 import org.narrativeandplay.hypedyn.uicomponents.Sidebar.SidebarButton
-import org.narrativeandplay.hypedyn.utils.{ExpandableEmptySpace, CollapsibleSplitPane}
+import org.narrativeandplay.hypedyn.utils.{CollapsibleSplitPane, ExpandableEmptySpace}
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 
 /**
@@ -380,6 +380,15 @@ class NodeEditor private (dialogTitle: String,
     dividerPositions = 0.75
   }
 
+  // alex testing recommendations
+  private val recommendButton = new Button("recommend") {
+    onAction = { actionEvent: ActionEvent =>
+      //UiEventDispatcher.requestNewNode()
+      Logger.info("recommendation button")
+      Logger.info("recommendation: " + Recommendation.recommendation(node().content.text))
+    }
+  }
+
   val contentPane = new BorderPane() {
     top = new VBox() {
       children += new HBox(10) {
@@ -389,6 +398,7 @@ class NodeEditor private (dialogTitle: String,
         children += new Label("Name:")
         children += nodeNameField
         children += startNodeCheckbox
+        children += recommendButton
 
         HBox.setHgrow(nodeNameField, Priority.Always)
       }
