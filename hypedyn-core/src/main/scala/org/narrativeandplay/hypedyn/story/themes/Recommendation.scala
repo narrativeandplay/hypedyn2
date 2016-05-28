@@ -11,8 +11,8 @@ import scala.xml.NodeSeq
   * Calculates a thematic recommendation.
   */
 object Recommendation {
-  def recommendation(text: String) : List[Tuple2[Node, Double]] = {
-    recommendation(text, StoryController.story.nodes, StoryController.story.themes, StoryController.story)
+  def recommendation(text: String, threshold: Double = 0.2) : List[Tuple2[Node, Double]] = {
+    recommendation(text, StoryController.story.nodes, StoryController.story.themes, StoryController.story, threshold)
   }
 
     /**
@@ -24,8 +24,8 @@ object Recommendation {
     * @param story the story
     * @return list of ordered pairs consisting of nodes that match the given themes, and their scores
     */
-  def recommendation(node: Node, targetNodes: List[Node], allThemes: List[Theme], story: Story): List[Tuple2[Node, Double]] = {
-      recommendation(node.content.text, targetNodes, allThemes, story)
+  def recommendation(node: Node, targetNodes: List[Node], allThemes: List[Theme], story: Story, threshold: Double): List[Tuple2[Node, Double]] = {
+      recommendation(node.content.text, targetNodes, allThemes, story, threshold)
   }
 
   /**
@@ -38,8 +38,8 @@ object Recommendation {
     * @param story the story
     * @return list of ordered pairs consisting of nodes that match the given themes, and their scores
     */
-  def recommendation(text: String, targetNodes: List[Node], allThemes: List[Theme], story: Story): List[Tuple2[Node, Double]] = {
-    recommendation(containedThemes(text, allThemes, story), targetNodes, story: Story)
+  def recommendation(text: String, targetNodes: List[Node], allThemes: List[Theme], story: Story, threshold: Double): List[Tuple2[Node, Double]] = {
+    recommendation(containedThemes(text, allThemes, story), targetNodes, story: Story, threshold)
   }
 
   /**
@@ -50,12 +50,12 @@ object Recommendation {
     * @param story the story
     * @return list of ordered pairs consisting of nodes that match the given themes, and their scores
     */
-  def recommendation(sourceThemes: List[Theme], targetNodes: List[Node], story: Story): List[Tuple2[Node, Double]] = {
+  def recommendation(sourceThemes: List[Theme], targetNodes: List[Node], story: Story, threshold: Double): List[Tuple2[Node, Double]] = {
     targetNodes map{node =>
       Tuple2(node,
         (thematicCoverage(sourceThemes, node.content.text, story) +
         componentCoverage(sourceThemes, node.content.text, story))/2.0)
-    } sortWith(_._2 > _._2)
+    } filter(_._2 > threshold) sortWith(_._2 > _._2)
   }
 
   /**
