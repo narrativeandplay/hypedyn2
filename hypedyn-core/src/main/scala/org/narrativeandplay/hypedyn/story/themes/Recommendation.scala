@@ -1,5 +1,6 @@
 package org.narrativeandplay.hypedyn.story.themes
 
+import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.story.StoryController
 import org.narrativeandplay.hypedyn.story.internal.{Node, Story}
 import org.narrativeandplay.hypedyn.story.themes.internal.{Motif, Theme}
@@ -58,7 +59,7 @@ object Recommendation {
   }
 
   /**
-    * Calculates the (simple) thematic coverage: contained themes/total themes
+    * Calculates the thematic coverage: contained themes/total themes
     *
     * @param themes themes to check for
     * @param text text to check
@@ -66,7 +67,10 @@ object Recommendation {
     * @return thematic coverage score
     */
   def thematicCoverage(themes: List[Theme], text: String, story: Story): Double = {
-    containedThemes(text, themes, story).length/themes.length
+    themes.length match {
+      case 0 => 0.0
+      case _ => containedThemes(text, themes, story).length.toDouble/themes.length.toDouble
+    }
   }
 
   /**
@@ -81,7 +85,7 @@ object Recommendation {
   def componentCoverage(themes: List[Theme], text: String, story: Story): Double = {
     val allMotifs = getAllMotifs(themes, story, false)
     val allSubthemes = getAllSubthemes(themes, story)
-    (motifsCoveredCount(text, allMotifs)+thematicCoverage(allSubthemes, text, story))/(allMotifs.length+allSubthemes.length)
+    (motifsCoveredCount(text, allMotifs)+thematicCoverage(allSubthemes, text, story)*allSubthemes.length)/(allMotifs.length+allSubthemes.length)
   }
 
   /**
@@ -107,22 +111,13 @@ object Recommendation {
     * @return list of all motifs
     */
   private def getAllMotifs(themes: List[Theme], story: Story, recursive: Boolean): List[Motif] = {
-    (
     themes flatMap { theme =>
-      List(
-        theme.motifs flatMap (motifID =>
-          story.motifs.find(_.id == motifID)),
-        (recursive, theme.subthemes.nonEmpty) match {
-          case (true, true) =>
-            getAllMotifs(getAllSubthemes(theme, story), story, recursive)
-          case _ => List[Motif]()
-        }
-      )
-    }).flatten
+      getAllMotifs(theme, story, recursive)
+    }
   }
 
   /**
-    * Helper function to get all motifs in a theme;
+    * Helper function to get all motifs in a single theme;
     * if recursive is true, then will recursively get motifs for all the subthemes as well
     *
     * @param theme theme from which to retrieve the motifs
@@ -131,16 +126,14 @@ object Recommendation {
     * @return list of all motifs
     */
   private def getAllMotifs(theme: Theme, story: Story, recursive: Boolean = false): List[Motif] = {
-    //(
-      //  List(
+    List(
       theme.motifs flatMap (motifID =>
-        story.motifs.find(_.id == motifID))
-      //    (recursive, theme.subthemes.nonEmpty) match {
-      //      case (true, true) =>
-      //        getAllMotifs(getAllSubthemes(theme, story), story, recursive)
-      //      case _ => List[Motif]()
-    //  )
-    //}).flatten
+        story.motifs.find(_.id == motifID)),
+      (recursive, theme.subthemes.nonEmpty) match {
+        case (true, true) =>
+          getAllMotifs(getAllSubthemes(theme, story), story, recursive)
+        case _ => List[Motif]()
+      }).flatten
   }
 
 
