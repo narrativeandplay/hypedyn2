@@ -45,7 +45,7 @@ object InterfaceToImplementationConversions {
                                                      nodal.isStartNode,
                                                      nodal.rules map ruleLike2Rule)
   implicit def narrativeMetadata2StoryMetadata(metadata: Narrative.Metadata): Story.Metadata =
-    new Metadata(metadata.comments, metadata.readerStyle, metadata.isBackButtonDisabled, metadata.isRestartButtonDisabled)
+    new Metadata(metadata.comments, metadata.readerStyle, metadata.isBackButtonDisabled, metadata.isRestartButtonDisabled, metadata.themeThreshold)
   implicit def narrative2Story(narrative: Narrative): Story = Story(narrative.title,
                                                                     narrative.author,
                                                                     narrative.description,

@@ -80,6 +80,11 @@ object Narrative {
      * Returns true if the restart button is to be disabled
      */
     def isRestartButtonDisabled: Boolean
+
+    /**
+      * Returns the threshold for thematic links
+      */
+    def themeThreshold: Double
   }
 
   /**

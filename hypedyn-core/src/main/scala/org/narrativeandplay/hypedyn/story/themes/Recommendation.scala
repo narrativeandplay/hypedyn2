@@ -11,7 +11,7 @@ import scala.xml.NodeSeq
   * Calculates a thematic recommendation.
   */
 object Recommendation {
-  def recommendation(text: String, threshold: Double = 0.2) : List[Tuple2[Node, Double]] = {
+  def recommendation(text: String, threshold: Double = 0.4) : List[Tuple2[Node, Double]] = {
     recommendation(text, StoryController.story.nodes, StoryController.story.themes, StoryController.story, threshold)
   }
 

@@ -140,11 +140,13 @@ object UiStory {
    * @param initReaderStyle The initial style of the reader
    * @param initBackDisabled The initial value of whether the back button is disabled
    * @param initRestartDisabled The initial value of whether the restart button is disabled
+   * @param initThemeThreshold The initial value of the theme threshold
    */
   class UiStoryMetadata(initComments: String,
                         initReaderStyle: ReaderStyle,
                         initBackDisabled: Boolean,
-                        initRestartDisabled: Boolean) extends Narrative.Metadata {
+                        initRestartDisabled: Boolean,
+                        initThemeThreshold: Double) extends Narrative.Metadata {
     /**
      * Backing property for the comments
      */
@@ -166,6 +168,11 @@ object UiStory {
     val restartDisabledProperty = BooleanProperty(initRestartDisabled)
 
     /**
+      * Backing property for theme threshold
+      */
+    val themeThresholdProperty = ObjectProperty(initThemeThreshold)
+
+    /**
      * Returns the story comments
      */
     override def comments: String = commentsProperty()
@@ -181,6 +188,11 @@ object UiStory {
     override def isBackButtonDisabled: Boolean = backDisabledProperty()
 
     /**
+      * Returns the theme threshold
+      */
+    override def themeThreshold: Double = themeThresholdProperty()
+
+    /**
      * Returns the style of the reader
      */
     override def readerStyle: ReaderStyle = readerStyleProperty()
@@ -190,6 +202,7 @@ object UiStory {
          |  comments: "$comments",
          |  readerStyle: $readerStyle,
          |  backDisabled?: $isBackButtonDisabled,
-         |  restartDisabled: $isRestartButtonDisabled)""".stripMargin
+         |  restartDisabled: $isRestartButtonDisabled,
+         |  themeThreshold: $themeThreshold)""".stripMargin
   }
 }

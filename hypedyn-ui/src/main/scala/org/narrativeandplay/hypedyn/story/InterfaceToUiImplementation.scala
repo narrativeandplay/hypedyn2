@@ -45,7 +45,7 @@ object InterfaceToUiImplementation {
   implicit def themeLike2UITheme(themeLike: ThemeLike): UITheme = new UITheme(themeLike.id, themeLike.name, themeLike.subthemes, themeLike.motifs)
 
   implicit def narrativeMetadata2UiStoryMetadata(metadata: Metadata): UiStory.UiStoryMetadata =
-    new UiStoryMetadata(metadata.comments, metadata.readerStyle, metadata.isBackButtonDisabled, metadata.isRestartButtonDisabled)
+    new UiStoryMetadata(metadata.comments, metadata.readerStyle, metadata.isBackButtonDisabled, metadata.isRestartButtonDisabled, metadata.themeThreshold)
 
   implicit def narrative2UiStory(narrative: Narrative): UiStory = new UiStory(narrative.title,
                                                                               narrative.description,

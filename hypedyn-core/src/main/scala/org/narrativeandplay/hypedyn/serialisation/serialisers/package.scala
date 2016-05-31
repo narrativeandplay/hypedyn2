@@ -521,7 +521,8 @@ package object serialisers {
     override def serialise(t: Metadata): AstElement = AstMap("comments" -> AstString(t.comments),
                                                              "readerStyle" -> ReaderStyleSerialiser.serialise(t.readerStyle),
                                                              "backDisabled" -> AstBoolean(t.isBackButtonDisabled),
-                                                             "restartDisabled" -> AstBoolean(t.isRestartButtonDisabled))
+                                                             "restartDisabled" -> AstBoolean(t.isRestartButtonDisabled),
+                                                             "themeThreshold" -> AstFloat(t.themeThreshold))
 
     /**
      * Returns an object given it's serialised representation

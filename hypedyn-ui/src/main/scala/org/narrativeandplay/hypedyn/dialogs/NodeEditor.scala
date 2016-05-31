@@ -386,7 +386,7 @@ class NodeEditor private (dialogTitle: String,
       //UiEventDispatcher.requestNewNode()
       Logger.info("recommendation button")
       val recommendation = Recommendation.recommendation(node().content.text) filterNot(_._1.id == node().id)
-      recommendation map{thisRecommendation =>
+      recommendation foreach{thisRecommendation =>
         Logger.info("recommendation: node: " + thisRecommendation._1.name +
           ", score: " + thisRecommendation._2)
       }

@@ -26,6 +26,8 @@ var window_resize_flag = true;
 var fixed_page_width = 0;
 var fixed_page_height = 0;
 
+var themeThreshold = 0.2;
+
 function write_config_flag( flag_name, value ) {
 	//disp("write config flag "+value);
 	switch ( flag_name ) {
@@ -39,6 +41,8 @@ function write_config_flag( flag_name, value ) {
 		case "page_flipping_mode":
 			if (display_mode == "mobile") // only override if its a mobile
 				page_flipping_mode = value; break;
+		case "theme_threshold":
+			themeThreshold = value; break;
 	}
 }
 

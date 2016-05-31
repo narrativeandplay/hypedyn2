@@ -41,8 +41,6 @@ var startNodeID;
 var currNodeID;
 var prev_read_nodes = [];
 
-var themeThreshold = 0.2;
-
 var myScroll = null;
 
 function get_device_dimension() {

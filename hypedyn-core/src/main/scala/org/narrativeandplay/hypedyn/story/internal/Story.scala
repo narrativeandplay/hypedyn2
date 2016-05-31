@@ -216,9 +216,11 @@ object Story {
    * @param readerStyle The style of the reader
    * @param isBackButtonDisabled Whether the back button is disabled
    * @param isRestartButtonDisabled Whether the restart button is disabled
+   * @param themeThreshold threshold for themes
    */
   case class Metadata(comments: String = "",
                       readerStyle: ReaderStyle = Standard,
                       isBackButtonDisabled: Boolean = false,
-                      isRestartButtonDisabled: Boolean = false) extends Narrative.Metadata
+                      isRestartButtonDisabled: Boolean = false,
+                      themeThreshold: Double = 0.5) extends Narrative.Metadata
 }

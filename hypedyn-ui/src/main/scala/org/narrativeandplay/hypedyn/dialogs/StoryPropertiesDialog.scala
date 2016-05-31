@@ -1,24 +1,26 @@
 package org.narrativeandplay.hypedyn.dialogs
 
+import java.text.{DecimalFormat, NumberFormat}
+import java.util.Locale
 import javafx.beans.value.ObservableValue
 import javafx.scene.control
 
 import scalafx.Includes._
-import scalafx.geometry.Orientation
+import scalafx.geometry.{Insets, Orientation, Pos}
 import scalafx.scene.control._
-import scalafx.scene.layout.HBox
+import scalafx.scene.layout.{HBox, Priority, Region, VBox}
 import scalafx.stage.FileChooser.ExtensionFilter
 import scalafx.stage.{FileChooser, Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
-
 import org.fxmisc.easybind.EasyBind
 import org.tbee.javafx.scene.layout.MigPane
-
 import org.narrativeandplay.hypedyn.dialogs.StoryPropertiesDialog.FileSelectorWithTextField
 import org.narrativeandplay.hypedyn.story.Narrative
 import org.narrativeandplay.hypedyn.story.UiStory.UiStoryMetadata
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
+
+import scalafx.util.converter.{DoubleStringConverter, FormatStringConverter}
 
 /**
  * Dialog for editing story properties
@@ -56,9 +58,17 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
       add(new Label("Author: "))
       add(authorField, "growx, wrap")
       add(new Label("Description: "))
-      add(descriptionArea, "wrap")
+      add(descriptionArea, "growx, wrap")
       add(new Label("Comments: "))
-      add(commentsArea)
+      add(commentsArea, "growx, wrap")
+      add(new Label("Theme threshold: "))
+      add(new HBox() {
+        padding = Insets(5, 0, 5, 0)
+        alignment = Pos.CenterLeft
+        children += thresholdField
+        children += slider
+        HBox.setHgrow(thresholdField, Priority.Always)
+      })
     }
   }
 
@@ -74,6 +84,18 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
   lazy val commentsArea = new TextArea {
     wrapText = true
     text <==> metadata.commentsProperty
+  }
+
+  lazy val slider = new Slider(0.0, 1.0, metadata.themeThreshold)
+
+  lazy val thresholdField = new TextField {
+    val converter = new FormatStringConverter[Number](NumberFormat.getNumberInstance())
+
+    textFormatter = new TextFormatter(converter){
+      value <==> slider.value
+    }
+    maxWidth = 140
+    maxHeight = Region.USE_COMPUTED_SIZE
   }
 
   lazy val readerPropertiesTab = new Tab {
@@ -148,6 +170,7 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
         case Custom(_) => Custom(customCssFileSelector.selectedFileFilename)
       }
       metadata.readerStyleProperty() = readerStyle
+      metadata.themeThresholdProperty() = slider.value() //thresholdField.text.value.toDouble
       (titleField.text(), authorField.text(), descriptionArea.text(), metadata)
     case _ => null
   }

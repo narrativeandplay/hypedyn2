@@ -408,6 +408,7 @@ function loadStory() {
 	write_config_flag('restart_button_flag', !story.metadata.restartDisabled);
 	write_config_flag('page_flipping_mode', true);
 	write_config_flag('window_resize_flag', true);
+	write_config_flag('theme_threshold', story.metadata.themeThreshold);
 
 	// all of this was originally in window.onload
 	read_config_flag();
