@@ -11,7 +11,15 @@ import scala.xml.NodeSeq
   * Calculates a thematic recommendation.
   */
 object Recommendation {
-  def recommendation(text: String, threshold: Double = 0.4) : List[Tuple2[Node, Double]] = {
+  /**
+    * Given a text string and an (optional) threshould, recommends a list of nodes from the story that contain the
+    * themes found in the string
+    *
+    * @param text string to match against
+    * @param threshold the cutoff point for themes
+    * @return list of ordered pairs consisting of nodes that match the given themes, and their scores
+    */
+  def recommendation(text: String, threshold: Double = StoryController.story.metadata.themeThreshold) : List[Tuple2[Node, Double]] = {
     recommendation(text, StoryController.story.nodes, StoryController.story.themes, StoryController.story, threshold)
   }
 
@@ -22,6 +30,7 @@ object Recommendation {
     * @param targetNodes list of target nodes
     * @param allThemes list of all themes in the story - do I need this? or could this be a subset? hmm
     * @param story the story
+    * @param threshold the cutoff point for themes
     * @return list of ordered pairs consisting of nodes that match the given themes, and their scores
     */
   def recommendation(node: Node, targetNodes: List[Node], allThemes: List[Theme], story: Story, threshold: Double): List[Tuple2[Node, Double]] = {
@@ -36,6 +45,7 @@ object Recommendation {
     * @param targetNodes list of target nodes
     * @param allThemes list of all themes in the story - do I need this? or could this be a subset? hmm
     * @param story the story
+    * @param threshold the cutoff point for themes
     * @return list of ordered pairs consisting of nodes that match the given themes, and their scores
     */
   def recommendation(text: String, targetNodes: List[Node], allThemes: List[Theme], story: Story, threshold: Double): List[Tuple2[Node, Double]] = {
@@ -48,6 +58,7 @@ object Recommendation {
     * @param sourceThemes list of themes to match
     * @param targetNodes list of target nodes
     * @param story the story
+    * @param threshold the cutoff point for themes
     * @return list of ordered pairs consisting of nodes that match the given themes, and their scores
     */
   def recommendation(sourceThemes: List[Theme], targetNodes: List[Node], story: Story, threshold: Double): List[Tuple2[Node, Double]] = {
@@ -182,10 +193,10 @@ object Recommendation {
     * @return number of motifs covered
     */
   def motifsCoveredCount(text: String, motifs: List[Motif]): Int = {
-    motifs flatMap(motif =>
+    motifs map(motif =>
       motif.features map(feature =>
         stringContainsPhrase(text.replaceAll("\\r\\n|\\r|\\n", " "), feature.replaceAll("\\r\\n|\\r|\\n", " "))
-      )
+      ) contains(true)
     ) count(_ == true)
   }
 
