@@ -168,7 +168,7 @@ case class Story(title: String = "Untitled",
     * @param theme The theme to remove
     * @return A new story with the specified theme removed
     */
-  def removeTheme(theme: Theme) = new Story(title, author, description, metadata, nodes, facts, rules, themes filter (_ != theme))
+  def removeTheme(theme: Theme) = new Story(title, author, description, metadata, nodes, facts, rules, themes filter (_ != theme), motifs)
 
   /**
     * Adds a motif to the story
