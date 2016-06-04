@@ -538,8 +538,9 @@ package object serialisers {
       val readerStyle = ReaderStyleSerialiser deserialise data("readerStyle")
       val backDisabled = safeCastStoryMetadata[AstBoolean](data("backDisabled")).boolean
       val restartDisabled = safeCastStoryMetadata[AstBoolean](data("restartDisabled")).boolean
+      val themeThreshold = safeCastStoryMetadata[AstFloat](data("themeThreshold")).f
 
-      Story.Metadata(comments, readerStyle, backDisabled, restartDisabled)
+      Story.Metadata(comments, readerStyle, backDisabled, restartDisabled, themeThreshold)
     }
   }
 

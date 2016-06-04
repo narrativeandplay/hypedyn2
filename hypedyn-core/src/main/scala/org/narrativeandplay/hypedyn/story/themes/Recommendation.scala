@@ -35,7 +35,7 @@ object Recommendation {
       Tuple2(node,
         (thematicCoverage(sourceThemes, node.content.text, StoryController.story) +
         componentCoverage(sourceThemes, node.content.text, StoryController.story))/2.0)
-    } filter(_._2 > threshold) sortWith(_._2 > _._2)
+    } filter(_._2 >= threshold) sortWith(_._2 > _._2)
   }
 
   /**

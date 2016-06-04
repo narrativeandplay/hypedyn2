@@ -170,6 +170,11 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
       grp.links filter (_.to == this) foreach { l => l.select(Color.Green) }
     }
 
+    storyViewer.viewer.thematicLinkGroups filter (_.endPoints contains this) foreach { grp =>
+      grp.links filter (_.from == this) foreach { l => l.select(Color.Red) }
+      grp.links filter (_.to == this) foreach { l => l.select(Color.Green) }
+    }
+
     pluginEventDispatcher.notifyNodeSelection(id)
   }
 
