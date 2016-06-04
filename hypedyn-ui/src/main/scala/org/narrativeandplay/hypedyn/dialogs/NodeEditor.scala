@@ -381,6 +381,8 @@ class NodeEditor private (dialogTitle: String,
   }
 
   // alex testing recommendations
+  // cheat and directly call Recommendation as I don't know how to get the response in NodeEditor
+  // perhaps should store the recommendations in the UINode and bind to it?
   private val recommendButton: Button = new Button("recommend") {
     onAction = { actionEvent: ActionEvent =>
       Logger.info("recommendation button")
@@ -389,6 +391,7 @@ class NodeEditor private (dialogTitle: String,
         Logger.info("recommendation: node: " + thisRecommendation._1.name +
           ", score: " + thisRecommendation._2)
       }
+      //UiEventDispatcher.requestRecommendation(node().id)
     }
   }
 

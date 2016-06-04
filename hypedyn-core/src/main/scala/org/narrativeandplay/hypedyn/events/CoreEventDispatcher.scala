@@ -85,7 +85,7 @@ object CoreEventDispatcher {
   EventBus.RecommendationRequests foreach { evt =>
     StoryController findNode evt.id foreach { n =>
       EventBus.send(RecommendationResponse(n.id, Recommendation.recommendation(n.content.text) filterNot (_._1.id == evt.id),
-        CoreEventSourceIdentity))
+        evt.src, CoreEventSourceIdentity))
     }
   }
   EventBus.CreateNodeEvents foreach { evt =>

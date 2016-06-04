@@ -377,9 +377,10 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
     EventBus.send(RecommendationRequest(id, StoryViewerEventSourceIdentity))
   }
 
-  EventBus.RecommendationResponses foreach { r => onRecommendationResponse(r.nodeId, r.recommendedNodes, r.src) }
+  EventBus.RecommendationResponses filter(_.origin == StoryViewerEventSourceIdentity) foreach { r =>
+    onRecommendationResponse(r.nodeId, r.recommendedNodes) }
 
-  def onRecommendationResponse(nodeId: NodeId, recommendation: List[(Nodal, Double)], src: String): Unit = {
+  def onRecommendationResponse(nodeId: NodeId, recommendation: List[(Nodal, Double)]): Unit = {
     viewer.onRecommendationResponse(nodeId, recommendation)
   }
 }

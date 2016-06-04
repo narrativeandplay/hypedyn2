@@ -133,7 +133,7 @@ sealed case class NewMotifResponse(src: String) extends Response
 sealed case class EditMotifResponse(motif: MotifLike, src: String) extends Response
 sealed case class DeleteMotifResponse(motif: MotifLike, src: String) extends Response
 
-sealed case class RecommendationResponse(nodeId: NodeId, recommendedNodes: List[(Nodal, Double)], src: String) extends Response
+sealed case class RecommendationResponse(nodeId: NodeId, recommendedNodes: List[(Nodal, Double)], origin: String, src: String) extends Response
 
 sealed case class SaveResponse(loadedFile: Option[File], src: String) extends Response
 sealed case class SaveAsResponse(src: String) extends Response

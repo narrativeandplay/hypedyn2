@@ -10,6 +10,7 @@ import rx.lang.scala.Observable
 import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
+import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.story.{Nodal, NodeId}
 import org.narrativeandplay.hypedyn.uicomponents.FactViewer
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
@@ -92,6 +93,11 @@ object UiEventDispatcher {
     editedMotif foreach { m => EventBus.send(UpdateMotif(res.motif, m, UiEventSourceIdentity)) }
   }
   EventBus.DeleteMotifResponses foreach { res => EventBus.send(DestroyMotif(res.motif, UiEventSourceIdentity)) }
+
+  EventBus.RecommendationResponses filter(_.origin == UiEventSourceIdentity) foreach { r =>
+    //onRecommendationResponse(r.nodeId, r.recommendedNodes)
+    Logger.info("*********** RecommendationResponses")
+  }
 
   EventBus.SaveResponses foreach { evt =>
     evt.loadedFile match {
@@ -264,6 +270,10 @@ object UiEventDispatcher {
   }
   def requestDeleteMotif(): Unit = {
     selectedMotif() foreach { id => EventBus.send(DeleteMotifRequest(id, UiEventSourceIdentity)) }
+  }
+
+  def requestRecommendation(id: NodeId): Unit = {
+    EventBus.send(RecommendationRequest(id, UiEventSourceIdentity))
   }
 
   def requestNewStory(): Unit = {
