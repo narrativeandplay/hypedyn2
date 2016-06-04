@@ -53,6 +53,8 @@ object EventBus {
   val EditMotifRequests = eventBus collect { case e: EditMotifRequest => e }
   val DeleteMotifRequests = eventBus collect { case e: DeleteMotifRequest => e }
 
+  val RecommendationRequests = eventBus collect { case e: RecommendationRequest => e }
+
   val SaveRequests = eventBus collect { case e: SaveRequest => e }
   val SaveAsRequests = eventBus collect { case e: SaveAsRequest => e }
   val LoadRequests = eventBus collect { case e: LoadRequest => e }
@@ -91,6 +93,8 @@ object EventBus {
   val NewMotifResponses = eventBus collect { case e: NewMotifResponse => e }
   val EditMotifResponses = eventBus collect { case e: EditMotifResponse => e }
   val DeleteMotifResponses = eventBus collect { case e: DeleteMotifResponse => e }
+
+  val RecommendationResponses = eventBus collect { case e: RecommendationResponse => e }
 
   val SaveResponses = eventBus collect { case e: SaveResponse => e }
   val SaveAsResponses = eventBus collect { case e: SaveAsResponse => e }

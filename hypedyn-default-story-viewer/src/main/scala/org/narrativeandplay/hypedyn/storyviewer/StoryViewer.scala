@@ -10,6 +10,7 @@ import scalafx.scene.control.{Control, ScrollPane}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 import com.github.benedictleejh.scala.math.vector.Vector2
 import org.narrativeandplay.hypedyn.events._
+import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.plugins.{Plugin, Saveable}
 import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
 import org.narrativeandplay.hypedyn.serialisation._
@@ -369,5 +370,16 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
     val y = motifData("y").asInstanceOf[AstFloat].f
 
     (ThematicElementID(id), x, y)
+  }
+
+
+  def requestRecommendation(id: NodeId): Unit = {
+    EventBus.send(RecommendationRequest(id, StoryViewerEventSourceIdentity))
+  }
+
+  EventBus.RecommendationResponses foreach { r => onRecommendationResponse(r.nodeId, r.recommendedNodes) }
+
+  def onRecommendationResponse(nodeId: NodeId, recommendation: List[(Nodal, Double)]): Unit = {
+    viewer.onRecommendationResponse(nodeId, recommendation)
   }
 }

@@ -33,6 +33,15 @@ object ViewerConversions {
         (actionTypes contains ActionType("EnableThematicLinkToHere")) ||
         (actionTypes contains ActionType("ShowDisabledAnywhereLink"))
     }
+
+    /**
+      * Returns true is the node is a thematic anywhere node, false otherwise
+      */
+    def isThematicAnywhere = {
+      val actionTypes = nodal.rules flatMap (_.actions) map (_.actionType)
+
+      (actionTypes contains ActionType("EnableThematicLinkToHere"))
+    }
   }
 
   /**
@@ -47,6 +56,10 @@ object ViewerConversions {
       * Returns true if a rule is a "show in popup" link, false otherwise
       */
     def isShowInPopup = ruleLike.actions map (_.actionType) contains ActionType("ShowPopupNode")
+    /**
+      * Returns true if a rule is a "EnableThematicLinkToHere" rule, false otherwise
+      */
+    def isThematic = ruleLike.actions map (_.actionType) contains ActionType("EnableThematicLinkToHere")
   }
 
 }

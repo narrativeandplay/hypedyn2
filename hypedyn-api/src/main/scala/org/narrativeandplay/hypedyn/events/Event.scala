@@ -90,6 +90,8 @@ sealed case class NewMotifRequest(src: String) extends Request
 sealed case class EditMotifRequest(id: ThematicElementID, src: String) extends Request
 sealed case class DeleteMotifRequest(id: ThematicElementID, src: String) extends Request
 
+sealed case class RecommendationRequest(id: NodeId, src: String) extends Request
+
 sealed case class SaveRequest(src: String) extends Request
 sealed case class SaveAsRequest(src: String) extends Request
 sealed case class LoadRequest(src: String) extends Request
@@ -130,6 +132,8 @@ sealed case class DeleteThemeResponse(theme: ThemeLike, src: String) extends Res
 sealed case class NewMotifResponse(src: String) extends Response
 sealed case class EditMotifResponse(motif: MotifLike, src: String) extends Response
 sealed case class DeleteMotifResponse(motif: MotifLike, src: String) extends Response
+
+sealed case class RecommendationResponse(nodeId: NodeId, recommendedNodes: List[(Nodal, Double)], src: String) extends Response
 
 sealed case class SaveResponse(loadedFile: Option[File], src: String) extends Response
 sealed case class SaveAsResponse(src: String) extends Response

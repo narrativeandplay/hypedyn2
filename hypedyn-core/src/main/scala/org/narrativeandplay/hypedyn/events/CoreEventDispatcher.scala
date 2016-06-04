@@ -10,6 +10,7 @@ import org.narrativeandplay.hypedyn.serialisation.{AstElement, AstMap, IoControl
 import org.narrativeandplay.hypedyn.story.StoryController
 import org.narrativeandplay.hypedyn.story.internal.Story
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, ConditionDefinitions, Fact}
+import org.narrativeandplay.hypedyn.story.themes.Recommendation
 import org.narrativeandplay.hypedyn.undo._
 
 import scala.util.control.NonFatal
@@ -79,6 +80,12 @@ object CoreEventDispatcher {
   EventBus.DeleteMotifRequests foreach { evt =>
     StoryController findMotif evt.id foreach { m =>
       EventBus.send(DeleteMotifResponse(m, CoreEventSourceIdentity))
+    }
+  }
+  EventBus.RecommendationRequests foreach { evt =>
+    StoryController findNode evt.id foreach { n =>
+      EventBus.send(RecommendationResponse(n.id, Recommendation.recommendation(n.content.text) filterNot (_._1.id == evt.id),
+        CoreEventSourceIdentity))
     }
   }
   EventBus.CreateNodeEvents foreach { evt =>

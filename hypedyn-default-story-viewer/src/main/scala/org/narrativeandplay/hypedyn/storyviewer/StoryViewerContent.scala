@@ -5,6 +5,7 @@ import javafx.event.EventHandler
 import javafx.scene.control.{Skin, Control => JfxControl}
 import javafx.scene.{input => jfxsi}
 
+import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.story.rules.RuleLike
 
 import scala.collection.mutable.ArrayBuffer
@@ -16,7 +17,7 @@ import org.narrativeandplay.hypedyn.storyviewer.utils.UnorderedPair
 import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
 import org.narrativeandplay.hypedyn.story.rules.Actionable.ActionType
 import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThematicElementID, ThemeLike}
-import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
+import org.narrativeandplay.hypedyn.story.{Narrative, Nodal, NodeId}
 import org.narrativeandplay.hypedyn.storyviewer.components._
 import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
 
@@ -28,6 +29,7 @@ import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
 class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends JfxControl {
   val nodes = ArrayBuffer.empty[ViewerNode]
   val linkGroups = ArrayBuffer.empty[LinkGroup]
+  val thematicLinkGroups = ArrayBuffer.empty[ThematicLinkGroup]
   val themes = ArrayBuffer.empty[ViewerTheme]
   val motifs = ArrayBuffer.empty[ViewerMotif]
   val themesubthemelinkGroups = ArrayBuffer.empty[ThemeSubthemeLinkGroup]
@@ -65,6 +67,11 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   def links = (linkGroups flatMap (_.links)).toList
 
   /**
+    * Returns all the thematic link representations for the story
+    */
+  def thematiclinks = (thematicLinkGroups flatMap (_.links)).toList
+
+  /**
     * Returns all the theme-subtheme link representations for the story
     */
   def themesubthemelinks = (themesubthemelinkGroups flatMap (_.links)).toList
@@ -83,6 +90,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     motifs foreach (children -= _)
 
     linkGroups.clear()
+    thematicLinkGroups.clear()
     themesubthemelinkGroups.clear()
     thememotiflinkGroups.clear()
     nodes.clear()
@@ -106,7 +114,8 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
 
   /**
    * Update a node
-   * @param node The data of the node to update
+    *
+    * @param node The data of the node to update
    * @param updatedNode The updated data of the node
    */
   def updateNode(node: Nodal, updatedNode: Nodal): Unit = {
@@ -116,6 +125,11 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
       viewerNode.node = updatedNode
 
       linkGroups filter (_.endPoints contains viewerNode) foreach { grp =>
+        val linksToRemove = grp.links filter (_.from == viewerNode)
+        grp.removeAll(linksToRemove)
+      }
+
+      thematicLinkGroups filter (_.endPoints contains viewerNode) foreach { grp =>
         val linksToRemove = grp.links filter (_.from == viewerNode)
         grp.removeAll(linksToRemove)
       }
@@ -137,6 +151,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     nodeToRemoveOption foreach { nodeToRemove =>
       children -= nodeToRemove
       linkGroups --= linkGroups filter (_.endPoints contains nodeToRemove)
+      thematicLinkGroups --= thematicLinkGroups filter (_.endPoints contains nodeToRemove)
       nodes -= nodeToRemove
     }
   }
@@ -151,12 +166,14 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     val t = makeTheme(theme)
 
     makeAllLinks(t)
+    // maybe need to update thematic links?
 
     t
   }
 
   /**
     * Update a theme
+    *
     * @param theme The data of the theme to update
     * @param updatedTheme The updated data of the theme
     */
@@ -173,6 +190,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
 
       makeAllLinks(viewerTheme)
     }
+    // maybe need to update thematic links?
 
     requestLayout()
   }
@@ -190,6 +208,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
       themesubthemelinkGroups --= themesubthemelinkGroups filter (_.endPoints contains themeToRemove)
       themes -= themeToRemove
     }
+    // maybe need to update thematic links?
   }
 
   /**
@@ -200,12 +219,14 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     */
   def addMotif(motif: MotifLike): ViewerMotif = {
     val m = makeMotif(motif)
+    // maybe need to update thematic links?
 
     m
   }
 
   /**
     * Update a motif
+    *
     * @param motif The data of the motif to update
     * @param updatedMotif The updated data of the motif
     */
@@ -220,6 +241,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
         grp.removeAll(linksToRemove)
       }
     }
+    // maybe need to update thematic links?
 
     requestLayout()
   }
@@ -237,6 +259,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
       thememotiflinkGroups --= thememotiflinkGroups filter (_.themotif == motifToRemove)
       motifs -= motifToRemove
     }
+    // maybe need to update thematic links?
   }
 
   /**
@@ -246,9 +269,9 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
    */
   def loadStory(story: Narrative): Unit = {
     val ns = story.nodes map makeNode
-    ns foreach makeAllLinks
     val ts = story.themes map makeTheme
     val ms = story.motifs map makeMotif
+    ns foreach makeAllLinks
     ts foreach makeAllLinks
   }
 
@@ -275,6 +298,8 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   private def makeAllLinks(viewerNode: ViewerNode): Unit = {
     makeLinks(viewerNode, viewerNode.node().links, ActionType("LinkTo"))
     makeLinks(viewerNode, viewerNode.node().showInPopups, ActionType("ShowPopupNode"))
+    if(viewerNode.node().rules exists(_.actions map (_.actionType) contains ActionType("EnableThematicLinkToHere")))
+      makeThematicLinks(viewerNode)
   }
 
   /**
@@ -301,6 +326,44 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
         }
 
         linkGroup.insert(viewerNode, to, link)
+      }
+    }
+  }
+
+  /**
+    * Create the thematic links from this node to other nodes
+    * Need to do this properly with events rather than call directly
+    *
+    * @param viewerNode the node for which to get the recommendation
+    */
+  private def makeThematicLinks(viewerNode: ViewerNode): Unit = {
+    pluginEventDispatcher.requestRecommendation(viewerNode.node().id)
+  }
+
+  def onRecommendationResponse(nodeId: NodeId, recommendation: List[(Nodal, Double)]): Unit = {
+    Logger.info("Got recommended node for " + nodeId)
+    recommendation foreach { thisRecommendation =>
+      Logger.info("recommendation: node: " + thisRecommendation._1.name +
+        ", score: " + thisRecommendation._2)
+    }
+
+    val viewerNodeOption = nodes find (_.id == nodeId)
+
+    viewerNodeOption foreach { viewerNode =>
+      recommendation filterNot(_._1.id == nodeId) foreach { thisRecommendation =>
+        val toNodeOption = nodes find (_.id == thisRecommendation._1.id)
+        toNodeOption foreach { toNode =>
+
+          val linkGroup = thematicLinkGroups find (_.endPoints == UnorderedPair(viewerNode, toNode)) match {
+            case Some(grp) => grp
+            case None =>
+              val grp = new ThematicLinkGroup(viewerNode, toNode)
+              thematicLinkGroups += grp
+              grp
+          }
+
+          linkGroup.insert(viewerNode, toNode)
+        }
       }
     }
   }

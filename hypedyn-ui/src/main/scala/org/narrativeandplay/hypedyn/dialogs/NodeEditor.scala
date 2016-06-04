@@ -381,9 +381,8 @@ class NodeEditor private (dialogTitle: String,
   }
 
   // alex testing recommendations
-  private val recommendButton = new Button("recommend") {
+  private val recommendButton: Button = new Button("recommend") {
     onAction = { actionEvent: ActionEvent =>
-      //UiEventDispatcher.requestNewNode()
       Logger.info("recommendation button")
       val recommendation = Recommendation.recommendation(node().content.text) filterNot(_._1.id == node().id)
       recommendation foreach{thisRecommendation =>

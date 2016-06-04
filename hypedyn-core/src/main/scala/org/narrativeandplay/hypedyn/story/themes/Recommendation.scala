@@ -17,55 +17,24 @@ object Recommendation {
     *
     * @param text string to match against
     * @param threshold the cutoff point for themes
-    * @return list of ordered pairs consisting of nodes that match the given themes, and their scores
+    * @return list of ordered pairs consisting of IDs of nodes that match the themes in text, and their scores
     */
-  def recommendation(text: String, threshold: Double = StoryController.story.metadata.themeThreshold) : List[Tuple2[Node, Double]] = {
-    recommendation(text, StoryController.story.nodes, StoryController.story.themes, StoryController.story, threshold)
-  }
-
-    /**
-    * Given a source node and a list of target nodes, recommends a list of nodes from the target list that contain the same themes
-    *
-    * @param node source node
-    * @param targetNodes list of target nodes
-    * @param allThemes list of all themes in the story - do I need this? or could this be a subset? hmm
-    * @param story the story
-    * @param threshold the cutoff point for themes
-    * @return list of ordered pairs consisting of nodes that match the given themes, and their scores
-    */
-  def recommendation(node: Node, targetNodes: List[Node], allThemes: List[Theme], story: Story, threshold: Double): List[Tuple2[Node, Double]] = {
-      recommendation(node.content.text, targetNodes, allThemes, story, threshold)
+  def recommendation(text: String, threshold: Double = StoryController.story.metadata.themeThreshold) : List[(Node, Double)] = {
+    recommendation(containedThemes(text, StoryController.story.themes, StoryController.story), threshold)
   }
 
   /**
-    * Given some text and a list of target nodes, recommends a list of nodes from the target list that contain
-    * the same themes as the text
-    *
-    * @param text source text
-    * @param targetNodes list of target nodes
-    * @param allThemes list of all themes in the story - do I need this? or could this be a subset? hmm
-    * @param story the story
-    * @param threshold the cutoff point for themes
-    * @return list of ordered pairs consisting of nodes that match the given themes, and their scores
-    */
-  def recommendation(text: String, targetNodes: List[Node], allThemes: List[Theme], story: Story, threshold: Double): List[Tuple2[Node, Double]] = {
-    recommendation(containedThemes(text, allThemes, story), targetNodes, story: Story, threshold)
-  }
-
-  /**
-    * Given a list of themes and a list of target nodes, recommends a list of nodes from the target list that contain the themes
+    * Given a list of themes and a threshold, recommends a list of IDs of nodes from the story that contain the themes
     *
     * @param sourceThemes list of themes to match
-    * @param targetNodes list of target nodes
-    * @param story the story
     * @param threshold the cutoff point for themes
-    * @return list of ordered pairs consisting of nodes that match the given themes, and their scores
+    * @return list of ordered pairs consisting of nodes that match sourceThemes, and their scores
     */
-  def recommendation(sourceThemes: List[Theme], targetNodes: List[Node], story: Story, threshold: Double): List[Tuple2[Node, Double]] = {
-    targetNodes map{node =>
+  def recommendation(sourceThemes: List[Theme], threshold: Double): List[(Node, Double)] = {
+    StoryController.story.nodes map{node =>
       Tuple2(node,
-        (thematicCoverage(sourceThemes, node.content.text, story) +
-        componentCoverage(sourceThemes, node.content.text, story))/2.0)
+        (thematicCoverage(sourceThemes, node.content.text, StoryController.story) +
+        componentCoverage(sourceThemes, node.content.text, StoryController.story))/2.0)
     } filter(_._2 > threshold) sortWith(_._2 > _._2)
   }
 
@@ -194,9 +163,9 @@ object Recommendation {
     */
   def motifsCoveredCount(text: String, motifs: List[Motif]): Int = {
     motifs map(motif =>
-      motif.features map(feature =>
+      motif.features exists(feature =>
         stringContainsPhrase(text.replaceAll("\\r\\n|\\r|\\n", " "), feature.replaceAll("\\r\\n|\\r|\\n", " "))
-      ) contains(true)
+      )
     ) count(_ == true)
   }
 

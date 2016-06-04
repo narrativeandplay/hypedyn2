@@ -7,13 +7,14 @@ import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions._
 import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.rules.internal.Rule
-import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThematicElementID, ThemeLike}
+import org.narrativeandplay.hypedyn.story.themes.{MotifLike, ThematicElementID, ThemeLike, Recommendation}
 import org.narrativeandplay.hypedyn.story.themes.internal.{Motif, Theme}
 
 /**
  * Controller for handling story-related actions
  */
 object StoryController {
+
   import Ordering.Implicits._
 
   private var currentStory = new Story()
@@ -24,29 +25,29 @@ object StoryController {
   private var firstUnusedThemeticElementId = ThematicElementID(0)
 
   /**
-   * Returns the story currently being edited
-   */
+    * Returns the story currently being edited
+    */
   def story = currentStory
 
   /**
-   * Sets up a new story
-   *
-   * @param title The title of the new story
-   * @param author The author of the new story
-   * @param description The description of the new story
-   */
+    * Sets up a new story
+    *
+    * @param title       The title of the new story
+    * @param author      The author of the new story
+    * @param description The description of the new story
+    */
   def newStory(title: String, author: String, description: String): Unit = {
     load(new Story(title, author, description))
   }
 
   /**
-   * Edit the current story
-   *
-   * @param title The new title
-   * @param author The new author
-   * @param description The new description
-   * @param metadata The new metadata
-   */
+    * Edit the current story
+    *
+    * @param title       The new title
+    * @param author      The new author
+    * @param description The new description
+    * @param metadata    The new metadata
+    */
   def editStory(title: String, author: String, description: String, metadata: Narrative.Metadata): Unit = {
     currentStory = currentStory rename title
     currentStory = currentStory changeAuthor author
@@ -56,10 +57,10 @@ object StoryController {
   }
 
   /**
-   * Load a given story
-   *
-   * @param story The story to load
-   */
+    * Load a given story
+    *
+    * @param story The story to load
+    */
   def load(story: Story): Unit = {
     currentStory = story
     firstUnusedNodeId = story.nodes map (_.id) reduceOption (_ max _) map (_.inc) getOrElse NodeId(0)
@@ -70,27 +71,27 @@ object StoryController {
   }
 
   /**
-   * Finds a node given a node ID
-   *
-   * @param nodeId The ID of the node to find
-   * @return An option containing the found node, or None if no node with the given ID exists
-   */
+    * Finds a node given a node ID
+    *
+    * @param nodeId The ID of the node to find
+    * @return An option containing the found node, or None if no node with the given ID exists
+    */
   def findNode(nodeId: NodeId) = currentStory.nodes find (_.id == nodeId)
 
   /**
-   * Create a node
-   *
-   * @param node The data for the node to create
-   * @return The created node
-   */
+    * Create a node
+    *
+    * @param node The data for the node to create
+    * @return The created node
+    */
   def create(node: Nodal): Node = {
     val newNodeContent = NodeContent(node.content.text, node.content.rulesets map { rulesetLike =>
       val ruleset = rulesetLike.copy(id = if (rulesetLike.id.isValid) rulesetLike.id else firstUnusedRulesetId,
-                                     rules = rulesetLike.rules map { rule =>
-                                       val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
-                                       firstUnusedRuleId = firstUnusedRuleId max r.id.inc
-                                       r
-                                     })
+        rules = rulesetLike.rules map { rule =>
+          val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
+          firstUnusedRuleId = firstUnusedRuleId max r.id.inc
+          r
+        })
       firstUnusedRulesetId = firstUnusedRulesetId max ruleset.id.inc
       ruleset
     })
@@ -100,7 +101,7 @@ object StoryController {
       r
     }
     val newNode = Node(if (node.id.isValid) node.id else firstUnusedNodeId,
-                       node.name, newNodeContent, node.isStartNode, newNodeRules)
+      node.name, newNodeContent, node.isStartNode, newNodeRules)
     currentStory = currentStory addNode newNode
     firstUnusedNodeId = firstUnusedNodeId max newNode.id.inc
 
@@ -108,13 +109,13 @@ object StoryController {
   }
 
   /**
-   * Update a node
-   *
-   * @param node The node to update
-   * @param editedNode The updated node data
-   * @return An option containing the original node, the updated node, and an option containing the unchanged and
-   *         changed node if the node to update was made the start node, or None if the node to update did not exist
-   */
+    * Update a node
+    *
+    * @param node       The node to update
+    * @param editedNode The updated node data
+    * @return An option containing the original node, the updated node, and an option containing the unchanged and
+    *         changed node if the node to update was made the start node, or None if the node to update did not exist
+    */
   def update(node: Nodal, editedNode: Nodal): Option[(Node, Node, Option[(Node, Node)])] = {
     val updatedOldStartNodeOption = if (editedNode.isStartNode && !node.isStartNode) {
       currentStory.startNode flatMap { oldStartNode =>
@@ -128,21 +129,21 @@ object StoryController {
   }
 
   /**
-   * Updates a node
-   *
-   * @param node The node to update
-   * @param updatedNode The updated node data
-   * @return An option containing the unupdated and updated versions of the node, or None if the node to update
-   *         does not exist
-   */
+    * Updates a node
+    *
+    * @param node        The node to update
+    * @param updatedNode The updated node data
+    * @return An option containing the unupdated and updated versions of the node, or None if the node to update
+    *         does not exist
+    */
   private def updateNode(node: Nodal, updatedNode: Nodal): Option[(Node, Node)] = {
     val editedNodeContent = NodeContent(updatedNode.content.text, updatedNode.content.rulesets map { rulesetLike =>
       val ruleset = rulesetLike.copy(id = if (rulesetLike.id.isValid) rulesetLike.id else firstUnusedRulesetId,
-                                     rules = rulesetLike.rules map { rule =>
-                                       val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
-                                       firstUnusedRuleId = firstUnusedRuleId max r.id.inc
-                                       r
-                                     })
+        rules = rulesetLike.rules map { rule =>
+          val r = rule.copy(id = if (rule.id.isValid) rule.id else firstUnusedRuleId)
+          firstUnusedRuleId = firstUnusedRuleId max r.id.inc
+          r
+        })
       firstUnusedRulesetId = firstUnusedRulesetId max ruleset.id.inc
       ruleset
     })
@@ -156,19 +157,19 @@ object StoryController {
     val updated = updatedNode.copy(content = editedNodeContent)
 
     toUpdateOption foreach { n =>
-      currentStory = currentStory updateNode (n, updated)
+      currentStory = currentStory updateNode(n, updated)
     }
 
     toUpdateOption map ((_, updated))
   }
 
   /**
-   * Destroy a node
-   *
-   * @param node The node to destroy
-   * @return An option containing the destroyed node and a map of nodes changed as a result of the destroyed node,
-   *         or None if the node to destroy does not exist
-   */
+    * Destroy a node
+    *
+    * @param node The node to destroy
+    * @return An option containing the destroyed node and a map of nodes changed as a result of the destroyed node,
+    *         or None if the node to destroy does not exist
+    */
   def destroy(node: Nodal): Option[(Node, Map[Node, Node])] = {
     val toDestroyOption = findNode(node.id)
 
@@ -242,11 +243,11 @@ object StoryController {
   def findFact(factId: FactId) = currentStory.facts find (_.id == factId)
 
   /**
-   * Create a new fact in the story
-   *
-   * @param fact The new fact
-   * @return The created fact
-   */
+    * Create a new fact in the story
+    *
+    * @param fact The new fact
+    * @return The created fact
+    */
   def create(fact: Fact): Fact = {
     val newFact = instantiateFact(fact)
 
@@ -256,28 +257,28 @@ object StoryController {
   }
 
   /**
-   * Update a fact
-   *
-   * @param fact The fact to update
-   * @param editedFact The updated fact data
-   * @return An option containing the unupdated and updated versions of the fact, or None if the fact to update
-   *         does not exist
-   */
+    * Update a fact
+    *
+    * @param fact       The fact to update
+    * @param editedFact The updated fact data
+    * @return An option containing the unupdated and updated versions of the fact, or None if the fact to update
+    *         does not exist
+    */
   def update(fact: Fact, editedFact: Fact): Option[(Fact, Fact)] = {
     val toUpdate = findFact(fact.id)
     val updated = instantiateFact(editedFact)
 
-    toUpdate foreach { f => currentStory = currentStory updateFact (f, updated) }
+    toUpdate foreach { f => currentStory = currentStory updateFact(f, updated) }
 
     toUpdate map ((_, updated))
   }
 
   /**
-   * Destroy a fact
-   *
-   * @param fact The fact to destroy
-   * @return An option containing the destroyed fact, or None if the fact to destroy does not exist
-   */
+    * Destroy a fact
+    *
+    * @param fact The fact to destroy
+    * @return An option containing the destroyed fact, or None if the fact to destroy does not exist
+    */
   def destroy(fact: Fact): Option[Fact] = {
     val toDestroy = findFact(fact.id)
 
@@ -287,37 +288,37 @@ object StoryController {
   }
 
   /**
-   * Instantiates a fact, i.e., provides a fact with a valid ID
-   *
-   * @param fact The fact to instantiate
-   * @return The instantiated fact
-   */
+    * Instantiates a fact, i.e., provides a fact with a valid ID
+    *
+    * @param fact The fact to instantiate
+    * @return The instantiated fact
+    */
   private def instantiateFact(fact: Fact): Fact = {
     val factInstance = fact match {
       case IntegerFact(id, name, initVal) => IntegerFact(if (id.isValid) id else firstUnusedFactId,
-                                                         name, initVal)
+        name, initVal)
       case StringFact(id, name, initVal) => StringFact(if (id.isValid) id else firstUnusedFactId,
-                                                       name, initVal)
+        name, initVal)
       case BooleanFact(id, name, initVal) => BooleanFact(if (id.isValid) id else firstUnusedFactId,
-                                                         name, initVal)
+        name, initVal)
       case IntegerFactList(id, name, initVal) =>
         val actualId = if (id.isValid) id else firstUnusedFactId
         firstUnusedFactId = firstUnusedFactId max actualId.inc
         IntegerFactList(actualId,
-                        name,
-                        (initVal map instantiateFact).asInstanceOf[List[IntegerFact]])
+          name,
+          (initVal map instantiateFact).asInstanceOf[List[IntegerFact]])
       case StringFactList(id, name, initVal) =>
         val actualId = if (id.isValid) id else firstUnusedFactId
         firstUnusedFactId = firstUnusedFactId max actualId.inc
         StringFactList(actualId,
-                       name,
-                       (initVal map instantiateFact).asInstanceOf[List[StringFact]])
+          name,
+          (initVal map instantiateFact).asInstanceOf[List[StringFact]])
       case BooleanFactList(id, name, initVal) =>
         val actualId = if (id.isValid) id else firstUnusedFactId
         firstUnusedFactId = firstUnusedFactId max actualId.inc
         BooleanFactList(actualId,
-                        name,
-                        (initVal map instantiateFact).asInstanceOf[List[BooleanFact]])
+          name,
+          (initVal map instantiateFact).asInstanceOf[List[BooleanFact]])
     }
 
     firstUnusedFactId = firstUnusedFactId max factInstance.id.inc
@@ -350,7 +351,7 @@ object StoryController {
   /**
     * Update a theme
     *
-    * @param theme The theme to update
+    * @param theme       The theme to update
     * @param editedTheme The updated theme data
     * @return An option containing the unupdated and updated versions of the theme, or None if the theme to update
     *         does not exist
@@ -359,7 +360,7 @@ object StoryController {
     val toUpdate = findTheme(theme.id)
     val updated = instantiateTheme(editedTheme)
 
-    toUpdate foreach { t => currentStory = currentStory updateTheme (t, updated) }
+    toUpdate foreach { t => currentStory = currentStory updateTheme(t, updated) }
 
     toUpdate map ((_, updated))
   }
@@ -417,7 +418,7 @@ object StoryController {
   /**
     * Update a motif
     *
-    * @param motif The motif to update
+    * @param motif       The motif to update
     * @param editedMotif The updated motif data
     * @return An option containing the unupdated and updated versions of the motif, or None if the motif to update
     *         does not exist
@@ -426,7 +427,7 @@ object StoryController {
     val toUpdate = findMotif(motif.id)
     val updated = instantiateMotif(editedMotif)
 
-    toUpdate foreach { m => currentStory = currentStory updateMotif (m, updated) }
+    toUpdate foreach { m => currentStory = currentStory updateMotif(m, updated) }
 
     toUpdate map ((_, updated))
   }
@@ -458,5 +459,4 @@ object StoryController {
 
     motifInstance
   }
-
 }
