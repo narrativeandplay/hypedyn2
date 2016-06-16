@@ -168,6 +168,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
 
     makeAllLinks(t)
     // maybe need to update thematic links?
+    refreshThematicLinks
 
     t
   }
@@ -192,6 +193,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
       makeAllLinks(viewerTheme)
     }
     // maybe need to update thematic links?
+    refreshThematicLinks
 
     requestLayout()
   }
@@ -210,6 +212,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
       themes -= themeToRemove
     }
     // maybe need to update thematic links?
+    refreshThematicLinks
   }
 
   /**
@@ -221,6 +224,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   def addMotif(motif: MotifLike): ViewerMotif = {
     val m = makeMotif(motif)
     // maybe need to update thematic links?
+    refreshThematicLinks
 
     m
   }
@@ -243,6 +247,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
       }
     }
     // maybe need to update thematic links?
+    refreshThematicLinks
 
     requestLayout()
   }
@@ -261,6 +266,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
       motifs -= motifToRemove
     }
     // maybe need to update thematic links?
+    refreshThematicLinks
   }
 
   /**
@@ -274,6 +280,17 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     val ms = story.motifs map makeMotif
     ns foreach makeAllLinks
     ts foreach makeAllLinks
+  }
+
+  /**
+    * Refresh the thematic links
+    */
+  def refreshThematicLinks(): Unit = {
+    thematicLinkGroups.clear()
+    nodes foreach { viewerNode =>
+      if(viewerNode.node().rules exists(_.actions map (_.actionType) contains ActionType("EnableThematicLinkToHere")))
+        makeThematicLinks(viewerNode)
+    }
   }
 
   /**
