@@ -7,7 +7,8 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Class representing a set of links between a theme and a motif
   *
-  * @param endPoints The theme and the motif that the links span
+  * @param themotif The motif that connotes the theme
+  * @param thetheme the theme connoted by the motif
   */
 class ThemeMotifLinkGroup(val themotif: ViewerMotif, val thetheme: ViewerTheme) {
 

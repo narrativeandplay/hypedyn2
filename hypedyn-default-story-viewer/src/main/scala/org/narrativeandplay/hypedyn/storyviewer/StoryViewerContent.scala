@@ -167,8 +167,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     val t = makeTheme(theme)
 
     makeAllLinks(t)
-    // maybe need to update thematic links?
-    refreshThematicLinks
+    refreshThematicLinks()
 
     t
   }
@@ -186,14 +185,17 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
       viewerTheme.theme = updatedTheme
 
       themesubthemelinkGroups filter (_.endPoints contains viewerTheme) foreach { grp =>
-        val linksToRemove = grp.links filter (_.from == viewerTheme)
+        val linksToRemove = grp.links filter (_.to == viewerTheme)
+        grp.removeAll(linksToRemove)
+      }
+      thememotiflinkGroups filter (_.thetheme == viewerTheme) foreach { grp =>
+        val linksToRemove = grp.links filter (_.to == viewerTheme)
         grp.removeAll(linksToRemove)
       }
 
       makeAllLinks(viewerTheme)
     }
-    // maybe need to update thematic links?
-    refreshThematicLinks
+    refreshThematicLinks()
 
     requestLayout()
   }
@@ -209,10 +211,10 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     themeToRemoveOption foreach { themeToRemove =>
       children -= themeToRemove
       themesubthemelinkGroups --= themesubthemelinkGroups filter (_.endPoints contains themeToRemove)
+      thememotiflinkGroups --= thememotiflinkGroups filter (_.thetheme == themeToRemove)
       themes -= themeToRemove
     }
-    // maybe need to update thematic links?
-    refreshThematicLinks
+    refreshThematicLinks()
   }
 
   /**
@@ -223,8 +225,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     */
   def addMotif(motif: MotifLike): ViewerMotif = {
     val m = makeMotif(motif)
-    // maybe need to update thematic links?
-    refreshThematicLinks
+    refreshThematicLinks()
 
     m
   }
@@ -241,13 +242,8 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     viewerMotifOption foreach { viewerMotif =>
       viewerMotif.motif = updatedMotif
 
-      thememotiflinkGroups filter (_.themotif == viewerMotif) foreach { grp =>
-        val linksToRemove = grp.links filter (_.from == viewerMotif)
-        grp.removeAll(linksToRemove)
-      }
     }
-    // maybe need to update thematic links?
-    refreshThematicLinks
+    refreshThematicLinks()
 
     requestLayout()
   }
@@ -265,8 +261,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
       thememotiflinkGroups --= thememotiflinkGroups filter (_.themotif == motifToRemove)
       motifs -= motifToRemove
     }
-    // maybe need to update thematic links?
-    refreshThematicLinks
+    refreshThematicLinks()
   }
 
   /**
