@@ -395,10 +395,10 @@ function backPrevNode() {
 	//	$("back_button").setAttribute("disabled", "disabled");
 	back_button_check();
 	
-	if (nodeID) { // if not undefined
+	if (nodeID != undefined) { // if not undefined
 		//disp("back's gotoNODE " +nodeID);
 		var node = nodelist[nodeID];
-		if (node) {
+		if (node != undefined) {
 			clicked_link_flag = false;
 			
 			//node.visited = true;
@@ -419,7 +419,6 @@ function restartStory() {
 	actionlist = [];
 	conditionlist = [];
 	loadStory();
-	runhypedyn()
 }
 
 // refresh node
