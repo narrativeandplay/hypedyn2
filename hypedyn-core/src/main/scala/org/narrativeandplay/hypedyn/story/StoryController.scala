@@ -87,7 +87,7 @@ object StoryController {
    * @param node The data for the node to create
    * @return The created node
    */
-  def create(node: Nodal): Node = {
+  def create(node: Nodal): (Node, Map[Node, Node]) = {
     val newNodeContent = NodeContent(node.content.text, node.content.rulesets map { rulesetLike =>
       val ruleset = rulesetLike.copy(id = if (rulesetLike.id.isValid) rulesetLike.id else firstUnusedRulesetId,
                                      rules = rulesetLike.rules map { rule =>
@@ -105,10 +105,17 @@ object StoryController {
     }
     val newNode = Node(if (node.id.isValid) node.id else firstUnusedNodeId,
                        node.name, newNodeContent, node.isStartNode, newNodeRules)
+
+    val oldStartNodeChange = if (node.isStartNode) {
+      List(currentStory.startNode flatMap { oldStartNode =>
+        updateNode(oldStartNode, oldStartNode.copy(isStartNode = false))
+      }).flatten
+    } else List.empty
+
     currentStory = currentStory addNode newNode
     firstUnusedNodeId = firstUnusedNodeId max newNode.id.inc
 
-    newNode
+    (newNode, oldStartNodeChange.toMap)
   }
 
   /**
