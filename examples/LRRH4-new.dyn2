@@ -10,6 +10,75 @@
       "restartDisabled":false
     },
     "nodes":[{
+      "id":13,
+      "name":"Pick the geraniums",
+      "content":{
+        "text":"Red decides to pick some of the geraniums in the grove and exchange them for the flowers in the basket for Grandma.",
+        "rulesets":[]
+      },
+      "isStart":false,
+      "rules":[{
+        "id":-1,
+        "name":"Add anywhere link",
+        "stopIfTrue":false,
+        "conditionsOp":"and",
+        "conditions":[{
+          "conditionType":"BooleanFactValue",
+          "params":{
+            "fact":{
+              "type":"booleanFact",
+              "value":1
+            },
+            "state":{
+              "type":"selectedListValue",
+              "value":"false"
+            }
+          }
+        },{
+          "conditionType":"BooleanFactValue",
+          "params":{
+            "fact":{
+              "type":"booleanFact",
+              "value":0
+            },
+            "state":{
+              "type":"selectedListValue",
+              "value":"true"
+            }
+          }
+        }],
+        "actions":[{
+          "actionType":"EnableAnywhereLinkToHere",
+          "params":{
+            
+          }
+        },{
+          "actionType":"UpdateBooleanFact",
+          "params":{
+            "fact":{
+              "type":"booleanFact",
+              "value":1
+            },
+            "value":{
+              "type":"selectedListValue",
+              "value":"true"
+            }
+          }
+        },{
+          "actionType":"UpdateStringFact",
+          "params":{
+            "fact":{
+              "type":"stringFact",
+              "value":2
+            },
+            "value":{
+              "type":"string",
+              "value":"geraniums"
+            }
+          }
+        }]
+      }]
+    },{
       "id":10,
       "name":"Go directly to Grandma's house",
       "content":{
@@ -511,75 +580,6 @@
         }]
       }]
     },{
-      "id":13,
-      "name":"PIck the geraniums",
-      "content":{
-        "text":"Red decides to pick some of the geraniums in the grove and exchange them for the flowers in the basket for Grandma.",
-        "rulesets":[]
-      },
-      "isStart":false,
-      "rules":[{
-        "id":-1,
-        "name":"Add anywhere link",
-        "stopIfTrue":false,
-        "conditionsOp":"and",
-        "conditions":[{
-          "conditionType":"BooleanFactValue",
-          "params":{
-            "fact":{
-              "type":"booleanFact",
-              "value":1
-            },
-            "state":{
-              "type":"selectedListValue",
-              "value":"false"
-            }
-          }
-        },{
-          "conditionType":"BooleanFactValue",
-          "params":{
-            "fact":{
-              "type":"booleanFact",
-              "value":0
-            },
-            "state":{
-              "type":"selectedListValue",
-              "value":"true"
-            }
-          }
-        }],
-        "actions":[{
-          "actionType":"EnableAnywhereLinkToHere",
-          "params":{
-            
-          }
-        },{
-          "actionType":"UpdateBooleanFact",
-          "params":{
-            "fact":{
-              "type":"booleanFact",
-              "value":1
-            },
-            "value":{
-              "type":"selectedListValue",
-              "value":"true"
-            }
-          }
-        },{
-          "actionType":"UpdateStringFact",
-          "params":{
-            "fact":{
-              "type":"stringFact",
-              "value":2
-            },
-            "value":{
-              "type":"string",
-              "value":"geraniums"
-            }
-          }
-        }]
-      }]
-    },{
       "id":14,
       "name":"Pick the violets",
       "content":{
@@ -747,46 +747,47 @@
   },
   "plugins":{
     "Default Story Viewer":{
+      "zoomLevel":0.5000000000000001,
       "nodes":[{
+        "id":10,
+        "x":248.71428571428584,
+        "y":276.85714285714283
+      },{
         "id":12,
-        "x":239.0,
-        "y":232.0
+        "x":108.99999999999997,
+        "y":504.0
       },{
         "id":7,
-        "x":725.0,
-        "y":632.0
+        "x":397.0,
+        "y":502.0000000000001
       },{
         "id":15,
-        "x":723.0,
-        "y":436.0
+        "x":1159.0,
+        "y":754.0000000000001
       },{
         "id":11,
-        "x":248.0,
-        "y":445.0
+        "x":254.00000000000003,
+        "y":758.9999999999999
       },{
         "id":9,
-        "x":719.0,
-        "y":234.0
+        "x":877.0,
+        "y":525.9999999999999
       },{
         "id":13,
-        "x":474.0,
-        "y":442.0
+        "x":650.0000000000001,
+        "y":754.0
       },{
         "id":14,
-        "x":471.0,
-        "y":235.0
+        "x":901.0,
+        "y":754.9999999999999
       },{
         "id":8,
-        "x":457.0,
-        "y":20.0
-      },{
-        "id":10,
-        "x":237.0,
-        "y":22.0
+        "x":875.0,
+        "y":272.2857142857142
       },{
         "id":6,
-        "x":24.0,
-        "y":22.0
+        "x":553.9999999999999,
+        "y":49.99999999999999
       }]
     }
   }
