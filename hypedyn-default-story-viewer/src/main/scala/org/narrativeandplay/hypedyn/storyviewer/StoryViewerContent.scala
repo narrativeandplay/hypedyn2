@@ -98,6 +98,11 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
       }
 
       makeAllLinks(viewerNode)
+      if(viewerNode.selected()) viewerNode.select() else {
+        linkGroups filter (_.endPoints contains viewerNode) foreach { grp =>
+          grp.links filter (_.from == viewerNode) filter (_.to selected()) foreach {l => l.to select()}
+        }
+      }
     }
 
     requestLayout()
