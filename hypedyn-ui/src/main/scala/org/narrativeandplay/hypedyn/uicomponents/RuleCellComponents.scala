@@ -254,6 +254,7 @@ object RuleCellComponents {
     lazy val removeButton = new StackPane {
       padding = Insets(0, 10, 0, 0)
       children += new Button("−") {
+        minWidth = 25
         onAction = { _ =>
           parentTreeItem.getChildren.remove(self)
           parentRule.actionsProperty() -= action

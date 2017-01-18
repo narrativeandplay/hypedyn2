@@ -106,9 +106,13 @@ class RuleCell(val rule: UiRule,
     expanded = true
 
     graphic = new HBox {
-      children += new Label("If ")
+      children += new Label("If ") {
+        minWidth = 20
+      }
       children += conditionCombineType
-      children += new Label(" of the following conditions are true:")
+      children += new Label(" of the following conditions are true:") {
+        minWidth = 200
+      }
       children += addCondButton
 
       alignment = Pos.CenterLeft
