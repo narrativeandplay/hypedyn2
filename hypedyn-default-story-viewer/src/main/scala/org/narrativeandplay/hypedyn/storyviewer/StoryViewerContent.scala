@@ -38,10 +38,6 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
     nodes foreach { n => if (!(n.bounds contains pt)) n.deselect() }
     links foreach { l => if (!(l contains pt)) l.deselect() }
     requestLayout()
-
-    if (nodes forall (!_.bounds.contains(pt))) {
-      links find (_ contains pt) foreach { l => if (l.selected()) l.deselect() else l.select(pt) }
-    }
   })
 
   private def zoomValueClamp(d: Double) = pluginEventDispatcher.zoomValueClamp(d)
@@ -102,6 +98,11 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
       }
 
       makeAllLinks(viewerNode)
+      if(viewerNode.selected()) viewerNode.select() else {
+        linkGroups filter (_.endPoints contains viewerNode) foreach { grp =>
+          grp.links filter (_.from == viewerNode) filter (_.to selected()) foreach {l => l.to select()}
+        }
+      }
     }
 
     requestLayout()

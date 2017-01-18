@@ -78,6 +78,9 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
    * @param story The story that is loaded
    */
   override def onStoryLoaded(story: Narrative): Unit = {
+    zoomLevel() = 1.0
+    nodeLocations.clear()
+
     viewer.clear()
     viewer.loadStory(story)
   }
@@ -114,8 +117,6 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
    * @param data The saved data
    */
   override def onLoad(data: AstElement): Unit = {
-    zoomLevel() = 1.0
-
     val properData = data.asInstanceOf[AstMap]
     val nodes = properData("nodes").asInstanceOf[AstList].elems
     nodes foreach { n =>
