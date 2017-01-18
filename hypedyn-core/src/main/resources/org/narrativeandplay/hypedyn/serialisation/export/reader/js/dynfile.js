@@ -230,7 +230,6 @@ function createFacts(facts) {
 
 function loadStory() {
 	var data = getStoryData();
-
 	var story = data.story;
 	var author = story.author; // unused
 	var description = story.description; // unused
@@ -238,22 +237,22 @@ function loadStory() {
 	var facts = story.facts;
 
 	// iterate through nodes and create
-	for (var i=0; i < nodes.length; i++){
+	for (var i = 0; i < nodes.length; i++) {
 		var thisNode = nodes[i];
-		if (thisNode!=null) {
-			var id=thisNode.id; 			// id of the node
-			var name=thisNode.name; 		// name of the node
-			var content=thisNode.content; 	// node content
-			var nodeRules=thisNode.rules; 		// node rules - do this later
+		if (thisNode != null) {
+			var id = thisNode.id; 			// id of the node
+			var name = thisNode.name; 		// name of the node
+			var content = thisNode.content; 	// node content
+			var nodeRules = thisNode.rules; 		// node rules - do this later
 
 			// create the node
 			createNode(name, content.text, false, id); // third param is isAnywhere??? check...
 
 			// now create the links (if any)
-			var links=content.rulesets;
-			if(links!=null) {
-				for(var j=0; j < links.length; j++) {
-					var thisRuleset=links[j];				// this link ("ruleset")
+			var links = content.rulesets;
+			if (links != null) {
+				for (var j = 0; j < links.length; j++) {
+					var thisRuleset = links[j];				// this link ("ruleset")
 					var start = thisRuleset.start;			// start offset of the link
 					var end = thisRuleset.end;				// end offset of the link
 					var rulesetID = thisRuleset.id;			// id of the link
@@ -264,14 +263,14 @@ function loadStory() {
 					createLink(id, start, end, rulesetID);
 
 					// now create rules (if any)
-					if(rules!=null) {
+					if (rules != null) {
 						createRules(rulesetID, "link", rules, false);
 					}
 				}
 			}
 
 			// now create the node rules (if any)
-			if(nodeRules!=null) {
+			if (nodeRules != null) {
 				createRules(id, "node", nodeRules, true);
 			}
 
@@ -283,15 +282,15 @@ function loadStory() {
 	}
 
 	// add facts
-	if(facts!=null) {
+	if (facts != null) {
 		createFacts(facts);
 	}
 
 	// write config flags
-	write_config_flag( 'back_button_flag', !story.metadata.backDisabled );
-	write_config_flag( 'restart_button_flag', !story.metadata.restartDisabled );
-	write_config_flag( 'page_flipping_mode', true );
-	write_config_flag( 'window_resize_flag', true );
+	write_config_flag('back_button_flag', !story.metadata.backDisabled);
+	write_config_flag('restart_button_flag', !story.metadata.restartDisabled);
+	write_config_flag('page_flipping_mode', true);
+	write_config_flag('window_resize_flag', true);
 
 	// all of this was originally in window.onload
 	read_config_flag();

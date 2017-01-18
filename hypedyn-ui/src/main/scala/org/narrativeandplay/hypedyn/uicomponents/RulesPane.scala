@@ -50,14 +50,26 @@ class RulesPane(labelText: String,
       rulesList.root().children += new RuleCell(newRule, conditionDefinitions, actionDefinitions, story, rules(), self)
     }
   }
+  private val collapseAllButton = new Button("Collapse all") {
+    onAction = { _ =>
+      changeExpansionStateTo(false)
+    }
+  }
+  private val expandAllButton = new Button("Expand all") {
+    onAction = { _ =>
+      changeExpansionStateTo(true)
+    }
+  }
 
   val disableAddRule = addRuleButton.disable
 
-  children += new HBox {
+  children += new HBox(10) {
     alignment = Pos.CenterLeft
     padding = Insets(5, 5, 0, 5)
 
     children += addRuleButton
+    children += collapseAllButton
+    children += expandAllButton
   }
   children += rulesList
 
@@ -94,6 +106,15 @@ class RulesPane(labelText: String,
         expanded = expand
       }
     }
+  }
+
+  private def changeExpansionStateTo(expanded: Boolean): Unit = {
+    def collapse(treeItem: TreeItem[_]): Unit = {
+      treeItem.expanded = expanded
+      treeItem.children foreach (collapse(_))
+    }
+
+    rulesList.root().children foreach (collapse(_))
   }
 
   VBox.setVgrow(rulesList, Priority.Always)

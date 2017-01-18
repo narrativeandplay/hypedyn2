@@ -1,17 +1,18 @@
 package org.narrativeandplay.hypedyn.events
 
 import java.io.File
-import java.net.URI
 import java.nio.file.Files
 
 import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.plugins.PluginsController
-import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser, AstMap, AstElement}
 import org.narrativeandplay.hypedyn.serialisation.serialisers._
+import org.narrativeandplay.hypedyn.serialisation.{AstElement, AstMap, IoController, Serialiser}
+import org.narrativeandplay.hypedyn.story.StoryController
 import org.narrativeandplay.hypedyn.story.internal.Story
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, ConditionDefinitions, Fact}
 import org.narrativeandplay.hypedyn.undo._
-import org.narrativeandplay.hypedyn.story.StoryController
+
+import scala.util.control.NonFatal
 
 /**
  * Main event dispatcher for the core
@@ -53,10 +54,10 @@ object CoreEventDispatcher {
   }
 
   EventBus.CreateNodeEvents foreach { evt =>
-    val created = StoryController.create(evt.node)
+    val (created, affectedNodes) = StoryController.create(evt.node)
 
     if (evt.src != UndoEventSourceIdentity) {
-      UndoableStream.send(new NodeCreatedChange(created, Map.empty))
+      UndoableStream.send(NodeCreatedChange(created, affectedNodes))
     }
 
     EventBus.send(NodeCreated(evt.node, created, CoreEventSourceIdentity))
@@ -140,7 +141,7 @@ object CoreEventDispatcher {
     // wrap the JSON in a .js file to allow to avoid cross origin request error running localling in Chrome
     IoController.write("function getStoryData(){\nreturn" + (Serialiser toString saveData) + ";\n};", new File(tmpDir, "story.js"))
 
-    EventBus.send(RunResponse(new File(tmpDir, "index.html"), CoreEventSourceIdentity))
+    EventBus.send(RunResponse(tmpDir, "index.html", CoreEventSourceIdentity))
   }
 
   EventBus.SaveDataEvents tumbling PluginsController.plugins.size zip EventBus.SaveToFileEvents foreach {
@@ -164,27 +165,37 @@ object CoreEventDispatcher {
       }
   }
 
-  EventBus.LoadFromFileEvents subscribe ({ evt =>
-    val dataToLoad = IoController read evt.file
-    val dataAst = (Serialiser fromString dataToLoad).asInstanceOf[AstMap]
+  EventBus.LoadFromFileEvents foreach { evt =>
+    try {
+      val dataToLoad = IoController read evt.file
+      val dataAst = Serialiser fromString dataToLoad match {
+        case d: AstMap => d
+        case e => throw DeserialisationException(s"Expected AstMap in deserialising story, received $e")
+      }
 
-    val pluginData = dataAst("plugins").asInstanceOf[AstMap].toMap
+      val pluginData = dataAst("plugins") match {
+        case d: AstMap => d.toMap
+        case e => throw DeserialisationException(s"Expected AstMap in deserialising plugin data, received $e")
+      }
 
-    val story = Serialiser.deserialise[Story](dataAst("story"))
-    StoryController load story
+      val story = Serialiser.deserialise[Story](dataAst("story"))
+      StoryController load story
 
-    loadedFile = Some(evt.file)
+      loadedFile = Some(evt.file)
 
-    UndoController.clearHistory()
-    UndoController.markCurrentPosition()
+      UndoController.clearHistory()
+      UndoController.markCurrentPosition()
 
-    EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
-    EventBus.send(DataLoaded(pluginData, CoreEventSourceIdentity))
-    EventBus.send(FileLoaded(loadedFile, CoreEventSourceIdentity))
-  }, { throwable =>
-    Logger.error("File loading error", throwable)
-    EventBus.send(Error("An error occurred while trying to load the story", throwable, CoreEventSourceIdentity))
-  })
+      EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
+      EventBus.send(DataLoaded(pluginData, CoreEventSourceIdentity))
+      EventBus.send(FileLoaded(loadedFile, CoreEventSourceIdentity))
+    }
+    catch {
+      case NonFatal(throwable) =>
+        Logger.error("File loading error", throwable)
+        EventBus.send(Error("An error occurred while trying to load the story", throwable, CoreEventSourceIdentity))
+    }
+  }
 
   EventBus.ExportToFileEvents foreach { evt =>
     val exportDirectory = new File(evt.dir, evt.filename.stripSuffix(".dyn2") + "-export")
@@ -194,7 +205,7 @@ object CoreEventDispatcher {
     // save current story to export directory
     val storyData = Serialiser serialise StoryController.story
     val saveData = AstMap("story" -> storyData)
-    IoController.write(Serialiser toString saveData, new File(exportDirectory, "story.dyn"))
+    IoController.write("function getStoryData(){\nreturn" + (Serialiser toString saveData) + ";\n};", new File(exportDirectory, "story.js"))
 
     // send completion (we're done!)
     EventBus.send(StoryExported(CoreEventSourceIdentity))

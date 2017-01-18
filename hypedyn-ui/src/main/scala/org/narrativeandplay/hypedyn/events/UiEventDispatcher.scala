@@ -104,9 +104,9 @@ object UiEventDispatcher {
     dirToSaveTo foreach { d => EventBus.send(ExportToFile(d, Main.loadedFileName, UiEventSourceIdentity)) }
   }
   // actually run the story
-  EventBus.RunResponses foreach { evt => EventBus.send(RunStory(evt.fileToRun, UiEventSourceIdentity)) }
+  EventBus.RunResponses foreach { evt => EventBus.send(RunStory(evt.filePath, evt.fileToRun, UiEventSourceIdentity)) }
   EventBus.RunStoryEvents foreach { evt =>
-    Main.runInBrowser(evt.fileToRun)
+    Main.runInBrowser(evt.filePath, evt.fileToRun)
 
     EventBus.send(StoryRan(UiEventSourceIdentity))
   }
@@ -150,6 +150,7 @@ object UiEventDispatcher {
   }
   EventBus.NodeDestroyedEvents foreach { evt =>
     openedNodeEditors find (_.id == evt.node.id) foreach (_.close())
+    selectedNode() find (_ == evt.node.id) foreach(_ => selectedNode() = None)
   }
 
   EventBus.UiNodeSelectedEvents foreach { evt => selectedNode() = Some(evt.id) }

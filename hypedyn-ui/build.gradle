@@ -4,6 +4,8 @@ dependencies {
     compile 'org.fxmisc.richtext:richtextfx:0.6.10'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
 
+    compile 'com.typesafe.akka:akka-http-experimental_2.11:2.4.4'
+
     compile project(':hypedyn-api')
     compile project(':hypedyn-core')
     compile project(':hypedyn-default-story-viewer')

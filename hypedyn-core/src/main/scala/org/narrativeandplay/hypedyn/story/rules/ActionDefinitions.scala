@@ -27,7 +27,7 @@ object ActionDefinitions {
                      true,
                      List(RuleParameter("fact", BooleanFacts),
                           RuleParameter("value", ListOfValues("true", "false")))),
-    ActionDefinition(ActionType("UpdateStringFact"), "Update text fact", List(NodeContentAction, NodeAction, StoryAction),
+    ActionDefinition(ActionType("UpdateStringFact"), "Update string fact", List(NodeContentAction, NodeAction, StoryAction),
                      true,
                      List(RuleParameter("fact", StringFacts),
                           RuleParameter("value", UserInputString))),

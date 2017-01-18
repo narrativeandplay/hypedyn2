@@ -14,7 +14,7 @@ javafx {
     mainClass 'org.narrativeandplay.hypedyn.Main'
 }
 
-version = "1.0"
+version = "0.23-alpha"
 
 ext {
     majorScalaVersion = "2.11"
@@ -45,8 +45,6 @@ allprojects {
 
     tasks.withType(ScalaCompile) {
         scalaCompileOptions.with {
-            useAnt = false
-            useCompileDaemon = true
             additionalParameters = [
                     "-Xexperimental", // for Single Abstract Method conversion support without needing implicits
                     "-Xlint:-nullary-unit,_",

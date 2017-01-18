@@ -47,6 +47,11 @@ class Link(val from: ViewerNode,
    */
   val selected = BooleanProperty(false)
 
+  /**
+    * A property to determine selection colour
+    */
+  val selectionColour = ObjectProperty(Color.Red)
+
   private val linkLabel = new Label {
     prefWidth <== name map[java.lang.Double] { s => new Text(s).layoutBounds().width }
     maxWidth = Link.LabelWidth
@@ -55,12 +60,16 @@ class Link(val from: ViewerNode,
     wrapText = true
 
     text <== name
+
+    visible <== from.showName
   }
 
   private val labelBackground = new Rectangle {
     width <== linkLabel.width
     height = Link.LabelHeight
     fill = Link.DefaultBackgroundColour
+
+    visible <== from.showName
   }
 
   private def endPoints = {
@@ -102,6 +111,14 @@ class Link(val from: ViewerNode,
    * @param pt The selection point
    */
   def select(pt: Point2D): Unit = select(pt.x, pt.y)
+
+  /**
+    * Select this link
+    */
+  def select(inSelectionColour: Color): Unit = {
+    selectionColour() = inSelectionColour
+    select(path pointAt 0.5)
+  }
 
   /**
    * Unselect this link
@@ -190,7 +207,7 @@ class Link(val from: ViewerNode,
 
     val highlight = if (selected()) {
       val h = pathCurve.toFxPath
-      h.stroke = Color.Red
+      h.stroke = selectionColour()
       h.strokeWidth = 5
       if(rule().isShowInPopup) h.strokeDashArray.addAll(3.0,7.0)
 
