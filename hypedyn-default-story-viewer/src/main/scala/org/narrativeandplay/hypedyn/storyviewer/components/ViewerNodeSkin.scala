@@ -23,7 +23,7 @@ class ViewerNodeSkin(viewerNode: ViewerNode) extends Skin[ViewerNode] {
   private val headingBarRect = new Rectangle {
     width <== viewerNode.widthProperty() - 1
     height <== when (viewerNode.showContent) choose HeadingHeight otherwise viewerNode.heightProperty() //min(HeadingHeight, viewerNode.heightProperty())
-    fill <== when (viewerNode.isAnywhere) choose Color.apply(0.63, 0.63, 0.63, 1) otherwise Color.LightGrey
+    fill <== when (viewerNode.isAnywhere) choose Color(0.63, 0.63, 0.63, 1) otherwise Color.LightGrey
     stroke = Color.Black
   }
   private val contentRect = new Rectangle {
