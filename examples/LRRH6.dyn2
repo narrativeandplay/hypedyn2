@@ -41,7 +41,7 @@
                 },
                 "operator":{
                   "type":"selectedListValue",
-                  "value":"=="
+                  "value":"="
                 }
               }
             }],
@@ -76,7 +76,7 @@
                 },
                 "operator":{
                   "type":"selectedListValue",
-                  "value":"=="
+                  "value":"="
                 }
               }
             }],
@@ -111,7 +111,7 @@
                 },
                 "operator":{
                   "type":"selectedListValue",
-                  "value":"=="
+                  "value":"="
                 }
               }
             }],

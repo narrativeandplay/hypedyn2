@@ -126,7 +126,7 @@ value.
 For now, we want to specify the number directly, so choose ``Input''. In the input field, specify ``1''.
 \end{enumerate}
 
-\noindent The rule we've created will set the ``whichEnding?'' fact to 1 when the reader enters the ``forest'' node. This 
+\noindent The rule we've created will set the ``whichEnding?'' fact to 1 when the reader enters the ``forest'' node.
 
 \subsection{Displaying a number fact using conditional text}
 
@@ -162,7 +162,7 @@ We'll begin by adding the rule which takes us to ``Version 1''.
     \item Add a condition. Choose ``Number Fact'' as the type of condition in the first pulldown menu.
     \item Notice that after changing the condition to a number fact 
     condition, the condition changes to show three pulldown menus. The first pulldown menu contains a list of number facts. Choose the ``whichEnding?'' fact.
-    \item The second pulldown menu contains $<$, $>$, $\le$, $\ge$, == and !=. This is the \textit{comparator} which will be used to compare the chosen number fact (in this case ``whichEnding?'') with the right-hand side of the condition.
+    \item The second pulldown menu contains \textit{$<$}, \textit{$>$}, \textit{$\le$}, \textit{$\ge$}, \textit{=} and \textit{not =}. This is the \textit{comparator} which will be used to compare the chosen number fact (in this case ``whichEnding?'') with the right-hand side of the condition.
     
 For now, set the comparator to be ``=''.
     \item To the right of the comparator is another pulldown menu, which has two options: input and fact. Choosing ``Input'' lets you enter a specific number for the comparison, whereas choosing ``Fact'' lets you compare against another fact. Set the choice to ``Input''.
@@ -286,7 +286,7 @@ get the correct value. We will do that now.
     \item Now we will add a new number fact to keep track of how many endings there are. Create a new number fact, and name it  ``numberOfEndings''.
     \item We need this fact to be set to ``3''. To do this, you can set the \textit{Initial value} of the fact in the \textit{New fact} dialog to be 3. 
     
-Note that if you want to change this value later, you can select the fact in the textit{Fact list} and click on the \textit{Edit Fact} button, or double-click the fact in the\textit{Fact list}.
+Note that if you want to change this value later, you can select the fact in the \textit{Fact list} and click on the \textit{Edit Fact} button, or double-click the fact in the \textit{Fact list}.
     \item Now we need to make use of this new fact in our two rules where we randomize ``whichEnding?''.
     
 Edit the ``forest'' node, and edit its node rules. Edit the rule ``choose ending''. In the first action, change the second ``Input'' to ``Fact''. This is the upper bound of our random number. Choose the fact ``numberOfEndings''.

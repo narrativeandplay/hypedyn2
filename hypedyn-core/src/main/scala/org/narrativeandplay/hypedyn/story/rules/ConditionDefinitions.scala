@@ -34,8 +34,8 @@ object ConditionDefinitions {
                                                                                                     ">",
                                                                                                     ">=",
                                                                                                     "<=",
-                                                                                                    "==",
-                                                                                                    "!=")),
+                                                                                                    "=",
+                                                                                                    "not =")),
                                                                                     RuleParameter("comparisonValue",
                                                                                                   Union(Map(
                                                                                                     "Input" -> RuleParameter("input", UserInputInteger),

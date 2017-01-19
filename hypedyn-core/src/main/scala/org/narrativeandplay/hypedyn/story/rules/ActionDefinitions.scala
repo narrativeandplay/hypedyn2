@@ -20,14 +20,14 @@ object ActionDefinitions {
                      false,
                      List(RuleParameter("text", Union(Map(
                       "Input" -> RuleParameter("textInput", UserInputString),
-                      "String Fact" -> RuleParameter("stringFactValue", StringFacts),
+                      "Text Fact" -> RuleParameter("stringFactValue", StringFacts),
                       "Number Fact" -> RuleParameter("NumberFactValue", IntegerFacts)
                      ))))),
     ActionDefinition(ActionType("UpdateBooleanFact"), "Update true/false fact", List(NodeContentAction, NodeAction, StoryAction),
                      true,
                      List(RuleParameter("fact", BooleanFacts),
                           RuleParameter("value", ListOfValues("true", "false")))),
-    ActionDefinition(ActionType("UpdateStringFact"), "Update string fact", List(NodeContentAction, NodeAction, StoryAction),
+    ActionDefinition(ActionType("UpdateStringFact"), "Update text fact", List(NodeContentAction, NodeAction, StoryAction),
                      true,
                      List(RuleParameter("fact", StringFacts),
                           RuleParameter("value", UserInputString))),
