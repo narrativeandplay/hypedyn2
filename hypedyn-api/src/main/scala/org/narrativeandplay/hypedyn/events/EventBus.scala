@@ -62,6 +62,9 @@ object EventBus {
   val UndoRequests = eventBus collect { case e: UndoRequest => e }
   val RedoRequests = eventBus collect { case e: RedoRequest => e }
 
+  val ZoomRequests = eventBus collect { case e: ZoomRequest => e }
+  val ResetZoomRequests = eventBus collect { case e: ResetZoomRequest => e }
+
 
   /**
    * Event stream of all `Response`s
@@ -93,6 +96,9 @@ object EventBus {
   val UndoResponses = eventBus collect { case e: UndoResponse => e }
   val RedoResponses = eventBus collect { case e: RedoResponse => e }
 
+  val ZoomResponses = eventBus collect { case e: ZoomResponse => e }
+  val ResetZoomResponses = eventBus collect { case e: ResetZoomResponse => e }
+
 
   /**
    * Event stream of all `Action`s
@@ -116,6 +122,9 @@ object EventBus {
 
   val CreateStoryEvents = eventBus collect { case e: CreateStory => e }
   val UpdateStoryPropertiesEvents = eventBus collect { case e: UpdateStoryProperties => e }
+
+  val ZoomStoryViewEvents = eventBus collect { case e: ZoomStoryView => e }
+  val ResetStoryViewZoomEvents = eventBus collect { case e: ResetStoryViewZoom => e }
 
 
   /**
@@ -144,6 +153,9 @@ object EventBus {
 
   val UiNodeSelectedEvents = eventBus collect { case e: UiNodeSelected => e }
   val UiNodeDeselectedEvents = eventBus collect { case e: UiNodeDeselected => e }
+
+  val StoryViewZoomedEvents = eventBus collect { case e: StoryViewZoomed => e }
+  val StoryViewZoomResetEvents = eventBus collect { case e: StoryViewZoomReset => e }
 
 
   /**

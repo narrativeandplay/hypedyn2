@@ -98,6 +98,9 @@ sealed case class EditStoryPropertiesRequest(src: String) extends Request
 sealed case class UndoRequest(src: String) extends Request
 sealed case class RedoRequest(src: String) extends Request
 
+sealed case class ZoomRequest(src: String) extends Request
+sealed case class ResetZoomRequest(src: String) extends Request
+
 
 /**
  * Responses to a request, either containing information, or simply being an acknowledgement of one
@@ -131,6 +134,9 @@ sealed case class EditStoryPropertiesResponse(story: Narrative, src: String) ext
 sealed case class UndoResponse(src: String) extends Response
 sealed case class RedoResponse(src: String) extends Response
 
+sealed case class ZoomResponse(src: String) extends Response
+sealed case class ResetZoomResponse(src: String) extends Response
+
 
 /**
  * Events containing the result of something having been done on the UI, resulting in a request to update something
@@ -163,6 +169,9 @@ sealed case class UpdateStoryProperties(title: String,
                                         metadata: Narrative.Metadata,
                                         src: String) extends Action
 
+sealed case class ZoomStoryView(deltaZoom: Double, src: String) extends Action
+sealed case class ResetStoryViewZoom(src: String) extends Action
+
 
 /**
  * Events signifying the completion of an Action, mainly to inform plugins that something has happened
@@ -191,6 +200,9 @@ sealed case class StoryRan(src: String) extends Completion
 
 sealed case class UiNodeSelected(id: NodeId, src: String) extends Completion
 sealed case class UiNodeDeselected(id: NodeId, src: String) extends Completion
+
+sealed case class StoryViewZoomed(src: String) extends Completion
+sealed case class StoryViewZoomReset(src: String) extends Completion
 
 
 sealed trait Notification extends Event
