@@ -45,27 +45,6 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   content = new Control(viewer) {}
 
   private[storyviewer] def zoomValueClamp(v: Double) = DoubleUtils.clamp(minZoom, maxZoom, v)
-  // Because OS X does something stupid by firing multiple events for a single Equals key press, we add a timestamp
-  // to track when the last time the zoom was triggered, and allow it to zoom only if it was at least 2 ms after
-  // the last zoom time.
-  private var lastKeypressTime = System.currentTimeMillis()
-  addEventFilter(KeyEvent.KeyPressed, { event: jfxsi.KeyEvent =>
-    val timeDiff = System.currentTimeMillis() - lastKeypressTime
-    if (event.shortcutDown && timeDiff > 1) {
-      event.code match {
-        case KeyCode.ADD | KeyCode.EQUALS => zoomLevel() = zoomValueClamp(zoomLevel() + 0.1)
-        case KeyCode.MINUS | KeyCode.SUBTRACT => zoomLevel() = zoomValueClamp(zoomLevel() - 0.1)
-        case KeyCode.NUMPAD0 | KeyCode.DIGIT0 => zoomLevel() = 1.0
-        case _ =>
-      }
-    }
-    event.code match {
-      case KeyCode.DELETE | KeyCode.BACK_SPACE =>
-        viewer.nodes filter (_.selected()) foreach { n => requestNodeDelete(n.id) }
-      case _ =>
-    }
-    lastKeypressTime = System.currentTimeMillis()
-  })
 
   /**
    * Returns the name of the plugin
@@ -170,10 +149,6 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
 
   def requestNodeEdit(id: NodeId): Unit = {
     EventBus.send(EditNodeRequest(id, StoryViewerEventSourceIdentity))
-  }
-
-  def requestNodeDelete(id: NodeId): Unit = {
-    EventBus.send(DeleteNodeRequest(id, StoryViewerEventSourceIdentity))
   }
 
   def notifyNodeMove(id: NodeId, initialPos: Vector2[Double], finalPos: Vector2[Double]): Unit = {

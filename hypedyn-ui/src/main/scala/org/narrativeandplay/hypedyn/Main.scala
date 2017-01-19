@@ -1,17 +1,22 @@
 package org.narrativeandplay.hypedyn
 
 import java.io.File
-import javafx.beans.value.ObservableValue
+import javafx.scene.{input => jfxsi}
 
 import scalafx.Includes._
-import scalafx.application.{Platform, JFXApp}
 import scalafx.application.JFXApp.PrimaryStage
+import scalafx.application.{JFXApp, Platform}
 import scalafx.beans.property.StringProperty
 import scalafx.scene.Scene
-import scalafx.scene.control.{ButtonType, Alert}
-import scalafx.scene.image.{ImageView, Image}
-import scalafx.scene.layout.{VBox, BorderPane}
+import scalafx.scene.control.Alert
+import scalafx.scene.image.{Image, ImageView}
+import scalafx.scene.input.{KeyCode, KeyEvent}
+import scalafx.scene.layout.{BorderPane, VBox}
 
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.server.Directives._
+import akka.stream.ActorMaterializer
 import com.sun.glass.ui
 import com.sun.glass.ui.Application.EventHandler
 import org.fxmisc.easybind.EasyBind
@@ -21,19 +26,11 @@ import org.narrativeandplay.hypedyn.dialogs._
 import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.plugins.PluginsController
-import org.narrativeandplay.hypedyn.serialisation.serialisers.DeserialisationException
-import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition, Fact}
+import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.uicomponents._
 import org.narrativeandplay.hypedyn.undo.UndoController
-import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 import org.narrativeandplay.hypedyn.utils.{System => Sys}
-
-import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Directives._
-import akka.stream.ActorMaterializer
-import akka.http.scaladsl.model.{HttpEntity, ContentTypes}
 
 /**
  * Entry point for the application
@@ -67,6 +64,8 @@ object Main extends JFXApp {
 
   private val refreshStream = SerializedSubject(PublishSubject[Unit]())
   def refreshRecent = refreshStream
+
+  private var lastKeypressTime = System.currentTimeMillis()
 
   /**
    * Returns a new file dialog
@@ -169,7 +168,7 @@ object Main extends JFXApp {
     }
   }
 
-  stage = new PrimaryStage {
+  new PrimaryStage {
     title <== loadedFilename + editedMarker + " - HypeDyn 2"
     icons.add(icon)
 
@@ -193,6 +192,27 @@ object Main extends JFXApp {
         }
       }
     }
+
+    addEventFilter(KeyEvent.KeyPressed, { event: jfxsi.KeyEvent =>
+      val timeDiff = System.currentTimeMillis() - lastKeypressTime
+      // Because OS X does something stupid by firing multiple events for a single Equals key press, we add a timestamp
+      // to track when the last time the zoom was triggered, and allow it to zoom only if it was at least 2 ms after
+      // the last zoom time.
+      if (event.shortcutDown && timeDiff > 1) {
+        event.code match {
+          case KeyCode.ADD | KeyCode.EQUALS => UiEventDispatcher.requestZoom(0.1)
+          case KeyCode.MINUS | KeyCode.SUBTRACT => UiEventDispatcher.requestZoom(-0.1)
+          case KeyCode.NUMPAD0 | KeyCode.DIGIT0 => UiEventDispatcher.requestZoomReset()
+          case _ =>
+        }
+      }
+      event.code match {
+        case KeyCode.DELETE | KeyCode.BACK_SPACE =>
+          UiEventDispatcher.requestDeleteNode()
+        case _ =>
+      }
+      lastKeypressTime = System.currentTimeMillis()
+    })
 
     scene = new Scene {
       root = new BorderPane() {
