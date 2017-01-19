@@ -3,6 +3,8 @@ package org.narrativeandplay.hypedyn.events
 import java.io.File
 import java.nio.file.Files
 
+import scala.util.control.NonFatal
+
 import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.serialisation.serialisers._
@@ -11,8 +13,7 @@ import org.narrativeandplay.hypedyn.story.StoryController
 import org.narrativeandplay.hypedyn.story.internal.Story
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, ConditionDefinitions, Fact}
 import org.narrativeandplay.hypedyn.undo._
-
-import scala.util.control.NonFatal
+import org.narrativeandplay.hypedyn.utils.parsing.SchemeParser
 
 /**
  * Main event dispatcher for the core
@@ -130,6 +131,7 @@ object CoreEventDispatcher {
   EventBus.LoadRequests foreach { _ => EventBus.send(LoadResponse(CoreEventSourceIdentity)) }
 
   EventBus.ExportRequests foreach { _ => EventBus.send(ExportResponse(CoreEventSourceIdentity)) }
+  EventBus.ImportRequests foreach { _ => EventBus.send(ImportResponse(CoreEventSourceIdentity)) }
   EventBus.RunRequests foreach { _ =>
     val tmpDir = Files.createTempDirectory("hypedyn2").toFile
     tmpDir.deleteOnExit()
@@ -195,6 +197,26 @@ object CoreEventDispatcher {
         Logger.error("File loading error", throwable)
         EventBus.send(Error("An error occurred while trying to load the story", throwable, CoreEventSourceIdentity))
     }
+  }
+
+  EventBus.ImportFromFileEvents foreach { evt =>
+    val dataToImport = IoController read evt.file
+    val parseResult = SchemeParser.parse(dataToImport)
+    val story = parseResult("story").asInstanceOf[Story]
+    val pluginData = parseResult("plugins").asInstanceOf[AstMap]
+
+    Console.println(pluginData.toString)
+
+    StoryController.load(story)
+
+    loadedFile = None
+
+    UndoController.clearHistory()
+    UndoController.markCurrentPosition()
+
+    EventBus.send(StoryLoaded(StoryController.story, CoreEventSourceIdentity))
+    EventBus.send(DataLoaded(pluginData.toMap, CoreEventSourceIdentity))
+    EventBus.send(FileLoaded(loadedFile, CoreEventSourceIdentity))
   }
 
   EventBus.ExportToFileEvents foreach { evt =>

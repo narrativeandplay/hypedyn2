@@ -1,22 +1,20 @@
 package org.narrativeandplay.hypedyn.events
 
 import java.io.File
+import javafx.stage.FileChooser
 
-import scala.collection.mutable.ArrayBuffer
-
-import scalafx.Includes._
-import scalafx.beans.property.{ObjectProperty, BooleanProperty}
-import scalafx.scene.control.{ButtonType, Alert}
-
-import rx.lang.scala.Observable
-
-import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
+import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
+import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.story.{Nodal, NodeId}
 import org.narrativeandplay.hypedyn.uicomponents.FactViewer
-import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.utils.HypedynPreferences
+
+import scala.collection.mutable.ArrayBuffer
+import scalafx.Includes._
+import scalafx.beans.property.{BooleanProperty, ObjectProperty}
+import scalafx.scene.control.{Alert, ButtonType}
 
 /**
  * Dispatcher for UI events
@@ -97,6 +95,18 @@ object UiEventDispatcher {
     }
   }
 
+  EventBus.ImportResponses foreach { evt =>
+    val dialog = Main.fileDialog
+    dialog.setTitle("Import")
+    dialog.getExtensionFilters.removeAll(dialog.getExtensionFilters)
+    dialog.getExtensionFilters.add(new FileChooser.ExtensionFilter("HypeDyn 1 Story", "*.dyn"))
+    val fileToImport = dialog.showOpenFileDialog()
+
+    fileToImport foreach { f =>
+      EventBus.send(ImportFromFile(f, UiEventSourceIdentity))
+    }
+  }
+
   EventBus.ExportResponses foreach { evt =>
     // get location to export to (a directory)
     val dirToSaveTo = Main.directoryDialog.showDialog()
@@ -110,7 +120,6 @@ object UiEventDispatcher {
 
     EventBus.send(StoryRan(UiEventSourceIdentity))
   }
-
   EventBus.StoryLoadedEvents foreach { evt =>
     FactViewer.facts.clear()
     evt.story.facts foreach { f => FactViewer.facts += f }
@@ -221,6 +230,9 @@ object UiEventDispatcher {
 
   def requestExport(): Unit = {
     EventBus.send(ExportRequest(UiEventSourceIdentity))
+  }
+  def requestImport(): Unit = {
+    EventBus.send(ImportRequest(UiEventSourceIdentity))
   }
   def requestRunStory(): Unit = {
     EventBus.send(RunRequest(UiEventSourceIdentity))

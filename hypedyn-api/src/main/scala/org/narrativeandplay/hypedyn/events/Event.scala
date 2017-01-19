@@ -86,6 +86,7 @@ sealed case class SaveAsRequest(src: String) extends Request
 sealed case class LoadRequest(src: String) extends Request
 
 sealed case class ExportRequest(src: String) extends Request
+sealed case class ImportRequest(src: String) extends Request
 sealed case class RunRequest(src: String) extends Request
 
 sealed case class CutNodeRequest(id: NodeId, src: String) extends Request
@@ -118,6 +119,7 @@ sealed case class SaveResponse(loadedFile: Option[File], src: String) extends Re
 sealed case class SaveAsResponse(src: String) extends Response
 sealed case class LoadResponse(src: String) extends Response
 
+sealed case class ImportResponse(src: String) extends Response
 sealed case class ExportResponse(src: String) extends Response
 sealed case class RunResponse(filePath: File, fileToRun: String, src: String) extends Response
 
@@ -150,6 +152,7 @@ sealed case class SaveData(pluginName: String, data: AstElement, src: String) ex
 sealed case class SaveToFile(file: File, src: String) extends Action
 sealed case class LoadFromFile(file: File, src: String) extends Action
 
+sealed case class ImportFromFile(file: File, src: String) extends Action
 sealed case class ExportToFile(dir: File, filename: String, src: String) extends Action
 sealed case class RunStory(filePath: File, fileToRun: String, src: String) extends Action
 

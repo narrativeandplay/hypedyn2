@@ -24,8 +24,6 @@ object EventBus {
     eventBus.onNext(event)
   }
 
-
-
   /**
    * Event stream of all `Event`s
    */
@@ -49,6 +47,7 @@ object EventBus {
   val SaveAsRequests = eventBus collect { case e: SaveAsRequest => e }
   val LoadRequests = eventBus collect { case e: LoadRequest => e }
 
+  val ImportRequests = eventBus collect { case e: ImportRequest => e }
   val ExportRequests = eventBus collect { case e: ExportRequest => e }
   val RunRequests = eventBus collect { case e: RunRequest => e }
 
@@ -80,6 +79,7 @@ object EventBus {
   val SaveAsResponses = eventBus collect { case e: SaveAsResponse => e }
   val LoadResponses = eventBus collect { case e: LoadResponse => e }
 
+  val ImportResponses = eventBus collect { case e: ImportResponse => e }
   val ExportResponses = eventBus collect { case e: ExportResponse => e }
   val RunResponses = eventBus collect { case e: RunResponse => e }
 
@@ -111,12 +111,12 @@ object EventBus {
   val SaveToFileEvents = eventBus collect { case e: SaveToFile => e }
   val LoadFromFileEvents = eventBus collect { case e: LoadFromFile => e }
 
+  val ImportFromFileEvents = eventBus collect { case e: ImportFromFile => e }
   val ExportToFileEvents = eventBus collect { case e: ExportToFile => e }
   val RunStoryEvents = eventBus collect { case e: RunStory => e }
 
   val CreateStoryEvents = eventBus collect { case e: CreateStory => e }
   val UpdateStoryPropertiesEvents = eventBus collect { case e: UpdateStoryProperties => e }
-
 
   /**
    * Event stream of all `Completion`s
