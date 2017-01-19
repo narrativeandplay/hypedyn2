@@ -60,7 +60,8 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
       }
     }
     event.code match {
-      case KeyCode.DELETE | KeyCode.BACK_SPACE => viewer.nodes.filter(_ selected()).foreach(n => EventBus.send(DeleteNodeRequest(n.id, StoryViewerEventSourceIdentity)))
+      case KeyCode.DELETE | KeyCode.BACK_SPACE =>
+        viewer.nodes filter (_.selected()) foreach { n => requestNodeDelete(n.id) }
       case _ =>
     }
     lastKeypressTime = System.currentTimeMillis()
@@ -169,6 +170,10 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
 
   def requestNodeEdit(id: NodeId): Unit = {
     EventBus.send(EditNodeRequest(id, StoryViewerEventSourceIdentity))
+  }
+
+  def requestNodeDelete(id: NodeId): Unit = {
+    EventBus.send(DeleteNodeRequest(id, StoryViewerEventSourceIdentity))
   }
 
   def notifyNodeMove(id: NodeId, initialPos: Vector2[Double], finalPos: Vector2[Double]): Unit = {
