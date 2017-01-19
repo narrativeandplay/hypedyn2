@@ -12,8 +12,8 @@ import scalafx.scene.input.{KeyCode, KeyEvent}
 
 import com.github.benedictleejh.scala.math.vector.Vector2
 
-import org.narrativeandplay.hypedyn.events.{UiNodeDeselected, UiNodeSelected, EditNodeRequest, EventBus}
-import org.narrativeandplay.hypedyn.plugins.{Saveable, Plugin}
+import org.narrativeandplay.hypedyn.events._
+import org.narrativeandplay.hypedyn.plugins.{Plugin, Saveable}
 import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
 import org.narrativeandplay.hypedyn.serialisation._
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal, NodeId}
@@ -58,6 +58,10 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
         case KeyCode.NUMPAD0 | KeyCode.DIGIT0 => zoomLevel() = 1.0
         case _ =>
       }
+    }
+    event.code match {
+      case KeyCode.DELETE => viewer.nodes.filter(_ selected()).foreach(n => EventBus.send(DeleteNodeRequest(n.id, StoryViewerEventSourceIdentity)))
+      case _ =>
     }
     lastKeypressTime = System.currentTimeMillis()
   })
