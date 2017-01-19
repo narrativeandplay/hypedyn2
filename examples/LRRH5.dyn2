@@ -455,7 +455,7 @@
     }],
     "facts":[{
       "id":2,
-      "name":"whichEnding",
+      "name":"whichEnding?",
       "type":"int",
       "initialValue":0
     },{
