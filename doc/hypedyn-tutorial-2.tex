@@ -75,6 +75,8 @@ choice.
 
 \item Similarly, create a fragment on the text ``street-smart'', name the fragment ``street-smart'', and create a rule named ``street-smart'' that links back to the ``start'' node.
 
+\item Note that changes made in the Node Editor are not actually applied to the story until you click the ``Apply'' button. If you look at the Map View now, you'll see that the new node is not visible. Now click on the ``Apply'' button to make these changes. The new node, and the two links you just created, will now be visible.
+
 \item Recall that the rule contains a list of conditions (initially empty), plus a list of actions. The actions will be performed if the conditions are satisfied.
 
 Since we don't want the reader to be able to change their choice, we will put a condition on the ``naive'' fragment: the link can only be followed if the reader \textit{hasn't} followed both the link ``naive'' and the link ``street-smart''. Do this by adding 2 conditions to the ``naive'' rule, as shown in Figure \ref{fig:tut2:red_is_naive}.
@@ -107,7 +109,7 @@ Now we will create the link to the two different endings, and set up the rules s
 
 \begin{enumerate}
   \item First, rename the current ``end'' node to ``end 1'' by editing the node in the Map view, and changing the name in the ``Name'' text field.
-  \item Still editing the node ``end 1'', delete the text ``back to start''. Notice that the link to the ``start'' node is deleted when you delete the text.
+  \item Still editing the node ``end 1'', delete the text ``back to start''. Notice that the fragment ``restart'' attached to the text ``start'' is deleted when you delete the text. If you apply the change by clicking on the ``Apply'' button, you will see the link also disappears from the Map View.
   \item Next, replace the text in the node ``end 1'' with the following text:
   \begin{quotation}
   \noindent Quickly the wolf ran ahead to Grandma's house, swallowed Grandma whole, and disguised himself as the poor old lady. When Red arrived, he finished her off too. Yum!
