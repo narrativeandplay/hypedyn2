@@ -60,7 +60,7 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
       }
     }
     event.code match {
-      case KeyCode.DELETE => viewer.nodes.filter(_ selected()).foreach(n => EventBus.send(DeleteNodeRequest(n.id, StoryViewerEventSourceIdentity)))
+      case KeyCode.DELETE | KeyCode.BACK_SPACE => viewer.nodes.filter(_ selected()).foreach(n => EventBus.send(DeleteNodeRequest(n.id, StoryViewerEventSourceIdentity)))
       case _ =>
     }
     lastKeypressTime = System.currentTimeMillis()
