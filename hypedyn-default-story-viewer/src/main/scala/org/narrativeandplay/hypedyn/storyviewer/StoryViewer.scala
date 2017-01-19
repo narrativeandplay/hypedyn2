@@ -77,7 +77,8 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   override def onNodeCreated(node: Nodal): Unit = {
     val createdNode = viewer.addNode(node)
 
-    nodeLocations get createdNode.id foreach (moveNode(createdNode.id, _))
+    nodeLocations get createdNode.id foreach {position : Vector2[Double] =>
+      moveNode(createdNode.id, Vector2(position.x*zoomLevel(), position.y*zoomLevel()))}
   }
 
   /**
@@ -140,7 +141,7 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
    * @param position The position to move it to
    */
   def moveNode(nodeId: NodeId, position: Vector2[Double]): Unit = {
-    nodeLocations += nodeId -> position
+    updateNodeLocations(nodeId, position)
 
     viewer.nodes find (_.id == nodeId) foreach (_.relocate(position.x, position.y))
 
@@ -152,9 +153,13 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   }
 
   def notifyNodeMove(id: NodeId, initialPos: Vector2[Double], finalPos: Vector2[Double]): Unit = {
-    nodeLocations += id -> finalPos
+    updateNodeLocations(id, finalPos)
 
     UndoableStream.send(new NodeMovedChange(this, id, initialPos, finalPos))
+  }
+
+  def updateNodeLocations(id: NodeId, pos: Vector2[Double]): Unit = {
+    nodeLocations += id -> Vector2(pos.x / zoomLevel(), pos.y / zoomLevel())
   }
 
   def notifyNodeSelection(id: NodeId): Unit = {
