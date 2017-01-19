@@ -115,7 +115,8 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
     requestLayout()
   }
   onMouseReleased = { me =>
-    if (prevTopLeft == topLeft && prevSelected) deselect()
+    val movedDist = (topLeft - prevTopLeft).length
+    if (movedDist < 0.01 && prevSelected) deselect()
     requestLayout()
   }
   onMouseDragged = { me =>
