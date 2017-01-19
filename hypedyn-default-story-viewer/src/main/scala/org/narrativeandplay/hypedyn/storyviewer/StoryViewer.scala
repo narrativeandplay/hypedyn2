@@ -190,6 +190,24 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
     EventBus.send(UiNodeDeselected(id, StoryViewerEventSourceIdentity))
   }
 
+  EventBus.ZoomRequests foreach { _ =>
+    EventBus.send(ZoomResponse(StoryViewerEventSourceIdentity))
+  }
+
+  EventBus.ResetZoomRequests foreach { _ =>
+    EventBus.send(ResetZoomResponse(StoryViewerEventSourceIdentity))
+  }
+
+  EventBus.ZoomStoryViewEvents foreach { evt =>
+    zoomLevel() = zoomValueClamp(zoomLevel() + evt.deltaZoom)
+    EventBus.send(StoryViewZoomed(StoryViewerEventSourceIdentity))
+  }
+
+  EventBus.ResetStoryViewZoomEvents foreach { _ =>
+    zoomLevel() = 1.0
+    EventBus.send(StoryViewZoomReset(StoryViewerEventSourceIdentity))
+  }
+
   private def serialise(n: ViewerNode) = {
     val unscaledX = n.layoutX / zoomLevel()
     val unscaledY = n.layoutY / zoomLevel()
