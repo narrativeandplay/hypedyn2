@@ -26,6 +26,7 @@ import org.narrativeandplay.hypedyn.dialogs._
 import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.plugins.PluginsController
+import org.narrativeandplay.hypedyn.server.Server
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition, Fact}
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.uicomponents._
@@ -44,6 +45,7 @@ object Main extends JFXApp {
   ClipboardEventDispatcher
   UndoEventDispatcher
   Logger
+  Server
 
   Thread.currentThread().setUncaughtExceptionHandler({ (_, throwable) =>
     // Most exceptions will show up as a `OnErrorNotImplementedException` because
@@ -150,12 +152,10 @@ object Main extends JFXApp {
   def loadedFileName_=(newFilename: String): Unit = loadedFilename() = newFilename
   def loadedFileName = loadedFilename()
 
-  var storyPath:String = null
-
   def runInBrowser(filePath: File, fileToRun: String): Unit = {
     val runtime = Runtime.getRuntime
-    val fileToLoad = "http://"+hostname+":"+port+"/"+fileToRun
-    storyPath = filePath.getAbsolutePath
+    val fileToLoad = "http://"+Server.hostname+":"+Server.port+"/"+fileToRun
+    Server.storyPath = filePath.getAbsolutePath
 
     if (Sys.isWindows) {
       runtime.exec(s"rundll32 url.dll,FileProtocolHandler $fileToLoad")
@@ -180,10 +180,7 @@ object Main extends JFXApp {
       UiEventDispatcher requestExit { exit =>
         if (exit) {
           Logger.info("Exiting HypeDyn 2 via main window close")
-          // shutdown web server
-          bindingFuture
-            .flatMap(_.unbind()) // trigger unbinding from the port
-            .onComplete(_ ⇒ webserver.terminate()) // and shutdown when done
+          Server.shutdown()
           Platform.exit()
         }
         else {
@@ -252,10 +249,7 @@ object Main extends JFXApp {
       UiEventDispatcher requestExit { exit =>
         if (exit) {
           Logger.info("Exiting HypeDyn 2 via Cmd-Q")
-          // shutdown web server
-          bindingFuture
-            .flatMap(_.unbind()) // trigger unbinding from the port
-            .onComplete(_ ⇒ webserver.terminate()) // and shutdown when done
+          Server.shutdown()
           Platform.exit()
         }
         else {
@@ -264,35 +258,4 @@ object Main extends JFXApp {
       }
     }
   })
-
-  //
-  // web server
-  //
-
-  private val hostname = "localhost"
-  private val port = 8080;
-  implicit val webserver = ActorSystem("my-system")
-  implicit val materializer = ActorMaterializer()
-  // needed for the future flatMap/onComplete in the end
-  implicit val executionContext = webserver.dispatcher
-
-  // not sure if this is a security risk
-  val route =
-    extractUnmatchedPath { p =>
-      get {
-        getFromFile(storyPath+p.toString)
-      }
-    }
-
-  val bindingFuture = Http().bindAndHandle(route, hostname, port)
-
-  bindingFuture.onFailure {
-    case ex: Exception =>
-      Logger.error("Server failed to bind to "+hostname+":"+port, ex)
-  }
-
-  bindingFuture.onSuccess {
-    case x:Http.ServerBinding =>
-      Logger.info("Server online at http://"+hostname+":"+port)
-  }
 }
