@@ -89,9 +89,9 @@ package object serialisers {
      * @param story The object to serialise
      */
     override def serialise(story: Story): AstElement =
-      AstMap("title" -> AstString(story.title),
-             "author" -> AstString(story.author),
-             "description" -> AstString(story.description),
+      AstMap("title" -> AstString(story.metadata.title),
+             "author" -> AstString(story.metadata.author),
+             "description" -> AstString(story.metadata.description),
              "metadata" -> StoryMetadataSerialiser.serialise(story.metadata),
              "nodes" -> AstList(story.nodes map NodeSerialiser.serialise: _*),
              "facts" -> AstList(story.facts map FactSerialiser.serialise: _*),
@@ -114,7 +114,7 @@ package object serialisers {
       val facts = safeCastStory[AstList](data("facts")).toList map FactSerialiser.deserialise
       val rules = safeCastStory[AstList](data("rules")).toList map RuleSerialiser.deserialise
 
-      new Story(title, author, description, metadata, nodes, facts, rules)
+      new Story(metadata.copy(title = title, author = author, description = description), nodes, facts, rules)
     }
   }
 
@@ -464,7 +464,7 @@ package object serialisers {
       val backDisabled = safeCastStoryMetadata[AstBoolean](data("backDisabled")).boolean
       val restartDisabled = safeCastStoryMetadata[AstBoolean](data("restartDisabled")).boolean
 
-      Story.Metadata(comments, readerStyle, backDisabled, restartDisabled)
+      Story.Metadata("", "", "",comments, readerStyle, backDisabled, restartDisabled)
     }
   }
 

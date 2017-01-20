@@ -42,12 +42,16 @@ object InterfaceToUiImplementation {
   implicit def nodalList2UiNodeList(nodals: List[Nodal]): List[UiNode] = nodals map nodal2UiNode
 
   implicit def narrativeMetadata2UiStoryMetadata(metadata: Metadata): UiStory.UiStoryMetadata =
-    new UiStoryMetadata(metadata.comments, metadata.readerStyle, metadata.isBackButtonDisabled, metadata.isRestartButtonDisabled)
+    new UiStoryMetadata(
+      metadata.title,
+      metadata.author,
+      metadata.description,
+      metadata.comments,
+      metadata.readerStyle,
+      metadata.isBackButtonDisabled,
+      metadata.isRestartButtonDisabled)
 
-  implicit def narrative2UiStory(narrative: Narrative): UiStory = new UiStory(narrative.title,
-                                                                              narrative.description,
-                                                                              narrative.author,
-                                                                              narrative.metadata,
+  implicit def narrative2UiStory(narrative: Narrative): UiStory = new UiStory(narrative.metadata,
                                                                               narrative.facts,
                                                                               narrative.nodes,
                                                                               narrative.rules)

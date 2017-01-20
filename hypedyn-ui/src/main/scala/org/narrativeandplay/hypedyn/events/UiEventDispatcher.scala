@@ -139,8 +139,8 @@ object UiEventDispatcher {
   EventBus.EditStoryPropertiesResponses foreach { evt =>
     val editedProperties = Main.storyPropertiesEditor(evt.story).showAndWait()
 
-    editedProperties foreach { case (title, author, desc, metadata) =>
-      EventBus.send(UpdateStoryProperties(title, author, desc, metadata, UiEventSourceIdentity))
+    editedProperties foreach { metadata =>
+      EventBus.send(UpdateStoryProperties(metadata, UiEventSourceIdentity))
     }
   }
 
