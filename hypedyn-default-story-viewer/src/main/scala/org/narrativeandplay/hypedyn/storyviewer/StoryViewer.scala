@@ -1,19 +1,16 @@
 package org.narrativeandplay.hypedyn.storyviewer
 
-import javafx.scene.{input => jfxsi}
-
 import scala.collection.mutable
 import scala.util.Try
 
 import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.scene.control.{Control, ScrollPane}
-import scalafx.scene.input.{KeyCode, KeyEvent}
 
 import com.github.benedictleejh.scala.math.vector.Vector2
 
-import org.narrativeandplay.hypedyn.events.{UiNodeDeselected, UiNodeSelected, EditNodeRequest, EventBus}
-import org.narrativeandplay.hypedyn.plugins.{Saveable, Plugin}
+import org.narrativeandplay.hypedyn.events._
+import org.narrativeandplay.hypedyn.plugins.{Plugin, Saveable}
 import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
 import org.narrativeandplay.hypedyn.serialisation._
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal, NodeId}
@@ -45,22 +42,6 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   content = new Control(viewer) {}
 
   private[storyviewer] def zoomValueClamp(v: Double) = DoubleUtils.clamp(minZoom, maxZoom, v)
-  // Because OS X does something stupid by firing multiple events for a single Equals key press, we add a timestamp
-  // to track when the last time the zoom was triggered, and allow it to zoom only if it was at least 2 ms after
-  // the last zoom time.
-  private var lastKeypressTime = System.currentTimeMillis()
-  addEventFilter(KeyEvent.KeyPressed, { event: jfxsi.KeyEvent =>
-    val timeDiff = System.currentTimeMillis() - lastKeypressTime
-    if (event.shortcutDown && timeDiff > 1) {
-      event.code match {
-        case KeyCode.ADD | KeyCode.EQUALS => zoomLevel() = zoomValueClamp(zoomLevel() + 0.1)
-        case KeyCode.MINUS | KeyCode.SUBTRACT => zoomLevel() = zoomValueClamp(zoomLevel() - 0.1)
-        case KeyCode.NUMPAD0 | KeyCode.DIGIT0 => zoomLevel() = 1.0
-        case _ =>
-      }
-    }
-    lastKeypressTime = System.currentTimeMillis()
-  })
 
   /**
    * Returns the name of the plugin
@@ -150,15 +131,17 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   }
 
   /**
-   * Moves a node
+   * Moves a node, to the correct scaled position for the current zoom
    *
    * @param nodeId The ID of the node to move
-   * @param position The position to move it to
+   * @param position The unscaled position to move it to
    */
   def moveNode(nodeId: NodeId, position: Vector2[Double]): Unit = {
-    nodeLocations += nodeId -> position
+    updateNodeLocations(nodeId, position)
 
-    viewer.nodes find (_.id == nodeId) foreach (_.relocate(position.x, position.y))
+    val scaledPosition = position * zoomLevel()
+
+    viewer.nodes find (_.id == nodeId) foreach (_.relocate(scaledPosition.x, scaledPosition.y))
 
     sizeToChildren()
   }
@@ -167,10 +150,27 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
     EventBus.send(EditNodeRequest(id, StoryViewerEventSourceIdentity))
   }
 
+  /**
+   * Notifies the system of a node having been moved
+   *
+   * @param id The ID of the node moved
+   * @param initialPos The unscaled initial position of the node
+   * @param finalPos The unscaled final position
+   */
   def notifyNodeMove(id: NodeId, initialPos: Vector2[Double], finalPos: Vector2[Double]): Unit = {
-    nodeLocations += id -> finalPos
+    updateNodeLocations(id, finalPos)
 
-    UndoableStream.send(new NodeMovedChange(this, id, initialPos, finalPos))
+    UndoableStream.send(NodeMovedChange(this, id, initialPos, finalPos))
+  }
+
+  /**
+   * Updates the stored table of node locations, to restore positions when needed (e.g. on undo)
+   *
+   * @param id The ID of the node
+   * @param pos The unscaled position of the node
+   */
+  def updateNodeLocations(id: NodeId, pos: Vector2[Double]): Unit = {
+    nodeLocations += id -> pos
   }
 
   def notifyNodeSelection(id: NodeId): Unit = {
@@ -179,6 +179,24 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
 
   def notifyNodeDeselection(id: NodeId): Unit = {
     EventBus.send(UiNodeDeselected(id, StoryViewerEventSourceIdentity))
+  }
+
+  EventBus.ZoomRequests foreach { _ =>
+    EventBus.send(ZoomResponse(StoryViewerEventSourceIdentity))
+  }
+
+  EventBus.ResetZoomRequests foreach { _ =>
+    EventBus.send(ResetZoomResponse(StoryViewerEventSourceIdentity))
+  }
+
+  EventBus.ZoomStoryViewEvents foreach { evt =>
+    zoomLevel() = zoomValueClamp(zoomLevel() + evt.deltaZoom)
+    EventBus.send(StoryViewZoomed(StoryViewerEventSourceIdentity))
+  }
+
+  EventBus.ResetStoryViewZoomEvents foreach { _ =>
+    zoomLevel() = 1.0
+    EventBus.send(StoryViewZoomReset(StoryViewerEventSourceIdentity))
   }
 
   private def serialise(n: ViewerNode) = {

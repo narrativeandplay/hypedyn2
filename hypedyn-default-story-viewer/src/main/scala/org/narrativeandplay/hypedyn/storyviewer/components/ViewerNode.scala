@@ -32,6 +32,8 @@ import scalafx.scene.paint.Color
 class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) extends JfxControl {
   private var anchor = Vector2(0.0, 0.0)
   private var topLeft = ViewerNode.DefaultLocation
+  private var prevSelected = false
+  private var prevTopLeft = ViewerNode.DefaultLocation
 
   private val storyViewer = pluginEventDispatcher
   private val _node = ObjectProperty(nodal)
@@ -104,22 +106,30 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
       case _ =>
     }
   }
-
   onMousePressed = { me =>
     anchor = (me.sceneX, me.sceneY)
     topLeft = (layoutX, layoutY)
-
-    if (selected()) deselect() else select()
+    prevTopLeft = (layoutX, layoutY)
+    prevSelected = selected()
+    if (!selected()) select()
+    requestLayout()
+  }
+  onMouseReleased = { me =>
+    val movedDist = (topLeft - prevTopLeft).length
+    if (movedDist < 0.01 && prevSelected) deselect()
     requestLayout()
   }
   onMouseDragged = { me =>
     val mouseLocationInStoryViewer = storyViewer.sceneToLocal(me.sceneX, me.sceneY)
-
+    if (!selected()) select()
     if (mouseLocationInStoryViewer.getX >= 0 && mouseLocationInStoryViewer.getY >= 0) {
       val translation = Vector2(me.sceneX, me.sceneY) - anchor
       val finalPos = topLeft + translation
 
-      pluginEventDispatcher.notifyNodeMove(id, topLeft, finalPos)
+      pluginEventDispatcher.notifyNodeMove(
+        id,
+        topLeft / pluginEventDispatcher.zoomLevel(),
+        finalPos / pluginEventDispatcher.zoomLevel())
 
       relocate(finalPos.x, finalPos.y)
       anchor = (me.sceneX, me.sceneY)
@@ -234,6 +244,12 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
     })
   }
 
+  def onMouseReleased = { me: MouseEvent => getOnMouseReleased.handle(me) }
+  def onMouseReleased_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: T => Unit)(implicit jfx2sfx: U => T) = {
+    setOnMouseReleased(new EventHandler[U] {
+      override def handle(event: U): Unit = lambda(event)
+    })
+  }
   // </editor-fold>
 }
 

@@ -73,28 +73,27 @@ We'll start by creating a collection of anywhere nodes that represent the pieces
 
 \begin{enumerate}
   \item First, create a node named ``start''.
-  \item Make this node the start node by clicking on the \textbf{Set start node} button.
+  \item Make this node the start node by clicking on the \textit{Start node} checkbox.
   \item Now add the following text:
 
 \begin{quotation}
 \noindent One day, Little Red Riding Hood is walking through the forest, on the way to deliver a basket of food and flowers to her grandmother. 
 \end{quotation}
 
-\item Now we need to create the rest of the story content, which will consist of a set of anywhere nodes. Create 7 nodes, with names and content as shown in Table \ref{table:tut3:node_content}.
-\item For each of these 7 nodes, make the node an \textit{anywhere node} by doing the following:
-\begin{enumerate}
-  \item Edit the node, and click on the \textit{Node rules} tab in the rules list. This shows the list of node rules, rules that apply to the \textit{entire node} rather than to a specific fragment.
-  \item Create a new rule, and name the rule ``Add anywhere link''.
-  \item Add the action \textit{Enable anywhere link to here} (see Figure \ref{fig:tut2:anywherenode}).
-
+\item Now we need to create the rest of the story content, which will consist of a set of anywhere nodes. Start by making a new node. You can leave the name as ``New Node'' for now. We'll use this node as a template for our anywhere node, and then copy-and-paste it for the rest of our nodes.
+\item Make the node an \textit{anywhere node} by doing the following:
 \begin{figure}[h]
   \centering
   \includegraphics[width=10cm]{images/hypedyn-tutorial-2-figure-9}
   \caption{\textit{Creating an anywhere node.}}
   \label{fig:tut2:anywherenode}
 \end{figure} 
-\end{enumerate}
 
+\begin{enumerate}
+\item Edit the node, and click on the \textit{Node rules} tab in the rules list. This shows the list of node rules, rules that apply to the \textit{entire node} rather than to a specific fragment.
+  \item Create a new rule, and name the rule ``Add anywhere link''.
+  \item Add the action \textit{Enable anywhere link to here} (see Figure \ref{fig:tut2:anywherenode}).
+\item Close the node by clicking on the ``Ok'' button.
 \end{enumerate}
 
 \begin{table}[h]
@@ -145,6 +144,14 @@ We'll start by creating a collection of anywhere nodes that represent the pieces
   \caption{Node contents}
   \label{table:tut3:node_content}
 \end{table}
+
+\item Now we will make copies of this Anywhere node. Select the node in the Map View, and then choose the \textit{Copy} menu item under the \textit{Edit} menu. 
+\item Now choose the \textit{Paste} menu item under the \textit{Edit} menu. A copy of the selected node will appear in the top left of the Map View. 
+\item Repeat the previous step 5 times, so that in total you have 7 nodes named ``New Node''.
+
+\item Now edit each of these nodes, and change the names and content to match the names and content as shown in Table \ref{table:tut3:node_content}.
+
+\end{enumerate}
 
 After creating these nodes, you will have something like what can be seen in Figure \ref{fig:tut3:initial_nodes}.
 
@@ -206,6 +213,8 @@ There is a problem, though - after Red has talked to the young man, and the read
 \begin{enumerate}
   \item Edit the node rule for ``Talk to young man''.
   \item In the ``Add Anywhere Link'' rule, add another condition, as follows: ``Node Talk to young man Not Visited''.
+
+Make sure that you change the pulldown menu to the right of ``If'' to show \textit{All}. This tells HypeDyn that \textit{all} of the conditions must be satisfied. The other option, \textit{Any}, tells HypeDyn to perform the actions if \textit{at least one} of the conditions is satisfied.
 \end{enumerate}
 
 \begin{figure}[h]
@@ -253,11 +262,12 @@ We can now go through and consider each of the other nodes, and add appropriate 
   \item ``Node Explore the forest Visited''.
   \item ``Node Go deeper into the forest Not Visited''.
   \item ``Node Head home Not Visited''.
-  \item ``Go directly to Grandma's house Not Visited''.
+  \item ``Node Go directly to Grandma's house Not Visited''.
   \end{enumerate}
+\item As with the previous node, make sure that you change the pulldown menu to the right of ``If'' to show \textit{All}.
 \end{enumerate}
 
-The next node we'll consider is ``Explore the forest''. This node is much less restricted, as we want this to be available to the reader immediately, but only if it has not yet been visited. As with ``Go deeper into the forest, it should also not be available if the reader has chosen ``Head home'' or ``Go directly to Grandma's house''.
+The next node we'll consider is ``Explore the forest''. This node is much less restricted, as we want this to be available to the reader immediately, but only if it has not yet been visited. As with ``Go deeper into the forest'', it should also not be available if the reader has chosen ``Head home'' or ``Go directly to Grandma's house''.
 
 \begin{enumerate}
   \item Edit the ``Add Anywhere Link'' node rule for ``Explore the forest''.
@@ -265,8 +275,9 @@ The next node we'll consider is ``Explore the forest''. This node is much less r
   \begin{enumerate}
   \item ``Node Explore the forest Not Visited''.
   \item ``Node Head home Not Visited''.
-  \item ``Go directly to Grandma's house Not Visited''.
+  \item ``Node Go directly to Grandma's house Not Visited''.
 \end{enumerate}
+\item Make sure that you change the pulldown menu to the right of ``If'' to show \textit{All}.
 \end{enumerate}
 
 We have now set out a path for the reader from the start through to talking to the young man. Next, lets turn our attention to the path to Grandma's house. The node ``Go directly to Grandma's house'' should always be available \textit{unless} the reader has already seen it, or has decided to view ``Head home''.
@@ -276,8 +287,9 @@ We have now set out a path for the reader from the start through to talking to t
   \item Add the following conditions: 
   \begin{enumerate}
   \item ``Node Head home Not Visited''.
-  \item ``Go directly to Grandma's house Not Visited''.
+  \item ``Node Go directly to Grandma's house Not Visited''.
 \end{enumerate}
+\item Make sure that you change the pulldown menu to the right of ``If'' to show \textit{All}.
 \end{enumerate}
 
 Notice that there is also some text in this node which probably should have conditions attached to it. Following what we did in the previous tutorials, set it up so that the second paragraph only appears if Red talked to the young man, and the third paragraph only appears if she \textit{didn't} talk to him.
@@ -291,11 +303,12 @@ For ``Pass the basket to Grandma'', we want the node to be available only if Red
   Grandma''.
   \item Add the following conditions:
   \begin{enumerate}
-  \item ``Go directly to Grandma's house Visited''.
+  \item ``Node Go directly to Grandma's house Visited''.
   \item ``Node Talk to young man Not Visited''.
   \item ``Node Head home Not Visited''.
   \item ``Node Pass the basket to Grandma Not Visited''.
 \end{enumerate}
+\item Make sure that you change the pulldown menu to the right of ``If'' to show \textit{All}.
 \end{enumerate}
 
 For ``Approach the young man'' we have a similar set of conditions, although this time we want to specify that Red \textit{did} talk to the young man.
@@ -304,11 +317,12 @@ For ``Approach the young man'' we have a similar set of conditions, although thi
   \item Edit the ``Add Anywhere Link'' node rule for ``Approach the young man''.
   \item Add the following conditions:
   \begin{enumerate}
-  \item ``Go directly to Grandma's house Visited''.
+  \item ``Node Go directly to Grandma's house Visited''.
   \item ``Node Talk to young man Visited''.
   \item ``Node Head home Not Visited''.
   \item ``Node Approach the young man Not Visited''.
 \end{enumerate}
+\item Make sure that you change the pulldown menu to the right of ``If'' to show \textit{All}.
 \end{enumerate}
 
 Finally, we have to set the conditions for ``Head home''. This is the least constrained of all the nodes, as it should be available everywhere
@@ -325,7 +339,7 @@ Now run the story. You should be able to explore several variations of the story
 
 There is one remaining problem: the reader can click on the ``back'' button and return to the previous node. In some cases, this does not make sense. For example, after clicking on ``Talk to young man'', if the reader clicks on the ``back'' button, she will see the ``Go deeper into the forest'' node. We could either have the contents of the nodes adapt to whether or not the reader has seen the next node, which is quite complicated, or we could \textit{disable} the back button. We'll do the latter.
 
-To disable the back button, go to the File menu and choose Properties. You should see the ``Properties'' dialog (see Figure\ref{fig:tut3:preferences}). Check the checkbox to the left of ``Disable back button'', and click on the ``Ok'' button. Now try running the story. You should see that the back button has been removed.
+To disable the back button, go to the File menu and choose Properties. You should see the ``Properties'' dialog (see Figure\ref{fig:tut3:preferences}). Make sure the \textit{Reader} tab is selected. Check the checkbox to the left of ``Disable back button'', and click on the ``Ok'' button. Now try running the story. You should see that the back button has been removed.
 
 \begin{figure}[h]
   \centering
@@ -346,7 +360,7 @@ It would also be possible to reduce the complexity of the conditions that we cre
 
 In previous tutorials, we have seen that HypeDyn can keep track of what the reader has done by referring to which nodes have been visited, and which links have been followed. This allows for quite complex procedural change. However, one major limitation is that you, as the author, are unable to have HypeDyn \textit{forget} that a node was visited or a link was followed. There are also times when a condition depends on one of several nodes having been visited, which can lead to fairly complex conditions. You also might want to have a condition that depends on, for example, the reader visiting a node several times, which requires that you count the number of visits to a node.
 
-To handle these limitations, we will now introduce \textit{facts}. In HypeDyn, a fact is something which is important to the story. There are three types of facts: \textit{true/false} facts, \textit{text} facts, and number facts. \textit{True/false} facts are either \textit{true} or \textit{false}, and can be checked in a condition and updated by an action. \textit{String} facts contain a piece of text, such as a sentence, can be updated by an action, and can be used to replace text in a node in the same way as \textit{alternative text}. \textit{Number} facts contain integers, such as 1 or 42, can be checked in a condition, updated by an action, and can be used to replace text in a node. In this tutorial we will cover true/false and string facts. See tutorial 4 for details on how to use number facts.
+To handle these limitations, we will now introduce \textit{facts}. In HypeDyn, a fact is something which is important to the story. There are three types of facts: \textit{true/false} facts, \textit{text} facts, and number facts. \textit{True/false} facts are either \textit{true} or \textit{false}, and can be checked in a condition and updated by an action. \textit{Text} facts contain a piece of text, such as a sentence, can be updated by an action, and can be used to replace text in a node in the same way as \textit{alternative text}. \textit{Number} facts contain integers, such as 1 or 42, can be checked in a condition, updated by an action, and can be used to replace text in a node. In this tutorial we will cover true/false and text facts. See tutorial 4 for details on how to use number facts.
 
 \subsection{Creating the nodes}
 
@@ -384,7 +398,7 @@ We will now create two facts to keep track of whether or not Red has picked the 
 \end{figure}
 
   \item Repeat these steps to create another \textit{true/false} fact named ``In the forest grove''.
-  \item Finally, create a third fact, but this time choose `String fact' in the \textit{Fact Type} pulldown menu. Enter the name of the fact as ``The flowers'', and leave the \textit{Initial value} field blank.
+  \item Finally, create a third fact, but this time choose `Text fact' in the \textit{Fact Type} pulldown menu. Enter the name of the fact as ``The flowers'', and leave the \textit{Initial value} field blank.
 \end{enumerate}
 
 We will use the fact ``Picked flowers'' to remember whether or not the reader has had Red pick the flowers, and ``The flowers'' to remember the type of flowers. We will use the fact ``In the forest grove'' to make sure that the flowers can only be picked in the forest grove. This could be done by checking which nodes have and haven't been visited, but in this case using a fact is much simpler, and allows for greater flexibility.
@@ -397,6 +411,7 @@ Now we need to make sure that the two nodes for picking the flowers are only ava
   \item Edit the ``Add Anywhere Link'' rule in the node rule for node ``Pick the violets''.
   \item Add a condition, and select \textit{True/False Fact} as the type. Now choose the fact \textit{Picked flowers} and value \textit{False}. This means that the condition is true when the fact \textit{Picked flowers} is false, i.e. Red hasn't picked the flowers. Note that facts are initially set to the value you entered in the \textit{Initial value} field when you created the fact, so when the story is started, both \textit{Picked flowers} and \textit{In the forest grove} are false.
   \item Add another condition, and set it to ``True/False Fact In the forest grove True''. This means that the condition is true when Red is in the forest grove.
+  \item Make sure that you change the pulldown menu to the right of ``If'' to show \textit{All}.
 \end{enumerate}
 
 You should have conditions as in Figure \ref{fig:tut3:picktheviolets}.
@@ -413,14 +428,15 @@ You should have conditions as in Figure \ref{fig:tut3:picktheviolets}.
 Now that we have our condition set, we need to update our facts. Facts can be updated either when nodes are visited, or when fragments are clicked. In our case, when the node``Pick the violets'' is visited, we'll update the fact ``Picked flowers'' to \textit{true}, and update the fact ``The Flowers'' to hold the name of the flowers that were picked.
 
 \begin{enumerate}
-  \item If you aren't already, edit the ``Add Anywhere Link'' rule in the
-  node rule for node ``Pick the violets'' again.
-  \item Add an ``Update true/false fact'' action.
-  \item Now choose the fact \textit{Picked flowers} and set the value to
-  \textit{true}. This means that when the node ``Pick the violets'' is visited, the fact \textit{Picked flowers} is set to \textit{true}, i.e. Red has picked the flowers.
-  \item Add an ``Update string fact'' action.
+  \item Edit the node ``Pick the violets'', and select the ``Node rules'' tab.
+  \item In the ``Add anywhere link'' rule, add an ``Update true/false fact'' action.
+  \item Now choose the fact \textit{Picked flowers} and set the value to \textit{true}. 
+  This means that when the node ``Pick the violets'' is visited, the fact \textit{Picked flowers} is set to \textit{true}, i.e. Red has picked the flowers.
+  \item Add an ``Update text fact'' action.
   \item Now choose the fact \textit{The flowers}. You should see a text entry field appear to the right. Type in the text ``violets''.
 \end{enumerate}
+
+You should have actions as in Figure \ref{fig:tut3:picktheviolets2}.
 
 \begin{figure}[h]
   \centering
@@ -428,8 +444,6 @@ Now that we have our condition set, we need to update our facts. Facts can be up
   \caption{\textit{Updating facts for ``Pick the Violets''.}}
   \label{fig:tut3:picktheviolets2}
 \end{figure}
-
-You should have actions as in Figure \ref{fig:tut3:picktheviolets2}.
 
 Now do exactly the same thing for the node ``Pick the geraniums'', except in the last step, type in the text ``geraniums'' instead of ``violets''.
 
@@ -445,22 +459,21 @@ At this point we are missing one key step - we don't ever update the fact ``In t
 
 We now have the ``In the forest grove'' fact set up to track whether or not Red is in the forest grove. Note that this would be \textit{very} difficult to accomplish using conditions on whether nodes where visited or not. (Try it!)
 
-\subsection{Using string facts with conditional text}
+\subsection{Using text facts with conditional text}
 
-The one thing remaining to be done is to update the text where the flowers are mentioned, so that the specific type of flowers that Red picked are shown. There are two places where this can be done: ``Pass the basket to Grandma'', and ``Talk to young man''. We'll to the first, and the second is left as an exercise.
+The one thing remaining to be done is to update the text where the flowers are mentioned, so that the specific type of flowers that Red picked are shown. There are two places where this can be done: ``Pass the basket to Grandma'', and ``Talk to young man''. We'll do the first, and the second is left as an exercise.
 
 \begin{enumerate}
   \item Edit the node ``Pass the basket to Grandma''.
-  \item Select the text ``display the flowers'', and create a new fragment named ``flowers''.
+  \item Select the text ``flowers'', and create a new fragment named ``flowers''.
   \item Add a new rule to the fragment.
   \item Name the rule ``display the flowers''.
   \item Add an ``Update fragment text'' action.
-  \item Now change the type of text from ``Input'' to ``String
-  fact'', and choose the fact \textit{The flowers}.
+  \item Now change the type of text from ``Input'' to ``Text fact'', and choose the fact \textit{The flowers}.
 
 This means that the fragment text will be replaced by whatever value we have set for the fact ``The flowers'' - either ``violets'' or ``geraniums'', depending on which node the reader visited. 
 
-\item We also need to make sure this replacement is only done if the flowers have been picked. Add a condition, and select type \textit{True/falst fact}. Choose the fact \textit{Picked flowers}, and the value \textit{true}. This means that the default text will be shown if the flowers have \textit{not} been picked, and the value of the fact \textit{The flowers} will be shown if the flowers \textit{have} been picked.
+\item We also need to make sure this replacement is only done if the flowers have been picked. Add a condition, and select type \textit{True/false fact}. Choose the fact \textit{Picked flowers}, and the value \textit{true}. This means that the default text will be shown if the flowers have \textit{not} been picked, and the value of the fact \textit{The flowers} will be shown if the flowers \textit{have} been picked.
 \end{enumerate}
 
 The fragment rule for the conditional text should look like Figure \ref{fig:tut3:conditional_text}.
@@ -493,6 +506,6 @@ In this tutorial, we have created a simple ``sculptural'' hypertext fiction. By 
 % questions about using the tool to the IVLE forum.
 
   \bibliographystyle{apalike}
-  \bibliography{../../Research/references/papers/thesis}
+  \bibliography{../../../Research/references/papers/thesis}
 
 \end{document}

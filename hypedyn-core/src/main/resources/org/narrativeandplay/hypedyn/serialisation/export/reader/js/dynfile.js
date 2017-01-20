@@ -49,10 +49,10 @@ function createConditions(rulesetID, ruleID, conditions) {
 				var not = false;
 
 				// operators may not match, so adjust if necessary
-				if (operator == "==") {
+				if (operator == "=") {
 					operator = "=";
 				}
-				if (operator == "!=") {
+				if (operator == "not =") {
 					operator = "=";
 					not = true;
 				}

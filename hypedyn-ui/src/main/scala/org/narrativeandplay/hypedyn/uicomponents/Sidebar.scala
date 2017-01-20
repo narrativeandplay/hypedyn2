@@ -9,7 +9,7 @@ import scalafx.scene.control.{Label, Button, ToolBar}
  * The side bar for the application
  */
 object Sidebar extends ToolBar {
-  orientation = Orientation.VERTICAL
+  orientation = Orientation.Vertical
 
   class SidebarButton(labelText: String) extends Button {
     private val buttonLabel = new Label(labelText) {

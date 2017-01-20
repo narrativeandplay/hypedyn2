@@ -111,6 +111,8 @@ object UiEventDispatcher {
     EventBus.send(StoryRan(UiEventSourceIdentity))
   }
 
+  EventBus.ResetZoomResponses foreach { _ => EventBus.send(ResetStoryViewZoom(UiEventSourceIdentity)) }
+
   EventBus.StoryLoadedEvents foreach { evt =>
     FactViewer.facts.clear()
     evt.story.facts foreach { f => FactViewer.facts += f }
@@ -241,6 +243,17 @@ object UiEventDispatcher {
   }
   def requestRedo(): Unit = {
     EventBus.send(RedoRequest(UiEventSourceIdentity))
+  }
+
+  def requestZoom(deltaZoom: Double): Unit = {
+    EventBus.ZoomResponses take 1 foreach { evt =>
+      EventBus.send(ZoomStoryView(deltaZoom, UiEventSourceIdentity))
+    }
+
+    EventBus.send(ZoomRequest(UiEventSourceIdentity))
+  }
+  def requestZoomReset(): Unit = {
+    EventBus.send(ResetZoomRequest(UiEventSourceIdentity))
   }
 
   def createNode(newNode: Nodal): Unit = {

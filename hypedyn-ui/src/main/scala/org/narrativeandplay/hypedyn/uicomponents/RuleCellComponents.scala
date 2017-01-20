@@ -10,7 +10,7 @@ import scala.util.Try
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.{ObservableBuffer, ObservableMap}
-import scalafx.geometry.Insets
+import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control._
 import scalafx.scene.layout.{Priority, StackPane, Region, HBox}
 import scalafx.util.StringConverter
@@ -252,6 +252,7 @@ object RuleCellComponents {
     }
 
     lazy val removeButton = new StackPane {
+      alignment = Pos.TopCenter
       padding = Insets(0, 10, 0, 0)
       children += new Button("−") {
         onAction = { _ =>

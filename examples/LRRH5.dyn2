@@ -205,7 +205,7 @@
                 },
                 "operator":{
                   "type":"selectedListValue",
-                  "value":"=="
+                  "value":"="
                 }
               }
             }],
@@ -240,7 +240,7 @@
                 },
                 "operator":{
                   "type":"selectedListValue",
-                  "value":"=="
+                  "value":"="
                 }
               }
             }],
@@ -275,7 +275,7 @@
                 },
                 "operator":{
                   "type":"selectedListValue",
-                  "value":"=="
+                  "value":"="
                 }
               }
             }],
@@ -455,7 +455,7 @@
     }],
     "facts":[{
       "id":2,
-      "name":"whichEnding",
+      "name":"whichEnding?",
       "type":"int",
       "initialValue":0
     },{

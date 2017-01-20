@@ -1,16 +1,17 @@
 package org.narrativeandplay.hypedyn
 
 import java.io.File
-import javafx.beans.value.ObservableValue
+import javafx.scene.{input => jfxsi}
 
 import scalafx.Includes._
-import scalafx.application.{Platform, JFXApp}
 import scalafx.application.JFXApp.PrimaryStage
+import scalafx.application.{JFXApp, Platform}
 import scalafx.beans.property.StringProperty
 import scalafx.scene.Scene
-import scalafx.scene.control.{ButtonType, Alert}
-import scalafx.scene.image.{ImageView, Image}
-import scalafx.scene.layout.{VBox, BorderPane}
+import scalafx.scene.control.Alert
+import scalafx.scene.image.{Image, ImageView}
+import scalafx.scene.input.{KeyCode, KeyEvent}
+import scalafx.scene.layout.{BorderPane, VBox}
 
 import com.sun.glass.ui
 import com.sun.glass.ui.Application.EventHandler
@@ -21,19 +22,11 @@ import org.narrativeandplay.hypedyn.dialogs._
 import org.narrativeandplay.hypedyn.events._
 import org.narrativeandplay.hypedyn.logging.Logger
 import org.narrativeandplay.hypedyn.plugins.PluginsController
-import org.narrativeandplay.hypedyn.serialisation.serialisers.DeserialisationException
-import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
+import org.narrativeandplay.hypedyn.server.Server
 import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition, Fact}
+import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.uicomponents._
 import org.narrativeandplay.hypedyn.undo.UndoController
-import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
-import org.narrativeandplay.hypedyn.utils.{System => Sys}
-
-import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Directives._
-import akka.stream.ActorMaterializer
-import akka.http.scaladsl.model.{HttpEntity, ContentTypes}
 
 /**
  * Entry point for the application
@@ -47,6 +40,7 @@ object Main extends JFXApp {
   ClipboardEventDispatcher
   UndoEventDispatcher
   Logger
+  Server
 
   Thread.currentThread().setUncaughtExceptionHandler({ (_, throwable) =>
     // Most exceptions will show up as a `OnErrorNotImplementedException` because
@@ -67,6 +61,8 @@ object Main extends JFXApp {
 
   private val refreshStream = SerializedSubject(PublishSubject[Unit]())
   def refreshRecent = refreshStream
+
+  private var lastKeypressTime = System.currentTimeMillis()
 
   /**
    * Returns a new file dialog
@@ -144,29 +140,18 @@ object Main extends JFXApp {
     graphic = new ImageView(icon)
     contentText =
       """Hypertext Fiction Editor
-        |Version 0.23-alpha
+        |Version 0.24-beta
       """.stripMargin
   }
 
   def loadedFileName_=(newFilename: String): Unit = loadedFilename() = newFilename
   def loadedFileName = loadedFilename()
 
-  var storyPath:String = null
-
   def runInBrowser(filePath: File, fileToRun: String): Unit = {
-    val runtime = Runtime.getRuntime
-    val fileToLoad = "http://"+hostname+":"+port+"/"+fileToRun
-    storyPath = filePath.getAbsolutePath
+    val fileToLoad = "http://"+Server.hostname+":"+Server.port+"/"+fileToRun
+    Server.storyPath = filePath.getAbsolutePath
 
-    if (Sys.isWindows) {
-      runtime.exec(s"rundll32 url.dll,FileProtocolHandler $fileToLoad")
-    }
-    else if (Sys.isMac) {
-      runtime.exec(s"open $fileToLoad")
-    }
-    else {
-      runtime.exec(s"xdg-open $fileToLoad")
-    }
+    hostServices.showDocument(fileToLoad)
   }
 
   stage = new PrimaryStage {
@@ -181,10 +166,7 @@ object Main extends JFXApp {
       UiEventDispatcher requestExit { exit =>
         if (exit) {
           Logger.info("Exiting HypeDyn 2 via main window close")
-          // shutdown web server
-          bindingFuture
-            .flatMap(_.unbind()) // trigger unbinding from the port
-            .onComplete(_ ⇒ webserver.terminate()) // and shutdown when done
+          Server.shutdown()
           Platform.exit()
         }
         else {
@@ -193,6 +175,27 @@ object Main extends JFXApp {
         }
       }
     }
+
+    addEventFilter(KeyEvent.KeyPressed, { event: jfxsi.KeyEvent =>
+      val timeDiff = System.currentTimeMillis() - lastKeypressTime
+      // Because OS X does something stupid by firing multiple events for a single Equals key press, we add a timestamp
+      // to track when the last time the zoom was triggered, and allow it to zoom only if it was at least 2 ms after
+      // the last zoom time.
+      if (event.shortcutDown && timeDiff > 1) {
+        event.code match {
+          case KeyCode.Add | KeyCode.Equals => UiEventDispatcher.requestZoom(0.1)
+          case KeyCode.Minus | KeyCode.Subtract => UiEventDispatcher.requestZoom(-0.1)
+          case KeyCode.Numpad0 | KeyCode.Digit0 => UiEventDispatcher.requestZoomReset()
+          case _ =>
+        }
+      }
+      event.code match {
+        case KeyCode.Delete | KeyCode.BackSpace =>
+          UiEventDispatcher.requestDeleteNode()
+        case _ =>
+      }
+      lastKeypressTime = System.currentTimeMillis()
+    })
 
     scene = new Scene {
       root = new BorderPane() {
@@ -232,10 +235,7 @@ object Main extends JFXApp {
       UiEventDispatcher requestExit { exit =>
         if (exit) {
           Logger.info("Exiting HypeDyn 2 via Cmd-Q")
-          // shutdown web server
-          bindingFuture
-            .flatMap(_.unbind()) // trigger unbinding from the port
-            .onComplete(_ ⇒ webserver.terminate()) // and shutdown when done
+          Server.shutdown()
           Platform.exit()
         }
         else {
@@ -244,35 +244,4 @@ object Main extends JFXApp {
       }
     }
   })
-
-  //
-  // web server
-  //
-
-  private val hostname = "localhost"
-  private val port = 8080;
-  implicit val webserver = ActorSystem("my-system")
-  implicit val materializer = ActorMaterializer()
-  // needed for the future flatMap/onComplete in the end
-  implicit val executionContext = webserver.dispatcher
-
-  // not sure if this is a security risk
-  val route =
-    extractUnmatchedPath { p =>
-      get {
-        getFromFile(storyPath+p.toString)
-      }
-    }
-
-  val bindingFuture = Http().bindAndHandle(route, hostname, port)
-
-  bindingFuture.onFailure {
-    case ex: Exception =>
-      Logger.error("Server failed to bind to "+hostname+":"+port, ex)
-  }
-
-  bindingFuture.onSuccess {
-    case x:Http.ServerBinding =>
-      Logger.info("Server online at http://"+hostname+":"+port)
-  }
 }

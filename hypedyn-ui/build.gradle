@@ -1,5 +1,5 @@
 dependencies {
-    compile "org.scalafx:scalafx_${rootProject.majorScalaVersion}:8.0.60-R9"
+    compile "org.scalafx:scalafx_${rootProject.majorScalaVersion}:8.0.102-R11"
     compile 'com.miglayout:miglayout-javafx:5.0'
     compile 'org.fxmisc.richtext:richtextfx:0.6.10'
     compile 'org.fxmisc.easybind:easybind:1.0.3'

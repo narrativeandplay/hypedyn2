@@ -6,7 +6,7 @@ import org.narrativeandplay.hypedyn.story.NodeId
 import org.narrativeandplay.hypedyn.storyviewer.StoryViewer
 
 /**
- * Change reprenting a node having been moved
+ * Change representing a node having been moved
  *
  * @param eventHandler The event dispatcher allowed to send events
  * @param nodeId The ID of the node moved
@@ -26,7 +26,7 @@ case class NodeMovedChange(eventHandler: StoryViewer,
 
   override def merge(other: Undoable): Option[Undoable] = other match {
     case c: NodeMovedChange =>
-      if (nodeId == c.nodeId) Some(new NodeMovedChange(eventHandler, nodeId, initialPos, c.finalPos)) else None
+      if (nodeId == c.nodeId) Some(NodeMovedChange(eventHandler, nodeId, initialPos, c.finalPos)) else None
     case _ => None
   }
 }
