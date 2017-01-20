@@ -27,7 +27,6 @@ import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefi
 import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.uicomponents._
 import org.narrativeandplay.hypedyn.undo.UndoController
-import org.narrativeandplay.hypedyn.utils.{System => Sys}
 
 /**
  * Entry point for the application

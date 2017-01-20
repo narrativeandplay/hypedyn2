@@ -1,14 +1,11 @@
 package org.narrativeandplay.hypedyn.storyviewer
 
-import javafx.scene.{input => jfxsi}
-
 import scala.collection.mutable
 import scala.util.Try
 
 import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.scene.control.{Control, ScrollPane}
-import scalafx.scene.input.{KeyCode, KeyEvent}
 
 import com.github.benedictleejh.scala.math.vector.Vector2
 
@@ -77,8 +74,7 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   override def onNodeCreated(node: Nodal): Unit = {
     val createdNode = viewer.addNode(node)
 
-    nodeLocations get createdNode.id foreach {position : Vector2[Double] =>
-      moveNode(createdNode.id, Vector2(position.x*zoomLevel(), position.y*zoomLevel()))}
+    nodeLocations get createdNode.id foreach (moveNode(createdNode.id, _))
   }
 
   /**
@@ -135,15 +131,17 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   }
 
   /**
-   * Moves a node
+   * Moves a node, to the correct scaled position for the current zoom
    *
    * @param nodeId The ID of the node to move
-   * @param position The position to move it to
+   * @param position The unscaled position to move it to
    */
   def moveNode(nodeId: NodeId, position: Vector2[Double]): Unit = {
     updateNodeLocations(nodeId, position)
 
-    viewer.nodes find (_.id == nodeId) foreach (_.relocate(position.x, position.y))
+    val scaledPosition = position * zoomLevel()
+
+    viewer.nodes find (_.id == nodeId) foreach (_.relocate(scaledPosition.x, scaledPosition.y))
 
     sizeToChildren()
   }
@@ -152,14 +150,27 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
     EventBus.send(EditNodeRequest(id, StoryViewerEventSourceIdentity))
   }
 
+  /**
+   * Notifies the system of a node having been moved
+   *
+   * @param id The ID of the node moved
+   * @param initialPos The unscaled initial position of the node
+   * @param finalPos The unscaled final position
+   */
   def notifyNodeMove(id: NodeId, initialPos: Vector2[Double], finalPos: Vector2[Double]): Unit = {
     updateNodeLocations(id, finalPos)
 
-    UndoableStream.send(new NodeMovedChange(this, id, initialPos, finalPos))
+    UndoableStream.send(NodeMovedChange(this, id, initialPos, finalPos))
   }
 
+  /**
+   * Updates the stored table of node locations, to restore positions when needed (e.g. on undo)
+   *
+   * @param id The ID of the node
+   * @param pos The unscaled position of the node
+   */
   def updateNodeLocations(id: NodeId, pos: Vector2[Double]): Unit = {
-    nodeLocations += id -> Vector2(pos.x / zoomLevel(), pos.y / zoomLevel())
+    nodeLocations += id -> pos
   }
 
   def notifyNodeSelection(id: NodeId): Unit = {

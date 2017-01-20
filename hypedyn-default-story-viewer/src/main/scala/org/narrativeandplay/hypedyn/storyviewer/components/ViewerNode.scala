@@ -126,7 +126,10 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
       val translation = Vector2(me.sceneX, me.sceneY) - anchor
       val finalPos = topLeft + translation
 
-      pluginEventDispatcher.notifyNodeMove(id, topLeft, finalPos)
+      pluginEventDispatcher.notifyNodeMove(
+        id,
+        topLeft / pluginEventDispatcher.zoomLevel(),
+        finalPos / pluginEventDispatcher.zoomLevel())
 
       relocate(finalPos.x, finalPos.y)
       anchor = (me.sceneX, me.sceneY)
