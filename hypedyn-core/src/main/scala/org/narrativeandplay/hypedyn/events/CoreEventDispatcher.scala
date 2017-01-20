@@ -227,7 +227,7 @@ object CoreEventDispatcher {
     EventBus.send(FileLoaded(loadedFile, CoreEventSourceIdentity))
   }
   EventBus.UpdateStoryPropertiesEvents foreach { evt =>
-    StoryController.editStory(evt.title, evt.author, evt.description, evt.metadata)
+    StoryController.editStory(evt.metadata)
 
     EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
   }
