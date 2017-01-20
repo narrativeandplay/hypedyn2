@@ -227,7 +227,13 @@ object CoreEventDispatcher {
     EventBus.send(FileLoaded(loadedFile, CoreEventSourceIdentity))
   }
   EventBus.UpdateStoryPropertiesEvents foreach { evt =>
+    import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions._
+
+    val oldMetadata = StoryController.story.metadata
+
     StoryController.editStory(evt.metadata)
+
+    UndoableStream.send(StoryPropertiesChange(oldMetadata, evt.metadata))
 
     EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
   }

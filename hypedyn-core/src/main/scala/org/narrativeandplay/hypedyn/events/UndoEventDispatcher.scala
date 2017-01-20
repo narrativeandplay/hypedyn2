@@ -2,6 +2,7 @@ package org.narrativeandplay.hypedyn.events
 
 import scalafx.Includes._
 
+import org.narrativeandplay.hypedyn.story.Narrative
 import org.narrativeandplay.hypedyn.story.internal.Node
 import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.undo._
@@ -87,5 +88,14 @@ object UndoEventDispatcher {
    */
   def destroyFact(fact: Fact): Unit = {
     EventBus.send(DestroyFact(fact, UndoEventSourceIdentity))
+  }
+
+  /**
+   * Sends an event to update the story properties
+   *
+   * @param newStoryProperties The updated story properties
+   */
+  def updateStoryProperties(newStoryProperties: Narrative.Metadata): Unit = {
+    EventBus.send(UpdateStoryProperties(newStoryProperties, UndoEventSourceIdentity))
   }
 }
