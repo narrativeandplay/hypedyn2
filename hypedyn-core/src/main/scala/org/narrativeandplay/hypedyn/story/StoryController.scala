@@ -33,23 +33,16 @@ object StoryController {
    * @param description The description of the new story
    */
   def newStory(title: String, author: String, description: String): Unit = {
-    load(new Story(title, author, description))
+    load(new Story(Metadata(title, author, description)))
   }
 
   /**
    * Edit the current story
    *
-   * @param title The new title
-   * @param author The new author
-   * @param description The new description
    * @param metadata The new metadata
    */
-  def editStory(title: String, author: String, description: String, metadata: Narrative.Metadata): Unit = {
-    currentStory = currentStory rename title
-    currentStory = currentStory changeAuthor author
-    currentStory = currentStory changeDescription description
+  def editStory(metadata: Narrative.Metadata): Unit = {
     currentStory = currentStory updateMetadata metadata
-
   }
 
   /**

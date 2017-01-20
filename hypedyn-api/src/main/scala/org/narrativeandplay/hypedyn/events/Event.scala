@@ -163,10 +163,7 @@ sealed case class CreateStory(title: String = "Untitled",
                               author: String = "",
                               desc: String = "",
                               src: String) extends Action
-sealed case class UpdateStoryProperties(title: String,
-                                        author: String,
-                                        description: String,
-                                        metadata: Narrative.Metadata,
+sealed case class UpdateStoryProperties(metadata: Narrative.Metadata,
                                         src: String) extends Action
 
 sealed case class ZoomStoryView(deltaZoom: Double, src: String) extends Action
