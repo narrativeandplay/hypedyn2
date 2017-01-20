@@ -88,7 +88,7 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
         children += customRadio
       }, "wrap")
       add(customCssFileSelector, "wrap")
-      add(new control.Separator(Orientation.HORIZONTAL), "growx, wrap")
+      add(new control.Separator(Orientation.Horizontal), "growx, wrap")
       add(new Label("Control"), "wrap")
       add(backDisabledCheckbox, "wrap")
       add(restartDisabledCheckbox)
@@ -109,7 +109,7 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
     toggleGroup = readerStyleRadioGroup
   }
 
-  lazy val customCssFileSelector = new FileSelectorWithTextField(dialogPane().scene.window()) {
+  lazy val customCssFileSelector = new FileSelectorWithTextField(dialogPane().getScene.getWindow) {
     chooseButton.disable <== !customRadio.selected
     filePathField.disable <== !customRadio.selected
   }
@@ -158,7 +158,7 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
    * @return An option containing the result of the dialog, or None if the dialog was not closed using the OK button
    */
   def showAndWait(): Option[(String, String, String, UiStoryMetadata)] = {
-    initModality(Modality.APPLICATION_MODAL)
+    initModality(Modality.ApplicationModal)
 
     val result = delegate.showAndWait()
 

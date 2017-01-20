@@ -13,10 +13,6 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 import scalafx.scene.layout.{BorderPane, VBox}
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Directives._
-import akka.stream.ActorMaterializer
 import com.sun.glass.ui
 import com.sun.glass.ui.Application.EventHandler
 import org.fxmisc.easybind.EasyBind
@@ -153,22 +149,13 @@ object Main extends JFXApp {
   def loadedFileName = loadedFilename()
 
   def runInBrowser(filePath: File, fileToRun: String): Unit = {
-    val runtime = Runtime.getRuntime
     val fileToLoad = "http://"+Server.hostname+":"+Server.port+"/"+fileToRun
     Server.storyPath = filePath.getAbsolutePath
 
-    if (Sys.isWindows) {
-      runtime.exec(s"rundll32 url.dll,FileProtocolHandler $fileToLoad")
-    }
-    else if (Sys.isMac) {
-      runtime.exec(s"open $fileToLoad")
-    }
-    else {
-      runtime.exec(s"xdg-open $fileToLoad")
-    }
+    hostServices.showDocument(fileToLoad)
   }
 
-  new PrimaryStage {
+  stage = new PrimaryStage {
     title <== loadedFilename + editedMarker + " - HypeDyn 2"
     icons.add(icon)
 
@@ -197,14 +184,14 @@ object Main extends JFXApp {
       // the last zoom time.
       if (event.shortcutDown && timeDiff > 1) {
         event.code match {
-          case KeyCode.ADD | KeyCode.EQUALS => UiEventDispatcher.requestZoom(0.1)
-          case KeyCode.MINUS | KeyCode.SUBTRACT => UiEventDispatcher.requestZoom(-0.1)
-          case KeyCode.NUMPAD0 | KeyCode.DIGIT0 => UiEventDispatcher.requestZoomReset()
+          case KeyCode.Add | KeyCode.Equals => UiEventDispatcher.requestZoom(0.1)
+          case KeyCode.Minus | KeyCode.Subtract => UiEventDispatcher.requestZoom(-0.1)
+          case KeyCode.Numpad0 | KeyCode.Digit0 => UiEventDispatcher.requestZoomReset()
           case _ =>
         }
       }
       event.code match {
-        case KeyCode.DELETE | KeyCode.BACK_SPACE =>
+        case KeyCode.Delete | KeyCode.BackSpace =>
           UiEventDispatcher.requestDeleteNode()
         case _ =>
       }

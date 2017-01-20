@@ -168,7 +168,7 @@ class FactEditor private (dialogTitle: String,
    *         the OK button
    */
   def showAndWait(): Option[Fact] = {
-    initModality(Modality.APPLICATION_MODAL)
+    initModality(Modality.ApplicationModal)
 
     val result = delegate.showAndWait()
 

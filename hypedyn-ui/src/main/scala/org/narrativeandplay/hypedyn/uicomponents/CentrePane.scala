@@ -17,7 +17,7 @@ object CentrePane extends SplitPane {
   case object NodesPane extends CentrePaneComponent
 
   private lazy val factsAndNodesPane = new SplitPane() {
-    orientation = Orientation.VERTICAL
+    orientation = Orientation.Vertical
 
     maxWidth = 300
 

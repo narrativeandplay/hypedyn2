@@ -41,7 +41,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
   })
 
   private def zoomValueClamp(d: Double) = pluginEventDispatcher.zoomValueClamp(d)
-  addEventFilter(ScrollEvent.SCROLL, { event: jfxsi.ScrollEvent =>
+  addEventFilter(ScrollEvent.Scroll, { event: jfxsi.ScrollEvent =>
     if (event.shortcutDown) {
       event.getDeltaY match {
         case x if x > 0 =>
@@ -202,7 +202,7 @@ class StoryViewerContent(private val pluginEventDispatcher: StoryViewer) extends
 
   def prefHeight = getPrefHeight
   def prefHeight_=(width: Double) = setPrefHeight(width)
-  
+
   def skin = getSkin
   def skin_=(s: Skin[_]) = setSkin(s)
 

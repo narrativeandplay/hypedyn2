@@ -94,7 +94,7 @@ class NodeEditor private (dialogTitle: String,
   resizable = true
 
   initOwner(ownerWindow)
-  initModality(Modality.NONE)
+  initModality(Modality.None)
 
   dialogPane().setPrefSize(1280, 800)
 
@@ -344,7 +344,7 @@ class NodeEditor private (dialogTitle: String,
     VBox.setVgrow(rulesetsList, Priority.Always)
   }
   val contentTextAndRulesetsListPane = new CollapsibleSplitPane {
-    orientation = Orientation.HORIZONTAL
+    orientation = Orientation.Horizontal
     add(rulesetsListVBox)
     add(new VBox {
       children += nodeContentText
@@ -357,7 +357,7 @@ class NodeEditor private (dialogTitle: String,
 
   dialogPane().scene().stylesheets += getClass.getResource("/org/narrativeandplay/hypedyn/tab-pane-fix.css").toExternalForm
   val textAndNodeRulesPane = new TabPane {
-    tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
+    tabClosingPolicy = TabPane.TabClosingPolicy.Unavailable
 
     tabs += new Tab {
       text = "Fragment rules"
@@ -370,7 +370,7 @@ class NodeEditor private (dialogTitle: String,
   }
 
   val mainContentPane = new CollapsibleSplitPane {
-    orientation = Orientation.VERTICAL
+    orientation = Orientation.Vertical
     VBox.setVgrow(this, Priority.Always)
 
     add(contentTextAndRulesetsListPane)
@@ -420,7 +420,7 @@ class NodeEditor private (dialogTitle: String,
 
     left = new ToolBar {
       style = "-fx-background-color: transparent;"
-      orientation = Orientation.VERTICAL
+      orientation = Orientation.Vertical
 
       items += new SidebarButton("Hide fragments") {
         onAction = { _ =>
@@ -508,7 +508,7 @@ class NodeEditor private (dialogTitle: String,
    * @return An option containing the edited face, or None if the dialog was not closed with the OK button
    */
   def showAndWait(): Option[Nodal] = {
-    initModality(Modality.APPLICATION_MODAL)
+    initModality(Modality.ApplicationModal)
 
     val result = delegate.showAndWait()
 

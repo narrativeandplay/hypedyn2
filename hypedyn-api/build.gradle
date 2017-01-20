@@ -4,7 +4,7 @@ dependencies {
     compile "io.reactivex:rxscala_${rootProject.majorScalaVersion}:0.25.1"
     compile 'org.fxmisc.undo:undofx:1.2'
 
-    compile "org.scalafx:scalafx_${rootProject.majorScalaVersion}:8.0.60-R9"
+    compile "org.scalafx:scalafx_${rootProject.majorScalaVersion}:8.0.102-R11"
 
     compile "org.slf4j:slf4j-api:1.7.13"
     compile 'ch.qos.logback:logback-classic:1.1.3'
