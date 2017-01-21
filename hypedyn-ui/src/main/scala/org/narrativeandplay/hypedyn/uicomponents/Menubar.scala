@@ -149,6 +149,8 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   private lazy val cut = new MenuItem("Cut") {
     accelerator = KeyCombinations.Cut
 
+    disable <== UiEventDispatcher.selectedNode map (_.isEmpty)
+
     onAction = { _ =>
       UiEventDispatcher.requestCut()
     }
@@ -157,6 +159,8 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   private lazy val copy = new MenuItem("Copy") {
     accelerator = KeyCombinations.Copy
 
+    disable <== UiEventDispatcher.selectedNode map (_.isEmpty)
+
     onAction = { _ =>
       UiEventDispatcher.requestCopy()
     }
@@ -164,6 +168,8 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
 
   private lazy val paste = new MenuItem("Paste") {
     accelerator = KeyCombinations.Paste
+
+    disable <== UiEventDispatcher.selectedNode map (_.isEmpty)
 
     onAction = { _ =>
       UiEventDispatcher.requestPaste()
