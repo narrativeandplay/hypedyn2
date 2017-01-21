@@ -7,12 +7,12 @@ import javafx.scene.control.{Skin, Control => JfxControl}
 import javafx.scene.{input => jfxsi}
 
 import scalafx.Includes.{jfxBounds2sfx, jfxMouseEvent2sfx, jfxReadOnlyDoubleProperty2sfx}
-import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyDoubleProperty}
+import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyBooleanProperty, ReadOnlyDoubleProperty}
 import scalafx.event.Event
 import scalafx.geometry.Bounds
 import scalafx.scene.input.MouseEvent
+import org.gerweck.scalafx.util._
 import com.github.benedictleejh.scala.math.vector.Vector2
-import org.fxmisc.easybind.EasyBind
 import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 import org.narrativeandplay.hypedyn.story.Nodal
@@ -46,12 +46,12 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
   /**
    * A binding for the name of the node
    */
-  val nodeName = EasyBind map (_node, (_: Nodal).name)
+  val nodeName = _node map (_.name)
 
   /**
    * A binding for the text content of the node
    */
-  val contentText = EasyBind map (_node, (_: Nodal).content.text)
+  val contentText = _node map (_.content.text)
 
   /**
    * A property determining if this node is selected
@@ -68,11 +68,12 @@ class ViewerNode(nodal: Nodal, private val pluginEventDispatcher: StoryViewer) e
     */
   val showName = storyViewer.zoomLevel >= storyViewer.showLabelsLimit
 
-
   /**
-   * A boolean expression for determining if this node is an anywhere node
+   * A ReadOnlyBooleanProperty for determining if this node is an anywhere node
    */
-  val isAnywhere = BooleanExpression.booleanExpression(EasyBind map (_node, { n: Nodal => Boolean box n.isAnywhere }))
+  // This is cast from a ReadOnlyObjectProperty[Boolean] to a ReadOnlyBooleanProperty to
+  // allow it ot be used for a binding condition in the skin
+  val isAnywhere: ReadOnlyBooleanProperty = _node map (_.isAnywhere)
 
   width = pluginEventDispatcher.zoomLevel() * ViewerNode.Width
   height = pluginEventDispatcher.zoomLevel() * ViewerNode.Height

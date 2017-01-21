@@ -13,9 +13,9 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 import scalafx.scene.layout.{BorderPane, VBox}
 
+import org.gerweck.scalafx.util._
 import com.sun.glass.ui
 import com.sun.glass.ui.Application.EventHandler
-import org.fxmisc.easybind.EasyBind
 import rx.lang.scala.subjects.{PublishSubject, SerializedSubject}
 
 import org.narrativeandplay.hypedyn.dialogs._
@@ -57,7 +57,7 @@ object Main extends JFXApp {
   private val icon = new Image(getClass.getResourceAsStream("hypedyn-icon.jpg"))
 
   private val loadedFilename = new StringProperty("Untitled")
-  private val editedMarker = EasyBind monadic UiEventDispatcher.isStoryEdited map[String] (if (_) "*" else "")
+  private val editedMarker = UiEventDispatcher.isStoryEdited map (if (_) "*" else "")
 
   private val refreshStream = SerializedSubject(PublishSubject[Unit]())
   def refreshRecent = refreshStream

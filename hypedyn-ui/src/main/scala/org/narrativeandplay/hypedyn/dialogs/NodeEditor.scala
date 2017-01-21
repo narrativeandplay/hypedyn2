@@ -1,31 +1,29 @@
 package org.narrativeandplay.hypedyn.dialogs
 
-import java.io.{DataOutputStream, DataInputStream}
+import java.io.{DataInputStream, DataOutputStream}
 import javafx.collections.ObservableList
 import javafx.{event => jfxe}
-import javafx.event.{ActionEvent => JfxActionEvent, EventHandler}
+import javafx.event.{EventHandler, ActionEvent => JfxActionEvent}
 import javafx.scene.control.{IndexRange => JfxIndexRange}
 import javafx.scene.{input => jfxsi}
 import javafx.scene.input.{KeyEvent => JfxKeyEvent}
 
 import scalafx.Includes._
-import scalafx.beans.property.ObjectProperty
+import scalafx.beans.property.{IntegerProperty, ObjectProperty, ReadOnlyObjectProperty, ReadOnlyStringProperty}
 import scalafx.collections.ObservableBuffer
-import scalafx.event.{Event, ActionEvent}
-import scalafx.geometry.{Pos, Insets, Orientation}
+import scalafx.event.{ActionEvent, Event}
+import scalafx.geometry.{Insets, Orientation, Pos}
 import scalafx.scene.control._
-import scalafx.scene.input.{MouseEvent, KeyEvent}
+import scalafx.scene.input.{KeyEvent, MouseEvent}
 import scalafx.scene.layout._
 import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
 import scalafx.scene.control.Tab.sfxTab2jfx
-
-import org.fxmisc.easybind.EasyBind
-import org.fxmisc.richtext.{Codec, StyleSpan, InlineStyleTextArea}
-
-import org.narrativeandplay.hypedyn.dialogs.NodeEditor.{NodeContentTextArea, LinkStyleInfo}
+import org.gerweck.scalafx.util._
+import org.fxmisc.richtext.{Codec, InlineStyleTextArea, StyleSpan}
+import org.narrativeandplay.hypedyn.dialogs.NodeEditor.{LinkStyleInfo, NodeContentTextArea}
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
-import org.narrativeandplay.hypedyn.story.NodalContent.{RulesetId, TextIndex, RulesetIndexes}
+import org.narrativeandplay.hypedyn.story.NodalContent.{RulesetId, RulesetIndexes, TextIndex}
 import org.narrativeandplay.hypedyn.story.UiNodeContent.UiRuleset
 import org.narrativeandplay.hypedyn.story._
 import org.narrativeandplay.hypedyn.story.rules.ActionLocationType.{NodeAction, NodeContentAction}
@@ -33,8 +31,10 @@ import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.uicomponents.RulesPane
 import org.narrativeandplay.hypedyn.uicomponents.Sidebar.SidebarButton
-import org.narrativeandplay.hypedyn.utils.{ExpandableEmptySpace, CollapsibleSplitPane}
+import org.narrativeandplay.hypedyn.utils.{CollapsibleSplitPane, ExpandableEmptySpace}
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
+
+import scalafx.beans.value.ObservableValue
 
 /**
  * Dialog for editing nodes
@@ -104,7 +104,6 @@ class NodeEditor private (dialogTitle: String,
 
   val story: ObjectProperty[UiStory] = ObjectProperty(narrative)
   private val node: ObjectProperty[UiNode] = ObjectProperty(nodeToEdit getOrElse NodeEditor.newNode)
-  private[this] val monadicNode = EasyBind monadic node
 
   private var updateFunc = UiEventDispatcher.updateNode(nodeToEdit getOrElse NodeEditor.newNode)
 
@@ -225,7 +224,7 @@ class NodeEditor private (dialogTitle: String,
       else selectionModel().clearSelection()
     }
 
-    items <== monadicNode flatMap[UiNodeContent] (_.contentProperty) flatMap[ObservableList[UiRuleset]] (_.rulesetsProperty)
+    items <== node flatMap (_.contentProperty) flatMap (_.rulesetsProperty)
   }
 
   lazy val nodeContentText = new NodeContentTextArea {
@@ -308,7 +307,7 @@ class NodeEditor private (dialogTitle: String,
                                     actionDefinitions filter (_.actionLocationTypes contains NodeAction),
                                     node().rulesProperty(),
                                     story) {
-    rules <== monadicNode flatMap[ObservableList[UiRule]] (_.rulesProperty)
+    rules <== node flatMap (_.rulesProperty)
   }
 
   val rulesetsListVBox = new VBox {
@@ -316,12 +315,12 @@ class NodeEditor private (dialogTitle: String,
       padding = Insets(5)
       alignment = Pos.CenterLeft
       children += new Button("Add fragment") {
-        disable <== EasyBind combine (nodeContentText.selectedTextProperty, nodeContentText.selectionProperty, { (s: String, i: JfxIndexRange) =>
-          val spansInSelection = nodeContentText styleSpansAt i map (_.getStyle.ruleset)
+        disable <== (nodeContentText.selectedText, nodeContentText.selection).observe map { case (str, idxRange) =>
+          val spansInSelection = nodeContentText styleSpansAt idxRange map (_.getStyle.ruleset)
           val selectionAlreadyContainsRuleset = !(spansInSelection forall (_.isEmpty))
           // Need to manually transform Scala Boolean to java.lang.Boolean because bloody Java<->Scala issues
-          Boolean box (s.trim.isEmpty || selectionAlreadyContainsRuleset)
-        })
+          Boolean box (str.trim.isEmpty || selectionAlreadyContainsRuleset)
+        }
 
         onAction = { _ =>
           val start = nodeContentText.getSelection.getStart
@@ -589,6 +588,10 @@ object NodeEditor {
       }
     }
 
+    def selectedText: ObservableValue[String, java.lang.String] = selectedTextProperty()
+
+    def selection: ObservableValue[JfxIndexRange, JfxIndexRange] = selectionProperty()
+
     /**
      * Returns all the style spans in the text
      */
@@ -619,8 +622,6 @@ object NodeEditor {
 
     def useInitialStyleForInsertion = useInitialStyleForInsertionProperty()
     def useInitialStyleForInsertion_=(value: Boolean) = setUseInitialStyleForInsertion(value)
-
-    def selection = selectionProperty()
 
     def caretPosition = caretPositionProperty()
 
