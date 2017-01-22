@@ -116,6 +116,9 @@ function clickedLink(linkID) {
 		clicked_link_flag = true;
         clickHandled = true; // tell touchHandler that the click was handled
 	}
+}
+
+function clickedAnywhereLink(linkID) {
 	var anywhere_node_check = get_activated_anywhere_node ( linkID );
 	if ( anywhere_node_check ) {
 		// linkID is actually anywhere node id
