@@ -3,9 +3,8 @@ package org.narrativeandplay.hypedyn.uicomponents
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.beans.property.ReadOnlyBooleanProperty
+import scalafx.event.ActionEvent
 import scalafx.scene.control._
-
-import org.gerweck.scalafx.util._
 
 import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher

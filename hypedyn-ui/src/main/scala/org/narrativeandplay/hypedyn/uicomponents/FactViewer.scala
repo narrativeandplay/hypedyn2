@@ -3,14 +3,13 @@ package org.narrativeandplay.hypedyn.uicomponents
 import java.lang
 import javafx.stage.Window
 
+import org.fxmisc.easybind.EasyBind
+
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.{ListCell, ListView, Tooltip}
-
-import org.gerweck.scalafx.util._
-import org.fxmisc.easybind.EasyBind
 
 import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.utils.System

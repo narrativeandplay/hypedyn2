@@ -8,8 +8,8 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape.{Polygon, Rectangle}
 import scalafx.scene.text.Text
 
-import org.gerweck.scalafx.util._
 import com.github.benedictleejh.scala.math.vector.Vector2
+import org.fxmisc.easybind.EasyBind
 
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 import org.narrativeandplay.hypedyn.storyviewer.utils.{CubicPolynomial, Line, BezierCurve}
@@ -40,7 +40,7 @@ class Link(val from: ViewerNode,
   /**
    * A binding to the name of the rule
    */
-  val name = rule map (_.name)
+  val name = EasyBind map (rule, (_: RuleLike).name)
 
   /**
    * A property determining if the link is currently selected

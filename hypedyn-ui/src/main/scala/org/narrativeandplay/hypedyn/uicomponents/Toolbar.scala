@@ -1,10 +1,12 @@
 package org.narrativeandplay.hypedyn.uicomponents
 
+import java.lang
+
 import scalafx.Includes._
 import scalafx.event.ActionEvent
 import scalafx.scene.control.{Button, ToolBar}
 
-import org.gerweck.scalafx.util._
+import org.fxmisc.easybind.EasyBind
 
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 
@@ -30,14 +32,14 @@ object Toolbar extends ToolBar {
       UiEventDispatcher.requestDeleteNode()
     }
 
-    disable <== UiEventDispatcher.selectedNode map (_.isEmpty)
+    disable <== EasyBind monadic UiEventDispatcher.selectedNode map[lang.Boolean] (_.isEmpty)
   }
   private lazy val editNode = new Button("Edit Node") {
     onAction = { actionEvent: ActionEvent =>
       UiEventDispatcher.requestEditNode()
     }
 
-    disable <== UiEventDispatcher.selectedNode map (_.isEmpty)
+    disable <== EasyBind monadic UiEventDispatcher.selectedNode map[lang.Boolean] (_.isEmpty)
   }
 
   private lazy val newFact = new Button("New Fact") {

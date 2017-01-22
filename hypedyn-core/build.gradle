@@ -7,7 +7,7 @@ dependencies {
 
     compile "commons-io:commons-io:2.4"
 
-    compile "org.gerweck.scalafx:scalafx-utils_${rootProject.majorScalaVersion}:0.11.2"
+    compile "org.fxmisc.easybind:easybind:1.0.3"
 
     compile project(':hypedyn-api')
 }

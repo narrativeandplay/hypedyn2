@@ -1,6 +1,6 @@
 dependencies {
     compile "org.scalafx:scalafx_${rootProject.majorScalaVersion}:8.0.60-R9"
-    compile "org.gerweck.scalafx:scalafx-utils_${rootProject.majorScalaVersion}:0.11.2"
+    compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile ':scala-math-vector:0.1.0'
 
     compile project(':hypedyn-api')
