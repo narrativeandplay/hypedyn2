@@ -248,7 +248,7 @@ function node_to_html( node, activated_anywhere_nodes, inactive_anywhere_nodes, 
 			var anywhere_tg = [];
             // need to escape the content in case name contains special characters
 			anywhere_tg.content = escape_special(anywherenode.label); //escape_special(anywherenode.name);
-			anywhere_tg.start_tag = "<a href='javascript:void(0)' class='anywhere' onMouseUp='clickedLink(" 
+			anywhere_tg.start_tag = "<a href='javascript:void(0)' class='anywhere' onMouseUp='clickedAnywhereLink("
 									+ anywherenode.id + ")'>";
 			anywhere_tg.end_tag = "</a><br>";
 			anywhere_tg_arr.push( anywhere_tg );
