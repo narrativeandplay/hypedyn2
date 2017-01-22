@@ -1,7 +1,6 @@
 package org.narrativeandplay.hypedyn
 
 import java.io.File
-import javafx.beans.value.ObservableValue
 import javafx.scene.{input => jfxsi}
 
 import scalafx.Includes._
@@ -14,9 +13,9 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 import scalafx.scene.layout.{BorderPane, VBox}
 
+import org.gerweck.scalafx.util._
 import com.sun.glass.ui
 import com.sun.glass.ui.Application.EventHandler
-import org.gerweck.scalafx.util._
 import rx.lang.scala.subjects.{PublishSubject, SerializedSubject}
 
 import org.narrativeandplay.hypedyn.dialogs._
@@ -58,9 +57,7 @@ object Main extends JFXApp {
   private val icon = new Image(getClass.getResourceAsStream("hypedyn-icon.jpg"))
 
   private val loadedFilename = new StringProperty("Untitled")
-  // Because scalafx-utils returns ReadOnlyObjectProperties, their usage in a string returns a bad toString form
-  // So we cast to an ObservableValue[String] to make the ReadOnlyObjectProperty[String] be useful in a binding
-  private val editedMarker: ObservableValue[String] = UiEventDispatcher.isStoryEdited map (if (_) "*" else "")
+  private val editedMarker = UiEventDispatcher.isStoryEdited map (if (_) "*" else "")
 
   private val refreshStream = SerializedSubject(PublishSubject[Unit]())
   def refreshRecent = refreshStream
