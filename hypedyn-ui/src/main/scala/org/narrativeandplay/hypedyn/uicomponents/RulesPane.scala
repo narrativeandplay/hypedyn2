@@ -4,16 +4,14 @@ import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
-import scalafx.geometry.{Insets, Pos}
-import scalafx.scene.control.{Button, Label, TreeItem, TreeView}
-import scalafx.scene.layout.{Priority, HBox, VBox}
 import scalafx.scene.Parent.sfxParent2jfx
 import scalafx.scene.control.TreeItem.sfxTreeItemToJfx
+import scalafx.scene.control._
+import scalafx.scene.layout.{Priority, VBox}
 
 import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.Or
-import org.narrativeandplay.hypedyn.story.{UiStory, UiRule}
-import org.narrativeandplay.hypedyn.story.rules.{RuleId, ActionDefinition, ConditionDefinition}
-import org.narrativeandplay.hypedyn.utils.ExpandableEmptySpace
+import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition, RuleId}
+import org.narrativeandplay.hypedyn.story.{UiRule, UiStory}
 
 /**
  * A control to manipulate rules
@@ -63,13 +61,8 @@ class RulesPane(labelText: String,
 
   val disableAddRule = addRuleButton.disable
 
-  children += new HBox(10) {
-    alignment = Pos.CenterLeft
-    padding = Insets(5, 5, 0, 5)
-
-    children += addRuleButton
-    children += collapseAllButton
-    children += expandAllButton
+  children += new ToolBar {
+    items.addAll(addRuleButton, collapseAllButton, expandAllButton)
   }
   children += rulesList
 
