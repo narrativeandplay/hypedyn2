@@ -361,6 +361,11 @@ function filter_out_empty_rules( rules ) {
     //disp("");
 	return prev_read_nodes[prev_read_nodes.length - 1] == nodeID;
  }
+
+ function nodeIsCurrent(nodeID) {
+ 	var result = currNodeID == nodeID;
+ 	return result;
+ }
  
  function createCondition(func, func_args_arr, ruleID, not, id) {
 	//disp("*** not: "+not);

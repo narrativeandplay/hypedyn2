@@ -20,8 +20,12 @@ function createConditions(rulesetID, ruleID, conditions) {
 					case "is not previous":
 						createCondition(nodeIsPrevious, [thisCondition.params.node.value], ruleID, true, l);
 						break;
-					case "current":
-						break;
+					case "is current":
+                        createCondition(nodeIsCurrent, [thisCondition.params.node.value], ruleID, false, l);
+                        break;
+                    case "is not current":
+                        createCondition(nodeIsCurrent, [thisCondition.params.node.value], ruleID, true, l);
+                        break;
 				}
 				break;
 			case "LinkCondition":
