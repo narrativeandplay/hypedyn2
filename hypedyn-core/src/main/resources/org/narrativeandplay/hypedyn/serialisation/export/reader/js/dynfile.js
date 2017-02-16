@@ -218,7 +218,7 @@ function createFacts(facts) {
 		switch(factType) {
 			case "bool":
 				createFact(factName, "boolean", factID);
-				setFact(factID, factValue == "true");
+				setFact(factID, factValue);
 				break;
 			case "string":
 				createFact(factName, "string", factID);
