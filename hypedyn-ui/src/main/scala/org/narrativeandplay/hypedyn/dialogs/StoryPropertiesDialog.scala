@@ -26,7 +26,7 @@ import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
  * @param story The story for which to edit properties
  * @param ownerWindow The parent window for the dialog, to inherit icons
  */
-class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialog[(String, String, String, UiStoryMetadata)] {
+class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialog[UiStoryMetadata] {
   import Narrative.ReaderStyle._
 
   title = "Properties"
@@ -63,13 +63,15 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
   }
 
   lazy val titleField = new TextField {
-    text = story.title
+    text <==> metadata.titleProperty
   }
   lazy val authorField = new TextField {
-    text = story.author
+    text <==> metadata.authorProperty
   }
-  lazy val descriptionArea = new TextArea(story.description) {
+  lazy val descriptionArea = new TextArea() {
     wrapText = true
+
+    text <==> metadata.descriptionProperty
   }
   lazy val commentsArea = new TextArea {
     wrapText = true
@@ -148,7 +150,7 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
         case Custom(_) => Custom(customCssFileSelector.selectedFileFilename)
       }
       metadata.readerStyleProperty() = readerStyle
-      (titleField.text(), authorField.text(), descriptionArea.text(), metadata)
+      metadata
     case _ => null
   }
 
@@ -157,7 +159,7 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
    *
    * @return An option containing the result of the dialog, or None if the dialog was not closed using the OK button
    */
-  def showAndWait(): Option[(String, String, String, UiStoryMetadata)] = {
+  def showAndWait(): Option[UiStoryMetadata] = {
     initModality(Modality.ApplicationModal)
 
     val result = delegate.showAndWait()

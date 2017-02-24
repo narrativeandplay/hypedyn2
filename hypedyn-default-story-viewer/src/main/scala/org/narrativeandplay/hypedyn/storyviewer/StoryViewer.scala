@@ -174,6 +174,7 @@ class StoryViewer extends ScrollPane with Plugin with NarrativeViewer with Savea
   }
 
   def notifyNodeSelection(id: NodeId): Unit = {
+    viewer.nodes filter (_.id != id) foreach (_.deselect())
     EventBus.send(UiNodeSelected(id, StoryViewerEventSourceIdentity))
   }
 

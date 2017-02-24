@@ -9,52 +9,22 @@ import org.narrativeandplay.hypedyn.story.rules.Fact
 /**
  * Class representing a story. The story class is immutable, and all operations on the story return a new copy
  *
- * @param title The title of the story
- * @param author The author of the story
- * @param description The description of the story
  * @param metadata The metadata of the story
  * @param nodes The story's nodes
  * @param facts The story's facts
  * @param rules The story-level rules
  */
-case class Story(title: String = "Untitled",
-                 author: String = "",
-                 description: String = "",
-                 metadata: Story.Metadata = Story.Metadata(),
+case class Story(metadata: Story.Metadata = Story.Metadata(),
                  nodes: List[Node] = Nil,
                  facts: List[Fact] = Nil,
                  rules: List[Rule] = Nil) extends Narrative {
-  /**
-   * Changes the title of the story
-   *
-   * @param newTitle The new title of the story
-   * @return A new story with the title changed
-   */
-  def rename(newTitle: String) = new Story(newTitle, author, description, metadata, nodes, facts, rules)
-
-  /**
-   * Changes the author of the story
-   *
-   * @param newAuthor The new author of the story
-   * @return A new story with the author changed
-   */
-  def changeAuthor(newAuthor: String) = new Story(title, newAuthor, description, metadata, nodes, facts, rules)
-
-  /**
-   * Changes the description of the story
-   *
-   * @param newDescription The new description of the story
-   * @return A new story with the description changed
-   */
-  def changeDescription(newDescription: String) = new Story(title, author, newDescription, metadata, nodes, facts, rules)
-
   /**
    * Updates the metadata of the story
    *
    * @param newMetadata The new metadata of the story
    * @return A new story with the metadata changed
    */
-  def updateMetadata(newMetadata: Story.Metadata) = new Story(title, author, description, newMetadata, nodes, facts, rules)
+  def updateMetadata(newMetadata: Story.Metadata) = new Story(newMetadata, nodes, facts, rules)
 
   /**
    * Adds a node to the story
@@ -62,7 +32,7 @@ case class Story(title: String = "Untitled",
    * @param node The node to add to the story
    * @return A new story with the specified node added
    */
-  def addNode(node: Node) = new Story(title, author, description, metadata, node :: nodes, facts, rules)
+  def addNode(node: Node) = new Story(metadata, node :: nodes, facts, rules)
 
   /**
    * Updates a node of the story
@@ -71,15 +41,15 @@ case class Story(title: String = "Untitled",
    * @param newNode The updated version of the node
    * @return A new story with the specified node updated
    */
-  def updateNode(node: Node, newNode: Node) = new Story(title, author, description, metadata,
-                                                        newNode :: (nodes filter (_ != node)), facts, rules)
+  def updateNode(node: Node, newNode: Node) =
+    new Story(metadata, newNode :: (nodes filter (_ != node)), facts, rules)
 
   /**
    * Removes a node from the story
    * @param node The node to remove
    * @return A new story with the specified node removed
    */
-  def removeNode(node: Node) = new Story(title, author, description, metadata, nodes filter (_ != node), facts, rules)
+  def removeNode(node: Node) = new Story(metadata, nodes filter (_ != node), facts, rules)
 
   /**
    * Adds a fact to the story
@@ -87,7 +57,7 @@ case class Story(title: String = "Untitled",
    * @param fact The fact to add
    * @return A new story with the specified fact added
    */
-  def addFact(fact: Fact) = new Story(title, author, description, metadata, nodes, fact :: facts, rules)
+  def addFact(fact: Fact) = new Story(metadata, nodes, fact :: facts, rules)
 
   /**
    * Updates a fact of the story
@@ -96,7 +66,7 @@ case class Story(title: String = "Untitled",
    * @param newFact The updated version of the fact
    * @return A new story with the specified fact updated
    */
-  def updateFact(fact: Fact, newFact: Fact) = new Story(title, author, description, metadata, nodes,
+  def updateFact(fact: Fact, newFact: Fact) = new Story(metadata, nodes,
                                                         newFact :: (facts filter (_ != fact)), rules)
 
   /**
@@ -105,7 +75,7 @@ case class Story(title: String = "Untitled",
    * @param fact The fact to remove
    * @return A new story with the specified fact removed
    */
-  def removeFact(fact: Fact) = new Story(title, author, description, metadata, nodes, facts filter (_ != fact), rules)
+  def removeFact(fact: Fact) = new Story(metadata, nodes, facts filter (_ != fact), rules)
 
   /**
    * Adds a story-level rule
@@ -113,7 +83,7 @@ case class Story(title: String = "Untitled",
    * @param rule The rule to add
    * @return A new story with the specified fact added
    */
-  def addRule(rule: Rule) = new Story(title, author, description, metadata, nodes, facts, rule :: rules)
+  def addRule(rule: Rule) = new Story(metadata, nodes, facts, rule :: rules)
 
   /**
    * Updates a story-level rule
@@ -122,7 +92,7 @@ case class Story(title: String = "Untitled",
    * @param newRule The updated version of the rule
    * @return A new story with the specified rule updated
    */
-  def updateRule(rule: Rule, newRule: Rule) = new Story(title, author, description, metadata, nodes, facts,
+  def updateRule(rule: Rule, newRule: Rule) = new Story(metadata, nodes, facts,
                                                         newRule :: (rules filter (_ != rule)))
 
   /**
@@ -131,7 +101,7 @@ case class Story(title: String = "Untitled",
    * @param rule The rule to remove
    * @return A new story with the specified rule removed
    */
-  def removeRule(rule: Rule) = new Story(title, author, description, metadata, nodes, facts, rules filter (_ != rule))
+  def removeRule(rule: Rule) = new Story(metadata, nodes, facts, rules filter (_ != rule))
 
   /**
    * Returns all the rules in the story (text, node, and story rules)
@@ -149,12 +119,18 @@ object Story {
   /**
    * Class to represent story metadata
    *
+   * @param title The title of the story
+   * @param author The author of the story
+   * @param description The description of the story
    * @param comments The story's comments
    * @param readerStyle The style of the reader
    * @param isBackButtonDisabled Whether the back button is disabled
    * @param isRestartButtonDisabled Whether the restart button is disabled
    */
-  case class Metadata(comments: String = "",
+  case class Metadata(title: String = "Untitled",
+                      author: String = "",
+                      description: String = "",
+                      comments: String = "",
                       readerStyle: ReaderStyle = Standard,
                       isBackButtonDisabled: Boolean = false,
                       isRestartButtonDisabled: Boolean = false) extends Narrative.Metadata

@@ -42,6 +42,8 @@ object Main extends JFXApp {
   Logger
   Server
 
+  Logger.info("Java version: " + System.getProperty("java.version"))
+
   Thread.currentThread().setUncaughtExceptionHandler({ (_, throwable) =>
     // Most exceptions will show up as a `OnErrorNotImplementedException` because
     // of RxScala, so we grab the actual exception instead of allowing it to
@@ -140,7 +142,7 @@ object Main extends JFXApp {
     graphic = new ImageView(icon)
     contentText =
       """Hypertext Fiction Editor
-        |Version 0.25-beta
+        |Version 0.26-beta
       """.stripMargin
   }
 
