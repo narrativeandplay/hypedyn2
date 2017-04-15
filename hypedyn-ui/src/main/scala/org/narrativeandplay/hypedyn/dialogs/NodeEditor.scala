@@ -250,7 +250,9 @@ class NodeEditor private (dialogTitle: String,
     node onChange { (_, _, newNode) =>
       indexUpdateSub.cancel()
       replaceText(newNode.content.text)
-      setStyle(0, text().length, new LinkStyleInfo()) // Clear text styling before applying text styling from rulesets
+      if (newNode.content.text.length > 0) {
+        setStyle(0, text().length, new LinkStyleInfo()) // Clear text styling before applying text styling from rulesets
+      }
       newNode.content.rulesetsProperty() foreach { ruleset =>
         setStyle(ruleset.indexes.startIndex.index.toInt,
                  ruleset.indexes.endIndex.index.toInt,
