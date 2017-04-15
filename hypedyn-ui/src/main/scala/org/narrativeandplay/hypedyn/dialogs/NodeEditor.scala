@@ -1,31 +1,35 @@
 package org.narrativeandplay.hypedyn.dialogs
 
-import java.io.{DataOutputStream, DataInputStream}
+import java.io.{DataInputStream, DataOutputStream}
+import java.util
+import java.util.function.BiConsumer
 import javafx.collections.ObservableList
 import javafx.{event => jfxe}
-import javafx.event.{ActionEvent => JfxActionEvent, EventHandler}
+import javafx.event.{EventHandler, ActionEvent => JfxActionEvent}
 import javafx.scene.control.{IndexRange => JfxIndexRange}
 import javafx.scene.{input => jfxsi}
 import javafx.scene.input.{KeyEvent => JfxKeyEvent}
+import javafx.scene.text.{Text, TextFlow}
 
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
-import scalafx.event.{Event, ActionEvent}
-import scalafx.geometry.{Pos, Insets, Orientation}
+import scalafx.event.{ActionEvent, Event}
+import scalafx.geometry.{Insets, Orientation, Pos}
 import scalafx.scene.control._
-import scalafx.scene.input.{MouseEvent, KeyEvent}
+import scalafx.scene.input.{KeyEvent, MouseEvent}
 import scalafx.scene.layout._
 import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
 import scalafx.scene.control.Tab.sfxTab2jfx
 
 import org.fxmisc.easybind.EasyBind
-import org.fxmisc.richtext.{Codec, StyleSpan, InlineStyleTextArea}
+import org.fxmisc.richtext.model.{Codec, StyleSpan, StyledText}
+import org.fxmisc.richtext.StyledTextArea
 
-import org.narrativeandplay.hypedyn.dialogs.NodeEditor.{NodeContentTextArea, LinkStyleInfo}
+import org.narrativeandplay.hypedyn.dialogs.NodeEditor.{LinkStyleInfo, NodeContentTextArea}
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
-import org.narrativeandplay.hypedyn.story.NodalContent.{RulesetId, TextIndex, RulesetIndexes}
+import org.narrativeandplay.hypedyn.story.NodalContent.{RulesetId, RulesetIndexes, TextIndex}
 import org.narrativeandplay.hypedyn.story.UiNodeContent.UiRuleset
 import org.narrativeandplay.hypedyn.story._
 import org.narrativeandplay.hypedyn.story.rules.ActionLocationType.{NodeAction, NodeContentAction}
@@ -33,7 +37,7 @@ import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.uicomponents.RulesPane
 import org.narrativeandplay.hypedyn.uicomponents.Sidebar.SidebarButton
-import org.narrativeandplay.hypedyn.utils.{ExpandableEmptySpace, CollapsibleSplitPane}
+import org.narrativeandplay.hypedyn.utils.{CollapsibleSplitPane, ExpandableEmptySpace}
 import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
 
 /**
@@ -537,12 +541,23 @@ object NodeEditor {
 
     override def toString = s"hasRule: ${ruleset.isDefined}"
   }
-  private[this] def linkStyleInfo2Css = { t: LinkStyleInfo => t.css}
+  private[this] def applyParagraphStyle = new BiConsumer[TextFlow, util.Collection[String]] {
+    override def accept(paragraph: TextFlow, styleClasses: util.Collection[String]) =
+      paragraph.getStyleClass.addAll(styleClasses)
+  }
+  private[this] def applyStyle = new BiConsumer[Text, LinkStyleInfo] {
+    override def accept(text: Text, style: LinkStyleInfo) = text.setStyle(style.css)
+  }
 
   /**
    * An extended rich text area to provide some convenience methods
    */
-  class NodeContentTextArea extends InlineStyleTextArea[LinkStyleInfo](new LinkStyleInfo(), linkStyleInfo2Css) {
+  class NodeContentTextArea extends StyledTextArea[util.Collection[String], LinkStyleInfo](
+    util.Collections.emptyList(),
+    applyParagraphStyle,
+    new LinkStyleInfo(),
+    applyStyle
+  ) {
     addEventFilter(KeyEvent.KeyTyped, { keyEvent: JfxKeyEvent =>
       if (keyEvent.shiftDown && keyEvent.character == " ") {
         useInitialStyleForInsertion = true
@@ -626,8 +641,10 @@ object NodeEditor {
 
     def text = textProperty()
 
-    def styleCodec = getStyleCodec
-    def styleCodec_=(codec: Codec[LinkStyleInfo]) = setStyleCodec(codec)
+
+
+    def styleCodec = getStyleCodecs.get()._2
+    def styleCodec_=(codec: Codec[LinkStyleInfo]) = setStyleCodecs(Codec.collectionCodec(Codec.STRING_CODEC), StyledText.codec(codec))
 
     def onMouseClicked = { me: MouseEvent => getOnMouseClicked.handle(me) }
     def onMouseClicked_=[T >: MouseEvent <: Event, U >: jfxsi.MouseEvent <: jfxe.Event](lambda: T => Unit)(implicit jfx2sfx: U => T) = {
