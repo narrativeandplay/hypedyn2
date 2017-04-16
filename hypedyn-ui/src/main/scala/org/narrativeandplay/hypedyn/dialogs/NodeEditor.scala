@@ -592,16 +592,6 @@ object NodeEditor {
 
             selectRange(ruleRange.start, ruleRange.end)
           }
-        case 2 =>
-          val range = getSelection
-          val selectedText = getSelectedText
-
-          if (selectedText.startsWith(" ")) {
-            selectRange(range.getStart + 1, range.getEnd)
-          }
-          else if (selectedText.endsWith(" ")) {
-            selectRange(range.getStart, range.getEnd - 1)
-          }
         case _ =>
       }
     }
