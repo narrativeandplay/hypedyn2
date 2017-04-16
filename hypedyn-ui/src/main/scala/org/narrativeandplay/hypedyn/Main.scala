@@ -150,7 +150,7 @@ object Main extends JFXApp {
   def loadedFileName = loadedFilename()
 
   def runInBrowser(filePath: File, fileToRun: String): Unit = {
-    val fileToLoad = "http://"+Server.hostname+":"+Server.port+"/"+fileToRun
+    val fileToLoad = s"${Server.address}/$fileToRun"
     Server.storyPath = filePath.getAbsolutePath
 
     hostServices.showDocument(fileToLoad)
