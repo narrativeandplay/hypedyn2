@@ -34,6 +34,10 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
 
   initOwner(ownerWindow)
 
+  // HACK: make story properties always on top
+  // Possibly due to some touch screen issues
+  dialogPane().scene().window().asInstanceOf[javafx.stage.Stage].alwaysOnTop = true
+
   val metadata: UiStoryMetadata = story.metadata
 
   dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Cancel)

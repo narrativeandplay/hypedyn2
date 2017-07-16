@@ -1,6 +1,7 @@
 package org.narrativeandplay.hypedyn.uicomponents
 
 import java.lang
+import javafx.beans.binding.BooleanExpression
 
 import scalafx.Includes._
 import scalafx.application.Platform
@@ -20,6 +21,8 @@ import org.narrativeandplay.hypedyn.utils.{HypedynPreferences, System}
  * Menu bar for the application
  */
 class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
+  private val noNodeSelected = BooleanExpression.booleanExpression(EasyBind monadic UiEventDispatcher.selectedNode map[lang.Boolean] (_.isEmpty))
+
   useSystemMenuBar = true
   menus.addAll(fileMenu, editMenu, helpMenu)
 
@@ -152,7 +155,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   private lazy val cut = new MenuItem("Cut") {
     accelerator = KeyCombinations.Cut
 
-    disable <== EasyBind monadic UiEventDispatcher.selectedNode map[lang.Boolean] (_.isEmpty)
+    disable <== noNodeSelected || !mainStageFocused
 
     onAction = { _ =>
       UiEventDispatcher.requestCut()
@@ -162,7 +165,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   private lazy val copy = new MenuItem("Copy") {
     accelerator = KeyCombinations.Copy
 
-    disable <== EasyBind monadic UiEventDispatcher.selectedNode map[lang.Boolean] (_.isEmpty)
+    disable <== noNodeSelected || !mainStageFocused
 
     onAction = { _ =>
       UiEventDispatcher.requestCopy()
@@ -172,7 +175,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   private lazy val paste = new MenuItem("Paste") {
     accelerator = KeyCombinations.Paste
 
-    disable <== EasyBind monadic UiEventDispatcher.selectedNode map[lang.Boolean] (_.isEmpty)
+    disable <== noNodeSelected || !mainStageFocused
 
     onAction = { _ =>
       UiEventDispatcher.requestPaste()

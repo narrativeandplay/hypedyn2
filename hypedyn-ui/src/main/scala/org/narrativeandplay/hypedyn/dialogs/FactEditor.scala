@@ -55,6 +55,10 @@ class FactEditor private (dialogTitle: String,
 
   initOwner(ownerWindow)
 
+  // HACK: make fact editor always on top
+  // Possibly due to some touch screen issues
+  dialogPane().scene().window().asInstanceOf[javafx.stage.Stage].alwaysOnTop = true
+
   dialogPane().buttonTypes.addAll(ButtonType.OK, ButtonType.Cancel)
   val okButton = dialogPane().lookupButton(ButtonType.OK)
 

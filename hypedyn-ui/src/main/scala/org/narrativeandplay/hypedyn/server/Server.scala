@@ -10,8 +10,8 @@ import org.narrativeandplay.hypedyn.logging.Logger
 object Server {
   private var _storyPath = ""
 
-  val hostname = "localhost"
-  val port = 8080
+  private val hostname = "localhost"
+  private var port = -1 // -1 represents an uninitialised port
 
   implicit val webserver = ActorSystem("hypedyn")
   implicit val materializer = ActorMaterializer()
@@ -26,16 +26,18 @@ object Server {
       }
     }
 
-  private val bindingFuture = Http().bindAndHandle(route, hostname, port)
+  // We bind to port 0 to let Akka randomly pick an available port to bind to
+  private val bindingFuture = Http().bindAndHandle(route, hostname, 0)
 
   bindingFuture.onFailure {
     case ex: Exception =>
-      Logger.error("Server failed to bind to "+hostname+":"+port, ex)
+      Logger.error("Server failed to start: ", ex)
   }
 
   bindingFuture.onSuccess {
-    case _: Http.ServerBinding =>
-      Logger.info("Server online at http://"+hostname+":"+port)
+    case binding =>
+      port = binding.localAddress.getPort
+      Logger.info(s"Server online at $address")
   }
 
   def shutdown(): Unit = {
@@ -44,4 +46,6 @@ object Server {
 
   def storyPath = _storyPath
   def storyPath_=(s: String) = _storyPath = s
+
+  def address = s"http://$hostname:$port"
 }
