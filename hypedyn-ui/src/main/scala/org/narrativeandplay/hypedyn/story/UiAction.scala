@@ -4,9 +4,9 @@ import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableMap
 
-import org.narrativeandplay.hypedyn.story.rules.Actionable
-import org.narrativeandplay.hypedyn.story.rules.Actionable.ActionType
-import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
+import org.narrativeandplay.hypedyn.api.story.rules.Actionable
+import org.narrativeandplay.hypedyn.api.story.rules.Actionable.ActionType
+import org.narrativeandplay.hypedyn.api.story.rules.RuleLike.{ParamName, ParamValue}
 
 /**
  * UI implementation for Actionable

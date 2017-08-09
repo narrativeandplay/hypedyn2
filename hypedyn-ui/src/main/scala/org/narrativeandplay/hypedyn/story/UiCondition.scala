@@ -4,9 +4,9 @@ import scalafx.Includes._
 import scalafx.beans.property.{ObjectProperty, StringProperty}
 import scalafx.collections.ObservableMap
 
-import org.narrativeandplay.hypedyn.story.rules.Conditional
-import org.narrativeandplay.hypedyn.story.rules.Conditional.ConditionType
-import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
+import org.narrativeandplay.hypedyn.api.story.rules.Conditional
+import org.narrativeandplay.hypedyn.api.story.rules.Conditional.ConditionType
+import org.narrativeandplay.hypedyn.api.story.rules.RuleLike.{ParamName, ParamValue}
 
 /**
  * UI implementation for Conditional

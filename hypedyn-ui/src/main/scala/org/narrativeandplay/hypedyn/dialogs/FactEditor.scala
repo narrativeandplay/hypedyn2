@@ -13,6 +13,7 @@ import scalafx.util.StringConverter.sfxStringConverter2jfx
 
 import org.tbee.javafx.scene.layout.MigPane
 
+import org.narrativeandplay.hypedyn.api.story.rules._
 import org.narrativeandplay.hypedyn.story.rules._
 
 /**

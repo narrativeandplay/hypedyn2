@@ -1,10 +1,10 @@
 package org.narrativeandplay.hypedyn.story.internal
 
-import org.narrativeandplay.hypedyn.story.Narrative
-import org.narrativeandplay.hypedyn.story.Narrative.ReaderStyle
-import org.narrativeandplay.hypedyn.story.Narrative.ReaderStyle.Standard
+import org.narrativeandplay.hypedyn.api.story.Narrative
+import org.narrativeandplay.hypedyn.api.story.Narrative.ReaderStyle
+import org.narrativeandplay.hypedyn.api.story.Narrative.ReaderStyle.Standard
+import org.narrativeandplay.hypedyn.api.story.rules.Fact
 import org.narrativeandplay.hypedyn.story.rules.internal.Rule
-import org.narrativeandplay.hypedyn.story.rules.Fact
 
 /**
  * Class representing a story. The story class is immutable, and all operations on the story return a new copy

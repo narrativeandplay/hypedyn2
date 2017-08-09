@@ -1,7 +1,8 @@
 package org.narrativeandplay.hypedyn.events
 
-import org.narrativeandplay.hypedyn.clipboard.ClipboardController
-import org.narrativeandplay.hypedyn.story.Nodal
+import org.narrativeandplay.hypedyn.api.events.{CreateNode, DestroyNode, EventBus}
+import org.narrativeandplay.hypedyn.clipboard._
+import org.narrativeandplay.hypedyn.api.story.Nodal
 
 /**
  * Event dispatcher for clipboard related events

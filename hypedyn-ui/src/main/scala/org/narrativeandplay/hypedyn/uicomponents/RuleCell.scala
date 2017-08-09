@@ -13,12 +13,12 @@ import scalafx.scene.layout.{Priority, HBox, StackPane}
 import scalafx.util.StringConverter
 import scalafx.scene.Parent.sfxParent2jfx
 
-import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.{Or, And}
-import org.narrativeandplay.hypedyn.story.rules.Conditional.ConditionType
+import org.narrativeandplay.hypedyn.api.story.rules.BooleanOperator.{Or, And}
+import org.narrativeandplay.hypedyn.api.story.rules.Conditional.ConditionType
 import org.narrativeandplay.hypedyn.story.{UiAction, UiCondition, UiStory, UiRule}
-import org.narrativeandplay.hypedyn.story.rules.{BooleanOperator, ActionDefinition, ConditionDefinition}
+import org.narrativeandplay.hypedyn.api.story.rules.{BooleanOperator, ActionDefinition, ConditionDefinition}
 import org.narrativeandplay.hypedyn.utils.ExpandableEmptySpace
-import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
+import org.narrativeandplay.hypedyn.api.utils.Scala2JavaFunctionConversions._
 
 /**
  * Cell in a rule list to manipulate rules

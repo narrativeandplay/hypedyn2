@@ -1,5 +1,6 @@
 package org.narrativeandplay.hypedyn.undo
 
+import org.narrativeandplay.hypedyn.api.undo.Undoable
 import org.narrativeandplay.hypedyn.events.UndoEventDispatcher
 import org.narrativeandplay.hypedyn.story.internal.Story
 

@@ -6,13 +6,12 @@ import javafx.stage.Window
 import org.fxmisc.easybind.EasyBind
 
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
-
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.{ListCell, ListView, Tooltip}
 
-import org.narrativeandplay.hypedyn.story.rules.Fact
-import org.narrativeandplay.hypedyn.utils.System
+import org.narrativeandplay.hypedyn.api.story.rules.Fact
+import org.narrativeandplay.hypedyn.api.utils.System
 
 /**
  * List view for facts

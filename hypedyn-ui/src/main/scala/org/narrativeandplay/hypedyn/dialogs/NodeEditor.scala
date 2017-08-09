@@ -27,18 +27,20 @@ import org.fxmisc.easybind.EasyBind
 import org.fxmisc.richtext.model.{Codec, StyleSpan, StyledText}
 import org.fxmisc.richtext.StyledTextArea
 
+import org.narrativeandplay.hypedyn.api.story.{Narrative, Nodal, NodeId}
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor.{LinkStyleInfo, NodeContentTextArea}
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
-import org.narrativeandplay.hypedyn.story.NodalContent.{RulesetId, RulesetIndexes, TextIndex}
+import org.narrativeandplay.hypedyn.api.story.NodalContent.{RulesetId, RulesetIndexes, TextIndex}
 import org.narrativeandplay.hypedyn.story.UiNodeContent.UiRuleset
 import org.narrativeandplay.hypedyn.story._
-import org.narrativeandplay.hypedyn.story.rules.ActionLocationType.{NodeAction, NodeContentAction}
+import org.narrativeandplay.hypedyn.api.story.rules.ActionLocationType.{NodeAction, NodeContentAction}
+import org.narrativeandplay.hypedyn.api.story.rules.{ActionDefinition, ConditionDefinition, RuleId}
 import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.uicomponents.RulesPane
 import org.narrativeandplay.hypedyn.uicomponents.Sidebar.SidebarButton
 import org.narrativeandplay.hypedyn.utils.{CollapsibleSplitPane, ExpandableEmptySpace}
-import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
+import org.narrativeandplay.hypedyn.api.utils.Scala2JavaFunctionConversions._
 
 /**
  * Dialog for editing nodes
@@ -460,7 +462,7 @@ class NodeEditor private (dialogTitle: String,
    * corresponding text (i.e., when text containing a text rule has been deleted).
    */
   def updateNodeContentRulesetsIndexes(): Unit = {
-    import NodalContent._
+    import org.narrativeandplay.hypedyn.api.story.NodalContent._
     val spans = nodeContentText.styleSpans.scanLeft((0, 0, Option.empty[UiRuleset])) {
       case ((_, end, rulesetOption), styleSpan) =>
         (end, end + styleSpan.getLength, styleSpan.getStyle.ruleset)

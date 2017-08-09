@@ -3,7 +3,7 @@ package org.narrativeandplay.hypedyn.plugins.storyviewer
 import scalafx.scene.control.Control
 
 import org.narrativeandplay.hypedyn.plugins.PluginsController
-import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
+import org.narrativeandplay.hypedyn.api.plugins.narrativeviewer.NarrativeViewer
 
 /**
  * Controller for story viewer plugins

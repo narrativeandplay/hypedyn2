@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.story.rules.internal
 
-import org.narrativeandplay.hypedyn.story.rules.{RuleLike, Actionable}
+import org.narrativeandplay.hypedyn.api.story.rules.{RuleLike, Actionable}
 
 /**
  * Class for representing an action instance

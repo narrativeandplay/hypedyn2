@@ -4,6 +4,7 @@ import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, ObjectProperty, StringProperty}
 import scalafx.collections.ObservableBuffer
 
+import org.narrativeandplay.hypedyn.api.story.rules.{BooleanOperator, RuleId, RuleLike}
 import org.narrativeandplay.hypedyn.story.rules._
 
 /**

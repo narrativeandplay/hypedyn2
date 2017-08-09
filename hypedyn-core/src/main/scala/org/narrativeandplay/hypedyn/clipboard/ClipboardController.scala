@@ -1,5 +1,7 @@
 package org.narrativeandplay.hypedyn.clipboard
 
+import org.narrativeandplay.hypedyn.api.clipboard.Copyable
+
 /**
  * Controller for clipboard actions
  *

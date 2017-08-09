@@ -14,8 +14,9 @@ import org.fxmisc.easybind.EasyBind
 import org.narrativeandplay.hypedyn.Main
 import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 import org.narrativeandplay.hypedyn.keycombinations.KeyCombinations
-import org.narrativeandplay.hypedyn.logging.Logger
-import org.narrativeandplay.hypedyn.utils.{HypedynPreferences, System}
+import org.narrativeandplay.hypedyn.api.logging.Logger
+import org.narrativeandplay.hypedyn.utils.HypedynPreferences
+import org.narrativeandplay.hypedyn.api.utils.System
 
 /**
  * Menu bar for the application

@@ -1,7 +1,7 @@
 package org.narrativeandplay.hypedyn.story.internal
 
 import org.narrativeandplay.hypedyn.story.rules.internal.Rule
-import org.narrativeandplay.hypedyn.story.{NodeId, Nodal}
+import org.narrativeandplay.hypedyn.api.story.{NodeId, Nodal}
 
 /**
  * Class representing a node of a story

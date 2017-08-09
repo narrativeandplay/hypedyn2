@@ -1,12 +1,12 @@
 package org.narrativeandplay.hypedyn
 
-import scalafx.scene.input.{ClipboardContent, Clipboard, DataFormat}
+import scalafx.scene.input.{Clipboard, ClipboardContent, DataFormat}
 
+import org.narrativeandplay.hypedyn.api.clipboard.Copyable
+import org.narrativeandplay.hypedyn.api.story.rules.RuleId
+import org.narrativeandplay.hypedyn.api.story.{Nodal, NodalContent, NodeId}
 import org.narrativeandplay.hypedyn.events.ClipboardEventDispatcher
-import org.narrativeandplay.hypedyn.story.rules.RuleId
-import org.narrativeandplay.hypedyn.story.rules.internal.Rule
-import org.narrativeandplay.hypedyn.story.{NodalContent, Nodal, NodeId}
-import org.narrativeandplay.hypedyn.story.internal.{NodeContent, Node}
+import org.narrativeandplay.hypedyn.story.internal.{Node, NodeContent}
 import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions._
 
 package object clipboard {

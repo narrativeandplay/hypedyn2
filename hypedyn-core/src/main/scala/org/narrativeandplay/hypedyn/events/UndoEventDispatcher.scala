@@ -2,9 +2,10 @@ package org.narrativeandplay.hypedyn.events
 
 import scalafx.Includes._
 
-import org.narrativeandplay.hypedyn.story.Narrative
+import org.narrativeandplay.hypedyn.api.events._
+import org.narrativeandplay.hypedyn.api.story.Narrative
+import org.narrativeandplay.hypedyn.api.story.rules.Fact
 import org.narrativeandplay.hypedyn.story.internal.Node
-import org.narrativeandplay.hypedyn.story.rules.Fact
 import org.narrativeandplay.hypedyn.undo._
 
 /**

@@ -11,10 +11,10 @@ import scalafx.scene.text.Text
 import com.github.benedictleejh.scala.math.vector.Vector2
 import org.fxmisc.easybind.EasyBind
 
-import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
+import org.narrativeandplay.hypedyn.api.utils.Scala2JavaFunctionConversions._
 import org.narrativeandplay.hypedyn.storyviewer.utils.{CubicPolynomial, Line, BezierCurve}
 import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions.StoryViewerRule
-import org.narrativeandplay.hypedyn.story.rules.RuleLike
+import org.narrativeandplay.hypedyn.api.story.rules.RuleLike
 import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils._
 import org.narrativeandplay.hypedyn.storyviewer.utils.VectorImplicitConversions._
 

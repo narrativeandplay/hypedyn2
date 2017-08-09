@@ -1,5 +1,6 @@
 package org.narrativeandplay.hypedyn.serialisation
 
+import org.narrativeandplay.hypedyn.api.serialisation.{AstElement, Serialisable}
 import serialisers._
 
 object Serialiser {

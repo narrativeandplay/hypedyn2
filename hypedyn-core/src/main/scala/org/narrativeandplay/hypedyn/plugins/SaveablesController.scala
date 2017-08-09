@@ -1,5 +1,7 @@
 package org.narrativeandplay.hypedyn.plugins
 
+import org.narrativeandplay.hypedyn.api.plugins.Saveable
+
 /**
  * Controller for plugins implementing the Saveable interface
  */

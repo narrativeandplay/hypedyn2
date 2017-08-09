@@ -1,7 +1,8 @@
 package org.narrativeandplay.hypedyn.undo
 
+import org.narrativeandplay.hypedyn.api.story.rules.Fact
+import org.narrativeandplay.hypedyn.api.undo.Undoable
 import org.narrativeandplay.hypedyn.events.UndoEventDispatcher
-import org.narrativeandplay.hypedyn.story.rules.Fact
 
 sealed abstract class FactChange(changedFact: Fact, f: Fact => Unit) extends Undoable {
   /**

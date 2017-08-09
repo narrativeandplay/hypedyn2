@@ -5,15 +5,16 @@ import java.io.File
 import scala.collection.mutable.ArrayBuffer
 
 import scalafx.Includes._
-import scalafx.beans.property.{ObjectProperty, BooleanProperty}
-import scalafx.scene.control.{ButtonType, Alert}
+import scalafx.beans.property.{BooleanProperty, ObjectProperty}
+import scalafx.scene.control.{Alert, ButtonType}
 
 import rx.lang.scala.Observable
 
-import org.narrativeandplay.hypedyn.story.rules.Fact
+import org.narrativeandplay.hypedyn.api.story.rules.Fact
 import org.narrativeandplay.hypedyn.Main
+import org.narrativeandplay.hypedyn.api.events._
 import org.narrativeandplay.hypedyn.dialogs.NodeEditor
-import org.narrativeandplay.hypedyn.story.{Nodal, NodeId}
+import org.narrativeandplay.hypedyn.api.story.{Nodal, NodeId}
 import org.narrativeandplay.hypedyn.uicomponents.FactViewer
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.utils.HypedynPreferences

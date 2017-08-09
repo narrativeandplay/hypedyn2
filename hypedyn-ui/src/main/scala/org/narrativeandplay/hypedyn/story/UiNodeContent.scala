@@ -4,8 +4,9 @@ import scalafx.Includes._
 import scalafx.beans.property.{ObjectProperty, StringProperty}
 import scalafx.collections.{ObservableBuffer, ObservableMap}
 
-import org.narrativeandplay.hypedyn.story.NodalContent.{RulesetLike, RulesetIndexes}
-import org.narrativeandplay.hypedyn.story.rules.RuleLike
+import org.narrativeandplay.hypedyn.api.story.NodalContent
+import org.narrativeandplay.hypedyn.api.story.NodalContent.{RulesetIndexes, RulesetLike}
+import org.narrativeandplay.hypedyn.api.story.rules.RuleLike
 
 /**
  * UI implementation of NodalContent

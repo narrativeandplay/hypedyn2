@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.story.rules.internal
 
-import org.narrativeandplay.hypedyn.story.rules.{RuleLike, Conditional}
+import org.narrativeandplay.hypedyn.api.story.rules.{RuleLike, Conditional}
 
 /**
  * Class representing a condition instance

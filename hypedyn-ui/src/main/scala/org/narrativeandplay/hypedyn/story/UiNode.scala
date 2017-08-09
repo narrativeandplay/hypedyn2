@@ -4,6 +4,8 @@ import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, ObjectProperty, StringProperty}
 import scalafx.collections.ObservableBuffer
 
+import org.narrativeandplay.hypedyn.api.story.{Nodal, NodeId}
+
 /**
  * UI implementation for Nodal
  * @param id The ID of the node

@@ -2,11 +2,12 @@ package org.narrativeandplay.hypedyn.story
 
 import scala.language.implicitConversions
 
-import org.narrativeandplay.hypedyn.story.Narrative.Metadata
-import org.narrativeandplay.hypedyn.story.NodalContent.RulesetLike
+import org.narrativeandplay.hypedyn.api.story.Narrative.Metadata
+import org.narrativeandplay.hypedyn.api.story.{Narrative, Nodal, NodalContent}
+import org.narrativeandplay.hypedyn.api.story.NodalContent.RulesetLike
 import org.narrativeandplay.hypedyn.story.UiNodeContent.UiRuleset
 import org.narrativeandplay.hypedyn.story.UiStory.UiStoryMetadata
-import org.narrativeandplay.hypedyn.story.rules.{RuleLike, Conditional, Actionable}
+import org.narrativeandplay.hypedyn.api.story.rules.{Actionable, Conditional, RuleLike}
 
 /**
  * Implicit conversions for interfaces to UI classes, to simplify conversions

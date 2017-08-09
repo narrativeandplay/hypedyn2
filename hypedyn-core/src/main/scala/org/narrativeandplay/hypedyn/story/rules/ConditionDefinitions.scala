@@ -1,12 +1,13 @@
 package org.narrativeandplay.hypedyn.story.rules
 
-import org.narrativeandplay.hypedyn.story.rules.ParameterValues._
+import org.narrativeandplay.hypedyn.api.story.rules.{ConditionDefinition, RuleParameter}
+import org.narrativeandplay.hypedyn.api.story.rules.ParameterValues._
 
 /**
  * Object holding condition definitions
  */
 object ConditionDefinitions {
-  import Conditional.ConditionType
+  import org.narrativeandplay.hypedyn.api.story.rules.Conditional.ConditionType
 
   def apply() = definitions
 

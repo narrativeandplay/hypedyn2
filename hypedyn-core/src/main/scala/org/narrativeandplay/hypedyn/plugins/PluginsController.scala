@@ -7,6 +7,8 @@ import scala.collection.mutable
 
 import org.clapper.classutil.ClassFinder
 
+import org.narrativeandplay.hypedyn.api.plugins.Plugin
+
 /**
  * Controller that handles plugin instantiation
  */

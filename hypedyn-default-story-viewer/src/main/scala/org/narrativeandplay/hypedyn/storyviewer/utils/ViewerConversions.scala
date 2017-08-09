@@ -1,8 +1,8 @@
 package org.narrativeandplay.hypedyn.storyviewer.utils
 
-import org.narrativeandplay.hypedyn.story.Nodal
-import org.narrativeandplay.hypedyn.story.rules.Actionable.ActionType
-import org.narrativeandplay.hypedyn.story.rules.RuleLike
+import org.narrativeandplay.hypedyn.api.story.Nodal
+import org.narrativeandplay.hypedyn.api.story.rules.Actionable.ActionType
+import org.narrativeandplay.hypedyn.api.story.rules.RuleLike
 
 /**
  * Implicit classes to extend interfaces with additional helper methods

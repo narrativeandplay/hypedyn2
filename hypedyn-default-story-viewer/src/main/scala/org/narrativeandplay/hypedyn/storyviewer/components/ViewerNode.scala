@@ -11,17 +11,19 @@ import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyDoublePr
 import scalafx.event.Event
 import scalafx.geometry.Bounds
 import scalafx.scene.input.MouseEvent
+
 import com.github.benedictleejh.scala.math.vector.Vector2
 import org.fxmisc.easybind.EasyBind
+
 import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils
-import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
-import org.narrativeandplay.hypedyn.story.Nodal
+import org.narrativeandplay.hypedyn.api.utils.Scala2JavaFunctionConversions._
 import org.narrativeandplay.hypedyn.storyviewer.StoryViewer
 import org.narrativeandplay.hypedyn.storyviewer.utils.VectorImplicitConversions._
 import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
 import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils._
-
 import scalafx.scene.paint.Color
+
+import org.narrativeandplay.hypedyn.api.story.Nodal
 
 /**
  * Visual representation of a node. More accurately, the model (MVC model) for the visual representation of a node

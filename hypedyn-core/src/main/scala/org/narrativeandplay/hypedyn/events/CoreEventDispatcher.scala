@@ -3,16 +3,20 @@ package org.narrativeandplay.hypedyn.events
 import java.io.File
 import java.nio.file.Files
 
-import org.narrativeandplay.hypedyn.logging.Logger
+import scala.util.control.NonFatal
+
+import org.narrativeandplay.hypedyn.api.events._
+import org.narrativeandplay.hypedyn.api.logging.Logger
+import org.narrativeandplay.hypedyn.api.serialisation.{AstElement, AstMap}
+import org.narrativeandplay.hypedyn.api.story.rules.Fact
+import org.narrativeandplay.hypedyn.api.undo.UndoableStream
 import org.narrativeandplay.hypedyn.plugins.PluginsController
 import org.narrativeandplay.hypedyn.serialisation.serialisers._
-import org.narrativeandplay.hypedyn.serialisation.{AstElement, AstMap, IoController, Serialiser}
+import org.narrativeandplay.hypedyn.serialisation.{IoController, Serialiser}
 import org.narrativeandplay.hypedyn.story.StoryController
 import org.narrativeandplay.hypedyn.story.internal.Story
-import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, ConditionDefinitions, Fact}
+import org.narrativeandplay.hypedyn.story.rules.{ActionDefinitions, ConditionDefinitions}
 import org.narrativeandplay.hypedyn.undo._
-
-import scala.util.control.NonFatal
 
 /**
  * Main event dispatcher for the core

@@ -3,7 +3,7 @@ package org.narrativeandplay.hypedyn.uicomponents
 import java.util.function.{Function => JFunction}
 import javafx.beans.property
 import javafx.collections.ObservableList
-import javafx.scene.control.{SpinnerValueFactory => JfxSpinnerValueFactory, ListCell => JfxListCell}
+import javafx.scene.control.{ListCell => JfxListCell, SpinnerValueFactory => JfxSpinnerValueFactory}
 
 import scala.util.Try
 
@@ -12,18 +12,19 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.collections.{ObservableBuffer, ObservableMap}
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control._
-import scalafx.scene.layout.{Priority, StackPane, Region, HBox}
+import scalafx.scene.layout.{HBox, Priority, Region, StackPane}
 import scalafx.util.StringConverter
 import scalafx.util.StringConverter.sfxStringConverter2jfx
 import scalafx.scene.Parent.sfxParent2jfx
 
 import org.fxmisc.easybind.EasyBind
 
-import org.narrativeandplay.hypedyn.story.rules.ParameterValues._
+import org.narrativeandplay.hypedyn.api.story.rules.ParameterValues._
 import org.narrativeandplay.hypedyn.story.rules._
-import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamName, ParamValue}
+import org.narrativeandplay.hypedyn.api.story.rules.RuleLike.{ParamName, ParamValue}
+import org.narrativeandplay.hypedyn.api.story.rules._
 import org.narrativeandplay.hypedyn.story._
-import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
+import org.narrativeandplay.hypedyn.api.utils.Scala2JavaFunctionConversions._
 
 
 object RuleCellComponents {

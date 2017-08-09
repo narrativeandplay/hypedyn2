@@ -5,7 +5,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives.{extractUnmatchedPath, get, getFromFile}
 import akka.stream.ActorMaterializer
 
-import org.narrativeandplay.hypedyn.logging.Logger
+import org.narrativeandplay.hypedyn.api.logging.Logger
 
 object Server {
   private var _storyPath = ""

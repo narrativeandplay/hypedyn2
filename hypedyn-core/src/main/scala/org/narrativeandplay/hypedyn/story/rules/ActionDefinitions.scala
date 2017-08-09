@@ -1,13 +1,14 @@
 package org.narrativeandplay.hypedyn.story.rules
 
-import org.narrativeandplay.hypedyn.story.rules.ParameterValues._
+import org.narrativeandplay.hypedyn.api.story.rules.{ActionDefinition, RuleParameter}
+import org.narrativeandplay.hypedyn.api.story.rules.ParameterValues._
 
 /**
  * Object holding action definitions
  */
 object ActionDefinitions {
-  import Actionable.ActionType
-  import ActionLocationType.{NodeContentAction, NodeAction, StoryAction}
+  import org.narrativeandplay.hypedyn.api.story.rules.Actionable.ActionType
+  import org.narrativeandplay.hypedyn.api.story.rules.ActionLocationType.{NodeContentAction, NodeAction, StoryAction}
 
   private val definitions = List(
     ActionDefinition(ActionType("LinkTo"), "Follow link to", List(NodeContentAction),

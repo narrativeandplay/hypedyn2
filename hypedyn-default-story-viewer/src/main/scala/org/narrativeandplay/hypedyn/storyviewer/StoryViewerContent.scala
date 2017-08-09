@@ -2,23 +2,22 @@ package org.narrativeandplay.hypedyn.storyviewer
 
 import javafx.{event => jfxe}
 import javafx.event.EventHandler
-import javafx.scene.control.{Control => JfxControl, Skin}
+import javafx.scene.control.{Skin, Control => JfxControl}
 import javafx.scene.{input => jfxsi}
-
-import org.narrativeandplay.hypedyn.story.rules.RuleLike
 
 import scala.collection.mutable.ArrayBuffer
 
 import scalafx.Includes._
 import scalafx.event.Event
 import scalafx.geometry.Point2D
-import scalafx.scene.input.{ScrollEvent, MouseEvent}
+import scalafx.scene.input.{MouseEvent, ScrollEvent}
 
+import org.narrativeandplay.hypedyn.api.story.rules.Actionable.ActionType
+import org.narrativeandplay.hypedyn.api.story.rules.RuleLike
+import org.narrativeandplay.hypedyn.api.story.rules.RuleLike.{ParamName, ParamValue}
+import org.narrativeandplay.hypedyn.api.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.storyviewer.utils.UnorderedPair
-import org.narrativeandplay.hypedyn.story.rules.RuleLike.{ParamValue, ParamName}
-import org.narrativeandplay.hypedyn.story.rules.Actionable.ActionType
-import org.narrativeandplay.hypedyn.story.{Narrative, Nodal}
-import org.narrativeandplay.hypedyn.storyviewer.components.{ViewerNode, LinkGroup}
+import org.narrativeandplay.hypedyn.storyviewer.components.{LinkGroup, ViewerNode}
 import org.narrativeandplay.hypedyn.storyviewer.utils.ViewerConversions._
 
 /**

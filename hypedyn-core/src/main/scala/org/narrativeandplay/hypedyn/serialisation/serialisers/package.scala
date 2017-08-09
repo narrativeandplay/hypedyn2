@@ -1,17 +1,18 @@
 package org.narrativeandplay.hypedyn.serialisation
 
-import org.narrativeandplay.hypedyn.story.Narrative.ReaderStyle
-import org.narrativeandplay.hypedyn.story.NodalContent.RulesetId
 import org.narrativeandplay.hypedyn.story.internal.NodeContent.Ruleset
 import org.narrativeandplay.hypedyn.story.internal.Story.Metadata
 import org.narrativeandplay.hypedyn.story.internal.{Node, NodeContent, Story}
-import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.{And, Or}
-import org.narrativeandplay.hypedyn.story.rules.RuleLike.ParamValue
-import org.narrativeandplay.hypedyn.story.rules._
 import org.narrativeandplay.hypedyn.story.rules.internal.{Action, Condition, Rule}
-import org.narrativeandplay.hypedyn.story.{Narrative, NodalContent, NodeId}
-
 import scala.reflect.ClassTag
+
+import org.narrativeandplay.hypedyn.api.serialisation._
+import org.narrativeandplay.hypedyn.api.story.Narrative.ReaderStyle
+import org.narrativeandplay.hypedyn.api.story.NodalContent.RulesetId
+import org.narrativeandplay.hypedyn.api.story.NodeId
+import org.narrativeandplay.hypedyn.api.story.rules.BooleanOperator.{And, Or}
+import org.narrativeandplay.hypedyn.api.story.rules._
+import org.narrativeandplay.hypedyn.api.story.rules.RuleLike.ParamValue
 
 package object serialisers {
 
@@ -182,7 +183,7 @@ package object serialisers {
       def safeCastRuleset[T <: AstElement](astElement: AstElement)(implicit ev: ClassTag[T]) =
         safeCast[T](astElement, "ruleset")
 
-      import NodalContent._
+      import org.narrativeandplay.hypedyn.api.story.NodalContent._
       val data = safeCastRuleset[AstMap](serialised)
       val id = RulesetId(safeCastRuleset[AstInteger](data("id")).i)
       val name = safeCastRuleset[AstString](data("name")).s
@@ -240,7 +241,7 @@ package object serialisers {
   }
 
   private def paramValueToAstMap(paramValue: ParamValue): AstMap =  {
-    import ParamValue._
+    import org.narrativeandplay.hypedyn.api.story.rules.RuleLike.ParamValue._
     paramValue match {
       case ParamValue.Node(n) => AstMap("type" -> AstString("node"),
                                         "value" -> AstInteger(n.value))
@@ -472,7 +473,7 @@ package object serialisers {
    * Typeclass instance for serialising the reader style information
    */
   implicit object ReaderStyleSerialiser extends Serialisable[ReaderStyle] {
-    import Narrative.ReaderStyle._
+    import org.narrativeandplay.hypedyn.api.story.Narrative.ReaderStyle._
 
     /**
      * Returns the serialised representation of an object

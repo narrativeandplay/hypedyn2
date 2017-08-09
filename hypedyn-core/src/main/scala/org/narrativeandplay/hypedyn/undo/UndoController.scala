@@ -7,7 +7,8 @@ import scalafx.beans.property.ObjectProperty
 import org.fxmisc.easybind.EasyBind
 import org.fxmisc.undo.UndoManagerFactory
 
-import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
+import org.narrativeandplay.hypedyn.api.undo.{Undoable, UndoableStream}
+import org.narrativeandplay.hypedyn.api.utils.Scala2JavaFunctionConversions._
 
 /**
  * Controller handling undo events

@@ -3,7 +3,7 @@ package org.narrativeandplay.hypedyn.storyviewer.components
 import scala.collection.mutable.ArrayBuffer
 
 import org.narrativeandplay.hypedyn.storyviewer.utils.UnorderedPair
-import org.narrativeandplay.hypedyn.story.rules.RuleLike
+import org.narrativeandplay.hypedyn.api.story.rules.RuleLike
 
 /**
  * Class representing a set of links between 2 nodes

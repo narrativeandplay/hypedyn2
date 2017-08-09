@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.story.rules.internal
 
-import org.narrativeandplay.hypedyn.story.rules.{BooleanOperator, RuleId, RuleLike}
+import org.narrativeandplay.hypedyn.api.story.rules.{BooleanOperator, RuleId, RuleLike}
 
 /**
  * Class representing a rule

@@ -9,14 +9,15 @@ import scalafx.scene.control.{Control, ScrollPane}
 
 import com.github.benedictleejh.scala.math.vector.Vector2
 
-import org.narrativeandplay.hypedyn.events._
-import org.narrativeandplay.hypedyn.plugins.{Plugin, Saveable}
-import org.narrativeandplay.hypedyn.plugins.narrativeviewer.NarrativeViewer
-import org.narrativeandplay.hypedyn.serialisation._
-import org.narrativeandplay.hypedyn.story.{Narrative, Nodal, NodeId}
+import org.narrativeandplay.hypedyn.api.events._
+import org.narrativeandplay.hypedyn.api.plugins.{Plugin, Saveable}
+import org.narrativeandplay.hypedyn.api.plugins.narrativeviewer.NarrativeViewer
+import org.narrativeandplay.hypedyn.api.serialisation._
+import org.narrativeandplay.hypedyn.api.story.{Narrative, Nodal, NodeId}
+import org.narrativeandplay.hypedyn.api.undo.UndoableStream
 import org.narrativeandplay.hypedyn.storyviewer.components.ViewerNode
 import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils
-import org.narrativeandplay.hypedyn.undo.{NodeMovedChange, UndoableStream}
+import org.narrativeandplay.hypedyn.undo.NodeMovedChange
 
 /**
  * StoryViewer implementation class

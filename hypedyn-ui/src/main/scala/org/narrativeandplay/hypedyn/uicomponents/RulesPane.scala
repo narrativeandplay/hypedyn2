@@ -9,8 +9,8 @@ import scalafx.scene.control.TreeItem.sfxTreeItemToJfx
 import scalafx.scene.control._
 import scalafx.scene.layout.{Priority, VBox}
 
-import org.narrativeandplay.hypedyn.story.rules.BooleanOperator.Or
-import org.narrativeandplay.hypedyn.story.rules.{ActionDefinition, ConditionDefinition, RuleId}
+import org.narrativeandplay.hypedyn.api.story.rules.BooleanOperator.Or
+import org.narrativeandplay.hypedyn.api.story.rules.{ActionDefinition, ConditionDefinition, RuleId}
 import org.narrativeandplay.hypedyn.story.{UiRule, UiStory}
 
 /**

@@ -2,6 +2,8 @@ package org.narrativeandplay.hypedyn.serialisation.serialisers
 
 import org.json4s._
 import org.json4s.native.JsonMethods._
+
+import org.narrativeandplay.hypedyn.api.serialisation._
 import org.narrativeandplay.hypedyn.serialisation._
 
 /**

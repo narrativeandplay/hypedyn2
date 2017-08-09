@@ -15,10 +15,10 @@ import org.fxmisc.easybind.EasyBind
 import org.tbee.javafx.scene.layout.MigPane
 
 import org.narrativeandplay.hypedyn.dialogs.StoryPropertiesDialog.FileSelectorWithTextField
-import org.narrativeandplay.hypedyn.story.Narrative
+import org.narrativeandplay.hypedyn.api.story.Narrative
 import org.narrativeandplay.hypedyn.story.UiStory.UiStoryMetadata
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
-import org.narrativeandplay.hypedyn.utils.Scala2JavaFunctionConversions._
+import org.narrativeandplay.hypedyn.api.utils.Scala2JavaFunctionConversions._
 
 /**
  * Dialog for editing story properties

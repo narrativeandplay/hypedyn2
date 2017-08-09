@@ -2,7 +2,8 @@ package org.narrativeandplay.hypedyn.undo
 
 import com.github.benedictleejh.scala.math.vector.Vector2
 
-import org.narrativeandplay.hypedyn.story.NodeId
+import org.narrativeandplay.hypedyn.api.story.NodeId
+import org.narrativeandplay.hypedyn.api.undo.Undoable
 import org.narrativeandplay.hypedyn.storyviewer.StoryViewer
 
 /**
