@@ -1,4 +1,4 @@
-package org.narrativeandplay.hypedyn.ui.uicomponents
+package org.narrativeandplay.hypedyn.ui.components
 
 import java.lang
 import javafx.beans.binding.BooleanExpression

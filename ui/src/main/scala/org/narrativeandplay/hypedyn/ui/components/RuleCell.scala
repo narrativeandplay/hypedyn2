@@ -1,8 +1,8 @@
-package org.narrativeandplay.hypedyn.ui.uicomponents
+package org.narrativeandplay.hypedyn.ui.components
 
 import javafx.scene.control.{ListCell => JfxListCell}
 
-import org.narrativeandplay.hypedyn.ui.uicomponents.RuleCellComponents.ConditionCell
+import org.narrativeandplay.hypedyn.ui.components.RuleCellComponents.ConditionCell
 
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty

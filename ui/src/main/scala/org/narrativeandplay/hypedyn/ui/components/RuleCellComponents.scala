@@ -1,4 +1,4 @@
-package org.narrativeandplay.hypedyn.ui.uicomponents
+package org.narrativeandplay.hypedyn.ui.components
 
 import java.util.function.{Function => JFunction}
 import javafx.beans.property

@@ -36,8 +36,8 @@ import org.narrativeandplay.hypedyn.ui.story._
 import org.narrativeandplay.hypedyn.api.story.rules.ActionLocationType.{NodeAction, NodeContentAction}
 import org.narrativeandplay.hypedyn.api.story.rules.{ActionDefinition, ConditionDefinition, RuleId}
 import org.narrativeandplay.hypedyn.ui.story.InterfaceToUiImplementation._
-import org.narrativeandplay.hypedyn.ui.uicomponents.RulesPane
-import org.narrativeandplay.hypedyn.ui.uicomponents.Sidebar.SidebarButton
+import org.narrativeandplay.hypedyn.ui.components.RulesPane
+import org.narrativeandplay.hypedyn.ui.components.Sidebar.SidebarButton
 import org.narrativeandplay.hypedyn.ui.utils.CollapsibleSplitPane
 import org.narrativeandplay.hypedyn.api.utils.Scala2JavaFunctionConversions._
 

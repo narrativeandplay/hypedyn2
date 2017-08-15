@@ -13,7 +13,7 @@ import org.narrativeandplay.hypedyn.ui.Main
 import org.narrativeandplay.hypedyn.api.events._
 import org.narrativeandplay.hypedyn.ui.dialogs.NodeEditor
 import org.narrativeandplay.hypedyn.api.story.{Nodal, NodeId}
-import org.narrativeandplay.hypedyn.ui.uicomponents.FactViewer
+import org.narrativeandplay.hypedyn.ui.components.FactViewer
 import org.narrativeandplay.hypedyn.ui.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.ui.utils.HypedynPreferences
 

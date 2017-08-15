@@ -26,7 +26,7 @@ import org.narrativeandplay.hypedyn.ui.dialogs._
 import org.narrativeandplay.hypedyn.core.events._
 import org.narrativeandplay.hypedyn.core.plugins.PluginsController
 import org.narrativeandplay.hypedyn.ui.server.Server
-import org.narrativeandplay.hypedyn.ui.uicomponents._
+import org.narrativeandplay.hypedyn.ui.components._
 import org.narrativeandplay.hypedyn.core.undo.UndoController
 import org.narrativeandplay.hypedyn.ui.events.UiEventDispatcher
 
