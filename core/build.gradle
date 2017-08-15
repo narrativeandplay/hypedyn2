@@ -1,0 +1,21 @@
+dependencies {
+    // For runtime plugin finding
+    compile "org.clapper:classutil_${rootProject.majorScalaVersion}:1.0.6"
+
+    // For serialisation to JSON (save/load/export)
+    compile "org.json4s:json4s-native_${rootProject.majorScalaVersion}:3.3.0"
+
+    compile "commons-io:commons-io:2.4"
+
+    compile "org.fxmisc.easybind:easybind:1.0.3"
+
+    compile project(':api')
+}
+
+sourceSets {
+    main {
+        resources {
+            exclude 'org/narrativeandplay/hypedyn/serialisation/export/dev' // exclude development resources
+        }
+    }
+}

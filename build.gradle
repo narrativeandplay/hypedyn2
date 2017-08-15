@@ -6,12 +6,12 @@ plugins {
 apply from: 'javafx.plugin'
 
 dependencies {
-    compile project(':hypedyn-ui')
+    compile project(':ui')
 }
 
 javafx {
     appName 'HypeDyn 2'
-    mainClass 'org.narrativeandplay.hypedyn.Main'
+    mainClass 'org.narrativeandplay.hypedyn.ui.Main'
 }
 
 version = "1.0"
@@ -56,4 +56,8 @@ allprojects {
             ]
         }
     }
+}
+
+subprojects {
+    archivesBaseName = "hypedyn-${project.name}"
 }
