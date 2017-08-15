@@ -35,7 +35,7 @@ import org.narrativeandplay.hypedyn.story.UiNodeContent.UiRuleset
 import org.narrativeandplay.hypedyn.story._
 import org.narrativeandplay.hypedyn.api.story.rules.ActionLocationType.{NodeAction, NodeContentAction}
 import org.narrativeandplay.hypedyn.api.story.rules.{ActionDefinition, ConditionDefinition, RuleId}
-import org.narrativeandplay.hypedyn.story.rules._
+import org.narrativeandplay.hypedyn.core.story.rules._
 import org.narrativeandplay.hypedyn.story.InterfaceToUiImplementation._
 import org.narrativeandplay.hypedyn.uicomponents.RulesPane
 import org.narrativeandplay.hypedyn.uicomponents.Sidebar.SidebarButton
@@ -272,9 +272,9 @@ class NodeEditor private (dialogTitle: String,
       override def getName: String = "link-style-info"
 
       override def encode(os: DataOutputStream, t: LinkStyleInfo): Unit = {
-        import org.narrativeandplay.hypedyn.serialisation.serialisers.RulesetSerialiser
-        import org.narrativeandplay.hypedyn.story.InterfaceToImplementationConversions.rulesetLike2Ruleset
-        import org.narrativeandplay.hypedyn.serialisation.serialisers.JsonSerialiser
+        import org.narrativeandplay.hypedyn.core.serialisation.serialisers.RulesetSerialiser
+        import org.narrativeandplay.hypedyn.core.story.InterfaceToImplementationConversions.rulesetLike2Ruleset
+        import org.narrativeandplay.hypedyn.core.serialisation.serialisers.JsonSerialiser
 
         t.ruleset match {
           case Some(r) =>
@@ -286,8 +286,8 @@ class NodeEditor private (dialogTitle: String,
       }
 
       override def decode(is: DataInputStream): LinkStyleInfo = {
-        import org.narrativeandplay.hypedyn.serialisation.serialisers.RulesetSerialiser
-        import org.narrativeandplay.hypedyn.serialisation.serialisers.JsonSerialiser
+        import org.narrativeandplay.hypedyn.core.serialisation.serialisers.RulesetSerialiser
+        import org.narrativeandplay.hypedyn.core.serialisation.serialisers.JsonSerialiser
 
         is.readBoolean() match {
           case true =>

@@ -23,11 +23,12 @@ import org.narrativeandplay.hypedyn.api.logging.Logger
 import org.narrativeandplay.hypedyn.api.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.api.story.rules.{ActionDefinition, ConditionDefinition, Fact}
 import org.narrativeandplay.hypedyn.dialogs._
-import org.narrativeandplay.hypedyn.events._
-import org.narrativeandplay.hypedyn.plugins.PluginsController
+import org.narrativeandplay.hypedyn.core.events._
+import org.narrativeandplay.hypedyn.core.plugins.PluginsController
 import org.narrativeandplay.hypedyn.server.Server
 import org.narrativeandplay.hypedyn.uicomponents._
-import org.narrativeandplay.hypedyn.undo.UndoController
+import org.narrativeandplay.hypedyn.core.undo.UndoController
+import org.narrativeandplay.hypedyn.events.UiEventDispatcher
 
 /**
  * Entry point for the application

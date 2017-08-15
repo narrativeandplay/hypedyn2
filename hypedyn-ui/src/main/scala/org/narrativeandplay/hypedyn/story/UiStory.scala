@@ -8,7 +8,7 @@ import org.narrativeandplay.hypedyn.api.story.Narrative
 import org.narrativeandplay.hypedyn.api.story.rules.Fact
 import org.narrativeandplay.hypedyn.api.story.Narrative.{Metadata, ReaderStyle}
 import org.narrativeandplay.hypedyn.api.story.rules.Actionable.ActionType
-import org.narrativeandplay.hypedyn.story.rules.ActionDefinitions
+import org.narrativeandplay.hypedyn.core.story.rules.ActionDefinitions
 
 /**
  * UI implementation for Narrative
