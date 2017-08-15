@@ -1,10 +1,10 @@
 dependencies {
-    compile "org.scalafx:scalafx_${rootProject.majorScalaVersion}:8.0.102-R11"
+    compile "org.scalafx:scalafx_%%:8.0.102-R11"
     compile 'com.miglayout:miglayout-javafx:5.0'
     compile 'org.fxmisc.richtext:richtextfx:0.7-M5'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
 
-    compile 'com.typesafe.akka:akka-http-experimental_2.11:2.4.4'
+    compile 'com.typesafe.akka:akka-http_%%:10.0.5'
 
     compile project(':api')
     compile project(':core')

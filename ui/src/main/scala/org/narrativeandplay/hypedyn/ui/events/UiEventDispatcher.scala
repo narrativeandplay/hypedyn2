@@ -8,8 +8,6 @@ import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, ObjectProperty}
 import scalafx.scene.control.{Alert, ButtonType}
 
-import rx.lang.scala.Observable
-
 import org.narrativeandplay.hypedyn.api.story.rules.Fact
 import org.narrativeandplay.hypedyn.ui.Main
 import org.narrativeandplay.hypedyn.api.events._

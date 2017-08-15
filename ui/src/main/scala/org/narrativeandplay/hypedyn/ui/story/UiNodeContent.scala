@@ -2,7 +2,7 @@ package org.narrativeandplay.hypedyn.ui.story
 
 import scalafx.Includes._
 import scalafx.beans.property.{ObjectProperty, StringProperty}
-import scalafx.collections.{ObservableBuffer, ObservableMap}
+import scalafx.collections.ObservableBuffer
 
 import org.narrativeandplay.hypedyn.api.story.NodalContent
 import org.narrativeandplay.hypedyn.api.story.NodalContent.{RulesetIndexes, RulesetLike}

@@ -17,8 +17,6 @@ import org.narrativeandplay.hypedyn.api.story.rules.BooleanOperator.{Or, And}
 import org.narrativeandplay.hypedyn.api.story.rules.Conditional.ConditionType
 import org.narrativeandplay.hypedyn.ui.story.{UiAction, UiCondition, UiStory, UiRule}
 import org.narrativeandplay.hypedyn.api.story.rules.{BooleanOperator, ActionDefinition, ConditionDefinition}
-import org.narrativeandplay.hypedyn.ui.utils.ExpandableEmptySpace
-import org.narrativeandplay.hypedyn.api.utils.Scala2JavaFunctionConversions._
 
 /**
  * Cell in a rule list to manipulate rules

@@ -8,7 +8,7 @@ import scalafx.geometry.Orientation
 import scalafx.scene.control._
 import scalafx.scene.layout.HBox
 import scalafx.stage.FileChooser.ExtensionFilter
-import scalafx.stage.{FileChooser, Modality, Window}
+import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
 
 import org.fxmisc.easybind.EasyBind

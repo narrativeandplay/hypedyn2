@@ -4,7 +4,6 @@ import org.json4s._
 import org.json4s.native.JsonMethods._
 
 import org.narrativeandplay.hypedyn.api.serialisation._
-import org.narrativeandplay.hypedyn.core.serialisation._
 
 /**
  * Object that transforms AST data into JSON strings
@@ -51,6 +50,7 @@ object JsonSerialiser {
     case JNothing => AstNothing
     case JNull => AstNull
     case JArray(a) => AstList(a map jValueToAstElement: _*)
+    case JSet(vs) => AstList(vs.toList map jValueToAstElement: _*)
     case JObject(o) =>
       AstMap(o map { case (k, v) =>
         k -> jValueToAstElement(v)

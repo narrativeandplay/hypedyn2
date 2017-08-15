@@ -61,8 +61,8 @@ object IoController {
     if (!jarConnection.getJarEntry.isDirectory)
       throw new IllegalArgumentException("Resource to be copied must be a directory")
 
-    import scala.collection.JavaConversions._
-    jarFile.entries() foreach { entry =>
+    import scala.collection.JavaConverters._
+    jarFile.entries().asScala foreach { entry =>
       if (entry.getName startsWith jarConnection.getEntryName) {
         val filename = entry.getName replace (jarConnection.getEntryName, "")
 

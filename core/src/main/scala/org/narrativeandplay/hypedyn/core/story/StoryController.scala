@@ -157,7 +157,7 @@ object StoryController {
     }
 
     val toUpdateOption = findNode(node.id)
-    val updated = updatedNode.copy(content = editedNodeContent)
+    val updated = updatedNode.copy(content = editedNodeContent, rules = updatedNodeRules)
 
     toUpdateOption foreach { n =>
       currentStory = currentStory updateNode (n, updated)

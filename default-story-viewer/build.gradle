@@ -1,5 +1,5 @@
 dependencies {
-    compile "org.scalafx:scalafx_${rootProject.majorScalaVersion}:8.0.60-R9"
+    compile "org.scalafx:scalafx_%%:8.0.102-R11"
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile ':scala-math-vector:0.1.0'
 

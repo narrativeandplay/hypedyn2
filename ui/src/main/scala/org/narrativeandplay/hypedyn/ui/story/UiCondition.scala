@@ -1,7 +1,7 @@
 package org.narrativeandplay.hypedyn.ui.story
 
 import scalafx.Includes._
-import scalafx.beans.property.{ObjectProperty, StringProperty}
+import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableMap
 
 import org.narrativeandplay.hypedyn.api.story.rules.Conditional

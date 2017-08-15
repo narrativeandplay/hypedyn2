@@ -3,7 +3,6 @@ package org.narrativeandplay.hypedyn.storyviewer
 import scala.collection.mutable
 import scala.util.Try
 
-import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.scene.control.{Control, ScrollPane}
 

@@ -6,7 +6,6 @@ import javafx.beans.binding.BooleanExpression
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.beans.property.ReadOnlyBooleanProperty
-import scalafx.event.ActionEvent
 import scalafx.scene.control._
 
 import org.fxmisc.easybind.EasyBind

@@ -1,9 +1,9 @@
 dependencies {
     // For runtime plugin finding
-    compile "org.clapper:classutil_${rootProject.majorScalaVersion}:1.0.6"
+    compile "org.clapper:classutil_%%:1.1.2"
 
     // For serialisation to JSON (save/load/export)
-    compile "org.json4s:json4s-native_${rootProject.majorScalaVersion}:3.3.0"
+    compile "org.json4s:json4s-native_%%:3.5.1"
 
     compile "commons-io:commons-io:2.4"
 

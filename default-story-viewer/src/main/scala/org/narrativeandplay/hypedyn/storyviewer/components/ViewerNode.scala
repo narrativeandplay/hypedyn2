@@ -6,8 +6,8 @@ import javafx.event.EventHandler
 import javafx.scene.control.{Skin, Control => JfxControl}
 import javafx.scene.{input => jfxsi}
 
-import scalafx.Includes.{jfxBounds2sfx, jfxMouseEvent2sfx, jfxReadOnlyDoubleProperty2sfx}
-import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyDoubleProperty}
+import scalafx.Includes.{jfxBounds2sfx, jfxMouseEvent2sfx}
+import scalafx.beans.property.{BooleanProperty, ObjectProperty}
 import scalafx.event.Event
 import scalafx.geometry.Bounds
 import scalafx.scene.input.MouseEvent
@@ -15,7 +15,6 @@ import scalafx.scene.input.MouseEvent
 import com.github.benedictleejh.scala.math.vector.Vector2
 import org.fxmisc.easybind.EasyBind
 
-import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils
 import org.narrativeandplay.hypedyn.api.utils.Scala2JavaFunctionConversions._
 import org.narrativeandplay.hypedyn.storyviewer.StoryViewer
 import org.narrativeandplay.hypedyn.storyviewer.utils.VectorImplicitConversions._
