@@ -27,6 +27,7 @@ javafx {
 
 version = "1.0"
 
+// Ignore non-release versions when checking for dependency updates
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->

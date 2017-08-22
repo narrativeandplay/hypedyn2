@@ -11,8 +11,10 @@ import javafx.scene.{input => jfxsi}
 import javafx.scene.input.{KeyEvent => JfxKeyEvent}
 import javafx.scene.text.{Text, TextFlow}
 
+import org.gerweck.scalafx.util._
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
+import scalafx.beans.value.ObservableValue
 import scalafx.collections.ObservableBuffer
 import scalafx.event.{ActionEvent, Event}
 import scalafx.geometry.{Insets, Orientation, Pos}
@@ -23,7 +25,6 @@ import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
 import scalafx.scene.control.Tab.sfxTab2jfx
 
-import org.fxmisc.easybind.EasyBind
 import org.fxmisc.richtext.model.{Codec, StyleSpan, StyledText}
 import org.fxmisc.richtext.StyledTextArea
 
@@ -109,7 +110,6 @@ class NodeEditor private (dialogTitle: String,
 
   val story: ObjectProperty[UiStory] = ObjectProperty(narrative)
   private val node: ObjectProperty[UiNode] = ObjectProperty(nodeToEdit getOrElse NodeEditor.newNode)
-  private[this] val monadicNode = EasyBind monadic node
 
   private var updateFunc = UiEventDispatcher.updateNode(nodeToEdit getOrElse NodeEditor.newNode)
 
@@ -230,7 +230,7 @@ class NodeEditor private (dialogTitle: String,
       else selectionModel().clearSelection()
     }
 
-    items <== monadicNode flatMap[UiNodeContent] (_.contentProperty) flatMap[ObservableList[UiRuleset]] (_.rulesetsProperty)
+    items <== node flatMap (_.contentProperty) flatMap (_.rulesetsProperty)
   }
 
   lazy val nodeContentText = new NodeContentTextArea {
@@ -315,7 +315,7 @@ class NodeEditor private (dialogTitle: String,
                                     actionDefinitions filter (_.actionLocationTypes contains NodeAction),
                                     node().rulesProperty(),
                                     story) {
-    rules <== monadicNode flatMap[ObservableList[UiRule]] (_.rulesProperty)
+    rules <== node flatMap (_.rulesProperty)
   }
 
   val rulesetsListVBox = new VBox {
@@ -323,12 +323,12 @@ class NodeEditor private (dialogTitle: String,
       padding = Insets(5)
       alignment = Pos.CenterLeft
       children += new Button("Add fragment") {
-        disable <== EasyBind combine (nodeContentText.selectedTextProperty, nodeContentText.selectionProperty, { (s: String, i: JfxIndexRange) =>
-          val spansInSelection = nodeContentText styleSpansAt i map (_.getStyle.ruleset)
-          val selectionAlreadyContainsRuleset = !(spansInSelection forall (_.isEmpty))
-          // Need to manually transform Scala Boolean to java.lang.Boolean because bloody Java<->Scala issues
-          Boolean box (s.trim.isEmpty || selectionAlreadyContainsRuleset)
-        })
+        disable <==
+          (nodeContentText.selectedText, nodeContentText.selection).observe map { case (s, i) =>
+            val spansInSelection = nodeContentText styleSpansAt i map (_.getStyle.ruleset)
+            val selectionAlreadyContainsRuleset = !(spansInSelection forall (_.isEmpty))
+            s.trim.isEmpty || selectionAlreadyContainsRuleset
+          }
 
         onAction = { _ =>
           val start = nodeContentText.getSelection.getStart
@@ -623,12 +623,14 @@ object NodeEditor {
       getStyleSpans(indexRange).asScala.toList
     }
 
+    def selectedText: ObservableValue[String, java.lang.String] = selectedTextProperty()
+
+    def selection: ObservableValue[JfxIndexRange, JfxIndexRange] = selectionProperty()
+
     def styleAt(position: Int) = getStyleAtPosition(position)
 
     def useInitialStyleForInsertion = useInitialStyleForInsertionProperty()
     def useInitialStyleForInsertion_=(value: Boolean) = setUseInitialStyleForInsertion(value)
-
-    def selection = selectionProperty()
 
     def caretPosition = caretPositionProperty()
 

@@ -7,7 +7,7 @@ dependencies {
 
     compile "commons-io:commons-io:2.5"
 
-    compile "org.fxmisc.easybind:easybind:1.0.3"
+    compile "org.gerweck.scalafx:scalafx-utils_%%:0.11.2"
 
     compile project(':api')
 }

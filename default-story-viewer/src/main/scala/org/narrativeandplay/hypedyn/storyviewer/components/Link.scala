@@ -1,14 +1,16 @@
 package org.narrativeandplay.hypedyn.storyviewer.components
 
+import javafx.beans.value.ObservableValue
+
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, ObjectProperty}
+import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyDoubleProperty}
 import scalafx.geometry.{Point2D, Pos}
 import scalafx.scene.control.Label
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.{Polygon, Rectangle}
 import scalafx.scene.text.Text
 
-import org.fxmisc.easybind.EasyBind
+import org.gerweck.scalafx.util._
 
 import org.narrativeandplay.hypedyn.api.utils.Scala2JavaFunctionConversions._
 import org.narrativeandplay.hypedyn.storyviewer.utils.{BezierCurve, CubicPolynomial, Line, Vector2}
@@ -39,7 +41,7 @@ class Link(val from: ViewerNode,
   /**
    * A binding to the name of the rule
    */
-  val name = EasyBind map (rule, (_: RuleLike).name)
+  val name = rule map (_.name)
 
   /**
    * A property determining if the link is currently selected
@@ -52,7 +54,8 @@ class Link(val from: ViewerNode,
   val selectionColour = ObjectProperty(Color.Red)
 
   private val linkLabel = new Label {
-    prefWidth <== name map[java.lang.Double] { s => new Text(s).layoutBounds().width }
+    // Box the Scala Double to Java for compatibility reasons
+    prefWidth <== name map { s => Double box new Text(s).layoutBounds().width }
     maxWidth = Link.LabelWidth
     maxHeight = Link.LabelHeight
     alignment = Pos.Center

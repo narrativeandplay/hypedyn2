@@ -7,6 +7,7 @@ import javafx.scene.control.{ListCell => JfxListCell, SpinnerValueFactory => Jfx
 
 import scala.util.Try
 
+import org.gerweck.scalafx.util._
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.{ObservableBuffer, ObservableMap}
@@ -16,8 +17,6 @@ import scalafx.scene.layout.{HBox, Priority, Region, StackPane}
 import scalafx.util.StringConverter
 import scalafx.util.StringConverter.sfxStringConverter2jfx
 import scalafx.scene.Parent.sfxParent2jfx
-
-import org.fxmisc.easybind.EasyBind
 
 import org.narrativeandplay.hypedyn.api.story.rules.ParameterValues._
 import org.narrativeandplay.hypedyn.api.story.rules.RuleLike.{ParamName, ParamValue}
@@ -373,7 +372,7 @@ object RuleCellComponents {
       Option(value()) foreach { v => paramMap += paramName -> ParamValue.Node(v.id) }
     }
 
-    items <== EasyBind monadic story flatMap[ObservableList[UiNode]] (_.nodesProperty)
+    items <== story flatMap (_.nodesProperty)
 
     items onChange {
       `val` foreach {
@@ -427,7 +426,7 @@ object RuleCellComponents {
       Option(value()) foreach { v => paramMap += paramName -> ParamValue.Link(v.id) }
     }
 
-    items <== EasyBind monadic story map[ObservableList[UiNodeContent.UiRuleset]] (_.canActivate)
+    items <== story map[ObservableList[UiNodeContent.UiRuleset]] (_.canActivate)
 
     items onChange {
       `val` foreach {
@@ -481,7 +480,7 @@ object RuleCellComponents {
       Option(selectionModel().selectedItem()) foreach { f => paramMap += paramName -> ParamValue.IntegerFact(f.id) }
     }
 
-    items <== EasyBind monadic story flatMap[ObservableList[Fact]] (_.factsProperty) map[ObservableList[IntegerFact]] { facts =>
+    items <== story flatMap (_.factsProperty) map[ObservableList[IntegerFact]] { facts =>
       facts collect { case f: IntegerFact => f }
     }
 
@@ -539,7 +538,7 @@ object RuleCellComponents {
       Option(selectionModel().selectedItem()) foreach { f => paramMap += paramName -> ParamValue.BooleanFact(f.id) }
     }
 
-    items <== EasyBind monadic story flatMap[ObservableList[Fact]] (_.factsProperty) map[ObservableList[BooleanFact]] { facts =>
+    items <== story flatMap (_.factsProperty) map[ObservableList[BooleanFact]] { facts =>
       facts collect { case f: BooleanFact => f }
     }
 
@@ -597,7 +596,7 @@ object RuleCellComponents {
       Option(selectionModel().selectedItem()) foreach { f => paramMap += paramName -> ParamValue.StringFact(f.id) }
     }
 
-    items <== EasyBind monadic story flatMap[ObservableList[Fact]] (_.factsProperty) map[ObservableList[StringFact]] { facts =>
+    items <== story flatMap (_.factsProperty) map[ObservableList[StringFact]] { facts =>
       facts collect { case f: StringFact => f }
     }
 

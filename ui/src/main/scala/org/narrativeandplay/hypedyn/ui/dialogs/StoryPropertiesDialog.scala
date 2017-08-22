@@ -3,6 +3,7 @@ package org.narrativeandplay.hypedyn.ui.dialogs
 import javafx.beans.value.ObservableValue
 import javafx.scene.control
 
+import org.gerweck.scalafx.util._
 import scalafx.Includes._
 import scalafx.geometry.Orientation
 import scalafx.scene.control._
@@ -11,7 +12,6 @@ import scalafx.stage.FileChooser.ExtensionFilter
 import scalafx.stage.{Modality, Window}
 import scalafx.scene.Parent.sfxParent2jfx
 
-import org.fxmisc.easybind.EasyBind
 import org.tbee.javafx.scene.layout.MigPane
 
 import org.narrativeandplay.hypedyn.ui.dialogs.StoryPropertiesDialog.FileSelectorWithTextField
@@ -129,11 +129,10 @@ class StoryPropertiesDialog(story: Narrative, ownerWindow: Window) extends Dialo
     selected <==> metadata.restartDisabledProperty
   }
 
-  okButton.disable <== EasyBind combine (customRadio.selected.delegate.asInstanceOf[ObservableValue[Boolean]],
-                                         customCssFileSelector.filePathField.text,
-                                         { (selected: Boolean, path: String) =>
-    Boolean box (selected && path.trim.isEmpty)
-  })
+  okButton.disable <==
+    (customRadio.selected, customCssFileSelector.filePathField.text).observe map { case (selected, path) =>
+      selected && path.trim.isEmpty
+    }
 
   metadata.readerStyle match {
     case Standard => standardRadio.selected = true

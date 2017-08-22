@@ -7,8 +7,7 @@ import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.beans.property.ReadOnlyBooleanProperty
 import scalafx.scene.control._
-
-import org.fxmisc.easybind.EasyBind
+import org.gerweck.scalafx.util._
 
 import org.narrativeandplay.hypedyn.ui.Main
 import org.narrativeandplay.hypedyn.ui.events.UiEventDispatcher
@@ -21,7 +20,7 @@ import org.narrativeandplay.hypedyn.api.utils.System
  * Menu bar for the application
  */
 class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
-  private val noNodeSelected = BooleanExpression.booleanExpression(EasyBind monadic UiEventDispatcher.selectedNode map[lang.Boolean] (_.isEmpty))
+  private val noNodeSelected = UiEventDispatcher.selectedNode map (_.isEmpty)
 
   useSystemMenuBar = true
   menus.addAll(fileMenu, editMenu, helpMenu)
