@@ -1,4 +1,4 @@
-package org.narrativeandplay.hypedyn.undo
+package org.narrativeandplay.hypedyn.storyviewer.undo
 
 import com.github.benedictleejh.scala.math.vector.Vector2
 
