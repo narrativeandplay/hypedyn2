@@ -3,9 +3,9 @@ dependencies {
     compile "org.clapper:classutil_%%:1.1.2"
 
     // For serialisation to JSON (save/load/export)
-    compile "org.json4s:json4s-native_%%:3.5.1"
+    compile "org.json4s:json4s-native_%%:3.5.3"
 
-    compile "commons-io:commons-io:2.4"
+    compile "commons-io:commons-io:2.5"
 
     compile "org.fxmisc.easybind:easybind:1.0.3"
 

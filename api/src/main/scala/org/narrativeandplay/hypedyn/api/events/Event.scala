@@ -2,7 +2,7 @@ package org.narrativeandplay.hypedyn.api.events
 
 import java.io.File
 
-import org.kiama.output.PrettyPrinter
+import org.bitbucket.inkytonik.kiama.output.PrettyPrinter
 
 import org.narrativeandplay.hypedyn.api.serialisation.AstElement
 import org.narrativeandplay.hypedyn.api.story.NodalContent.RulesetId
@@ -57,12 +57,12 @@ sealed trait Event extends PrettyPrinter {
                   any)
           }
         case s : String    => dquotes (text (s))
-        case _             => a.toDoc
+        case _             => value(a)
       }
 
   override val defaultIndent = 2
 
-  override def toString: String = pretty(any(this))
+  override def toString: String = pretty(any(this)).toString
 }
 
 

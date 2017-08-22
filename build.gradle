@@ -27,9 +27,17 @@ javafx {
 
 version = "1.0"
 
-ext {
-    majorScalaVersion = "2.11"
-    minorScalaVersion = "7"
+dependencyUpdates.resolutionStrategy = {
+    componentSelection { rules ->
+        rules.all { ComponentSelection selection ->
+            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
+            }
+        }
+    }
 }
 
 allprojects {
@@ -51,7 +59,7 @@ allprojects {
         compile "org.scala-lang:scala-library:%scala-version%"
 
         testCompile 'junit:junit:4.12'
-        testCompile "org.scalatest:scalatest_%%:3.0.1"
+        testCompile "org.scalatest:scalatest_%%:3.0.4"
         testRuntime "org.scala-lang.modules:scala-xml_%%:1.0.6"
     }
 
@@ -63,8 +71,7 @@ allprojects {
                     "-feature",
                     "-Xfatal-warnings",
                     "-deprecation",
-                    "-unchecked",
-                    "-Yinline-warnings"
+                    "-unchecked"
             ]
         }
     }

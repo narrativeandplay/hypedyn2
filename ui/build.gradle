@@ -4,7 +4,7 @@ dependencies {
     compile 'org.fxmisc.richtext:richtextfx:0.7-M5'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
 
-    compile 'com.typesafe.akka:akka-http_%%:10.0.5'
+    compile 'com.typesafe.akka:akka-http_%%:10.0.9'
 
     compile project(':api')
     compile project(':core')
