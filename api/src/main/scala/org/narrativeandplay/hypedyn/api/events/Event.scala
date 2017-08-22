@@ -62,7 +62,7 @@ sealed trait Event extends PrettyPrinter {
 
   override val defaultIndent = 2
 
-  override def toString: String = pretty(any(this)).toString
+  override def toString: String = pretty(any(this)).layout
 }
 
 
