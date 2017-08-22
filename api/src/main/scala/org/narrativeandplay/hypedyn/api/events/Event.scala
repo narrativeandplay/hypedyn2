@@ -52,7 +52,9 @@ sealed trait Event extends PrettyPrinter {
           if (fields.length == 0) {
             s"${p.productPrefix}"
           } else {
-            list (fields.toList,
+            list (fields.toList filter { case (fieldName, _) =>
+                    fieldName != "conditionDefinitions" &&  fieldName != "actionDefinitions"
+                  },
                   s"${p.productPrefix} ",
                   any)
           }
