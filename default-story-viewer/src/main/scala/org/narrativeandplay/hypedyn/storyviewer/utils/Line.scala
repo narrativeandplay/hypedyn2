@@ -1,7 +1,5 @@
 package org.narrativeandplay.hypedyn.storyviewer.utils
 
-import com.github.benedictleejh.scala.math.vector.Vector2
-
 /**
  * Class representing a generic line of the form Ax + By + C = 0 in 2 dimensions.
  *

@@ -6,28 +6,17 @@ import scala.language.implicitConversions
 
 import scalafx.geometry.Point2D
 
-import com.github.benedictleejh.scala.math.vector.{Vector2, VectorN}
-
 /**
  * Convenience implicit conversions to and from vectors
  */
 object VectorImplicitConversions {
-  implicit def Tuple2ToVector2[T](t: (T, T))(implicit n: Numeric[T]): Vector2[T] = new Vector2[T](t._1, t._2)
+  implicit def Tuple2ToVector2[T](t: (T, T))(implicit n: Numeric[T]): Vector2[T] = Vector2[T](t._1, t._2)
 
-  implicit def pointToVector2Int(p: Point): Vector2[Int] = new Vector2(p.x, p.y)
+  implicit def pointToVector2Int(p: Point): Vector2[Int] = Vector2(p.x, p.y)
 
-  implicit def point2dToVector2Double(p: Point2D): Vector2[Double] = new Vector2(p.getX, p.getY)
+  implicit def point2dToVector2Double(p: Point2D): Vector2[Double] = Vector2(p.getX, p.getY)
 
   implicit def vector2Double2Point2D(p: Vector2[Double]): Point2D = new Point2D(p.x, p.y)
-
-  implicit def vectorNIntToPoint(v: VectorN[Int]): Point = {
-    v.dimension match {
-      case 2 =>
-        val v2 = v.asInstanceOf[Vector2[Int]]
-        new Point(v2.x, v2.y)
-      case _ => throw new ClassCastException
-    }
-  }
 
   implicit class RotatableVector(v: Vector2[Double]) {
     private def degToRad(x: Double) = math.Pi / 180 * x

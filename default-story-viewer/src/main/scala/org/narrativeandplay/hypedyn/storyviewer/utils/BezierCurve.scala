@@ -2,8 +2,6 @@ package org.narrativeandplay.hypedyn.storyviewer.utils
 
 import scalafx.scene.shape.{CubicCurveTo, MoveTo, Path}
 
-import com.github.benedictleejh.scala.math.vector.Vector2
-
 import DoubleUtils._
 
 /**

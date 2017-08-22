@@ -12,7 +12,6 @@ import scalafx.event.Event
 import scalafx.geometry.Bounds
 import scalafx.scene.input.MouseEvent
 
-import com.github.benedictleejh.scala.math.vector.Vector2
 import org.fxmisc.easybind.EasyBind
 
 import org.narrativeandplay.hypedyn.api.utils.Scala2JavaFunctionConversions._
@@ -23,6 +22,7 @@ import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils._
 import scalafx.scene.paint.Color
 
 import org.narrativeandplay.hypedyn.api.story.Nodal
+import org.narrativeandplay.hypedyn.storyviewer.utils.Vector2
 
 /**
  * Visual representation of a node. More accurately, the model (MVC model) for the visual representation of a node

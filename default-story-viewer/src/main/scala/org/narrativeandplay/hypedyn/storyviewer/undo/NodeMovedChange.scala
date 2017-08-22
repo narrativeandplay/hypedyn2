@@ -1,10 +1,9 @@
 package org.narrativeandplay.hypedyn.storyviewer.undo
 
-import com.github.benedictleejh.scala.math.vector.Vector2
-
 import org.narrativeandplay.hypedyn.api.story.NodeId
 import org.narrativeandplay.hypedyn.api.undo.Undoable
 import org.narrativeandplay.hypedyn.storyviewer.StoryViewer
+import org.narrativeandplay.hypedyn.storyviewer.utils.Vector2
 
 /**
  * Change representing a node having been moved

@@ -6,8 +6,6 @@ import scala.util.Try
 import scalafx.beans.property.DoubleProperty
 import scalafx.scene.control.{Control, ScrollPane}
 
-import com.github.benedictleejh.scala.math.vector.Vector2
-
 import org.narrativeandplay.hypedyn.api.events._
 import org.narrativeandplay.hypedyn.api.plugins.{Plugin, Saveable}
 import org.narrativeandplay.hypedyn.api.plugins.narrativeviewer.NarrativeViewer
@@ -15,8 +13,8 @@ import org.narrativeandplay.hypedyn.api.serialisation._
 import org.narrativeandplay.hypedyn.api.story.{Narrative, Nodal, NodeId}
 import org.narrativeandplay.hypedyn.api.undo.UndoableStream
 import org.narrativeandplay.hypedyn.storyviewer.components.ViewerNode
-import org.narrativeandplay.hypedyn.storyviewer.utils.DoubleUtils
-import org.narrativeandplay.hypedyn.undo.NodeMovedChange
+import org.narrativeandplay.hypedyn.storyviewer.utils.{DoubleUtils, Vector2}
+import org.narrativeandplay.hypedyn.storyviewer.undo.NodeMovedChange
 
 /**
  * StoryViewer implementation class
