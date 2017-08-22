@@ -3,8 +3,6 @@ package org.narrativeandplay.hypedyn.ui.utils
 import java.io.File
 import java.util.prefs.Preferences
 
-import scala.collection.mutable.ArrayBuffer
-
 object HypedynPreferences {
   object Keys {
     val RecentFiles = "recentFiles"

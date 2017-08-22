@@ -1,6 +1,7 @@
 package org.narrativeandplay.hypedyn.ui
 
 import java.io.File
+import java.lang.{System => Sys}
 import javafx.scene.{input => jfxsi}
 
 import scalafx.Includes._
@@ -22,6 +23,7 @@ import org.narrativeandplay.hypedyn.api.events.EventBus
 import org.narrativeandplay.hypedyn.api.logging.Logger
 import org.narrativeandplay.hypedyn.api.story.{Narrative, Nodal}
 import org.narrativeandplay.hypedyn.api.story.rules.{ActionDefinition, ConditionDefinition, Fact}
+import org.narrativeandplay.hypedyn.api.utils.System
 import org.narrativeandplay.hypedyn.ui.dialogs._
 import org.narrativeandplay.hypedyn.core.events._
 import org.narrativeandplay.hypedyn.core.plugins.PluginsController
@@ -34,6 +36,8 @@ import org.narrativeandplay.hypedyn.ui.events.UiEventDispatcher
  * Entry point for the application
  */
 object Main extends JFXApp {
+  Sys.setProperty("hypedyn.log.location", System.DataLocation.resolve("logs").toString)
+
   EventBus
   UndoController
   PluginsController
@@ -44,7 +48,7 @@ object Main extends JFXApp {
   Logger
   Server
 
-  Logger.info("Java version: " + System.getProperty("java.version"))
+  Logger.info("Java version: " + Sys.getProperty("java.version"))
 
   Thread.currentThread().setUncaughtExceptionHandler({ (_, throwable) =>
     // Most exceptions will show up as a `OnErrorNotImplementedException` because
@@ -66,7 +70,7 @@ object Main extends JFXApp {
   private val refreshStream = SerializedSubject(PublishSubject[Unit]())
   def refreshRecent = refreshStream
 
-  private var lastKeypressTime = System.currentTimeMillis()
+  private var lastKeypressTime = Sys.currentTimeMillis()
 
   /**
    * Returns a new file dialog
@@ -181,7 +185,7 @@ object Main extends JFXApp {
     }
 
     addEventFilter(KeyEvent.KeyPressed, { event: jfxsi.KeyEvent =>
-      val timeDiff = System.currentTimeMillis() - lastKeypressTime
+      val timeDiff = Sys.currentTimeMillis() - lastKeypressTime
       // Because OS X does something stupid by firing multiple events for a single Equals key press, we add a timestamp
       // to track when the last time the zoom was triggered, and allow it to zoom only if it was at least 2 ms after
       // the last zoom time.
@@ -198,7 +202,7 @@ object Main extends JFXApp {
           UiEventDispatcher.requestDeleteNode()
         case _ =>
       }
-      lastKeypressTime = System.currentTimeMillis()
+      lastKeypressTime = Sys.currentTimeMillis()
     })
 
     scene = new Scene {

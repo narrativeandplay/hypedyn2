@@ -143,7 +143,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   }
 
   private lazy val redo = new MenuItem("Redo") {
-    accelerator = if (System.isWindows) KeyCombinations.RedoWin else KeyCombinations.RedoUnix
+    accelerator = if (System.IsWindows) KeyCombinations.RedoWin else KeyCombinations.RedoUnix
 
     disable <== !UiEventDispatcher.redoAvailable || !mainStageFocused
 

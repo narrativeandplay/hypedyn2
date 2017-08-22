@@ -1,6 +1,7 @@
 package org.narrativeandplay.hypedyn.api.utils
 
 import java.lang.{System => Sys}
+import java.nio.file.{Path, Paths}
 
 /**
  * OS related utilities
@@ -12,9 +13,27 @@ object System {
 
   private val os = Sys.getProperty("os.name").toLowerCase
 
-  def isWindows = os startsWith Windows
-  def isMac = os startsWith Mac
-  def isLinux = os startsWith Linux
+  def IsWindows: Boolean = os startsWith Windows
+  def IsMac: Boolean = os startsWith Mac
+  def IsLinux: Boolean = os startsWith Linux
 
-  def isUnix = !isWindows
+  def IsUnix: Boolean = !IsWindows
+
+  def DataLocation: Path = {
+    if (IsWindows) {
+      Paths.get(Sys.getenv("LocalAppData"), "hypedyn")
+    }
+    else if (IsMac) {
+      Paths.get(Sys.getProperty("user.home"), "Library", "Application Support", "hypedyn")
+    }
+    else {
+      Option(Sys.getenv("XDG_DATA_HOME")) match {
+        case Some(dataHome) =>
+          Paths.get(dataHome, "hypedyn")
+
+        case None =>
+          Paths.get(Sys.getProperty("user.home"), ".local", "share", "hypedyn")
+      }
+    }
+  }
 }

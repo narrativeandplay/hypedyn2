@@ -60,7 +60,7 @@ object FactViewer extends ListView[Fact] {
   }
 
   private val deselectionInfo = new Tooltip() {
-    text = s"${if (System.isMac) "Cmd" else "Ctrl"}-Click deselects a selected fact"
+    text = s"${if (System.IsMac) "Cmd" else "Ctrl"}-Click deselects a selected fact"
   }
 
   // The functions `select` and `selectObject` are Java method calls to a generic methods. Due to limitations in the
