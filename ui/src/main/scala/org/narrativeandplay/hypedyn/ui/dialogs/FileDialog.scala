@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.ui.dialogs
 
-import java.io.File
+import better.files._
 
 import scalafx.Includes._
 import scalafx.stage.{Window, FileChooser}
@@ -19,12 +19,12 @@ class FileDialog(ownerWindow: Window) extends FileChooser {
    *
    * @return An option containing the selected file, or None if no file was selected
    */
-  def showOpenFileDialog(): Option[File] = Option(super.showOpenDialog(ownerWindow))
+  def showOpenFileDialog(): Option[File] = Option(super.showOpenDialog(ownerWindow)) map (_.toScala)
 
   /**
    * Shows a new save file dialog
    *
    * @return An option containing the selected file, or None if no file was selected
    */
-  def showSaveFileDialog(): Option[File] = Option(super.showSaveDialog(ownerWindow))
+  def showSaveFileDialog(): Option[File] = Option(super.showSaveDialog(ownerWindow)) map (_.toScala)
 }

@@ -190,7 +190,7 @@ object StoryPropertiesDialog {
     }
     val chooseButton = new Button("Choose") {
       onAction = { _ =>
-        fileDialog.showOpenFileDialog() foreach { file => filePathField.text = file.getAbsolutePath }
+        fileDialog.showOpenFileDialog() foreach { file => filePathField.text = file.toString() }
       }
     }
 

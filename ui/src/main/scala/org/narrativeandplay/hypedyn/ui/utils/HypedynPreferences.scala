@@ -1,7 +1,8 @@
 package org.narrativeandplay.hypedyn.ui.utils
 
-import java.io.File
 import java.util.prefs.Preferences
+
+import better.files._
 
 object HypedynPreferences {
   object Keys {
@@ -15,11 +16,11 @@ object HypedynPreferences {
 
   def recentFiles: List[File] = {
     val filePaths = preferences get (Keys.RecentFiles, "") split "," filter (_ != "")
-    filePaths.toList map (new File(_))
+    filePaths.toList map (File(_))
   }
 
   def recentFiles_=(files: List[File]): Unit = {
-    val filePaths = files dropRight (files.size - MaxRecentFiles) map (_.getAbsolutePath)
+    val filePaths = files dropRight (files.size - MaxRecentFiles) map (_.toString())
     preferences.put(Keys.RecentFiles, filePaths.distinct mkString ",")
   }
 }

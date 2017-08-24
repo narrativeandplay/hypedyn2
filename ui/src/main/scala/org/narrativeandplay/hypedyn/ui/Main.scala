@@ -1,9 +1,10 @@
 package org.narrativeandplay.hypedyn.ui
 
-import java.io.File
 import java.lang.{System => Sys}
 import javafx.beans.value.ObservableValue
 import javafx.scene.{input => jfxsi}
+
+import scala.util.Properties
 
 import scalafx.Includes._
 import scalafx.application.JFXApp.PrimaryStage
@@ -15,6 +16,7 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.input.{KeyCode, KeyEvent}
 import scalafx.scene.layout.{BorderPane, VBox}
 
+import better.files._
 import org.gerweck.scalafx.util._
 import com.sun.glass.ui
 import com.sun.glass.ui.Application.EventHandler
@@ -37,7 +39,7 @@ import org.narrativeandplay.hypedyn.ui.events.UiEventDispatcher
  * Entry point for the application
  */
 object Main extends JFXApp {
-  Sys.setProperty("hypedyn.log.location", System.DataLocation.resolve("logs").toString)
+  Properties.setProp("hypedyn.log.location", System.LogLocation.toString())
 
   EventBus
   UndoController
@@ -49,7 +51,7 @@ object Main extends JFXApp {
   Logger
   Server
 
-  Logger.info("Java version: " + Sys.getProperty("java.version"))
+  Logger.info("Java version: " + Properties.javaVersion)
 
   Thread.currentThread().setUncaughtExceptionHandler({ (_, throwable) =>
     // Most exceptions will show up as a `OnErrorNotImplementedException` because
@@ -161,7 +163,7 @@ object Main extends JFXApp {
 
   def runInBrowser(filePath: File, fileToRun: String): Unit = {
     val fileToLoad = s"${Server.address}/$fileToRun"
-    Server.storyPath = filePath.getAbsolutePath
+    Server.storyPath = filePath.toString()
 
     hostServices.showDocument(fileToLoad)
   }
@@ -223,7 +225,7 @@ object Main extends JFXApp {
   }
 
   if (parameters.raw.length == 1) {
-    val fileToOpen = new File(parameters.raw.head)
+    val fileToOpen = File(parameters.raw.head)
 
     if (fileToOpen.exists()) UiEventDispatcher.loadStory(fileToOpen)
   }
@@ -235,7 +237,7 @@ object Main extends JFXApp {
       // The filtering is for when HypeDyn is run directly from the IDE (and possibly via the
       // command line using Gradle) because it's passed the classname to run, and without removing
       //  that the application would crash
-      val files = filepaths filterNot (_ == "org.narrativeandplay.hypedyn.Main") map (new File(_))
+      val files = filepaths filterNot (_ == "org.narrativeandplay.hypedyn.Main") map (File(_))
       if (files.length > 0) {
         UiEventDispatcher.loadStory(files.head)
       }

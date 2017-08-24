@@ -1,13 +1,12 @@
 package org.narrativeandplay.hypedyn.ui.events
 
-import java.io.File
-
 import scala.collection.mutable.ArrayBuffer
 
 import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, ObjectProperty}
 import scalafx.scene.control.{Alert, ButtonType}
 
+import better.files._
 import org.narrativeandplay.hypedyn.api.story.rules.Fact
 import org.narrativeandplay.hypedyn.ui.Main
 import org.narrativeandplay.hypedyn.api.events._
@@ -123,7 +122,7 @@ object UiEventDispatcher {
     HypedynPreferences.recentFiles +:= evt.file
     Main.refreshRecent.onNext(())
 
-    Main.loadedFileName = evt.file.getName
+    Main.loadedFileName = evt.file.name
   }
   EventBus.FileLoadedEvents foreach { evt =>
     evt.fileOption foreach { f =>
@@ -131,7 +130,7 @@ object UiEventDispatcher {
       Main.refreshRecent.onNext(())
     }
 
-    Main.loadedFileName = evt.fileOption map (_.getName) getOrElse "Untitled"
+    Main.loadedFileName = evt.fileOption map (_.name) getOrElse "Untitled"
   }
 
   EventBus.NewStoryResponses foreach { _ => EventBus.send(CreateStory(src = UiEventSourceIdentity)) }

@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.ui.dialogs
 
-import java.io.File
+import better.files._
 
 import scalafx.stage.{Window, DirectoryChooser}
 
@@ -16,5 +16,5 @@ class DirectoryDialog(ownerWindow: Window) extends DirectoryChooser {
    *
    * @return An option containing the selected directory, or None if no directory was selected
    */
-  def showDialog(): Option[File] = Option(super.showDialog(ownerWindow))
+  def showDialog(): Option[File] = Option(super.showDialog(ownerWindow)) map (_.toScala)
 }

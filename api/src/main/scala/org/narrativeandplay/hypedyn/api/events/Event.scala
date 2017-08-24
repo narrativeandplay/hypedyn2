@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.api.events
 
-import java.io.File
+import better.files.File
 
 import org.bitbucket.inkytonik.kiama.output.PrettyPrinter
 

@@ -1,7 +1,8 @@
 package org.narrativeandplay.hypedyn.api.utils
 
-import java.lang.{System => Sys}
-import java.nio.file.{Path, Paths}
+import scala.util.Properties
+
+import better.files._
 
 /**
  * OS related utilities
@@ -11,7 +12,7 @@ object System {
   private final val Mac = "mac"
   private final val Linux = "linux"
 
-  private val os = Sys.getProperty("os.name").toLowerCase
+  private val os = Properties.osName.toLowerCase
 
   def IsWindows: Boolean = os startsWith Windows
   def IsMac: Boolean = os startsWith Mac
@@ -19,21 +20,26 @@ object System {
 
   def IsUnix: Boolean = !IsWindows
 
-  def DataLocation: Path = {
+  def DataLocation: File = {
     if (IsWindows) {
-      Paths.get(Sys.getenv("LocalAppData"), "hypedyn")
+      // This env var is guaranteed to exist on Windows, so the else string will never trigger
+      Properties.envOrElse("LocalAppData", "") / "HypeDyn 2"
     }
     else if (IsMac) {
-      Paths.get(Sys.getProperty("user.home"), "Library", "Application Support", "hypedyn")
+      Properties.userHome / "Library" / "Application Support" / "HypeDyn 2"
     }
     else {
-      Option(Sys.getenv("XDG_DATA_HOME")) match {
+      Properties.envOrNone("XDG_DATA_HOME") match {
         case Some(dataHome) =>
-          Paths.get(dataHome, "hypedyn")
+          dataHome / "hypedyn2"
 
         case None =>
-          Paths.get(Sys.getProperty("user.home"), ".local", "share", "hypedyn")
+          Properties.userHome / ".local" / "share" / "hypedyn2"
       }
     }
   }
+
+  def LogLocation: File = DataLocation / "logs"
+
+  def SettingsFile: File = DataLocation.createChild("hypedyn2.conf")
 }

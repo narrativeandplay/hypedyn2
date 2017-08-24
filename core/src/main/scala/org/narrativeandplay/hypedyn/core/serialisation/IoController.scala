@@ -1,9 +1,10 @@
 package org.narrativeandplay.hypedyn.core.serialisation
 
-import java.io.{PrintWriter, File}
 import java.net.JarURLConnection
 
 import scala.io.Source
+
+import better.files._
 
 import org.apache.commons.io.FileUtils
 
@@ -18,10 +19,7 @@ object IoController {
    * @param file The file to write to
    */
   def write(data: String, file: File): Unit = {
-    val fileWriter = new PrintWriter(file)
-
-    fileWriter.write(data)
-    fileWriter.close()
+    file.overwrite(data)
   }
 
   /**
@@ -31,12 +29,7 @@ object IoController {
    * @return The data in the file as a string
    */
   def read(file: File): String = {
-    val fileSource = Source.fromFile(file)
-    val data = fileSource.mkString
-
-    fileSource.close()
-
-    data
+    file.contentAsString
   }
 
   /**
@@ -46,14 +39,12 @@ object IoController {
    * Adapted from http://stackoverflow.com/a/2993908
    *
    * @param resourceName The resource folder whose contents are to be copied; if a relative resource path is given,
-   *                     it will be relative to org.narrativeandplay.hypedyn.serialisation
+   *                     it will be relative to org.narrativeandplay.hypedyn.core.serialisation
    * @param directory The directory where the files are to be copied to, if the folder does not exist, it will be
    *                  created
    */
   def copyResourceToFilesystem(resourceName: String, directory: File): Unit = {
-    if (!directory.exists()) {
-      directory.mkdirs()
-    }
+    directory.createIfNotExists(asDirectory = true, createParents = true)
 
     val jarConnection = getClass.getResource(resourceName).openConnection().asInstanceOf[JarURLConnection]
     val jarFile = jarConnection.getJarFile
@@ -66,15 +57,17 @@ object IoController {
       if (entry.getName startsWith jarConnection.getEntryName) {
         val filename = entry.getName replace (jarConnection.getEntryName, "")
 
-        if (!entry.isDirectory) {
-          val in = jarFile.getInputStream(entry)
-          FileUtils.copyInputStreamToFile(in, new File(directory, filename))
-          in.close()
-        }
-        else {
-          if (!directory.exists()) {
-            new File(directory, filename).mkdir()
-          }
+        entry match {
+          case file if !entry.isDirectory =>
+            val in = jarFile.getInputStream(entry)
+            directory.createChild(filename, createParents = true).outputStream foreach { output =>
+              in.pipeTo(output)
+            }
+
+            in.close()
+
+          case dir =>
+            directory.createChild(filename, asDirectory = true, createParents = true)
         }
       }
     }

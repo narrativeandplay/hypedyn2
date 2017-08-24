@@ -1,9 +1,8 @@
 package org.narrativeandplay.hypedyn.core.events
 
-import java.io.File
-import java.nio.file.Files
-
 import scala.util.control.NonFatal
+
+import better.files._
 
 import org.narrativeandplay.hypedyn.api.events._
 import org.narrativeandplay.hypedyn.api.logging.Logger
@@ -72,7 +71,7 @@ object CoreEventDispatcher {
 
     updatedUnupdatedPair foreach { case (unupdated, updated, changedStartNodeOption) =>
       if (evt.src != UndoEventSourceIdentity) {
-        UndoableStream.send(new NodeUpdatedChange(unupdated, updated, changedStartNodeOption))
+        UndoableStream.send(NodeUpdatedChange(unupdated, updated, changedStartNodeOption))
       }
 
       EventBus.send(NodeUpdated(unupdated, updated, CoreEventSourceIdentity))
@@ -84,7 +83,7 @@ object CoreEventDispatcher {
 
     destroyed foreach { case (destroyedNode, changedNodes) =>
       if (evt.src != UndoEventSourceIdentity) {
-        UndoableStream.send(new NodeDestroyedChange(destroyedNode, changedNodes))
+        UndoableStream.send(NodeDestroyedChange(destroyedNode, changedNodes))
       }
 
       EventBus.send(NodeDestroyed(destroyedNode, CoreEventSourceIdentity))
@@ -95,7 +94,7 @@ object CoreEventDispatcher {
   EventBus.CreateFactEvents foreach { evt =>
     val created = StoryController.create(evt.fact)
 
-    UndoableStream.send(new FactCreatedChange(created))
+    UndoableStream.send(FactCreatedChange(created))
 
     EventBus.send(FactCreated(created, CoreEventSourceIdentity))
     EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
@@ -104,7 +103,7 @@ object CoreEventDispatcher {
     val updatedUnupdatedPair = StoryController.update(evt.fact, evt.updatedFact)
 
     updatedUnupdatedPair foreach { case (unupdated, updated) =>
-      UndoableStream.send(new FactUpdatedChange(unupdated, updated))
+      UndoableStream.send(FactUpdatedChange(unupdated, updated))
 
       EventBus.send(FactUpdated(unupdated, updated, CoreEventSourceIdentity))
       EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
@@ -114,7 +113,7 @@ object CoreEventDispatcher {
     val destroyed = StoryController.destroy(evt.fact)
 
     destroyed foreach { f =>
-      UndoableStream.send(new FactDestroyedChange(f))
+      UndoableStream.send(FactDestroyedChange(f))
 
       EventBus.send(FactDestroyed(f, CoreEventSourceIdentity))
       EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
@@ -135,7 +134,7 @@ object CoreEventDispatcher {
 
   EventBus.ExportRequests foreach { _ => EventBus.send(ExportResponse(CoreEventSourceIdentity)) }
   EventBus.RunRequests foreach { _ =>
-    val tmpDir = Files.createTempDirectory("hypedyn2").toFile
+    val tmpDir = File.newTemporaryDirectory("hypedyn2")
     tmpDir.deleteOnExit()
 
     IoController.copyResourceToFilesystem("export/reader/", tmpDir)
@@ -143,7 +142,7 @@ object CoreEventDispatcher {
     val storyData = Serialiser serialise StoryController.story
     val saveData = AstMap("story" -> storyData)
     // wrap the JSON in a .js file to allow to avoid cross origin request error running localling in Chrome
-    IoController.write("function getStoryData(){\nreturn" + (Serialiser toString saveData) + ";\n};", new File(tmpDir, "story.js"))
+    IoController.write("function getStoryData(){\nreturn" + (Serialiser toString saveData) + ";\n};", tmpDir.createChild("story.js"))
 
     EventBus.send(RunResponse(tmpDir, "index.html", CoreEventSourceIdentity))
   }
@@ -202,14 +201,14 @@ object CoreEventDispatcher {
   }
 
   EventBus.ExportToFileEvents foreach { evt =>
-    val exportDirectory = new File(evt.dir, evt.filename.stripSuffix(".dyn2") + "-export")
+    val exportDirectory = evt.dir.createChild(evt.filename.stripSuffix(".dyn2") + "-export")
 
     IoController.copyResourceToFilesystem("export/reader/", exportDirectory)
 
     // save current story to export directory
     val storyData = Serialiser serialise StoryController.story
     val saveData = AstMap("story" -> storyData)
-    IoController.write("function getStoryData(){\nreturn" + (Serialiser toString saveData) + ";\n};", new File(exportDirectory, "story.js"))
+    IoController.write("function getStoryData(){\nreturn" + (Serialiser toString saveData) + ";\n};", exportDirectory.createChild("story.js"))
 
     // send completion (we're done!)
     EventBus.send(StoryExported(CoreEventSourceIdentity))

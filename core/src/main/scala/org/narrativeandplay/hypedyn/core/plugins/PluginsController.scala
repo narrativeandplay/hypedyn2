@@ -1,6 +1,6 @@
 package org.narrativeandplay.hypedyn.core.plugins
 
-import java.io.File
+import better.files._
 import java.net.{URL, URLClassLoader}
 
 import scala.collection.mutable
@@ -15,7 +15,7 @@ import org.narrativeandplay.hypedyn.api.plugins.Plugin
 object PluginsController {
   private val PluginClassName = classOf[Plugin].getCanonicalName
 
-  private final val PluginFolder = new File("plugins")
+  private final val PluginFolder = File("plugins")
 
   private val _plugins = mutable.HashMap.empty[String, Plugin]
 
@@ -28,15 +28,14 @@ object PluginsController {
    * Initialisation function to find and instantiate plugins
    */
   private def init(): Unit = {
-    val pluginFolderFiles = Option(PluginFolder.listFiles()) getOrElse Array.empty[File]
-    val pluginJars = pluginFolderFiles filter (_.getName.endsWith(".jar"))
-    val classpath = ClassFinder.classpath ++ pluginJars
+    val pluginJars = PluginFolder.glob("*.jar").toList
+    val classpath = ClassFinder.classpath ++ (pluginJars map (_.toJava))
     val finder = ClassFinder(classpath)
     val classes = finder.getClasses()
     val classMap = ClassFinder classInfoMap classes.iterator
     val pluginsToLoad = ClassFinder concreteSubclasses (PluginClassName, classMap)
 
-    val loader = new URLClassLoader(pluginJars map { f => new URL(s"file:${f.getAbsolutePath}") }, ClassLoader.getSystemClassLoader)
+    val loader = new URLClassLoader(pluginJars.toArray map { f => new URL(s"file:${f.toString()}") }, ClassLoader.getSystemClassLoader)
 
     pluginsToLoad.map(_.name).foreach { pluginClassName =>
       val plugin = loader.loadClass(pluginClassName).newInstance().asInstanceOf[Plugin]
