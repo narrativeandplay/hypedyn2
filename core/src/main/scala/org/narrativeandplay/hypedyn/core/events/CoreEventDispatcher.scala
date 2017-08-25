@@ -134,7 +134,7 @@ object CoreEventDispatcher {
 
   EventBus.ExportRequests foreach { _ => EventBus.send(ExportResponse(CoreEventSourceIdentity)) }
   EventBus.RunRequests foreach { _ =>
-    val tmpDir = File.newTemporaryDirectory("hypedyn2")
+    val tmpDir = File.newTemporaryDirectory("hypedyn2-")
     tmpDir.deleteOnExit()
 
     IoController.copyResourceToFilesystem("export/reader/", tmpDir)
