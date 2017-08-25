@@ -40,11 +40,11 @@ object IoController {
    *
    * @param resourceName The resource folder whose contents are to be copied; if a relative resource path is given,
    *                     it will be relative to org.narrativeandplay.hypedyn.core.serialisation
-   * @param directory The directory where the files are to be copied to, if the folder does not exist, it will be
-   *                  created
+   * @param destinationDir The directory where the files are to be copied to, if the folder does not exist, it will be
+   *                       created
    */
-  def copyResourceToFilesystem(resourceName: String, directory: File): Unit = {
-    directory.createIfNotExists(asDirectory = true, createParents = true)
+  def copyResourceToFilesystem(resourceName: String, destinationDir: File): Unit = {
+    destinationDir.createIfNotExists(asDirectory = true, createParents = true)
 
     val jarConnection = getClass.getResource(resourceName).openConnection().asInstanceOf[JarURLConnection]
     val jarFile = jarConnection.getJarFile
@@ -60,14 +60,14 @@ object IoController {
         entry match {
           case file if !entry.isDirectory =>
             val in = jarFile.getInputStream(entry)
-            directory.createChild(filename, createParents = true).outputStream foreach { output =>
+            destinationDir.createChild(filename, createParents = true).outputStream foreach { output =>
               in.pipeTo(output)
             }
 
             in.close()
 
           case dir =>
-            directory.createChild(filename, asDirectory = true, createParents = true)
+            destinationDir.createChild(filename, asDirectory = true, createParents = true)
         }
       }
     }
