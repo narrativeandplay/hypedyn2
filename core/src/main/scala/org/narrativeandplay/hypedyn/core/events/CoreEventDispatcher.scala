@@ -6,14 +6,15 @@ import better.files._
 
 import org.narrativeandplay.hypedyn.api.events._
 import org.narrativeandplay.hypedyn.api.logging.Logger
-import org.narrativeandplay.hypedyn.api.serialisation.{AstElement, AstMap}
+import org.narrativeandplay.hypedyn.api.serialisation.{AstElement, AstMap, DeserialisationException, Serialiser}
 import org.narrativeandplay.hypedyn.api.story.rules.Fact
 import org.narrativeandplay.hypedyn.api.undo.UndoableStream
+import org.narrativeandplay.hypedyn.api.serialisation.serialisers._
+import org.narrativeandplay.hypedyn.api.story.Narrative
 import org.narrativeandplay.hypedyn.core.plugins.PluginsController
-import org.narrativeandplay.hypedyn.core.serialisation.serialisers._
-import org.narrativeandplay.hypedyn.core.serialisation.{IoController, Serialiser}
+import org.narrativeandplay.hypedyn.core.serialisation.IoController
 import org.narrativeandplay.hypedyn.core.story.StoryController
-import org.narrativeandplay.hypedyn.core.story.internal.Story
+import org.narrativeandplay.hypedyn.core.story.InterfaceToImplementationConversions._
 import org.narrativeandplay.hypedyn.core.story.rules.{ActionDefinitions, ConditionDefinitions}
 import org.narrativeandplay.hypedyn.core.undo._
 
@@ -142,7 +143,7 @@ object CoreEventDispatcher {
     val storyData = Serialiser serialise StoryController.story
     val saveData = AstMap("story" -> storyData)
     // wrap the JSON in a .js file to allow to avoid cross origin request error running localling in Chrome
-    IoController.write("function getStoryData(){\nreturn" + (Serialiser toString saveData) + ";\n};", tmpDir.createChild("story.js"))
+    IoController.write("function getStoryData(){\nreturn" + (Serialiser render saveData) + ";\n};", tmpDir.createChild("story.js"))
 
     EventBus.send(RunResponse(tmpDir, "index.html", CoreEventSourceIdentity))
   }
@@ -157,7 +158,7 @@ object CoreEventDispatcher {
         val storyData = Serialiser serialise StoryController.story
         val saveData = AstMap("story" -> storyData, "plugins" -> pluginSaveDataAstMap)
 
-        IoController.write(Serialiser toString saveData, saveFileEvt.file)
+        IoController.write(Serialiser render saveData, saveFileEvt.file)
 
         loadedFile = Some(saveFileEvt.file)
 
@@ -171,7 +172,7 @@ object CoreEventDispatcher {
   EventBus.LoadFromFileEvents foreach { evt =>
     try {
       val dataToLoad = IoController read evt.file
-      val dataAst = Serialiser fromString dataToLoad match {
+      val dataAst = Serialiser parse dataToLoad match {
         case d: AstMap => d
         case e => throw DeserialisationException(s"Expected AstMap in deserialising story, received $e")
       }
@@ -181,7 +182,7 @@ object CoreEventDispatcher {
         case e => throw DeserialisationException(s"Expected AstMap in deserialising plugin data, received $e")
       }
 
-      val story = Serialiser.deserialise[Story](dataAst("story"))
+      val story = Serialiser.deserialise[Narrative](dataAst("story"))
       StoryController load story
 
       loadedFile = Some(evt.file)
@@ -208,7 +209,7 @@ object CoreEventDispatcher {
     // save current story to export directory
     val storyData = Serialiser serialise StoryController.story
     val saveData = AstMap("story" -> storyData)
-    IoController.write("function getStoryData(){\nreturn" + (Serialiser toString saveData) + ";\n};", exportDirectory.createChild("story.js"))
+    IoController.write("function getStoryData(){\nreturn" + (Serialiser render saveData) + ";\n};", exportDirectory.createChild("story.js"))
 
     // send completion (we're done!)
     EventBus.send(StoryExported(CoreEventSourceIdentity))

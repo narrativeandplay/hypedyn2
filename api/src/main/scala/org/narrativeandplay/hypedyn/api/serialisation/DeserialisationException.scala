@@ -1,4 +1,4 @@
-package org.narrativeandplay.hypedyn.core.serialisation.serialisers
+package org.narrativeandplay.hypedyn.api.serialisation
 
 /**
  * Exception class for deserialisation errors

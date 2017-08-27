@@ -2,9 +2,6 @@ dependencies {
     // For runtime plugin finding
     compile "org.clapper:classutil_%%:1.1.2"
 
-    // For serialisation to JSON (save/load/export)
-    compile "org.json4s:json4s-native_%%:3.5.3"
-
     compile "commons-io:commons-io:2.5"
 
     compile "org.gerweck.scalafx:scalafx-utils_%%:0.11.2"

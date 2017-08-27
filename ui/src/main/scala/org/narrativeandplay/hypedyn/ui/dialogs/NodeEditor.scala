@@ -3,7 +3,6 @@ package org.narrativeandplay.hypedyn.ui.dialogs
 import java.io.{DataInputStream, DataOutputStream}
 import java.util
 import java.util.function.BiConsumer
-import javafx.collections.ObservableList
 import javafx.{event => jfxe}
 import javafx.event.{EventHandler, ActionEvent => JfxActionEvent}
 import javafx.scene.control.{IndexRange => JfxIndexRange}
@@ -28,10 +27,11 @@ import scalafx.scene.control.Tab.sfxTab2jfx
 import org.fxmisc.richtext.model.{Codec, StyleSpan, StyledText}
 import org.fxmisc.richtext.StyledTextArea
 
+import org.narrativeandplay.hypedyn.api.serialisation.Serialiser
 import org.narrativeandplay.hypedyn.api.story.{Narrative, Nodal, NodeId}
 import org.narrativeandplay.hypedyn.ui.dialogs.NodeEditor.{LinkStyleInfo, NodeContentTextArea}
 import org.narrativeandplay.hypedyn.ui.events.UiEventDispatcher
-import org.narrativeandplay.hypedyn.api.story.NodalContent.{RulesetId, RulesetIndexes, TextIndex}
+import org.narrativeandplay.hypedyn.api.story.NodalContent.{RulesetId, RulesetIndexes, RulesetLike, TextIndex}
 import org.narrativeandplay.hypedyn.ui.story.UiNodeContent.UiRuleset
 import org.narrativeandplay.hypedyn.ui.story._
 import org.narrativeandplay.hypedyn.api.story.rules.ActionLocationType.{NodeAction, NodeContentAction}
@@ -41,6 +41,7 @@ import org.narrativeandplay.hypedyn.ui.components.RulesPane
 import org.narrativeandplay.hypedyn.ui.components.Sidebar.SidebarButton
 import org.narrativeandplay.hypedyn.ui.utils.CollapsibleSplitPane
 import org.narrativeandplay.hypedyn.api.utils.Scala2JavaFunctionConversions._
+import org.narrativeandplay.hypedyn.api.serialisation.serialisers._
 
 /**
  * Dialog for editing nodes
@@ -268,31 +269,27 @@ class NodeEditor private (dialogTitle: String,
     }
 
     styleCodec = new Codec[LinkStyleInfo] {
+      import Serialiser._
       override def getName: String = "link-style-info"
 
       override def encode(os: DataOutputStream, t: LinkStyleInfo): Unit = {
-        import org.narrativeandplay.hypedyn.core.serialisation.serialisers.RulesetSerialiser
-        import org.narrativeandplay.hypedyn.core.story.InterfaceToImplementationConversions.rulesetLike2Ruleset
-        import org.narrativeandplay.hypedyn.core.serialisation.serialisers.JsonSerialiser
-
         t.ruleset match {
           case Some(r) =>
             os.writeBoolean(true)
-            os.writeUTF(JsonSerialiser.serialise(RulesetSerialiser.serialise(r)))
+            os.writeUTF(render(serialise(r)))
           case None =>
             os.writeBoolean(false)
         }
       }
 
       override def decode(is: DataInputStream): LinkStyleInfo = {
-        import org.narrativeandplay.hypedyn.core.serialisation.serialisers.RulesetSerialiser
-        import org.narrativeandplay.hypedyn.core.serialisation.serialisers.JsonSerialiser
-
         is.readBoolean() match {
           case true =>
-            val ruleset = RulesetSerialiser.deserialise(JsonSerialiser.deserialise(is.readUTF()))
-            val copiedRules = ruleset.rules map (_.copy(id = RuleId(-1)))
-            val copiedRuleset = ruleset.copy(id = firstUnusedRulesetId, rules = copiedRules)
+            val ruleset: UiRuleset = deserialise[RulesetLike](parse(is.readUTF()))
+            val copiedRules = ruleset.rules map { r =>
+              new UiRule(RuleId(-1), r.name, r.stopIfTrue, r.conditionsOp, r.conditions, r.actions)
+            }
+            val copiedRuleset = new UiRuleset(firstUnusedRulesetId, ruleset.name, ruleset.indexes, copiedRules)
             firstUnusedRulesetId = firstUnusedRulesetId.dec
 
             new LinkStyleInfo(Some(copiedRuleset))
