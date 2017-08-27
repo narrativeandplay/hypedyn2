@@ -15,7 +15,7 @@ object Settings {
     _.toString()
   )
 
-  private val settings = loadConfig[Settings](System.SettingsFile.path) match {
+  private def settings = loadConfig[Settings](System.SettingsFile.path) match {
     case Left(errs) =>
       Logger.error("Error(s) occurred when attempting to read settings:")
       errs.toList foreach { err => Logger.error(err) }
