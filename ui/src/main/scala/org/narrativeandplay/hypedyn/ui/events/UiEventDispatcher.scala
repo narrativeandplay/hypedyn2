@@ -14,7 +14,7 @@ import org.narrativeandplay.hypedyn.ui.dialogs.NodeEditor
 import org.narrativeandplay.hypedyn.api.story.{Nodal, NodeId}
 import org.narrativeandplay.hypedyn.ui.components.FactViewer
 import org.narrativeandplay.hypedyn.ui.story.InterfaceToUiImplementation._
-import org.narrativeandplay.hypedyn.ui.utils.HypedynPreferences
+import org.narrativeandplay.hypedyn.ui.utils.Settings
 
 /**
  * Dispatcher for UI events
@@ -119,14 +119,14 @@ object UiEventDispatcher {
     openedNodeEditors foreach (_.story() = evt.story)
   }
   EventBus.FileSavedEvents foreach { evt =>
-    HypedynPreferences.recentFiles +:= evt.file
+    Settings.recentFiles +:= evt.file
     Main.refreshRecent.onNext(())
 
     Main.loadedFileName = evt.file.name
   }
   EventBus.FileLoadedEvents foreach { evt =>
     evt.fileOption foreach { f =>
-      HypedynPreferences.recentFiles +:= f
+      Settings.recentFiles +:= f
       Main.refreshRecent.onNext(())
     }
 

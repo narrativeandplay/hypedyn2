@@ -13,7 +13,7 @@ import org.narrativeandplay.hypedyn.ui.Main
 import org.narrativeandplay.hypedyn.ui.events.UiEventDispatcher
 import org.narrativeandplay.hypedyn.ui.keycombinations.KeyCombinations
 import org.narrativeandplay.hypedyn.api.logging.Logger
-import org.narrativeandplay.hypedyn.ui.utils.HypedynPreferences
+import org.narrativeandplay.hypedyn.ui.utils.Settings
 import org.narrativeandplay.hypedyn.api.utils.System
 
 /**
@@ -68,7 +68,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
   }
 
   private lazy val openRecentStory = new Menu("Open Recent") {
-    def makeMenuItems() = items = HypedynPreferences.recentFiles map { file =>
+    def makeMenuItems() = items = Settings.recentFiles map { file =>
       new MenuItem(file.name) {
         onAction = { _ =>
           UiEventDispatcher requestExit { loadStory =>

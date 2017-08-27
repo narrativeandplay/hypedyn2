@@ -7,6 +7,8 @@ dependencies {
 
     compile 'com.typesafe.akka:akka-http_%%:10.0.9'
 
+    compile "com.github.pureconfig:pureconfig_%%:0.8.0"
+
     compile project(':api')
     compile project(':core')
     compile project(':default-story-viewer')
