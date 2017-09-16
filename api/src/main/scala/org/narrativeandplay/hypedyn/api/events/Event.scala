@@ -2,12 +2,10 @@ package org.narrativeandplay.hypedyn.api.events
 
 import better.files.File
 
-import org.bitbucket.inkytonik.kiama.output.PrettyPrinter
-
 import org.narrativeandplay.hypedyn.api.serialisation.AstElement
-import org.narrativeandplay.hypedyn.api.story.NodalContent.RulesetId
 import org.narrativeandplay.hypedyn.api.story.rules._
-import org.narrativeandplay.hypedyn.api.story.{NodeId, Narrative, Nodal}
+import org.narrativeandplay.hypedyn.api.story.{Narrative, Nodal, NodeId}
+import org.narrativeandplay.hypedyn.api.utils.PrettyPrintable
 
 /**
  * A generic trait representing an event in the HypeDyn event system
@@ -25,44 +23,11 @@ import org.narrativeandplay.hypedyn.api.story.{NodeId, Narrative, Nodal}
  *
  *
  */
-sealed trait Event extends PrettyPrinter {
+sealed trait Event extends PrettyPrintable {
   /**
    * Returns the originator of the event
    */
   def src: String
-
-  override def any (a : Any) : Doc =
-    if (a == null)
-      "null"
-    else
-      a match {
-        case v : Vector[_] => list (v.toList, "Vector ", any)
-        case m : Map[_,_]  => list (m.toList, "Map ", any)
-        case Nil           => "Nil"
-        case l : List[_]   => list (l, "List ", any)
-        case (l, r)        => any (l) <+> "->" <+> any (r)
-        case Some(v)       => s"Some ($v)"
-        case None          => "None"
-        case NodeId(id)    => s"NodeId ($id)"
-        case FactId(id)    => s"FactId ($id)"
-        case RuleId(id)    => s"RuleId ($id)"
-        case RulesetId(id) => s"RulesetId ($id)"
-        case p : Product   =>
-          val fields = p.getClass.getDeclaredFields map (_.getName) zip p.productIterator.to
-          if (fields.length == 0) {
-            s"${p.productPrefix}"
-          } else {
-            list (fields.toList filter { case (fieldName, _) =>
-                    fieldName != "conditionDefinitions" &&  fieldName != "actionDefinitions"
-                  },
-                  s"${p.productPrefix} ",
-                  any)
-          }
-        case s : String    => dquotes (text (s))
-        case _             => value(a)
-      }
-
-  override val defaultIndent = 2
 
   override def toString: String = pretty(any(this)).layout
 }

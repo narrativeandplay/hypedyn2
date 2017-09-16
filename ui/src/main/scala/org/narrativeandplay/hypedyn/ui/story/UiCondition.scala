@@ -7,6 +7,7 @@ import scalafx.collections.ObservableMap
 import org.narrativeandplay.hypedyn.api.story.rules.Conditional
 import org.narrativeandplay.hypedyn.api.story.rules.Conditional.ConditionType
 import org.narrativeandplay.hypedyn.api.story.rules.RuleLike.{ParamName, ParamValue}
+import org.narrativeandplay.hypedyn.api.utils.PrettyPrintable
 
 /**
  * UI implementation for Conditional
@@ -14,7 +15,9 @@ import org.narrativeandplay.hypedyn.api.story.rules.RuleLike.{ParamName, ParamVa
  * @param initConditionType The initial condition type
  * @param initParams The initial paramters and their values
  */
-class UiCondition(initConditionType: ConditionType, initParams: Map[ParamName, ParamValue]) extends Conditional {
+class UiCondition(initConditionType: ConditionType, initParams: Map[ParamName, ParamValue])
+  extends Conditional
+  with PrettyPrintable {
   /**
    * Backing property for the condition type
    */
@@ -35,7 +38,11 @@ class UiCondition(initConditionType: ConditionType, initParams: Map[ParamName, P
    */
   override def params: Map[ParamName, ParamValue] = paramsProperty().toMap
 
-  override def toString: String = s"UiCondition($conditionType, $params)"
+  override def toString: String = {
+    val fields = List("conditionType" -> conditionType, "params" -> params)
+    val doc = list(fields, getClass.getSimpleName, any)
+    pretty(doc).layout
+  }
 }
 
 object UiCondition {

@@ -7,6 +7,7 @@ import scalafx.collections.ObservableBuffer
 import org.narrativeandplay.hypedyn.api.story.NodalContent
 import org.narrativeandplay.hypedyn.api.story.NodalContent.{RulesetIndexes, RulesetLike}
 import org.narrativeandplay.hypedyn.api.story.rules.RuleLike
+import org.narrativeandplay.hypedyn.api.utils.PrettyPrintable
 
 /**
  * UI implementation of NodalContent
@@ -14,7 +15,9 @@ import org.narrativeandplay.hypedyn.api.story.rules.RuleLike
  * @param initText The initial text of the node
  * @param initRulesets The initial list of text rules for the node
  */
-class UiNodeContent(initText: String, initRulesets: List[UiNodeContent.UiRuleset]) extends NodalContent {
+class UiNodeContent(initText: String, initRulesets: List[UiNodeContent.UiRuleset])
+  extends NodalContent
+  with PrettyPrintable {
   /**
    * Backing property for the node text
    */
@@ -36,14 +39,9 @@ class UiNodeContent(initText: String, initRulesets: List[UiNodeContent.UiRuleset
   override def rulesets: List[RulesetLike] = rulesetsProperty().toList
 
   override def toString: String = {
-    val rulesetsString = rulesets match {
-      case Nil => "Nil"
-      case _ => s"""List(
-                   |      ${rulesets map (_.toString) mkString ",\n        "})"""
-    }
-    s"""${getClass.getSimpleName} (
-       |    text = "$text",
-       |    rulesets = $rulesetsString""".stripMargin
+    val fields = List("text" -> text, "rulesets" -> rulesets)
+    val doc = list(fields, getClass.getSimpleName, any)
+    pretty(doc).layout
   }
 }
 
@@ -62,7 +60,7 @@ object UiNodeContent {
   class UiRuleset(val id: NodalContent.RulesetId,
                   initName: String,
                   initIndexes: RulesetIndexes,
-                  initRules: List[UiRule]) extends NodalContent.RulesetLike {
+                  initRules: List[UiRule]) extends NodalContent.RulesetLike with PrettyPrintable {
     /**
      * Backing property for the name
      */
@@ -103,16 +101,9 @@ object UiNodeContent {
     def canEqual(that: Any): Boolean = that.isInstanceOf[UiRuleset]
 
     override def toString: String = {
-      val rulesString = rules match {
-        case Nil => "Nil"
-        case _ => s"""List(
-                     |    ${rules map (_.toString) mkString ",\n        "})"""
-      }
-      s"""${getClass.getSimpleName}(
-         |      id = $id,
-         |      name = $name,
-         |      indexes = (${indexes.startIndex.index}, ${indexes.endIndex.index}),
-         |      rules = $rulesString""".stripMargin
+      val fields = List("id" -> id, "name" -> name, "indexes" -> indexes, "rules" -> rules)
+      val doc = list(fields, getClass.getSimpleName, any)
+      pretty(doc).layout
     }
   }
 }

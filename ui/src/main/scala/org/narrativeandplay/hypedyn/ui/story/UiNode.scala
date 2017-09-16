@@ -5,6 +5,7 @@ import scalafx.beans.property.{BooleanProperty, ObjectProperty, StringProperty}
 import scalafx.collections.ObservableBuffer
 
 import org.narrativeandplay.hypedyn.api.story.{Nodal, NodeId}
+import org.narrativeandplay.hypedyn.api.utils.PrettyPrintable
 
 /**
  * UI implementation for Nodal
@@ -18,7 +19,7 @@ class UiNode(val id: NodeId,
              initName: String,
              initContent: UiNodeContent,
              initIsStartNode: Boolean,
-             initRules: List[UiRule]) extends Nodal {
+             initRules: List[UiRule]) extends Nodal with PrettyPrintable {
   /**
    * Backing property for the name
    */
@@ -38,7 +39,7 @@ class UiNode(val id: NodeId,
    * Backing property for the list of rules
    */
   val rulesProperty = ObjectProperty(ObservableBuffer(initRules: _*))
-  
+
   /**
    * The name of the node
    */
@@ -60,17 +61,9 @@ class UiNode(val id: NodeId,
   override def isStartNode: Boolean = isStartNodeProperty()
 
   override def toString: String = {
-    val rulesString = rules match {
-      case Nil => "Nil"
-      case _ => s"""List(
-                   |    ${rules map (_.toString) mkString ",\n        "})"""
-    }
-    s"""UiNode(
-       |  id = $id,
-       |  name = $name,
-       |  content = $content,
-       |  isStartNode = $isStartNode,
-       |  rules = $rulesString""".stripMargin
+    val fields = List("id" -> id, "name" -> name, "content" -> content, "isStartNode" -> isStartNode, "rules" -> rules)
+    val doc = list(fields, getClass.getSimpleName, any)
+    pretty(doc).layout
   }
 
   def copy = new UiNode(id, name, content, isStartNode, rules)

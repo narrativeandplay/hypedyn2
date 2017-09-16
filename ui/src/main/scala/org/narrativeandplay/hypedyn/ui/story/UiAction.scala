@@ -7,6 +7,7 @@ import scalafx.collections.ObservableMap
 import org.narrativeandplay.hypedyn.api.story.rules.Actionable
 import org.narrativeandplay.hypedyn.api.story.rules.Actionable.ActionType
 import org.narrativeandplay.hypedyn.api.story.rules.RuleLike.{ParamName, ParamValue}
+import org.narrativeandplay.hypedyn.api.utils.PrettyPrintable
 
 /**
  * UI implementation for Actionable
@@ -14,7 +15,9 @@ import org.narrativeandplay.hypedyn.api.story.rules.RuleLike.{ParamName, ParamVa
  * @param initActionType The initial action type
  * @param initParams the initial parameters and their values
  */
-class UiAction(initActionType: ActionType, initParams: Map[ParamName, ParamValue]) extends Actionable {
+class UiAction(initActionType: ActionType, initParams: Map[ParamName, ParamValue])
+  extends Actionable
+  with PrettyPrintable {
   /**
    * Backing property for the action type
    */
@@ -35,5 +38,9 @@ class UiAction(initActionType: ActionType, initParams: Map[ParamName, ParamValue
    */
   override def params: Map[ParamName, ParamValue] = paramsProperty().toMap
 
-  override def toString: String = s"UiAction($actionType, $params)"
+  override def toString: String = {
+    val fields = List("actionType" -> actionType, "params" -> params)
+    val doc = list(fields, getClass.getSimpleName, any)
+    pretty(doc).layout
+  }
 }

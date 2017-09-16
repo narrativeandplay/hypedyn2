@@ -8,6 +8,7 @@ import org.narrativeandplay.hypedyn.api.story.Narrative
 import org.narrativeandplay.hypedyn.api.story.rules.Fact
 import org.narrativeandplay.hypedyn.api.story.Narrative.ReaderStyle
 import org.narrativeandplay.hypedyn.api.story.rules.Actionable.ActionType
+import org.narrativeandplay.hypedyn.api.utils.PrettyPrintable
 import org.narrativeandplay.hypedyn.core.story.rules.ActionDefinitions
 
 /**
@@ -21,7 +22,7 @@ import org.narrativeandplay.hypedyn.core.story.rules.ActionDefinitions
 class UiStory(initMetadata: UiStory.UiStoryMetadata,
               initFacts: List[Fact],
               initNodes: List[UiNode],
-              initRules: List[UiRule]) extends Narrative {
+              initRules: List[UiRule]) extends Narrative with PrettyPrintable {
   /**
    * Backing property for the metadata
    */
@@ -71,6 +72,12 @@ class UiStory(initMetadata: UiStory.UiStoryMetadata,
         ruleset.rulesProperty.exists( rule => rule.actions.map(_.actionType) contains ActionType(thisActionType))
     }
   }
+
+  override def toString: String = {
+    val fields = List("metadata" -> metadata, "facts" -> facts, "nodes" -> nodes, "rules" -> rules)
+    val doc = list(fields, getClass.getSimpleName, any)
+    pretty(doc).layout
+  }
 }
 
 object UiStory {
@@ -92,7 +99,7 @@ object UiStory {
                         initComments: String,
                         initReaderStyle: ReaderStyle,
                         initBackDisabled: Boolean,
-                        initRestartDisabled: Boolean) extends Narrative.Metadata {
+                        initRestartDisabled: Boolean) extends Narrative.Metadata with PrettyPrintable {
     /**
      * Backing property for the title
      */
@@ -163,14 +170,18 @@ object UiStory {
      */
     override def readerStyle: ReaderStyle = readerStyleProperty()
 
-    override def toString: String =
-      s"""${getClass.getSimpleName} (
-         |  title: "$title",
-         |  author: "$author",
-         |  description: "$description",
-         |  comments: "$comments",
-         |  readerStyle: $readerStyle,
-         |  backDisabled?: $isBackButtonDisabled,
-         |  restartDisabled: $isRestartButtonDisabled)""".stripMargin
+    override def toString: String = {
+      val fields = List(
+        "title" -> title,
+        "author" -> author,
+        "description" -> description,
+        "comments" -> comments,
+        "readerStyle" -> readerStyle,
+        "isBackButtonDisabled" -> isBackButtonDisabled,
+        "isRestartButtonDisabled" -> isRestartButtonDisabled
+      )
+      val doc = list(fields, getClass.getSimpleName, any)
+      pretty(doc).layout
+    }
   }
 }

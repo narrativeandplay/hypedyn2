@@ -5,6 +5,7 @@ import scalafx.beans.property.{BooleanProperty, ObjectProperty, StringProperty}
 import scalafx.collections.ObservableBuffer
 
 import org.narrativeandplay.hypedyn.api.story.rules.{BooleanOperator, RuleId, RuleLike}
+import org.narrativeandplay.hypedyn.api.utils.PrettyPrintable
 
 /**
  * UI implementation of RuleLike
@@ -21,7 +22,7 @@ class UiRule(val id: RuleId,
              initStopIfTrue: Boolean,
              initConditionsOp: BooleanOperator,
              initConditions: List[UiCondition],
-             initActions: List[UiAction]) extends RuleLike {
+             initActions: List[UiAction]) extends RuleLike with PrettyPrintable {
   /**
    * Backing property for the name
    */
@@ -72,5 +73,16 @@ class UiRule(val id: RuleId,
    */
   override def conditions: List[UiCondition] = conditionsProperty().toList
 
-  override def toString: String = s"UiRule($id, $name, $conditionsOp, $conditions, $actions)"
+  override def toString: String = {
+    val fields = List(
+      "id" -> id,
+      "name" -> name,
+      "stopIfTrue" -> stopIfTrue,
+      "conditionsOp" -> conditionsOp,
+      "conditions" -> conditions,
+      "actions" -> actions
+    )
+    val doc = list(fields, getClass.getSimpleName, any)
+    pretty(doc).layout
+  }
 }
