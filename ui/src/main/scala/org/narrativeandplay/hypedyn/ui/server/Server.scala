@@ -41,7 +41,11 @@ object Server {
   }
 
   def shutdown(): Unit = {
-    bindingFuture flatMap (_.unbind()) onComplete { _ => webserver.terminate() }
+    bindingFuture flatMap (_.unbind()) onComplete { _ =>
+      Logger.info(s"Shutting down server at $address...")
+      webserver.terminate()
+      Logger.info(s"Server at $address shutdown")
+    }
   }
 
   def storyPath = _storyPath

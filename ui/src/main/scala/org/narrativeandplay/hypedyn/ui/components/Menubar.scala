@@ -7,6 +7,7 @@ import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.beans.property.ReadOnlyBooleanProperty
 import scalafx.scene.control._
+
 import org.gerweck.scalafx.util._
 
 import org.narrativeandplay.hypedyn.ui.Main
@@ -15,6 +16,7 @@ import org.narrativeandplay.hypedyn.ui.keycombinations.KeyCombinations
 import org.narrativeandplay.hypedyn.api.logging.Logger
 import org.narrativeandplay.hypedyn.ui.utils.Settings
 import org.narrativeandplay.hypedyn.api.utils.System
+import org.narrativeandplay.hypedyn.ui.server.Server
 
 /**
  * Menu bar for the application
@@ -116,6 +118,7 @@ class Menubar(mainStageFocused: ReadOnlyBooleanProperty) extends MenuBar {
       UiEventDispatcher requestExit { exit =>
         if (exit) {
           Logger.info("Exiting HypeDyn 2 via menu item")
+          Platform.runLater(Server.shutdown())
           Platform.exit()
         }
         else {

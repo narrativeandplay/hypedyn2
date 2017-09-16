@@ -180,7 +180,7 @@ object Main extends JFXApp {
       UiEventDispatcher requestExit { exit =>
         if (exit) {
           Logger.info("Exiting HypeDyn 2 via main window close")
-          Server.shutdown()
+          Platform.runLater(Server.shutdown())
           Platform.exit()
         }
         else {
@@ -249,7 +249,7 @@ object Main extends JFXApp {
       UiEventDispatcher requestExit { exit =>
         if (exit) {
           Logger.info("Exiting HypeDyn 2 via Cmd-Q")
-          Server.shutdown()
+          Platform.runLater(Server.shutdown())
           Platform.exit()
         }
         else {
