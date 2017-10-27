@@ -28,7 +28,7 @@ object PluginsController {
    * Initialisation function to find and instantiate plugins
    */
   private def init(): Unit = {
-    val pluginJars = PluginFolder.glob("*.jar").toList
+    val pluginJars = if (PluginFolder.exists) PluginFolder.glob("*.jar").toList else Nil
     val classpath = ClassFinder.classpath ++ (pluginJars map (_.toJava))
     val finder = ClassFinder(classpath)
     val classes = finder.getClasses()
