@@ -17,7 +17,7 @@ include 'services:webservice'
 */
 
 rootProject.name = 'hypedyn2'
-include 'hypedyn-api'
-include 'hypedyn-core'
-include 'hypedyn-default-story-viewer'
-include 'hypedyn-ui'
+include 'api'
+include 'core'
+include 'default-story-viewer'
+include 'ui'

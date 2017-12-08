@@ -1,28 +1,39 @@
 plugins {
-    id "com.github.hierynomus.license" version "0.11.0"
-    id "com.github.ben-manes.versions" version "0.12.0"
+    id "com.github.hierynomus.license" version "0.14.0"
+    id "com.github.ben-manes.versions" version "0.15.0"
+    id "com.adtran.scala-multiversion-plugin" version "1.0.28" apply false
 }
 
 apply from: 'javafx.plugin'
 
 dependencies {
-    compile project(':hypedyn-ui')
+    compile project(':ui')
 }
 
 javafx {
     appName 'HypeDyn 2'
-    mainClass 'org.narrativeandplay.hypedyn.Main'
+    mainClass 'org.narrativeandplay.hypedyn.ui.Main'
 }
 
 version = "1.0"
 
-ext {
-    majorScalaVersion = "2.11"
-    minorScalaVersion = "7"
+// Ignore non-release versions when checking for dependency updates
+dependencyUpdates.resolutionStrategy = {
+    componentSelection { rules ->
+        rules.all { ComponentSelection selection ->
+            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
+            }
+        }
+    }
 }
 
 allprojects {
     apply plugin: 'scala'
+    apply plugin: "com.adtran.scala-multiversion-plugin"
 
     repositories {
         jcenter()
@@ -36,24 +47,27 @@ allprojects {
     sourceCompatibility = 1.8
 
     dependencies {
-        compile "org.scala-lang:scala-library:${rootProject.majorScalaVersion}.${rootProject.minorScalaVersion}"
+        compile "org.scala-lang:scala-library:%scala-version%"
 
         testCompile 'junit:junit:4.12'
-        testCompile "org.scalatest:scalatest_${rootProject.majorScalaVersion}:2.2.4"
-        testRuntime "org.scala-lang.modules:scala-xml_${rootProject.majorScalaVersion}:1.0.5"
+        testCompile "org.scalatest:scalatest_%%:3.0.4"
+        testRuntime "org.scala-lang.modules:scala-xml_%%:1.0.6"
     }
 
     tasks.withType(ScalaCompile) {
         scalaCompileOptions.with {
             additionalParameters = [
                     "-Xexperimental", // for Single Abstract Method conversion support without needing implicits
-                    "-Xlint:-nullary-unit,_",
+                    "-Xlint:-nullary-unit,-unused,_",
                     "-feature",
                     "-Xfatal-warnings",
                     "-deprecation",
-                    "-unchecked",
-                    "-Yinline-warnings"
+                    "-unchecked"
             ]
         }
     }
+}
+
+subprojects {
+    archivesBaseName = "hypedyn-${project.name}"
 }

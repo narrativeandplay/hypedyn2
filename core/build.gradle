@@ -1,0 +1,18 @@
+dependencies {
+    // For runtime plugin finding
+    compile "org.clapper:classutil_%%:1.1.2"
+
+    compile "commons-io:commons-io:2.5"
+
+    compile "org.gerweck.scalafx:scalafx-utils_%%:0.11.2"
+
+    compile project(':api')
+}
+
+sourceSets {
+    main {
+        resources {
+            exclude 'org/narrativeandplay/hypedyn/serialisation/export/dev' // exclude development resources
+        }
+    }
+}

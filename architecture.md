@@ -2,10 +2,10 @@
 
 HypeDyn is split into 4 modules:
 
-* `hypedyn-api` - contains the API that the other modules and plugins use to communicate
-* `hypedyn-core` - the backend of the system, handling things such as data structure management, serialisation, etc.
-* `hypedyn-ui` - contains the UI of the system, including the main entry point into the application
-* `hypedyn-default-story-viewer` - contains an implementation of the story viewer, for story visualisation
+* `api` - contains the API that the other modules and plugins use to communicate
+* `core` - the backend of the system, handling things such as data structure management, serialisation, etc.
+* `ui` - contains the UI of the system, including the main entry point into the application
+* `default-story-viewer` - contains an implementation of the story viewer, for story visualisation
 
 ## Overview
 

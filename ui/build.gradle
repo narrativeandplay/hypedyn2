@@ -1,0 +1,15 @@
+dependencies {
+    compile "org.scalafx:scalafx_%%:8.0.102-R11"
+    compile 'com.miglayout:miglayout-javafx:5.0'
+    compile 'org.fxmisc.richtext:richtextfx:0.7-M5'
+
+    compile "org.gerweck.scalafx:scalafx-utils_%%:0.11.2"
+
+    compile 'com.typesafe.akka:akka-http_%%:10.0.9'
+
+    compile "com.github.pureconfig:pureconfig_%%:0.8.0"
+
+    compile project(':api')
+    compile project(':core')
+    compile project(':default-story-viewer')
+}

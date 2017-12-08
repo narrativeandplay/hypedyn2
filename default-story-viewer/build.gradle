@@ -1,0 +1,6 @@
+dependencies {
+    compile "org.scalafx:scalafx_%%:8.0.102-R11"
+    compile "org.gerweck.scalafx:scalafx-utils_%%:0.11.2"
+
+    compile project(':api')
+}

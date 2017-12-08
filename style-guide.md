@@ -33,7 +33,7 @@ class MyClass {
 
 ### Acronyms
 
-Use camel case for acroynms, for example, `HttpUtil`. For consistency, this includes class names like `Ttl` and `Json` 
+Use camel case for acronyms, for example, `HttpUtil`. For consistency, this includes class names like `Ttl` and `Json`
 as well as common terms such as `Db` and `Io`. Follow normal camel-casing rules.
 
 ```scala
@@ -129,15 +129,15 @@ object. It is automatically imported for you, so it's redundant to manually
 Use `val` by default. `var`s should be limited to local variables or `private` class variables. Their usage
 should be well documented.
 
-`null`s are not allowed anywhere in `hypedyn-core` or `hypedyn-api`. These modules make it a point to be completely
+`null`s are not allowed anywhere in `core` or `api`. These modules make it a point to be completely
 type safe, and `null`s are a hole in the type system that violates this invariant.
  
-`null`s are to be used sparingly in `hypedyn-ui` and `hypedyn-default-story-viewer` when needed to interface with 
+`null`s are to be used sparingly in `ui` and `default-story-viewer` when needed to interface with
 Java code that requires a null for correct operation. When receiving potentially nullable values from Java code, 
 wrap it in an `Option` to make the nullability of the received value obvious.
 
-Do **not** return, or set a value to `null` unless it is absolutely required by the API, even in `hypedyn-ui` and 
-`hypedyn-default-story-viewer`.
+Do **not** return, or set a value to `null` unless it is absolutely required by the API, even in `ui` and
+`default-story-viewer`.
 
 `Any` should almost never be used or inferred for the type of any value. If there is a case where `Any` is returned,
 it must be explicitly noted, with an accompanying explanation for its use.
