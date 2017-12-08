@@ -95,7 +95,9 @@ object CoreEventDispatcher {
   EventBus.CreateFactEvents foreach { evt =>
     val created = StoryController.create(evt.fact)
 
-    UndoableStream.send(FactCreatedChange(created))
+    if (evt.src != UndoEventSourceIdentity) {
+      UndoableStream.send(FactCreatedChange(created))
+    }
 
     EventBus.send(FactCreated(created, CoreEventSourceIdentity))
     EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
@@ -104,7 +106,9 @@ object CoreEventDispatcher {
     val updatedUnupdatedPair = StoryController.update(evt.fact, evt.updatedFact)
 
     updatedUnupdatedPair foreach { case (unupdated, updated) =>
-      UndoableStream.send(FactUpdatedChange(unupdated, updated))
+      if (evt.src != UndoEventSourceIdentity) {
+        UndoableStream.send(FactUpdatedChange(unupdated, updated))
+      }
 
       EventBus.send(FactUpdated(unupdated, updated, CoreEventSourceIdentity))
       EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))
@@ -114,7 +118,9 @@ object CoreEventDispatcher {
     val destroyed = StoryController.destroy(evt.fact)
 
     destroyed foreach { f =>
-      UndoableStream.send(FactDestroyedChange(f))
+      if (evt.src != UndoEventSourceIdentity) {
+        UndoableStream.send(FactDestroyedChange(f))
+      }
 
       EventBus.send(FactDestroyed(f, CoreEventSourceIdentity))
       EventBus.send(StoryUpdated(StoryController.story, CoreEventSourceIdentity))

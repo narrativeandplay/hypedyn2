@@ -1,7 +1,7 @@
 package org.narrativeandplay.hypedyn.core.undo
 
 import org.narrativeandplay.hypedyn.api.story.rules.Fact
-import org.narrativeandplay.hypedyn.api.undo.Undoable
+import org.narrativeandplay.hypedyn.api.undo.{Undoable, UndoableStream}
 import org.narrativeandplay.hypedyn.core.events.UndoEventDispatcher
 
 /**
@@ -19,5 +19,8 @@ sealed case class FactUpdatedChange(notUpdatedFact: Fact, updatedFact: Fact) ext
   /**
    * Defines how to reverse an undo action
    */
-  override def redo(): Unit = UndoEventDispatcher.updateFact(notUpdatedFact, updatedFact)
+  override def redo(): Unit = {
+    UndoEventDispatcher.updateFact(notUpdatedFact, updatedFact)
+    UndoableStream.send(this)
+  }
 }

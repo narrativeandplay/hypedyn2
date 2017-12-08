@@ -1,7 +1,7 @@
 package org.narrativeandplay.hypedyn.core.undo
 
 import org.narrativeandplay.hypedyn.api.story.rules.Fact
-import org.narrativeandplay.hypedyn.api.undo.Undoable
+import org.narrativeandplay.hypedyn.api.undo.{Undoable, UndoableStream}
 import org.narrativeandplay.hypedyn.core.events.UndoEventDispatcher
 
 sealed abstract class FactChange(changedFact: Fact, f: Fact => Unit) extends Undoable {
@@ -13,7 +13,10 @@ sealed abstract class FactChange(changedFact: Fact, f: Fact => Unit) extends Und
   /**
    * Defines how to reverse an undo action
    */
-  override def redo(): Unit = f(changedFact)
+  override def redo(): Unit = {
+    f(changedFact)
+    UndoableStream.send(this)
+  }
 }
 
 sealed case class FactCreatedChange(createdFact: Fact)
