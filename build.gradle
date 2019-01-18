@@ -14,7 +14,7 @@ javafx {
     mainClass 'org.narrativeandplay.hypedyn.Main'
 }
 
-version = "1.0"
+version = "1.0.1"
 
 ext {
     majorScalaVersion = "2.11"
