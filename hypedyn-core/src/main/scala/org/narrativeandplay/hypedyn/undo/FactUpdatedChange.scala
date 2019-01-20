@@ -18,5 +18,8 @@ sealed case class FactUpdatedChange(notUpdatedFact: Fact, updatedFact: Fact) ext
   /**
    * Defines how to reverse an undo action
    */
-  override def redo(): Unit = UndoEventDispatcher.updateFact(notUpdatedFact, updatedFact)
+  override def redo(): Unit = {
+    UndoEventDispatcher.updateFact(notUpdatedFact, updatedFact)
+    UndoableStream.send(this)
+  }
 }

@@ -12,7 +12,10 @@ sealed abstract class FactChange(changedFact: Fact, f: Fact => Unit) extends Und
   /**
    * Defines how to reverse an undo action
    */
-  override def redo(): Unit = f(changedFact)
+  override def redo(): Unit = {
+    f(changedFact)
+    UndoableStream.send(this)
+  }
 }
 
 sealed case class FactCreatedChange(createdFact: Fact)
