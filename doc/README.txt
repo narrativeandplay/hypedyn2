@@ -1,14 +1,15 @@
-HypeDyn 2 version 1.0
+HypeDyn 2 version 1.0.1
 
 Installing HypeDyn 2
 
-MacOS: To install HypeDyn, unzip the HypeDyn 2-1.0-MacOS.zip folder, and copy the entire folder to your Applications folder.
-Windows: To install HypeDyn, unzip the HypeDyn 2-1.0-Windows.zip folder, and copy the entire folder to somewhere safe, such as C:\Users\yourname\Documents, where "yourname" is your username. Always keep all the files in this folder together. 
+MacOS: To install HypeDyn, unzip the HypeDyn 2-1.0.1-MacOS.zip folder, and copy the entire folder to your Applications folder.
+
+Windows: To install HypeDyn, unzip the HypeDyn 2-1.0.1-Windows.zip folder, and copy the entire folder to somewhere safe, such as C:\Users\yourname\Documents, where "yourname" is your username. Always keep all the files in this folder together.
 
 Running HypeDyn 2
 
-Windows: To run HypeDyn, double-click on HypeDyn 2-1.0-Windows\HypeDyn 2\HypeDyn.exe.
-MacOS: To run HypeDyn, double-click on HypeDyn 2-1.0-MacOS\HypeDyn.app.
+Windows: To run HypeDyn, double-click on HypeDyn 2-1.0.1-Windows\HypeDyn 2\HypeDyn.exe.
+MacOS: To run HypeDyn, double-click on HypeDyn 2-1.0.1-MacOS\HypeDyn.app.
 
 Tutorials and examples
 
