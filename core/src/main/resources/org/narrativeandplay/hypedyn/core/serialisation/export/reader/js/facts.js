@@ -93,7 +93,7 @@ function setNumberFact( id, mode, args ) {
 					break;
 			}
 			if ( operator != "/")
-				setFact( id, eval( operand1_val.toString() + operator + operand2_val.toString() ) );
+				setFact( id, eval( operand1_val.toString() + ((operator==="x") ? "*" : operator) + operand2_val.toString() ) );
 			else
 				// we want a c style / on integer where we only give the quotient instead of a decimal
 				setFact( id, eval( "quotient( " + operand1_val.toString() + ", " + operand2_val.toString() + ")" ) );
