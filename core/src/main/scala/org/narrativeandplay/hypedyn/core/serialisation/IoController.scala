@@ -38,15 +38,15 @@ object IoController {
    *
    * Adapted from http://stackoverflow.com/a/2993908
    *
-   * @param resourceName The resource folder whose contents are to be copied; if a relative resource path is given,
+   * @param resourceFolder The resource folder whose contents are to be copied; if a relative resource path is given,
    *                     it will be relative to org.narrativeandplay.hypedyn.core.serialisation
    * @param destinationDir The directory where the files are to be copied to, if the folder does not exist, it will be
    *                       created
    */
-  def copyResourceToFilesystem(resourceName: String, destinationDir: File): Unit = {
+  def copyResourceFolderToFilesystem(resourceFolder: String, destinationDir: File): Unit = {
     destinationDir.createIfNotExists(asDirectory = true, createParents = true)
 
-    val jarConnection = getClass.getResource(resourceName).openConnection().asInstanceOf[JarURLConnection]
+    val jarConnection = getClass.getResource(resourceFolder).openConnection().asInstanceOf[JarURLConnection]
     val jarFile = jarConnection.getJarFile
 
     if (!jarConnection.getJarEntry.isDirectory)
@@ -70,6 +70,40 @@ object IoController {
             destinationDir.createChild(filename, asDirectory = true, createParents = true)
         }
       }
+    }
+  }
+
+  /**
+   * Copies a resource from inside the classpath to the filesystem
+   *
+   * Adapted from http://stackoverflow.com/a/2993908
+   *
+   * @param resource The resource to be copied; if a relative resource path is given,
+   *                 it will be relative to org.narrativeandplay.hypedyn.core.serialisation
+   * @param destination The destination where the file is to be copied to; if it ends with a '/' it is treated as a
+   *                    folder, the copied file will retain the name of the resource, otherwise, it will be given the
+   *                    filename
+   */
+  def copyResourceToFilesystem(resource: String, destination: File): Unit = {
+    val isDir = destination.name.endsWith("/")
+    if (isDir) { // The destination is a folder
+      destination.createIfNotExists(true, true)
+    }
+    else {
+      destination.createIfNotExists(createParents = true)
+    }
+
+    val jarConnection = getClass.getResource(resource).openConnection().asInstanceOf[JarURLConnection]
+    val jarFile = jarConnection.getJarFile
+
+    if (jarConnection.getJarEntry.isDirectory)
+      throw new IllegalArgumentException("Resource to be copied must not be a directory")
+
+    val file = if (isDir) destination / resource.split("/").last else destination
+
+    val in = getClass.getResourceAsStream(resource)
+    file.outputStream foreach { output =>
+      in.pipeTo(output)
     }
   }
 }
