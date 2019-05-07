@@ -15,7 +15,7 @@ javafx {
     mainClass 'org.narrativeandplay.hypedyn.ui.Main'
 }
 
-version = "1.0.1"
+version = "1.0.2"
 
 // Ignore non-release versions when checking for dependency updates
 dependencyUpdates.resolutionStrategy = {

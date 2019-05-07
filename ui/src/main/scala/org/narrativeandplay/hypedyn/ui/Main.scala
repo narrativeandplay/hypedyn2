@@ -154,7 +154,7 @@ object Main extends JFXApp {
     graphic = new ImageView(icon)
     contentText =
       """Hypertext Fiction Editor
-        |Version 1.0.1
+        |Version 1.0.2
       """.stripMargin
   }
 
