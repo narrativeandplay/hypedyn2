@@ -85,94 +85,99 @@ function createActions(rulesetID, ruleID, actions, isNodeRules) {
 
 		// createAction(eventType, parentRuleID, func, args, id)
 		// eventType can be "enteredNode" "clickedLink" "anywhereCheck" "disabledAnywhereCheck"
-		switch (actionType) {
-			case "LinkTo":
-				createAction("clickedLink", ruleID, gotoNode, [thisAction.params.node.value], l);
-				break;
-			case "ShowPopupNode":
-				createAction("clickedLink", ruleID, popup, [thisAction.params.node.value], l);
-				break;
-			case "UpdateText":
-				switch(thisAction.params.text.value) {
-					case "textInput":
-						//createAction("enteredNode", 63, replaceText, [62, "alternative text", "\"I'm not supposed to talk to strangers,\""], 98);
-						createAction("enteredNode", ruleID, replaceText, [rulesetID, "alternative text", thisAction.params.textInput.value], l);
-						break;
-					case "stringFactValue":
-						//createAction("enteredNode", 63, replaceText, [62, "text fact", 99], 101);
-						createAction("enteredNode", ruleID, replaceText, [rulesetID, "text fact", thisAction.params.stringFactValue.value], l);
-						break;
-					case "NumberFactValue":
-						//createAction("enteredNode", 4, replaceText, [3, "number fact", 2], 5);
-						createAction("enteredNode", ruleID, replaceText, [rulesetID, "number fact", thisAction.params.NumberFactValue.value], l);
-						break;
-				}
-				break;
-			case "UpdateBooleanFact":
-				//createAction("clickedLink", 4, setFact, [2, true], 5);
-				createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setFact,
-					[thisAction.params.fact.value, thisAction.params.value.value == "true"], l);
-				break;
-			case "UpdateStringFact":
-				//createAction("clickedLink", 8, setFact, [6, "[the fact text...........]"], 9);
-				createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setFact,
-					[thisAction.params.fact.value, thisAction.params.value.value], l);
-				break;
-			case "UpdateIntegerFacts": // + - x / %
-				switch (thisAction.params.updateValue.value) {
-					case "inputValue":
-						//createAction("clickedLink", 5, setNumberFact, [3, "Input", [10]], 6);
-						createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setNumberFact,
-							[thisAction.params.fact.value, "Input", [thisAction.params.inputValue.value]], l);
-						break;
-					case "integerFactValue":
-						//createAction("clickedLink", 5, setNumberFact, [3, "Fact", [4]], 7);
-						createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setNumberFact,
-							[thisAction.params.fact.value, "Fact", [thisAction.params.integerFactValue.value]], l);
-						break;
-					case "computation":
-						var operandtype1=thisAction.params.operand1.value;
-						var operand1=thisAction.params[operandtype1].value;
-						var operandtype2=thisAction.params.operand2.value;
-						var operand2=thisAction.params[operandtype2].value;
+		try {
+			switch (actionType) {
+				case "LinkTo":
+					createAction("clickedLink", ruleID, gotoNode, [thisAction.params.node.value], l);
+					break;
+				case "ShowPopupNode":
+					createAction("clickedLink", ruleID, popup, [thisAction.params.node.value], l);
+					break;
+				case "UpdateText":
+					switch (thisAction.params.text.value) {
+						case "textInput":
+							//createAction("enteredNode", 63, replaceText, [62, "alternative text", "\"I'm not supposed to talk to strangers,\""], 98);
+							createAction("enteredNode", ruleID, replaceText, [rulesetID, "alternative text", thisAction.params.textInput.value], l);
+							break;
+						case "stringFactValue":
+							//createAction("enteredNode", 63, replaceText, [62, "text fact", 99], 101);
+							createAction("enteredNode", ruleID, replaceText, [rulesetID, "text fact", thisAction.params.stringFactValue.value], l);
+							break;
+						case "NumberFactValue":
+							//createAction("enteredNode", 4, replaceText, [3, "number fact", 2], 5);
+							createAction("enteredNode", ruleID, replaceText, [rulesetID, "number fact", thisAction.params.NumberFactValue.value], l);
+							break;
+					}
+					break;
+				case "UpdateBooleanFact":
+					//createAction("clickedLink", 4, setFact, [2, true], 5);
+					createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setFact,
+						[thisAction.params.fact.value, thisAction.params.value.value == "true"], l);
+					break;
+				case "UpdateStringFact":
+					//createAction("clickedLink", 8, setFact, [6, "[the fact text...........]"], 9);
+					createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setFact,
+						[thisAction.params.fact.value, thisAction.params.value.value], l);
+					break;
+				case "UpdateIntegerFacts": // + - x / %
+					switch (thisAction.params.updateValue.value) {
+						case "inputValue":
+							//createAction("clickedLink", 5, setNumberFact, [3, "Input", [10]], 6);
+							createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setNumberFact,
+								[thisAction.params.fact.value, "Input", [thisAction.params.inputValue.value]], l);
+							break;
+						case "integerFactValue":
+							//createAction("clickedLink", 5, setNumberFact, [3, "Fact", [4]], 7);
+							createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setNumberFact,
+								[thisAction.params.fact.value, "Fact", [thisAction.params.integerFactValue.value]], l);
+							break;
+						case "computation":
+							var operandtype1 = thisAction.params.operand1.value;
+							var operand1 = thisAction.params[operandtype1].value;
+							var operandtype2 = thisAction.params.operand2.value;
+							var operand2 = thisAction.params[operandtype2].value;
 
-						//createAction("clickedLink", 5, setNumberFact, [3, "Math", ["+", 3, "Fact", 4, "Fact"]], 10);
-						createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setNumberFact,
-							[thisAction.params.fact.value, "Math",
-								[thisAction.params.operator.value,
-									operand1, operandtype1 == "userOperand1" ? "Input" : "Fact",
-									operand2, operandtype2 == "userOperand2" ? "Input" : "Fact"]],
-							l);
-						break;
-					case "randomValue":
-						var operandtype1=thisAction.params.start.value;
-						var operand1=thisAction.params[operandtype1].value;
-						var operandtype2=thisAction.params.end.value;
-						var operand2=thisAction.params[operandtype2].value;
+							//createAction("clickedLink", 5, setNumberFact, [3, "Math", ["+", 3, "Fact", 4, "Fact"]], 10);
+							createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setNumberFact,
+								[thisAction.params.fact.value, "Math",
+									[thisAction.params.operator.value,
+										operand1, operandtype1 == "userOperand1" ? "Input" : "Fact",
+										operand2, operandtype2 == "userOperand2" ? "Input" : "Fact"]],
+								l);
+							break;
+						case "randomValue":
+							var operandtype1 = thisAction.params.start.value;
+							var operand1 = thisAction.params[operandtype1].value;
+							var operandtype2 = thisAction.params.end.value;
+							var operand2 = thisAction.params[operandtype2].value;
 
-						//createAction("clickedLink", 5, setNumberFact, [3, "Random", [1, "Input", 4, "Fact"]], 11);
-						createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setNumberFact,
-							[thisAction.params.fact.value, "Random",
-								[operand1, operandtype1 == "startInput" ? "Input" : "Fact",
-									operand2, operandtype2 == "endInput" ? "Input" : "Fact"]],
-							l);
-						break;
-				}
-				break;
-			case "EnableAnywhereLinkToHere":
-				// hack to set anywhere flag in the node
-				var node = nodelist[rulesetID];
-				if(node!=null) {
-					node.anywhere=true;
-				}
+							//createAction("clickedLink", 5, setNumberFact, [3, "Random", [1, "Input", 4, "Fact"]], 11);
+							createAction(isNodeRules ? "enteredNode" : "clickedLink", ruleID, setNumberFact,
+								[thisAction.params.fact.value, "Random",
+									[operand1, operandtype1 == "startInput" ? "Input" : "Fact",
+										operand2, operandtype2 == "endInput" ? "Input" : "Fact"]],
+								l);
+							break;
+					}
+					break;
+				case "EnableAnywhereLinkToHere":
+					// hack to set anywhere flag in the node
+					var node = nodelist[rulesetID];
+					if (node != null) {
+						node.anywhere = true;
+					}
 
-				//createAction("anywhereCheck", 67, addAnywhereLink, [66], 68);
-				createAction("anywhereCheck", ruleID, addAnywhereLink, [rulesetID], l);
-				break;
-			case "ShowDisabledAnywhereLink":
-				//createAction("disabledAnywhereCheck", 2, addInactiveAnywhereLink, [1], 3);
-				createAction("disabledAnywhereCheck", ruleID, addInactiveAnywhereLink, [rulesetID], l);
-				break;
+					//createAction("anywhereCheck", 67, addAnywhereLink, [66], 68);
+					createAction("anywhereCheck", ruleID, addAnywhereLink, [rulesetID], l);
+					break;
+				case "ShowDisabledAnywhereLink":
+					//createAction("disabledAnywhereCheck", 2, addInactiveAnywhereLink, [1], 3);
+					createAction("disabledAnywhereCheck", ruleID, addInactiveAnywhereLink, [rulesetID], l);
+					break;
+			}
+		}
+		catch(err) {
+			throw(actionType);
 		}
 	}
 }
@@ -196,12 +201,22 @@ function createRules(rulesetID, rulesetType, rules, isNodeRules) {
 
 		// create conditions
 		if(conditions!=null) {
-			createConditions(rulesetID, ruleID, conditions);
+			try {
+				createConditions(rulesetID, ruleID, conditions);
+			}
+			catch(e) {
+				throw("rule \""+ ruleName + "\".\n\nBlank entries in condition.");
+			}
 		}
 
 		// create actions
 		if(actions!=null) {
-			createActions(rulesetID, ruleID, actions, isNodeRules);
+			try {
+				createActions(rulesetID, ruleID, actions, isNodeRules);
+			}
+			catch(e) {
+				throw("rule \""+ ruleName + "\".\n\nBlank entries in action.");
+			}
 		}
 	}
 }
@@ -268,14 +283,24 @@ function loadStory() {
 
 					// now create rules (if any)
 					if (rules != null) {
-						createRules(rulesetID, "link", rules, false);
+						try{
+							createRules(rulesetID, "link", rules, false);
+						}
+						catch(err) {
+							alert("Error in fragment rule for node \""+name+"\", fragment \""+rulesetName+", "+err);
+						}
 					}
 				}
 			}
 
 			// now create the node rules (if any)
 			if (nodeRules != null) {
-				createRules(id, "node", nodeRules, true);
+				try {
+					createRules(id, "node", nodeRules, true);
+				}
+				catch(err) {
+					alert("Error in node rule for node \""+name+"\", "+err);
+				}
 			}
 
 			// set start node if necessary
