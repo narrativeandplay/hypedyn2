@@ -1,0 +1,159 @@
+/* in text links (not followed) */
+a.intextlink:link {
+	text-decoration: underline; 
+	color: blue;
+	/* background-color:#B2FF99; */
+	font-size: 26px;
+}
+/* in text links (followed): note that link is generated so the usual followed state doesn't work */
+a.intextlink-followed:link {
+	text-decoration: underline;
+	color: purple;
+	/* background-color:#FFFF85; */
+	font-size: 26px;
+}
+/* in text links: hover and active (same for followed and not followed) */
+a.intextlink:hover,a.intextlink-followed:hover {
+	text-decoration: overline;
+	color: salmon;
+	/* background-color:#FF704D; */
+	font-size: 26px;
+}
+a.intextlink:active,a.intextlink-followed:active {
+	text-decoration: none;
+	color: salmon;
+	background-color: gold;
+	font-size: 26px;
+}
+
+/* anywhere links */
+a.anywhere:link {
+	text-decoration: underline; 
+	color: blue;
+	/* background-color:#B2FF99; */
+	font-size: 26px;
+}
+a.anywhere:visited {
+	text-decoration: underline;
+	color: purple;
+	/* background-color:#FFFF85; */
+	font-size: 26px;
+}
+a.anywhere:hover {
+	text-decoration: overline;
+	color: chartreuse;/* green; */
+	/* background-color:#FF704D; */
+	font-size: 26px;
+}
+a.anywhere:active {
+	text-decoration: none;
+	color: green;
+	background-color: chartreuse;
+	font-size: 26px;
+}
+
+/* unformatted text */
+.plaintext {
+	color: navy;
+	font-size: 26px;
+}
+
+/* dormant link (might be activated next time to be clickable)*/
+.dormant_visited{
+	color: navy;
+	font-size: 26px;
+}
+
+.dormant_not_visited{
+	color: navy;
+	font-size: 26px;
+	font-weight: bold;
+}
+.dormant_visited{
+	color: navy;
+	font-size: 26px;
+}
+
+body {
+	/* background-image: url(page_back_320_480.png); */
+	background-color: aliceblue;
+	background-size: 100%;
+}
+
+.pageflip {
+	background-image: url(page_back_btm_320_480.png);
+}
+
+/* applied to the sections in 'pages' */
+.pagesdiv {
+	position: absolute;
+	overflow: hidden;
+	white-space: pre-wrap; /* preserve sequence of white space and wrap the text */
+	
+	padding: 0px;
+	left: 0px;
+	top: 50px;
+}
+
+/* makes sure the div in the page do not scale with parent section (ie keep constant width) used to be #pages div*/
+.pagecontent {
+	padding: 20px;
+}
+
+/* pages
+		page(div)
+			pagecontent (div)
+*/
+
+#buttons-panel {
+	position: absolute;
+	height: 50px;
+	left: 0px;
+	top: 0px;
+}
+
+#page-indicate-canvas {
+	position: absolute;
+}
+
+#pageflip-canvas {
+	position: absolute;
+	z-Index: -101;
+	opacity: 1.0;
+	top: 0px;
+	left: 0px;
+}
+
+#popup {
+	position: relative;
+	/* width: 260px; */
+	z-Index: -104;
+	opacity: 1.0;
+	overflow: scroll;
+	border-radius: 15px;
+
+	top: 15px;
+	left: 15px;
+	
+	padding-right: 15px;
+}
+
+#outer-popup {
+	position: fixed;
+	/* width: 290px; */
+	z-Index: -104;
+	border-radius: 15px;
+	
+	top: 50px;
+	left: 30px;
+}
+
+#lightsoff-canvas {
+	position: fixed;
+	height: 480px;
+	z-Index: -102;
+	opacity: 1.0;
+	color: black;
+	top: 0px;
+	left: 0px;
+}

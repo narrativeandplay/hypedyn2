@@ -144,7 +144,19 @@ object CoreEventDispatcher {
     val tmpDir = File.newTemporaryDirectory("hypedyn2-")
     tmpDir.deleteOnExit()
 
-    IoController.copyResourceToFilesystem("export/reader/", tmpDir)
+    IoController.copyResourceFolderToFilesystem("export/reader/", tmpDir)
+    StoryController.story.metadata.readerStyle match {
+      case Narrative.ReaderStyle.Standard =>
+        IoController.copyResourceToFilesystem("export/css/standard.css", tmpDir / "css" / "styling.css")
+
+      case Narrative.ReaderStyle.Fancy =>
+        IoController.copyResourceToFilesystem("export/css/fancy.css", tmpDir / "css" / "styling.css")
+
+      case Narrative.ReaderStyle.Custom(cssFile) =>
+        val inputFileData = IoController.read(File(cssFile))
+
+        IoController.write(inputFileData, tmpDir / "css" / "styling.css")
+    }
 
     val storyData = Serialiser serialise StoryController.story
     val saveData = AstMap("story" -> storyData)
@@ -210,7 +222,19 @@ object CoreEventDispatcher {
   EventBus.ExportToFileEvents foreach { evt =>
     val exportDirectory = evt.dir.createChild(evt.filename.stripSuffix(".dyn2") + "-export", asDirectory = true)
 
-    IoController.copyResourceToFilesystem("export/reader/", exportDirectory)
+    IoController.copyResourceFolderToFilesystem("export/reader/", exportDirectory)
+    StoryController.story.metadata.readerStyle match {
+      case Narrative.ReaderStyle.Standard =>
+        IoController.copyResourceToFilesystem("export/css/standard.css", exportDirectory / "css" / "styling.css")
+
+      case Narrative.ReaderStyle.Fancy =>
+        IoController.copyResourceToFilesystem("export/css/fancy.css", exportDirectory / "css" / "styling.css")
+
+      case Narrative.ReaderStyle.Custom(cssFile) =>
+        val inputFileData = IoController.read(File(cssFile))
+
+        IoController.write(inputFileData, exportDirectory / "css" / "styling.css")
+    }
 
     // save current story to export directory
     val storyData = Serialiser serialise StoryController.story

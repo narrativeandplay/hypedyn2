@@ -1,6 +1,6 @@
 /* in text links (not followed) */
 a.intextlink:link {
-	text-decoration: underline; 
+	text-decoration: underline;
 	color: black;
 	/* background-color:#B2FF99; */
 	font-size: 18px;
@@ -8,7 +8,7 @@ a.intextlink:link {
 }
 /* in text links (followed): note that link is generated so the usual followed state doesn't work */
 a.intextlink-followed:link {
-	text-decoration: underline; 
+	text-decoration: underline;
 	color: black;
 	/* background-color:#B2FF99; */
 	font-size: 18px;
@@ -30,7 +30,7 @@ a.intextlink:active,a.intextlink-followed:active {
 
 /* anywhere links */
 a.anywhere:link {
-	text-decoration: underline; 
+	text-decoration: underline;
 	color: black;
 	/* background-color:#B2FF99; */
 	font-size: 18px;
@@ -81,7 +81,7 @@ body {
 }
 
 .pageflip {
-	background-image: url(../images/page_back_btm_320_480.png);
+	background-image: url(../reader/images/page_back_btm_320_480.png);
 }
 
 /* applied to the sections in 'pages' */
@@ -89,7 +89,7 @@ body {
 	position: absolute;
 	overflow: hidden;
 	white-space: pre-wrap; /* preserve sequence of white space and wrap the text */
-	
+
 	padding: 0px;
 	left: 0px;
 	top: 30px;
@@ -109,9 +109,9 @@ body {
 	background-color: #EEEEEE;
 	opacity: 1.0;
 	/* maintain position when content scrolls */
-	position: fixed; 
+	position: fixed;
     /* keep the button-panel in front of the text */
-    z-Index: 10; 
+    z-Index: 10;
 	height: 27px;
 	left: 0px;
 	right: 0px;
@@ -142,7 +142,7 @@ body {
 
 	top: 15px;
 	left: 15px;
-	
+
 	padding-right: 15px;
 }
 
@@ -151,7 +151,7 @@ body {
 	/* width: 290px; */
 	z-Index: -104;
 	border-radius: 15px;
-	
+
 	top: 50px;
 	left: 30px;
 }
